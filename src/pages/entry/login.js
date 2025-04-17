@@ -12,17 +12,21 @@ import {
   Checkbox,
 } from "antd";
 import "./styles.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const { Text, Title } = Typography;
 
 export const Login = () => {
-
+  const navigate = useNavigate();
   const CardTitle = (
     <Title level={3} className="title">
       Sign in your account
     </Title>
   );
+
+  function LoginButton(){
+  navigate("/main");
+  }
 
   return (
     <AntdLayout className="layout">
@@ -79,7 +83,7 @@ export const Login = () => {
                     Forgot password?
                   </Link>
                 </div>
-                <Button type="primary" size="large" htmlType="submit" block>
+                <Button type="primary" size="large" htmlType="submit" block onClick={LoginButton}>
                   Sign in
                 </Button>
               </Form>
