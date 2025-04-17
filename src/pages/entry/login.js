@@ -12,6 +12,7 @@ import {
   Checkbox,
 } from "antd";
 import "./styles.css";
+import { Link } from "react-router-dom";
 
 const { Text, Title } = Typography;
 
@@ -68,15 +69,15 @@ export const Login = () => {
                     </Checkbox>
                   </Form.Item>
 
-                  <a
+                  <Link
                     style={{
                       float: "right",
                       fontSize: "12px",
                     }}
-                    href="#"
+                    to="/resetpassword"
                   >
                     Forgot password?
-                  </a>
+                  </Link>
                 </div>
                 <Button type="primary" size="large" htmlType="submit" block>
                   Sign in
@@ -85,9 +86,9 @@ export const Login = () => {
               <div style={{ marginTop: 8 }}>
                 <Text style={{ fontSize: 12 }}>
                   Don’t have an account?{" "}
-                  <a href="#" style={{ fontWeight: "bold" }}>
+                  <Link to="/register" style={{ fontWeight: "bold" }}>
                     Sign up
-                  </a>
+                  </Link>
                 </Text>
               </div>
             </Card>
