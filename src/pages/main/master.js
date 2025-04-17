@@ -35,9 +35,8 @@ const items = [
 ];
   const [collapsed, setCollapsed] = useState(false);
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-     <Sider collapsible collapsed={collapsed} onCollapse={value => setCollapsed(value)}  breakpoint="lg">
-        <div className="demo-logo-vertical" />
+    <Layout style={{ minHeight: '100vh'}}>
+     <Sider collapsible collapsed={collapsed} onCollapse={value => setCollapsed(value)}  breakpoint="lg">      
         <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
       </Sider>
        

@@ -25,7 +25,7 @@ export const Login = () => {
   );
 
   function LoginButton(){
-  navigate("/main");
+    navigate("/main");
   }
 
   return (
