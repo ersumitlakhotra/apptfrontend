@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from "react";
+import React, { useState } from "react";
 import {
   Row,
   Col,
@@ -11,21 +11,28 @@ import {
   Button,
   Checkbox,
 } from "antd";
-import "./styles.css";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { apiCalls } from "../../hook/apiCall.js";
 
 const { Text, Title } = Typography;
 
-export const Login = () => {
-  const navigate = useNavigate();
+export const Register = () => {
+  const [companyName, setCompanyName]= useState('');
+  const [email, setEmail]= useState('');
+
   const CardTitle = (
     <Title level={3} className="title">
-      Sign in your account
+      Create your account
     </Title>
   );
 
-  function LoginButton(){
-    navigate("/main");
+  const onRegister = async() => {
+    const body= JSON.stringify( {
+      name:companyName,
+      email:email
+    });
+    const data=await apiCalls('POST','company',null,body);
+    console.log("register",data)
   }
 
   return (
@@ -46,14 +53,23 @@ export const Login = () => {
                 initialValues={{
                   remember: false,
                 }}
-              >
+              > 
                 <Form.Item
-                  name="username"
-                  label="Username"
+                  name="businessname"
+                  label="Business Name"
                   rules={[{ required: true }]}
                 >
-                  <Input size="large" placeholder="Username" />
+                  <Input size="large" placeholder="Business Name" onChange={(e) => setCompanyName(e.target.value)} />
                 </Form.Item>
+
+                <Form.Item
+                  name="email"
+                  label="Email"
+                  rules={[{ required: true }]}
+                >
+                  <Input size="large" placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
+                </Form.Item>
+                         
                 <Form.Item
                   name="password"
                   label="Password"
@@ -62,6 +78,7 @@ export const Login = () => {
                 >
                   <Input type="password" placeholder="●●●●●●●●" size="large" />
                 </Form.Item>
+
                 <div style={{ marginBottom: "12px" }}>
                   <Form.Item name="remember" valuePropName="checked" noStyle>
                     <Checkbox
@@ -69,29 +86,19 @@ export const Login = () => {
                         fontSize: "12px",
                       }}
                     >
-                      Remember me
+                      I accept the Terms of Use and Privacy Policy.
                     </Checkbox>
                   </Form.Item>
-
-                  <Link
-                    style={{
-                      float: "right",
-                      fontSize: "12px",
-                    }}
-                    to="/resetpassword"
-                  >
-                    Forgot password?
-                  </Link>
                 </div>
-                <Button type="primary" size="large" htmlType="submit" block onClick={LoginButton}>
-                  Sign in
+                <Button type="primary" size="large" htmlType="submit" block onClick={onRegister}>
+                  Register
                 </Button>
               </Form>
               <div style={{ marginTop: 8 }}>
                 <Text style={{ fontSize: 12 }}>
-                  Don’t have an account?{" "}
-                  <Link to="/register" style={{ fontWeight: "bold" }}>
-                    Sign up
+                  Already have an account?{" "}
+                  <Link to="/" style={{ fontWeight: "bold" }}>
+                    Sign in
                   </Link>
                 </Text>
               </div>
@@ -104,4 +111,4 @@ export const Login = () => {
 };
 
 
-export default Login;
+export default Register;

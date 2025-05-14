@@ -11,18 +11,21 @@ import {
   Button,
   Checkbox,
 } from "antd";
-import "./styles.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const { Text, Title } = Typography;
 
-export const Register = () => {
-
+export const Login = () => {
+  const navigate = useNavigate();
   const CardTitle = (
     <Title level={3} className="title">
-      Create your account
+      Sign in your account
     </Title>
   );
+
+  function LoginButton(){
+    navigate("/main");
+  }
 
   return (
     <AntdLayout className="layout">
@@ -42,31 +45,7 @@ export const Register = () => {
                 initialValues={{
                   remember: false,
                 }}
-              > 
-                <Form.Item
-                  name="fullname"
-                  label="Fullname"
-                  rules={[{ required: true }]}
-                >
-                  <Input size="large" placeholder="Fullname" />
-                </Form.Item>
-
-                <Form.Item
-                  name="email"
-                  label="Email"
-                  rules={[{ required: true }]}
-                >
-                  <Input size="large" placeholder="Email" />
-                </Form.Item>
-
-                <Form.Item
-                  name="cell"
-                  label="Cell"
-                  rules={[{ required: true }]}
-                >
-                  <Input size="large" placeholder="Cell" />
-                </Form.Item>
-
+              >
                 <Form.Item
                   name="username"
                   label="Username"
@@ -74,7 +53,6 @@ export const Register = () => {
                 >
                   <Input size="large" placeholder="Username" />
                 </Form.Item>
-
                 <Form.Item
                   name="password"
                   label="Password"
@@ -83,7 +61,6 @@ export const Register = () => {
                 >
                   <Input type="password" placeholder="●●●●●●●●" size="large" />
                 </Form.Item>
-
                 <div style={{ marginBottom: "12px" }}>
                   <Form.Item name="remember" valuePropName="checked" noStyle>
                     <Checkbox
@@ -91,19 +68,29 @@ export const Register = () => {
                         fontSize: "12px",
                       }}
                     >
-                      I accept the Terms of Use and Privacy Policy.
+                      Remember me
                     </Checkbox>
                   </Form.Item>
+
+                  <Link
+                    style={{
+                      float: "right",
+                      fontSize: "12px",
+                    }}
+                    to="/resetpassword"
+                  >
+                    Forgot password?
+                  </Link>
                 </div>
-                <Button type="primary" size="large" htmlType="submit" block>
-                  Register
+                <Button type="primary" size="large" htmlType="submit" block onClick={LoginButton}>
+                  Sign in
                 </Button>
               </Form>
               <div style={{ marginTop: 8 }}>
                 <Text style={{ fontSize: 12 }}>
-                  Already have an account?{" "}
-                  <Link to="/" style={{ fontWeight: "bold" }}>
-                    Sign in
+                  Don’t have an account?{" "}
+                  <Link to="/register" style={{ fontWeight: "bold" }}>
+                    Sign up
                   </Link>
                 </Text>
               </div>
@@ -116,4 +103,4 @@ export const Register = () => {
 };
 
 
-export default Register;
+export default Login;

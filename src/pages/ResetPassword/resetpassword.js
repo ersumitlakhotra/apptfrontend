@@ -10,7 +10,6 @@ import {
   Input,
   Button
 } from "antd";
-import "./styles.css";
 import { Link } from "react-router-dom";
 
 const { Text, Title } = Typography;

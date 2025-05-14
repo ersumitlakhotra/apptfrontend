@@ -1,20 +1,15 @@
-import {React , useState} from 'react';
-import { Layout, Menu, theme } from 'antd';
+import React, { useState } from 'react';
 import {
   DesktopOutlined,
+  UnorderedListOutlined,
+  TagOutlined,
   FileOutlined,
-  PieChartOutlined,
   TeamOutlined,
   UserOutlined,
 } from '@ant-design/icons';
+import { Avatar, Breadcrumb, Col, Layout, Menu, Row, theme } from 'antd';
 const { Header, Content, Footer, Sider } = Layout;
-
-const MasterPage = () => {
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
-  
-  function getItem(label, key, icon, children) {
+function getItem(label, key, icon, children) {
   return {
     key,
     icon,
@@ -23,35 +18,52 @@ const MasterPage = () => {
   };
 }
 const items = [
-  getItem('Option 1', '1', <PieChartOutlined />),
-  getItem('Option 2', '2', <DesktopOutlined />),
-  getItem('User', 'sub1', <UserOutlined />, [
-    getItem('Tom', '3'),
-    getItem('Bill', '4'),
-    getItem('Alex', '5'),
+  getItem('Dashboard', '1', <DesktopOutlined />),
+  getItem('Orders', '2', <UnorderedListOutlined />),
+  getItem('Promotions', '3', <TagOutlined />),
+  getItem('User', '4', <UserOutlined />),
+  getItem('Reports', 'sub1', <UserOutlined />, [
+    getItem('Sales', '6'),
+    getItem('Purchase', '7'),
+    getItem('Profit', '8'),
   ]),
   getItem('Team', 'sub2', <TeamOutlined />, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
   getItem('Files', '9', <FileOutlined />),
 ];
+const MasterPage = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const {
+    token: { colorBgContainer, borderRadiusLG },
+  } = theme.useToken();
   return (
-    <Layout style={{ minHeight: '100vh'}}>
-     <Sider collapsible collapsed={collapsed} onCollapse={value => setCollapsed(value)}  breakpoint="lg">      
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
+    <Layout style={{ minHeight: '100vh' }} theme="light">
+      <Sider collapsible collapsed={collapsed} onCollapse={value => setCollapsed(value)} theme='light' width={240 } > 
+        <Header style={{ padding: 0, background: colorBgContainer }}>
+        <Row>
+          <Col span={8} align={'middle'} justify={'center'}> 
+            <Avatar size={36} style={{ backgroundColor: '#87d068' }} icon={<UserOutlined />} />
+          </Col>
+          <Col span={16}>Company name</Col>
+        </Row>
+        </Header>       
+        <Menu defaultSelectedKeys={['1']} mode="inline" items={items} />
       </Sider>
-       
       <Layout>
         <Header style={{ padding: 0, background: colorBgContainer }} />
-        <Content style={{ margin: '24px 16px 0' }}>
+        <Content style={{ margin: '0 16px' }}>
+          <Breadcrumb style={{ margin: '16px 0' }}>
+            <Breadcrumb.Item>User</Breadcrumb.Item>
+            <Breadcrumb.Item>Bill</Breadcrumb.Item>
+          </Breadcrumb>
           <div
             style={{
               padding: 24,
-              minHeight: '80vh',
+              minHeight: 360,
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
             }}
           >
-            content
+            Bill is a cat.
           </div>
         </Content>
         <Footer style={{ textAlign: 'center' }}>
@@ -61,5 +73,4 @@ const items = [
     </Layout>
   );
 };
-
 export default MasterPage;
