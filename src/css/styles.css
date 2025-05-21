@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .layout {
     background: radial-gradient(50% 50% at 50% 50%, #d1c4c4 0%, #ffffff 100%);
     background-size: "cover";
