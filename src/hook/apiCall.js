@@ -14,6 +14,7 @@ export const apiCalls =async (method ,endPoint, id = null, body = null) => {
     try {
        return await axios.request(options);
     } catch (error) {
+        return error;
     } 
     // api calls
 };
