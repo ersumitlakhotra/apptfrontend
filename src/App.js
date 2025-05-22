@@ -2,7 +2,7 @@ import './css/App.css';
 import './css/styles.css'
 import Login from './pages/Login/login.js';
 import ResetPassword from './pages/ResetPassword/resetpassword.js' 
-import MasterPage from './pages/Main/master.js';
+import MasterPage from './pages/main/master.js';
 import Signup from './pages/Signup/signup.js';
 import {
  BrowserRouter as Router,
