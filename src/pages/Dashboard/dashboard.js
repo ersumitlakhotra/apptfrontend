@@ -1,17 +1,15 @@
+import DashHeaderItems from "../../components/Dashboard/Header/headerItem"; 
+import Cards from "../../components/Dashboard/Cards/cards";
+
 const Dashboard=()=> {
+    const dashHeaderItems=DashHeaderItems;
     return(
         <div>
-            <div class='h-72 border bg-white'>
-                dashboard
-
-            </div>
-            <div class='h-72 border bg-white'>
-                dashboard1
-
-            </div>
+            <div class='flex flex-col gap-3 md:flex-row '>
+            {dashHeaderItems.map (items => (
+                <Cards key={items.key} label={items.label} value={items.value} />
+            ))}
             
-            <div class='h-72 border bg-white'>
-                dashboar2
 
             </div>
         </div>

@@ -72,7 +72,7 @@ const [MenuItems,setMenuItems] = useState( [
                      {item.badge}</span>
                   } 
                   {item.btn != null &&
-                     <span class={`inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-primary-700  dark:text-primary-900 duration-150 ${!open && 'scale-0'}`} 
+                     <span class={`inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium duration-150 ${!open && 'scale-0'}`} 
                      onClick={()=>onViewDropList(item.key)}>
                      {item.btn}</span>
                   }         
