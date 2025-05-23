@@ -1,6 +1,6 @@
 import React, {useEffect,useState} from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowDownOutlined, PieChartFilled, ProductFilled, TagsFilled, MailFilled, FileTextFilled, SettingFilled, CustomerServiceFilled, NotificationFilled, ContactsFilled,DownOutlined,UpOutlined,LeftOutlined } from '@ant-design/icons';
+import { PieChartFilled, ProductFilled, TagsFilled, MailFilled, FileTextFilled, SettingFilled, CustomerServiceFilled, NotificationFilled, ContactsFilled,DownOutlined,UpOutlined,LeftOutlined } from '@ant-design/icons';
 
 
 function getItem (label, key, icon,badge,btn, children,dropdown) {
@@ -15,7 +15,7 @@ function getItem (label, key, icon,badge,btn, children,dropdown) {
   };
 }
 
-const Sidebar = ({screen}) => {
+const Sidebar = ({screen,onSelected}) => {
 const [open, setOpen] = useState (true);
 useEffect (
   () => {
@@ -55,11 +55,12 @@ const [MenuItems,setMenuItems] = useState( [
    };
    setMenuItems(newItems);
  };
+
   return (
-    <div class={`border border-gray-300 bg-white p-3 relative duration-300 ${open ? 'w-72' : 'w-16'}`}>
+    <div class={`border border-gray-300 bg-white p-3 h-full relative duration-300 ${open ? 'w-72' : 'w-16'}`}>
      
       {MenuItems.map (item => (
-         <ul class="space-y-2 font-medium" key={item.key}>
+         <ul class="space-y-2 font-medium" key={item.key} onClick={() => onSelected(item.label)}>
             <li>
                <Link href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group" aria-controls="dropdown-example" data-collapse-toggle="dropdown-example">
                   <span class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 22 21">

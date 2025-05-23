@@ -1,21 +1,33 @@
-import {
-    Routes,
-    Route
-   } from "react-router-dom";
+
+import { useState } from "react";
 import Header from "../../components/Main/Header/header.js";
 import Sidebar from "../../components/Main/Sidebar/sidebar.js";
 import Dashboard from '../Dashboard/dashboard.js'
 import Order from '../Order/order.js'
 
 const MasterPage = () => {
-    return( 
-        <div class='h-full w-screen bg-gray-100 border m-0'>
-            <Header/>
-            <div class='h-full w-full bg-gray-100 flex fixed mt-16'>
-            <Sidebar/>
-            <div>Content</div>
+const [content, setContent] = useState('Dashboard');
 
+  const onSelected = (newContent) => {
+    setContent(newContent);
+  };
+
+  let displayedContent;
+  if (content === 'Dashboard') {
+    displayedContent = <Dashboard />;
+  } else if (content === 'Order') {
+    displayedContent = <Order />;
+  }
+
+
+    return( 
+        <div>
+            <Header/>
+            <div class='h-screen w-screen bg-gray-100 flex fixed mt-16 '>
+                <Sidebar onSelected={onSelected} />
+               <div class='overflow-y-scroll w-full p-4'>{displayedContent}</div> 
             </div>
+            
 
           {/*  <div>
                 <Routes>

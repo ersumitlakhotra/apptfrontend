@@ -11,7 +11,7 @@ const navigate = useNavigate();
 const [email, setEmail]= useState('');
 const [password, setPassword]= useState('');
 const [loading, setLoading] = useState(false);
-const { contextHolder , success,error} = useAlert();
+const { contextHolder ,error} = useAlert();
 
 const onSubmit = async() => {
   setLoading(true);
