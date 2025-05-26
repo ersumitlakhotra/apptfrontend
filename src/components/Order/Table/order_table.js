@@ -1,31 +1,25 @@
 
 import { Space, Table, Tag } from 'antd';
+import Link from 'antd/es/typography/Link';
 const columns = [
   {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
-    render: text => <a>{text}</a>,
+    title: 'Order',
+    dataIndex: 'order',
+    key: 'order',
+    render: text => <Link>{text}</Link>,
   },
   {
-    title: 'Age',
-    dataIndex: 'age',
-    key: 'age',
-  },
-  {
-    title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
-  },
-  {
-    title: 'Tags',
-    key: 'tags',
-    dataIndex: 'tags',
-    render: (_, { tags }) => (
+    title: 'Status',
+    dataIndex: 'status',
+    key: 'status',
+    render: (_, { status }) => (
       <>
-        {tags.map(tag => {
-          let color = tag.length > 5 ? 'geekblue' : 'green';
-          if (tag === 'loser') {
+        {status.map(tag => {
+          let color = 'yellow';
+          if (tag === 'Confirmed') {
+            color = 'green';
+          }
+          if (tag === 'Cancelled') {
             color = 'volcano';
           }
           return (
@@ -38,12 +32,76 @@ const columns = [
     ),
   },
   {
+    title: 'Customer',
+    dataIndex: 'customer',
+    key: 'customer',
+  },
+  {
+    title: 'Price',
+    dataIndex: 'price',
+    key: 'price',
+  },
+  {
+    title: 'Services',
+    dataIndex: 'services',
+    key: 'services',
+  },
+  {
+    title: 'Scheduled',
+    dataIndex: 'schedule',
+    key: 'schedule',
+  },
+  {
+    title: 'Clients',
+    dataIndex: 'clients',
+    key: 'clients',
+  }, 
+  {
+    title: 'Employee',
+    dataIndex: 'employee',
+    key: 'employee',
+  },
+  {
+    title: 'Tags',
+    key: 'tags',
+    dataIndex: 'tags',
+    render: (_, { tags }) => (
+      <>
+        {tags.map(tag => {
+          let color = 'yellow';
+          if (tag === 'assigned') {
+            color = 'blue';
+          }
+          if (tag === 'inprogress') {
+            color = 'orange';
+          }
+          if (tag === 'completed') {
+            color = 'green';
+          }
+          if (tag === 'cancelled') {
+            color = 'volcano';
+          }
+          return (
+            <Tag color={color} key={tag}>
+              {tag.toUpperCase()}
+            </Tag>
+          );
+        })}
+      </>
+    ),
+  },
+  {
+    title: 'Last Modified',
+    dataIndex: 'last_modified',
+    key: 'last_modified',
+  },
+  {
     title: 'Action',
     key: 'action',
     render: (_, record) => (
       <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
+        <Link>Edit</Link>
+        <Link>Delete</Link>
       </Space>
     ),
   },
@@ -51,45 +109,45 @@ const columns = [
 const data = [
   {
     key: '1',
-    name: 'John Brown',
-    age: 32,
+    order: '#1001',
+    status: ['Confirmed'],
+    customer: 'Sumit kumar',
+    price: '$40',
+    services: 'Cutting Beard',
+    schedule: '2025-05-31',
+    clients: '1',
+    employee: 'Bobby',
+    last_modified:'2025-05-28 08:00 PM',
     address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
+    tags: ['not assigned', 'assigned'],
   },
   {
     key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
+    order: '#1002',
+    status: ['Pending'],
+    customer: 'Sandeep Kaur',
+    price: '$10',
+    services: 'Threading',
+    schedule: '2025-05-31',
+    clients: '1',
+    employee: 'Suman',
+    last_modified:'2025-05-28 08:00 PM',
+    address: 'New York No. 1 Lake Park',
+    tags: ['inprogress', 'completed'],
   },
   {
     key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sydney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
-  },
-  {
-    key: '4',
-    name: 'John Brown',
-    age: 32,
+    order: '#1003',
+    status: ['Cancelled'],
+    customer: 'Gurpreet',
+    price: '$50',
+    services: '',
+    schedule: '2025-05-31',
+    clients: '1',
+    employee: 'Sunil',
+    last_modified:'2025-05-28 08:00 PM',
     address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '5',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
-  },
-  {
-    key: '6',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sydney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
+    tags: ['cancelled'],
   },
 ];
 const OrderTable = () => <Table columns={columns} dataSource={data} />;
