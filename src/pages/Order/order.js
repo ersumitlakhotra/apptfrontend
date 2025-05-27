@@ -1,5 +1,5 @@
-import { Button, Divider, Select } from "antd";
-import { DownloadOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Divider, Input, Select } from "antd";
+import { DownloadOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import OrderHeaderItems from "../../components/Order/OrderItems/order_header_items";
 import Cards from "../../components/Order/Cards/cards";
 import OrderTable from "../../components/Order/Table/order_table"; 
@@ -24,9 +24,7 @@ const Order=()=> {
             <Divider/>
 
             <div class='flex items-center justify-between mb-6'>
-                <input type="text" name="search" id="search" 
-                             class="w-1/4 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block  p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-                             placeholder="Search. . ."/>
+                <Input size="large" placeholder="Search" prefix={<SearchOutlined />} style={{width:'30%'}} />
                 <div class="flex gap-2">
                     <Select
                         defaultValue="15"

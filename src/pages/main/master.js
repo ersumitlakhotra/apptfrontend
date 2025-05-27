@@ -4,6 +4,7 @@ import Header from "../../components/Main/Header/header.js";
 import Sidebar from "../../components/Main/Sidebar/sidebar.js";
 import Dashboard from '../Dashboard/dashboard.js'
 import Order from '../Order/order.js'
+import Users from "../Users/users.js";
 
 const MasterPage = () => {
 const [content, setContent] = useState('Dashboard');
@@ -19,6 +20,8 @@ const [screenValue, setScreenValue] = useState ('');
     displayedContent = <Dashboard />;
   } else if (content === 'Order') {
     displayedContent = <Order />;
+  }else if (content === 'Users') {
+    displayedContent = <Users />;
   }
 
 useEffect (() => {
