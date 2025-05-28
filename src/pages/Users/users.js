@@ -1,24 +1,64 @@
-import { Badge, Button, Divider,Select } from "antd";
-import {  PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { useState } from "react";
+import { Badge, Button, Divider,Select, Drawer, Space } from "antd";
+import {  CloseOutlined, PlusOutlined, SaveOutlined, SearchOutlined } from '@ant-design/icons';
+import { useEffect, useState } from "react";
 import UserTable from "../../components/Users/Table/user_table";
+import { apiCalls } from "../../hook/apiCall";
+import useAlert from "../../common/alert";
 
 const ROLES_OPTIONS = ['Administrator', 'Manager', 'Employee', 'Users'];
 const STATUS_OPTIONS = ['Active', 'In Active'];
 
-const Users=()=> {
+const Users=({setLoading})=> {
     const [selectedRolesItems, setSelectedRolesItems] = useState([]);
     const rolesOptions = ROLES_OPTIONS.filter(o => !selectedRolesItems.includes(o));
 
     const [selectedStatusItems, setSelectedStatusItems] = useState([]);
     const statusOptions = STATUS_OPTIONS.filter(o => !selectedStatusItems.includes(o));
+    const { contextHolder , success,error,warning} = useAlert();
+    
+    const [userList, setUserList] = useState([]);
 
+    const [open, setOpen] = useState(false);
+    const [new_edit, setNewEdit]=useState('New')
+    const [userId, setUserId]=useState(0)
+
+    const showDrawer = () => {
+        //loading(false);
+        setOpen(true);
+      };
+
+      const onClose = () => {
+        setOpen(false);
+      };
+
+      const newUser=()=>{
+        setNewEdit('New');
+        setUserId(0); 
+        showDrawer();
+      }
+      useEffect(() => {
+        setLoading(true);
+        getData();
+        setLoading(false);
+      },[]);
+
+      const getData = async() => {
+        try{
+        const res= await apiCalls('GET','user',null,null);
+        setUserList(res.data.data);
+       // console.log(userList);
+        }
+        catch(e)
+        {
+            error(error.message)
+        }
+      }
     return(
         <div class='bg-white border rounded-md w-full p-4'>
             <div class='flex items-center justify-between mb-8'>
                 <p class='text-xl font-semibold text-gray-600'>All Users </p>  
                 <div class="flex gap-2">
-                    <Button type="primary" icon={<PlusOutlined />} size="large">Add new user</Button>
+                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={newUser}>Add new user</Button>
                 </div>
             </div>
 
@@ -54,7 +94,20 @@ const Users=()=> {
             </div>
             <Divider/>
 
-            <UserTable/>
+            <UserTable dataSource={userList} />
+            <Drawer title={`${new_edit} User`} placement='right' width={500} onClose={onClose} open={open} 
+                extra={
+                <Space>
+                    <Button type="primary" icon={<SaveOutlined/>} onClick={onClose} >Save</Button>               
+                    <Button danger icon={<CloseOutlined/>} onClick={onClose}>Close</Button>
+                </Space>
+                }
+            >
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            </Drawer>
+            {contextHolder}
         </div>
     )
 }

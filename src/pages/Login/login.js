@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React,{useState} from "react";
+import React,{useEffect, useState} from "react";
 import { LoadingOutlined } from '@ant-design/icons';
 import useAlert from "../../common/alert.js";
 import {  Spin  } from 'antd';
@@ -13,13 +13,23 @@ const [password, setPassword]= useState('');
 const [loading, setLoading] = useState(false);
 const { contextHolder ,error} = useAlert();
 
+useEffect(() => {
+  const companyId = localStorage.getItem('cid');
+  if (companyId) {
+    navigate("/main"); 
+  }
+});
+
 const onSubmit = async() => {
   setLoading(true);
   
   try{
-    const res= await apiCalls('GET',`user/auth/${email}/${password}`,null,null);
-    if(res.status === 200)     
-        navigate("/main"); //success('Login Successfully');            
+    const res= await apiCalls('GET',`user/auth/${email}/${password}`,null,null,false);
+    if(res.status === 200)
+      { 
+        localStorage.setItem('cid', res.data.data.cid); 
+        navigate("/main"); //success('Login Successfully');     
+      }       
     else         
        error('Login Failed. Invalid username or password.')
   }

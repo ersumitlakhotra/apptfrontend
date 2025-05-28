@@ -22,17 +22,21 @@ const onSubmit = async() => {
       email:email,
       cell:cell,
     }); 
-    const res= await apiCalls('POST','company',null,body);
+    const res= await apiCalls('POST','company',null,body,false);
     if(res.status === 201)
     {
       const id =res.data.data.id;
       try{
         const userBody= JSON.stringify( {
-          cid:id,
           username:email,
           password:password,
+          email:email,
+          cell:cell,
+          permission:'YYYYYYYYYYYYYYYYYYYY',
+          rating:'1',
+          role:'Administrator'
         }); 
-        const resUser= await apiCalls('POST','user',null,userBody);
+        const resUser= await apiCalls('POST','user',null,userBody,true,id);
         if(resUser.status === 201)       
           success('Congratulation, your account has been successfully created.');       
         else        

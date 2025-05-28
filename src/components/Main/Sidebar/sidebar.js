@@ -35,15 +35,15 @@ const [MenuItems,setMenuItems] = useState( [
    getItem ('Order', 2, <ProductFilled />),
    getItem ('Events', 3, <TagsFilled />),
    getItem ('Promotion', 4, <NotificationFilled />),
-   getItem ('Inbox', 4, <MailFilled />,5),
-   getItem ('Report', 5, <FileTextFilled />,null,<DownOutlined/>,[
-    getItem('Sales',51),
-    getItem('Purchase',52),
-    getItem('Accounting',53),
+   getItem ('Inbox', 5, <MailFilled />,5),
+   getItem ('Report', 6, <FileTextFilled />,null,<DownOutlined/>,[
+    getItem('Sales',61),
+    getItem('Purchase',62),
+    getItem('Accounting',63),
    ], false),
-   getItem ('Users', 6, <ContactsFilled />),
-   getItem ('Support', 7, <CustomerServiceFilled />),
-   getItem ('Setting', 8, <SettingFilled />),
+   getItem ('Users', 7, <ContactsFilled />),
+   getItem ('Support', 8, <CustomerServiceFilled />),
+   getItem ('Setting', 9, <SettingFilled />),
  ]);
 
  const onViewDropList = (index) => {
