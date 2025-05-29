@@ -1,7 +1,6 @@
-import { Avatar, Image, Rate } from "antd";
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Avatar,  Rate, Button } from "antd";
 
+import {  EditOutlined} from '@ant-design/icons';
 function getHeaderItem( key,label,icon,color, value) {
     return {
       key,
@@ -31,7 +30,7 @@ const UserTable = (dataSource) => {
     const headerItems =[ 
         getHeaderItem('1','USER'), 
         getHeaderItem('2','USER ROLE'), 
-        getHeaderItem('3','EMAIL'), 
+        getHeaderItem('3','USERNAME'), 
         getHeaderItem('4','ACCOUNT TYPE'), 
         getHeaderItem('5','RATING'), 
         getHeaderItem('6','STATUS'), 
@@ -60,9 +59,14 @@ const UserTable = (dataSource) => {
             <tr key={items.key} class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">               
                 <th scope="row" class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
                     {/*<Image class="w-10 h-10 rounded-full" src={items.image} alt="Profile"/>*/}
+                    
+                    {items.profilepic === null ?
+                     <Avatar size={40} style={{ backgroundColor: '#fde3cf', color: '#f56a00' }}>{(items.fullname).charAt(0)}</Avatar>:    
                     <Avatar size={40} src={items.profilepic} />
+                    }
+
                     <div class="ps-3">
-                        <div class="text-base font-semibold">{items.email}</div>
+                        <div class="text-base font-semibold">{items.fullname}</div>
                         <div class="font-normal text-gray-500">{items.email}</div>
                     </div>  
                 </th>
@@ -72,11 +76,11 @@ const UserTable = (dataSource) => {
                 </td>
 
                 <td class="px-6 py-4">
-                    {items.email}
+                    {items.username}
                 </td>
 
                 <td class="px-6 py-4">
-                    {items.email}
+                    {items.accounttype}
                 </td>
 
                 <td class="px-6 py-4">
@@ -85,12 +89,12 @@ const UserTable = (dataSource) => {
                 
                 <td class="px-6 py-4">
                     <div class="flex items-center">
-                        <div class={`h-2.5 w-2.5 rounded-full ${items.active ? 'bg-green-500' : 'bg-red-500'} me-2`}></div> {items.active ?'Active':'Inactive'}
+                        <div class={`h-2.5 w-2.5 rounded-full ${items.status ==='Active' ? 'bg-green-500' : 'bg-red-500'} me-2`}></div> {items.status}
                     </div>
                 </td>
 
                 <td class="px-6 py-4">
-                    <Link href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit user</Link>
+                    <Button type="link" icon={<EditOutlined />}>Edit</Button>
                 </td>
             </tr> 
             ))}                       

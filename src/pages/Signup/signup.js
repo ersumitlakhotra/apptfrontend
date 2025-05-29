@@ -30,11 +30,13 @@ const onSubmit = async() => {
         const userBody= JSON.stringify( {
           username:email,
           password:password,
+          role:'Administrator',
+          permission:'YYYYYYYYYYYYYYYYYYYY',
           email:email,
           cell:cell,
-          permission:'YYYYYYYYYYYYYYYYYYYY',
           rating:'1',
-          role:'Administrator'
+          status:'Active',
+          accounttype:'Basic'
         }); 
         const resUser= await apiCalls('POST','user',null,userBody,true,id);
         if(resUser.status === 201)       

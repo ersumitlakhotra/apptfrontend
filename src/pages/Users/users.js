@@ -6,7 +6,7 @@ import { apiCalls } from "../../hook/apiCall";
 import useAlert from "../../common/alert";
 
 const ROLES_OPTIONS = ['Administrator', 'Manager', 'Employee', 'Users'];
-const STATUS_OPTIONS = ['Active', 'In Active'];
+const STATUS_OPTIONS = ['Active', 'Inactive'];
 
 const Users=({setLoading})=> {
     const [selectedRolesItems, setSelectedRolesItems] = useState([]);
