@@ -36,7 +36,8 @@ const onSubmit = async() => {
           cell:cell,
           rating:'1',
           status:'Active',
-          accounttype:'Basic'
+          accounttype:'Basic',
+          fullname:business_name
         }); 
         const resUser= await apiCalls('POST','user',null,userBody,true,id);
         if(resUser.status === 201)       

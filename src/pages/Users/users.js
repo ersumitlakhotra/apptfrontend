@@ -1,9 +1,10 @@
 import { Badge, Button, Divider,Select, Drawer, Space } from "antd";
-import {  CloseOutlined, PlusOutlined, SaveOutlined, SearchOutlined } from '@ant-design/icons';
+import {  PlusOutlined, SaveOutlined, SearchOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import UserTable from "../../components/Users/Table/user_table";
 import { apiCalls } from "../../hook/apiCall";
 import useAlert from "../../common/alert";
+import UserDetail from "../../components/Users/Details/user_detail";
 
 const ROLES_OPTIONS = ['Administrator', 'Manager', 'Employee', 'Users'];
 const STATUS_OPTIONS = ['Active', 'Inactive'];
@@ -14,33 +15,29 @@ const Users=({setLoading})=> {
 
     const [selectedStatusItems, setSelectedStatusItems] = useState([]);
     const statusOptions = STATUS_OPTIONS.filter(o => !selectedStatusItems.includes(o));
-    const { contextHolder , success,error,warning} = useAlert();
+    const { contextHolder ,error} = useAlert();
     
     const [userList, setUserList] = useState([]);
 
     const [open, setOpen] = useState(false);
-    const [new_edit, setNewEdit]=useState('New')
+    const [userTitle, setUserTitle]=useState('New')
     const [userId, setUserId]=useState(0)
 
-    const showDrawer = () => {
-        //loading(false);
+   
+      const openUser=(id)=>{
+        setUserTitle(` ${id === 0 ? "New":"Edit" } User`);
+        setUserId(id); 
         setOpen(true);
-      };
-
-      const onClose = () => {
-        setOpen(false);
-      };
-
-      const newUser=()=>{
-        setNewEdit('New');
-        setUserId(0); 
-        showDrawer();
       }
+
+    // eslint-disable-next-line no-unused-vars
       useEffect(() => {
-        setLoading(true);
-        getData();
-        setLoading(false);
-      },[]);
+            setLoading(true);
+            getData();
+            setLoading(false);
+      },
+      // eslint-disable-next-line no-unused-vars
+      []);
 
       const getData = async() => {
         try{
@@ -58,7 +55,7 @@ const Users=({setLoading})=> {
             <div class='flex items-center justify-between mb-8'>
                 <p class='text-xl font-semibold text-gray-600'>All Users </p>  
                 <div class="flex gap-2">
-                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={newUser}>Add new user</Button>
+                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => openUser(0)}>Add new user</Button>
                 </div>
             </div>
 
@@ -94,18 +91,17 @@ const Users=({setLoading})=> {
             </div>
             <Divider/>
 
-            <UserTable dataSource={userList} />
-            <Drawer title={`${new_edit} User`} placement='right' width={500} onClose={onClose} open={open} 
+            <UserTable dataSource={userList} onEdit={(e)=>openUser(e)} />
+
+            <Drawer title={userTitle} placement='right' width={500} onClose={()=>setOpen(false)} open={open} 
                 extra={
                 <Space>
-                    <Button type="primary" icon={<SaveOutlined/>} onClick={onClose} >Save</Button>               
-                    <Button danger icon={<CloseOutlined/>} onClick={onClose}>Close</Button>
+                    <Button type="primary" icon={<SaveOutlined/>} onClick={()=>setOpen(false)} >Save</Button>               
+                    {/*<Button danger icon={<CloseOutlined/>} onClick={()=>setOpen(false)}>Close</Button>*/}
                 </Space>
                 }
             >
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
+            <UserDetail id={userId}/>
             </Drawer>
             {contextHolder}
         </div>

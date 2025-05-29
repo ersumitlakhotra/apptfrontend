@@ -1,31 +1,13 @@
 import { Avatar,  Rate, Button } from "antd";
 
 import {  EditOutlined} from '@ant-design/icons';
-function getHeaderItem( key,label,icon,color, value) {
+function getHeaderItem( key,label) {
     return {
       key,
       label   
     };
   }
-  function getDatasourceItem( key,image,name,role,email,accountType,rating,status) {
-    return {
-      key,
-      image,
-      name,
-      role,
-      email,
-      accountType,
-      rating,
-      status,
-      action:[
-        {
-            key:key,
-            label:'Edit',
-        }
-      ]
-    };
-  }
-const UserTable = (dataSource) => {
+const UserTable = ({dataSource,onEdit}) => {
     
     const headerItems =[ 
         getHeaderItem('1','USER'), 
@@ -37,26 +19,21 @@ const UserTable = (dataSource) => {
         getHeaderItem('7','ACTIONS'), 
       ];
 
-      const dataSourceItems =[ 
-        getDatasourceItem('1','https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg','Sumit Kumar','Administrator','ersumit@gmail.com','PRO','4.7','Active'), 
-        getDatasourceItem('2','https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg','Sandeep','Moderator','erSandeepKailay@gmail.com','Basic','2.0','Inactive'),  
-        ];
-
     return (
 <div class="relative overflow-x-auto shadow-md sm:rounded-lg"> 
     <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
                 {headerItems.map(items => (
-                    <th scope="col" id={items.id} class="px-6 py-3">
+                    <th scope="col" id={items.key} class="px-6 py-3">
                     {items.label}
                 </th>
                 ))}
             </tr>
         </thead>
         <tbody>
-        {(dataSource.dataSource).map(items => (                 
-            <tr key={items.key} class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">               
+        {dataSource.map(items => (                 
+            <tr key={items.id} class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">               
                 <th scope="row" class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
                     {/*<Image class="w-10 h-10 rounded-full" src={items.image} alt="Profile"/>*/}
                     
@@ -94,7 +71,7 @@ const UserTable = (dataSource) => {
                 </td>
 
                 <td class="px-6 py-4">
-                    <Button type="link" icon={<EditOutlined />}>Edit</Button>
+                    <Button type="link" icon={<EditOutlined />} onClick={()=>onEdit(items.id)}>Edit</Button>
                 </td>
             </tr> 
             ))}                       
