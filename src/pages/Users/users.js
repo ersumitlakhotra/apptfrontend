@@ -21,11 +21,13 @@ const Users=({setLoading})=> {
 
     const [open, setOpen] = useState(false);
     const [userTitle, setUserTitle]=useState('New')
-    const [userId, setUserId]=useState(0)
+    const [userId, setUserId]=useState(0);
+    const [refresh, setRefresh] = useState(0);
 
    
       const openUser=(id)=>{
         setUserTitle(` ${id === 0 ? "New":"Edit" } User`);
+        setRefresh(refresh+1);
         setUserId(id); 
         setOpen(true);
       }
@@ -33,23 +35,22 @@ const Users=({setLoading})=> {
     // eslint-disable-next-line no-unused-vars
       useEffect(() => {
             setLoading(true);
-            getData();
+                getData();
             setLoading(false);
-      },
-      // eslint-disable-next-line no-unused-vars
-      []);
+      },[]);
 
       const getData = async() => {
         try{
-        const res= await apiCalls('GET','user',null,null);
+            const res= await apiCalls('GET','user',null,null);
         setUserList(res.data.data);
-       // console.log(userList);
         }
         catch(e)
         {
             error(error.message)
         }
       }
+
+
     return(
         <div class='bg-white border rounded-md w-full p-4'>
             <div class='flex items-center justify-between mb-8'>
@@ -101,7 +102,7 @@ const Users=({setLoading})=> {
                 </Space>
                 }
             >
-            <UserDetail id={userId}/>
+                <UserDetail id={userId} reload={refresh}/>
             </Drawer>
             {contextHolder}
         </div>

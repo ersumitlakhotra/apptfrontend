@@ -14,13 +14,13 @@ function getTabItems( key,label,icon,children) {
       icon,   
     };
   }
-const UserDetail=({id}) => {
+const UserDetail=({id,reload}) => {
     const [userList, setUserList] = useState([]);
     
 
     useEffect(() => {  
-        getData();        
-    },[id]);
+        getData();    
+    },[reload]);
 
     const getData = async() => {
         if(id !== 0)
@@ -48,7 +48,8 @@ const UserDetail=({id}) => {
                     <p class='text-2xl font-semibold text-gray-600'>{userList.fullname}</p>
                     <p class="font-normal text-blue-500 ">{userList.role}</p>
                     <p class="font-normal text-gray-400 mt-5 mb-2">Rating</p>
-                    <Rate disabled defaultValue={userList.rating} />
+                    <Rate disabled value={userList.rating} />
+                    
                 </div>
             </div>
 

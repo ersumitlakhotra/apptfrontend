@@ -1,12 +1,14 @@
 import { Avatar,  Rate, Button } from "antd";
 
 import {  EditOutlined} from '@ant-design/icons';
+
 function getHeaderItem( key,label) {
     return {
       key,
       label   
     };
   }
+
 const UserTable = ({dataSource,onEdit}) => {
     
     const headerItems =[ 
@@ -61,7 +63,7 @@ const UserTable = ({dataSource,onEdit}) => {
                 </td>
 
                 <td class="px-6 py-4">
-                    <Rate disabled defaultValue={items.rating} />
+                    <Rate disabled value={items.rating} />
                 </td>
                 
                 <td class="px-6 py-4">
