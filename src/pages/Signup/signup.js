@@ -73,6 +73,7 @@ const onSubmit = async() => {
     if (phoneNumber.length > 7) {
         phoneNumber = phoneNumber.substring(0, 7) + '-' + phoneNumber.substring(7);
     }
+    if (phoneNumber.length < 13)
     setCell(phoneNumber);
   }
   

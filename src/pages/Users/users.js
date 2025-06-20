@@ -22,22 +22,22 @@ const Users = ({ setLoading }) => {
     const [userList, setUserList] = useState([]);
 
     const [open, setOpen] = useState(false);
-    const [userTitle, setUserTitle] = useState('New')
-    const [userId, setUserId] = useState(0);
+    const [title, setTitle] = useState('New')
+    const [id, setId] = useState(0);
     const [refresh, setRefresh] = useState(0);
 
 
     const btnNew_Click = () => {
-        setUserTitle("New User");
+        setTitle("New User");
         setRefresh(refresh + 1);
-        setUserId(0);
+        setId(0);
         setOpen(true);
     }
     
     const btnEdit_Click = (id) => {
-        setUserTitle("Edit User");
+        setTitle("Edit User");
         setRefresh(refresh + 1);
-        setUserId(id);
+        setId(id);
         setOpen(true);
     }
 
@@ -126,10 +126,10 @@ const Users = ({ setLoading }) => {
             <UserTable dataSource={userList} onEdit={(e) => btnEdit_Click(e)} />
 
             {/* Drawer on right*/}
-            <Drawer title={userTitle} placement='right' width={500} onClose={() => setOpen(false)} open={open}
+            <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
-                <UserDetail id={userId} reload={refresh} ref={ref} />
+                <UserDetail id={id} reload={refresh} ref={ref} />
             </Drawer>
 
             {contextHolder}

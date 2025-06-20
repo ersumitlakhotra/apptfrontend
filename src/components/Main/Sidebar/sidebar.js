@@ -1,6 +1,6 @@
 import React, {useEffect,useState} from 'react';
 import { Link } from 'react-router-dom';
-import { PieChartFilled, ProductFilled, TagsFilled, MailFilled, FileTextFilled, SettingFilled, CustomerServiceFilled, NotificationFilled, ContactsFilled,DownOutlined,UpOutlined,LeftOutlined } from '@ant-design/icons';
+import { PieChartFilled, ProductFilled, TagsFilled, MailFilled, FileTextFilled, SettingFilled, CustomerServiceFilled, NotificationFilled, ContactsFilled,DownOutlined,UpOutlined,LeftOutlined, PlusSquareFilled, DatabaseFilled } from '@ant-design/icons';
 
 
 function getItem (label, key, icon,badge,btn, children,dropdown) {
@@ -41,9 +41,10 @@ const [MenuItems,setMenuItems] = useState( [
     getItem('Purchase',62),
     getItem('Accounting',63),
    ], false),
-   getItem ('Users', 7, <ContactsFilled />),
-   getItem ('Support', 8, <CustomerServiceFilled />),
-   getItem ('Setting', 9, <SettingFilled />),
+   getItem('Services', 7, <DatabaseFilled />),
+   getItem('Users', 8, <ContactsFilled />),
+   getItem ('Support', 9, <CustomerServiceFilled />),
+   getItem ('Setting', 10, <SettingFilled />),
  ]);
 
  const onViewDropList = (index) => {

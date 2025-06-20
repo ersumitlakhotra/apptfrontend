@@ -8,6 +8,7 @@ import Users from "../Users/users.js";
 import { useNavigate } from "react-router-dom";
 import { Spin } from "antd";
 import { LoadingOutlined } from '@ant-design/icons';
+import Services from "../Services/services.js";
 
 const MasterPage = () => {
 const navigate = useNavigate();
@@ -29,9 +30,11 @@ const [isLoading, setIsLoading] = useState(false);
   if (content === 'Dashboard') {
     displayedContent = <Dashboard />;
   } else if (content === 'Order') {
-    displayedContent = <Order />;
-  }else if (content === 'Users') {
+    displayedContent = <Order setLoading={onLoadingHandler} />;
+  } else if (content === 'Users') {
     displayedContent = <Users setLoading={onLoadingHandler} />;
+  } else if (content === 'Services') {
+    displayedContent = <Services setLoading={onLoadingHandler} />;
   }
 
 useEffect (() => {
