@@ -9,6 +9,8 @@ import { useNavigate } from "react-router-dom";
 import { Spin } from "antd";
 import { LoadingOutlined } from '@ant-design/icons';
 import Services from "../Services/services.js";
+import Event from "../Event/event.js";
+import Tasks from "../Tasks/tasks.js";
 
 const MasterPage = () => {
 const navigate = useNavigate();
@@ -28,9 +30,13 @@ const [isLoading, setIsLoading] = useState(false);
 
   let displayedContent;
   if (content === 'Dashboard') {
-    displayedContent = <Dashboard />;
+    displayedContent = <Dashboard setLoading={onLoadingHandler} />;
+  } else if (content === 'Tasks') {
+    displayedContent = <Tasks setLoading={onLoadingHandler} />;
   } else if (content === 'Order') {
     displayedContent = <Order setLoading={onLoadingHandler} />;
+  } else if (content === 'Event') {
+    displayedContent = <Event setLoading={onLoadingHandler}  />;
   } else if (content === 'Users') {
     displayedContent = <Users setLoading={onLoadingHandler} />;
   } else if (content === 'Services') {
@@ -80,9 +86,11 @@ const onSetSignout=()=>
     return( 
         <div>
             <Header onSignout={onSetSignout}/>
-            <div class='h-screen w-screen bg-gray-100 flex fixed mt-16 '>
+            <div class='h-screen w-screen bg-gray-50 flex fixed mt-16 '>
                 <Sidebar onSelected={onSelected} screen={screenValue} />
-               <div class='overflow-y-scroll w-full p-4'>{displayedContent}</div> 
+               <div class='overflow-y-scroll w-full p-8'>
+                {displayedContent}
+               </div> 
             </div>
             
 

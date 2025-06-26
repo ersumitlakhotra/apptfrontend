@@ -1,17 +1,20 @@
+import { Tag } from "antd";
+import { LineChartOutlined } from '@ant-design/icons';
+
 const Cards = ({key,label,value}) => {
     return (
-        <div class='w-full bg-white rounded shadow p-5 text-gray-600'>
-            <div key={key} class='flex text-gray-600 dark:text-white text-xl' >{label}</div>           
-            <div class='flex flex-col xl:flex-row gap-2'>
-                <div class='w-full flex flex-col gap-3'>
-                    <div class='flex font-semibold dark:text-white text-3xl ' >{value}</div>
-                    <div class='text-gray-600' >
-                        <p><spam class='text-green-700 font-semibold'> 19% </spam> vs last month</p>
-                    </div>
-                </div>
-                <div  class='flex w-full font-bold dark:text-white items-center justify-center border ' >Charts</div>
-                
+        <div class='w-full bg-white border rounded p-5 text-gray-500 flex flex-col gap-2'>
+            
+            <p key={key} class='text-sm font-medium' >
+                {label}
+            </p>           
+
+            <div class='flex gap-3 items-center mb-3'>
+                <p class='text-xl text-black font-semibold'>{value}</p>
+                <Tag color="green" icon={<LineChartOutlined/>}>25.5%</Tag>                
             </div>
+
+            <p class='text-sm' ><spam class='text-green-700'> 19% </spam> vs last month</p>       
         </div>
     )
 }

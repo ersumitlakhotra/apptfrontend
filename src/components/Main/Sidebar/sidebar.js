@@ -1,6 +1,6 @@
 import React, {useEffect,useState} from 'react';
 import { Link } from 'react-router-dom';
-import { PieChartFilled, ProductFilled, TagsFilled, MailFilled, FileTextFilled, SettingFilled, CustomerServiceFilled, NotificationFilled, ContactsFilled,DownOutlined,UpOutlined,LeftOutlined, PlusSquareFilled, DatabaseFilled } from '@ant-design/icons';
+import { PieChartFilled, ProductFilled, TagsFilled, MailFilled, FileTextFilled, SettingFilled, CustomerServiceFilled, NotificationFilled, ContactsFilled,DownOutlined,UpOutlined,LeftOutlined, PlusSquareFilled, DatabaseFilled, CalendarFilled } from '@ant-design/icons';
 
 
 function getItem (label, key, icon,badge,btn, children,dropdown) {
@@ -31,16 +31,16 @@ useEffect (
 );
 
 const [MenuItems,setMenuItems] = useState( [
-   getItem ('Dashboard', 1, <PieChartFilled />),
-   getItem ('Order', 2, <ProductFilled />),
-   getItem ('Events', 3, <TagsFilled />),
-   getItem ('Promotion', 4, <NotificationFilled />),
-   getItem ('Inbox', 5, <MailFilled />,5),
-   getItem ('Report', 6, <FileTextFilled />,null,<DownOutlined/>,[
-    getItem('Sales',61),
-    getItem('Purchase',62),
-    getItem('Accounting',63),
-   ], false),
+  getItem('Dashboard', 1, <PieChartFilled />),
+  getItem('Tasks', 2, <CalendarFilled />),
+   getItem ('Order', 3, <ProductFilled />),
+  getItem('Event', 4, <NotificationFilled />),
+   //getItem ('Inbox', 5, <MailFilled />,5),
+ //  getItem ('Report', 6, <FileTextFilled />,null,<DownOutlined/>,[
+   // getItem('Sales',61),
+   // getItem('Purchase',62),
+   // getItem('Accounting',63),
+   //], false),
    getItem('Services', 7, <DatabaseFilled />),
    getItem('Users', 8, <ContactsFilled />),
    getItem ('Support', 9, <CustomerServiceFilled />),

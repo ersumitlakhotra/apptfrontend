@@ -132,7 +132,7 @@ const OrderDetail = ({ id, reload, ref }) => {
     }
 
     return (
-        <div class='flex flex-col font-normal gap-2 mt-2'>
+        <div class='flex flex-col font-normal gap-3 mt-2'>
             <p class="text-gray-400 mb-4">Customer Information</p>
 
             {/*  customer_name */}
