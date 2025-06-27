@@ -75,6 +75,7 @@ const Dashboard = ({ setLoading }) => {
             </div>
 
             {/* statics and income*/}
+            
             <div class='flex flex-col gap-8 mt-4 md:flex-row'>
                 {/* statics with apex charts*/}
                 <div class='flex flex-col gap-4 w-full md:w-3/5'>
@@ -111,7 +112,6 @@ const Dashboard = ({ setLoading }) => {
                                 data: [11, 32, 45, 32, 34, 52, 41]
                             }]}
                             type="area"
-                            width="100%"
                             height={500}
                         />
                     </div>
@@ -140,7 +140,6 @@ const Dashboard = ({ setLoading }) => {
                                 data: [31, 40, 28, 51, 42, 109, 100]
                             }]}
                             type="bar"
-                            width="100%"
                             height={460}
                         />
                     </div>
@@ -195,7 +194,6 @@ const Dashboard = ({ setLoading }) => {
                             }}
                             series={[40, 28, 51]}
                             type="donut"
-                            width="100%"
                             height={200}
                         />
                         
@@ -284,7 +282,6 @@ const Dashboard = ({ setLoading }) => {
                             ]}
                             type="bar"
                             chart="stacked"
-                            width="100%"
                             height={350}
                         />
                    
@@ -353,7 +350,7 @@ const Dashboard = ({ setLoading }) => {
                         </div>
                     </div>
                 </div>
-            </div>
+                </div>
             {contextHolder}
         </div>
     )

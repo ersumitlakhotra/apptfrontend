@@ -1,5 +1,5 @@
 
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import Header from "../../components/Main/Header/header.js";
 import Sidebar from "../../components/Main/Sidebar/sidebar.js";
 import Dashboard from '../Dashboard/dashboard.js'
@@ -13,18 +13,17 @@ import Event from "../Event/event.js";
 import Tasks from "../Tasks/tasks.js";
 
 const MasterPage = () => {
-const navigate = useNavigate();
-const [content, setContent] = useState('Dashboard');
-const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-const [screenValue, setScreenValue] = useState('');
-const [signout, setSignout] = useState(false);
-const [isLoading, setIsLoading] = useState(false);
-
+  const navigate = useNavigate();
+  const [content, setContent] = useState('Dashboard');
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const [signout, setSignout] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [open, setOpen] = useState(true);
   const onSelected = (newContent) => {
     setContent(newContent);
   };
 
-  const onLoadingHandler = (value) =>{
+  const onLoadingHandler = (value) => {
     setIsLoading(value);
   };
 
@@ -36,72 +35,89 @@ const [isLoading, setIsLoading] = useState(false);
   } else if (content === 'Order') {
     displayedContent = <Order setLoading={onLoadingHandler} />;
   } else if (content === 'Event') {
-    displayedContent = <Event setLoading={onLoadingHandler}  />;
+    displayedContent = <Event setLoading={onLoadingHandler} />;
   } else if (content === 'Users') {
     displayedContent = <Users setLoading={onLoadingHandler} />;
   } else if (content === 'Services') {
     displayedContent = <Services setLoading={onLoadingHandler} />;
   }
 
-useEffect (() => {
-  const handleResize = () => {
-    setScreenWidth (window.innerWidth);
-  };
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
 
-  window.addEventListener ('resize', handleResize);
+    window.addEventListener('resize', handleResize);
 
-  // Clean up the event listener on component unmount
-  return () => {
-    window.removeEventListener ('resize', handleResize);
-  };
-}, []);
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
-useEffect (
-  () => {
-    // Update myValue based on screenWidth
-    if (screenWidth < 768) {
-      setScreenValue ('sm');
-    } else if (screenWidth >= 768 && screenWidth < 1200) {
-      setScreenValue ('md');
-    } else {
-      setScreenValue ('lg');
+  useEffect(
+    () => {
+      // Update myValue based on screenWidth
+      if (screenWidth < 768) {
+        setOpen(false)
+      } else if (screenWidth >= 768 && screenWidth < 1200) {
+        setOpen(false)
+      } else {
+        setOpen(true)
+      }
+    },
+    [screenWidth]
+  );
+
+
+
+
+  useEffect(() => {
+    const companyId = localStorage.getItem('cid');
+    if (!companyId) {
+      navigate("/");
     }
-  },
-  [screenWidth]
-);
+  }, [navigate, signout]);
 
-useEffect(() => {
-  const companyId = localStorage.getItem('cid');
-  if (!companyId) {
-    navigate("/"); 
+  const onSetSignout = () => {
+    setSignout(true);
   }
-},[navigate, signout]);
-
-const onSetSignout=()=>
-{
-  setSignout(true);
-}
 
 
-    return( 
-        <div>
-            <Header onSignout={onSetSignout}/>
-            <div class='h-screen w-screen bg-gray-50 flex fixed mt-16 '>
-                <Sidebar onSelected={onSelected} screen={screenValue} />
-               <div class='overflow-y-scroll w-full p-8'>
-                {displayedContent}
-               </div> 
-            </div>
-            
+  return (
+    <div class='h-screen w-full flex flex-row '>
+      <Sidebar onSelected={onSelected} open={open} />
+      <div class='flex flex-col w-full bg-gray-50 '>
+        <header class='h-16 border-b bg-white '>
+          <Header onSignout={onSetSignout} open={open} setOpen={setOpen} />
+        </header>
+        <section class='overflow-y-scroll p-8 w-full'>
+          {displayedContent}
+        </section>
+      </div>
+      {/* <div class='h-screen w-screen bg-gray-50 flex flex-row '>
+      <Sidebar onSelected={onSelected} open={open} />
+      <div class='flex flex-col w-full'>
+        <header class='h-16 border-b bg-white '>
+          <Header onSignout={onSetSignout} open={open} setOpen={setOpen} />
+        </header>
+        <section class='overflow-y-scroll p-8 w-full'>
+          {displayedContent}
+        </section>
+      </div>
 
-          {/*  <div>
-                <Routes>
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/order" element={<Order />} />
-                </Routes>
-            </div>
-            */}
-            {isLoading && (
+
+
+
+      <Header onSignout={onSetSignout} />
+      <div class='h-screen w-screen bg-gray-50 flex fixed mt-16 '>
+        <Sidebar onSelected={onSelected} screen={screenValue} />
+        <div class='overflow-y-scroll w-full p-8'>
+          {displayedContent}
+        </div>
+      </div>
+*/}
+      {isLoading && (
         <div
           style={{
             position: 'fixed',
@@ -119,9 +135,9 @@ const onSetSignout=()=>
           <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
         </div>
       )}
-       
-        </div>
-    )
+
+    </div>
+  )
 }
 
 export default MasterPage
