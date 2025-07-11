@@ -1,15 +1,14 @@
 import { Badge, Button, Divider, Select, Drawer, Space } from "antd";
 import { PlusOutlined, SaveOutlined, SearchOutlined } from '@ant-design/icons';
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import UserTable from "../../components/Users/Table/user_table";
-import { apiCalls } from "../../hook/apiCall";
 import useAlert from "../../common/alert";
 import UserDetail from "../../components/Users/Details/user_detail";
 
 const ROLES_OPTIONS = ['Administrator', 'Manager', 'Employee', 'Users'];
 const STATUS_OPTIONS = ['Active', 'Inactive'];
 
-const Users = ({ setLoading }) => {
+const Users = ({ userList }) => {
     const ref= useRef();
     const [selectedRolesItems, setSelectedRolesItems] = useState([]);
     const rolesOptions = ROLES_OPTIONS.filter(o => !selectedRolesItems.includes(o));
@@ -19,7 +18,6 @@ const Users = ({ setLoading }) => {
 
     const { contextHolder,success, error } = useAlert();
 
-    const [userList, setUserList] = useState([]);
 
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState('New')
@@ -39,23 +37,6 @@ const Users = ({ setLoading }) => {
         setRefresh(refresh + 1);
         setId(id);
         setOpen(true);
-    }
-
-    // eslint-disable-next-line no-unused-vars
-    useEffect(() => {
-        setLoading(true);
-        getData();
-        setLoading(false);
-    }, []);
-
-    const getData = async () => {
-        try {
-            const res = await apiCalls('GET', 'user', null, null);
-            setUserList(res.data.data);
-        }
-        catch (e) {
-            error(error.message)
-        }
     }
 
     const btnSave = async() => {
@@ -122,7 +103,7 @@ const Users = ({ setLoading }) => {
 
             <Divider />
 
-            {/* Datatable with datasource*/}
+            {/* Datatable with datasource
             <UserTable dataSource={userList} onEdit={(e) => btnEdit_Click(e)} />
 
             {/* Drawer on right*/}

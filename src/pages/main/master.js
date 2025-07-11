@@ -11,6 +11,9 @@ import { LoadingOutlined } from '@ant-design/icons';
 import Services from "../Services/services.js";
 import Event from "../Event/event.js";
 import Tasks from "../Tasks/tasks.js";
+import Setting from "../Setting/setting.js";
+import { apiCalls } from "../../hook/apiCall.js";
+import useAlert from "../../common/alert.js";
 
 const MasterPage = () => {
   const navigate = useNavigate();
@@ -18,29 +21,27 @@ const MasterPage = () => {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [signout, setSignout] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [refresh, setRefresh] = useState(0);
   const [open, setOpen] = useState(true);
+  const {contextHolder, success, error } = useAlert();
+
+  const [settingActiveTab, setSettingActiveTab] = useState('1');
+  const [orderActiveTab, setOrderActiveTab] = useState('1');
+ 
+
+
+  const [orderList, setOrderList] = useState([]);
+  const [companyList, setCompanyList] = useState([]);
+  const [servicesList, setServicesList] = useState([]);
+  const [userList, setUserList] = useState([]);
+  const [logoList, setLogoList] = useState([]);
+
   const onSelected = (newContent) => {
+    setIsLoading(true);
     setContent(newContent);
+    setRefresh(refresh+1)
+    setIsLoading(false);
   };
-
-  const onLoadingHandler = (value) => {
-    setIsLoading(value);
-  };
-
-  let displayedContent;
-  if (content === 'Dashboard') {
-    displayedContent = <Dashboard setLoading={onLoadingHandler} />;
-  } else if (content === 'Tasks') {
-    displayedContent = <Tasks setLoading={onLoadingHandler} />;
-  } else if (content === 'Order') {
-    displayedContent = <Order setLoading={onLoadingHandler} />;
-  } else if (content === 'Event') {
-    displayedContent = <Event setLoading={onLoadingHandler} />;
-  } else if (content === 'Users') {
-    displayedContent = <Users setLoading={onLoadingHandler} />;
-  } else if (content === 'Services') {
-    displayedContent = <Services setLoading={onLoadingHandler} />;
-  }
 
   useEffect(() => {
     const handleResize = () => {
@@ -69,9 +70,6 @@ const MasterPage = () => {
     [screenWidth]
   );
 
-
-
-
   useEffect(() => {
     const companyId = localStorage.getItem('cid');
     if (!companyId) {
@@ -83,16 +81,134 @@ const MasterPage = () => {
     setSignout(true);
   }
 
+  const getLogo = async ( method, endPoint, id = null, body = null) => {
+    setIsLoading(true);
+    try {
+      const res = await apiCalls(method, endPoint, id, body);
+      if (res.data.status === 200)
+        setLogoList(res.data.data);
+    else
+        setLogoList([]);
+    }
+    catch (e) {
+      setLogoList([]);
+    }
+    setIsLoading(false);
+  }
+
+  const getData = async (setList, method, endPoint, id = null, body = null) => {
+    setIsLoading(true);
+    try {
+      const res = await apiCalls(method, endPoint, id, body);
+      setList(res.data.data);
+    }
+    catch (e) {
+      error(error.message)
+    }
+    setIsLoading(false);
+  } 
+  
+  const saveData = async (label, method, endPoint, id = null, body = null) => {
+    setIsLoading(true);
+    try {
+      const result = await apiCalls(method, endPoint, id, body);
+      if (result.status === 500 || result.status === 404)
+        error(result.message);
+      if (result.status === 201)
+        success(`The ${label} has been successfully created.`);
+      if (result.status === 200)
+        success(`The ${label} has been modified successfully.`);
+
+      if (result.status === 201 || result.status === 200)
+        setRefresh(refresh + 1)
+    }
+    catch (e) {
+      error(error.message)
+    }  
+    setIsLoading(false);
+  }
+
+  useEffect(() => {
+    switch (content) {
+      case "Dashboard":
+        {
+          getData(setOrderList, "GET", "order");
+          getData(setServicesList, "GET", "services");
+          break;
+        } 
+        case "Order":
+        {
+          getData(setOrderList, "GET", "order");
+          getData(setServicesList, "GET", "services");
+          break;
+        }
+      case 'Services':
+        {
+          getData(setServicesList, "GET", "services");
+          break;
+        }
+      case 'Users':
+        {
+          getData(setUserList, "GET", "user");
+          break;
+        }
+      case 'Setting':
+        {
+          getData(setCompanyList, "GET", "company");
+          getLogo("GET", "logo");
+          break;
+        }
+      default: { break }
+    }
+
+  },
+    [refresh]);
+
+  let displayedContent;
+  if (content === 'Dashboard') {
+    //displayedContent = <Dashboard orderList={orderList} servicesList={servicesList} />;
+  } else if (content === 'Tasks') {
+    //displayedContent = <Tasks setLoading={onLoadingHandler} />;
+  } else if (content === 'Order') {
+    displayedContent = <Order orderList={orderList} servicesList={servicesList} tabActiveKey={orderActiveTab} setTabActiveKey={setOrderActiveTab} />;
+  } else if (content === 'Event') {
+   // displayedContent = <Event setLoading={onLoadingHandler} />;
+  } else if (content === 'Services') {
+   // displayedContent = <Services servicesList={servicesList} />;
+  } else if (content === 'Users') {
+    //displayedContent = <Users userList={userList} />;
+  } else if (content === 'Setting') {
+    displayedContent = <Setting companyList={companyList} saveData={saveData} setRefresh={setRefresh} logoList={logoList} tabActiveKey={settingActiveTab} setTabActiveKey={setSettingActiveTab} />;
+  }
 
   return (
     <div class='h-screen w-full flex flex-row '>
-      <Sidebar onSelected={onSelected} open={open} />
+      <Sidebar onSelected={onSelected} content={content} open={open} />
       <div class='flex flex-col w-full bg-gray-50 '>
         <header class='h-16 border-b bg-white '>
           <Header onSignout={onSetSignout} open={open} setOpen={setOpen} />
         </header>
         <section class='overflow-y-scroll p-8 w-full'>
-          {displayedContent}
+          {isLoading ? (
+            <div
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                zIndex: 9999, // Ensure it's on top
+              }}
+            >
+              <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
+            </div>
+          ) :
+            displayedContent
+          }
         </section>
       </div>
       {/* <div class='h-screen w-screen bg-gray-50 flex flex-row '>
@@ -116,7 +232,7 @@ const MasterPage = () => {
           {displayedContent}
         </div>
       </div>
-*/}
+
       {isLoading && (
         <div
           style={{
@@ -135,7 +251,8 @@ const MasterPage = () => {
           <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
         </div>
       )}
-
+      */}
+      {contextHolder}
     </div>
   )
 }

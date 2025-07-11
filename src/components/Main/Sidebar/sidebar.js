@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react';
-import {  ProductFilled, SettingFilled, CustomerServiceFilled, NotificationFilled, ContactsFilled, DownOutlined, UpOutlined, LeftOutlined, PlusSquareFilled, DatabaseFilled, CalendarFilled, PieChartOutlined, CheckSquareOutlined, ProductOutlined, NotificationOutlined, UnorderedListOutlined, UserOutlined, SettingOutlined, CustomerServiceOutlined } from '@ant-design/icons';
-import { Badge } from 'antd';
+import {  PieChartOutlined, CheckSquareOutlined, ProductOutlined, NotificationOutlined, UnorderedListOutlined, UserOutlined, SettingOutlined, CustomerServiceOutlined } from '@ant-design/icons';
 import SideBarButton from '../sidebar_button';
 
 
@@ -16,7 +14,7 @@ function getItem(label, key, icon, badge, btn, children, dropdown) {
   };
 }
 
-const Sidebar = ({ screen, onSelected, open }) => {
+const Sidebar = ({ screen, onSelected, content, open }) => {
  
 
   const overview=([
@@ -26,7 +24,7 @@ const Sidebar = ({ screen, onSelected, open }) => {
     getItem('Event', 14, <NotificationOutlined />),
   ]);
 
-  const management= ([
+  const management = ([
     //getItem ('Inbox', 5, <MailFilled />,5),
     //  getItem ('Report', 6, <FileTextFilled />,null,<DownOutlined/>,[
     // getItem('Sales',61),
@@ -35,8 +33,10 @@ const Sidebar = ({ screen, onSelected, open }) => {
     //], false),
     getItem('Services', 21, <UnorderedListOutlined />),
     getItem('Users', 22, <UserOutlined />),
-    getItem('Support', 23, <CustomerServiceOutlined />),
-    getItem('Setting', 24, <SettingOutlined />),
+  ]);
+  const misc = ([
+    getItem('Help', 31, <CustomerServiceOutlined />),
+    getItem('Setting', 32, <SettingOutlined />),
   ]);
 
   {/* const onViewDropList = (index) => {
@@ -51,19 +51,23 @@ const Sidebar = ({ screen, onSelected, open }) => {
   */}
 
   return (
-    <div class={` bg-blue-500 h-full relative duration-300 flex flex-col text-white  ${open ? 'w-72' : 'w-14'}`}>
+    <div class={` h-full relative duration-300 flex flex-col  ${open ? 'w-72' : 'w-14'}`}>
       <sidebar class='w-full flex flex-col' >
 
-        <header class='h-16 bg-blue-600 p-3 flex items-center gap-3 cursor-pointer '>
+        <header class='h-16  p-3 flex items-center gap-3 cursor-pointer '>
           <img class="w-8 h-8 rounded-full bg-white" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg" alt="Rounded avatar" />
-          <span class={`text-lg font-semibold text-white whitespace-nowrap duration-150 ${!open && ' scale-0'}`}>{process.env.REACT_APP_PROJECT_NAME}</span>
+          <span class={`text-lg font-semibold whitespace-nowrap duration-150 ${!open && ' scale-0'}`}>{process.env.REACT_APP_PROJECT_NAME}</span>
         </header>
 
-        <span class={`text-blue-300 px-5 mt-6 duration-150 ${!open && 'scale-0'} whitespace-nowrap`}>Overview</span>
-        {overview.map(item => (<SideBarButton key={item.key} isOpen={open} icon={item.icon} label={item.label} badge={item.badge} onSelected={(e) => onSelected(e)} />))}
+        <span class={` text-sm px-5 mt-6 duration-150 ${!open && 'scale-0'} whitespace-nowrap`}>Overview</span>
+        {overview.map(item => (<SideBarButton key={item.key} isOpen={open} icon={item.icon} label={item.label} badge={item.badge} content={content} onSelected={(e) => onSelected(e)} />))}
 
-        <span class={`text-blue-300 px-5 mt-6 duration-150 ${!open && 'scale-0'} whitespace-nowrap`}>Management</span>
-        {management.map(item => (<SideBarButton key={item.key} isOpen={open} icon={item.icon} label={item.label} badge={item.badge} onSelected={(e) => onSelected(e)} />))}
+        <span class={` text-sm px-5 mt-6 duration-150 ${!open && 'scale-0'} whitespace-nowrap`}>Management</span>
+        {management.map(item => (<SideBarButton key={item.key} isOpen={open} icon={item.icon} label={item.label} badge={item.badge} content={content} onSelected={(e) => onSelected(e)} />))}
+        
+        <span class={` text-sm px-5 mt-6 duration-150 ${!open && 'scale-0'} whitespace-nowrap`}>Misc</span>
+        {misc.map(item => (<SideBarButton key={item.key} isOpen={open} icon={item.icon} label={item.label} badge={item.badge} content={content} onSelected={(e) => onSelected(e)} />))}
+       
       </sidebar>
     </div>
   );

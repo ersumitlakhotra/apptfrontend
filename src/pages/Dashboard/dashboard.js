@@ -4,9 +4,6 @@ import Chart from "react-apexcharts";
 import { Button,  Dropdown, Flex, Space, Tag } from "antd";
 import { DownOutlined } from '@ant-design/icons';
 import OrderTable from "../../components/Order/order_table";
-import { useEffect, useState } from "react";
-import { apiCalls } from "../../hook/apiCall";
-import useAlert from "../../common/alert";
 
 const handleButtonClick = e => {
 
@@ -34,36 +31,8 @@ const menuProps = {
     items,
     onClick: handleMenuClick,
 };
-const Dashboard = ({ setLoading }) => {
+const Dashboard = ({orderList, servicesList}) => {
     const dashHeaderItems = DashHeaderItems;
-
-    const { contextHolder, success, error } = useAlert();
-    const [dataList, setDataList] = useState([]);
-    const [servicesList, setServicesList] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [refresh, setRefresh] = useState(0);
-
-    useEffect(() => {
-        getData();
-    }, []);
-
-    const getData = async () => {
-        setLoading(true);
-        setIsLoading(true);
-        try {
-            const res = await apiCalls('GET', 'order', null, null);
-            setDataList(res.data.data);
-
-            const res1 = await apiCalls('GET', 'services', null, null);
-            setServicesList(res1.data.data);
-        }
-        catch (e) {
-            error(error.message)
-        }
-        setLoading(false);
-        setIsLoading(false);
-    }
-
     return (
         <div class="flex flex-col gap-4 mb-12">
             <span class="text-lg font-semibold text-gray-800">Dashboard</span>
@@ -159,10 +128,7 @@ const Dashboard = ({ setLoading }) => {
                         </Button>
                     </Dropdown>
                 </div>
-                {
-                    !isLoading &&
-                    <OrderTable dataSource={dataList} serviceList={servicesList} />
-                }
+                 <OrderTable dataSource={orderList} serviceList={servicesList} />
             </div>
 
 
@@ -195,6 +161,7 @@ const Dashboard = ({ setLoading }) => {
                             series={[40, 28, 51]}
                             type="donut"
                             height={200}
+                            width={'100%'}
                         />
                         
                         <div class='flex justify-between border-b pb-2'>
@@ -351,7 +318,6 @@ const Dashboard = ({ setLoading }) => {
                     </div>
                 </div>
                 </div>
-            {contextHolder}
         </div>
     )
 }

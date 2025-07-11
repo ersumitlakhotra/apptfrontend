@@ -1,13 +1,13 @@
 import { Badge } from "antd"
 
-const SideBarButton = ({ key, isOpen, icon, label, badge, onSelected }) => {
+const SideBarButton = ({ key, isOpen, icon, label, badge, content, onSelected }) => {
 
-    return(
-        <div key={key} onClick={() => onSelected(label)}  class='p-2 px-5 flex flex-row gap-4 items-center hover:bg-blue-600 cursor-pointer'>
-        <icon class='text-lg text-blue-300 '>{icon}</icon>
+    return (
+        <div key={key} onClick={() => onSelected(label)} class={` ${content === label ? 'bg-gray-50 text-blue-400' : ''} p-2 px-5 flex flex-row gap-4 items-center hover:bg-gray-50 hover:text-blue-400 cursor-pointer`}>
+            <icon class='text-lg'>{icon}</icon>
             <div class={`duration-150 ${!isOpen && 'scale-0'} whitespace-nowrap flex items-center justify-between w-full`}>
-              <span class='text-sm font-medium '>{label}</span>
-              {badge != null && <Badge count={badge} style={{ background:'white', color:'blue'}} />}
+                <span class='text-sm'>{label}</span>
+                {badge != null && <Badge count={badge} style={{ background: '#F5F5F5', color: 'black' }} />}
             </div>
         </div>
     )

@@ -6,30 +6,14 @@ import { DownloadOutlined, SearchOutlined, PlusOutlined, SaveOutlined } from '@a
 import ServicesTable from "../../components/Services/services_table";
 import ServiceDetail from "../../components/Services/service_detail";
 
-const Services = ({ setLoading }) => {
+const Services = ({ servicesList }) => {
     const ref= useRef();
     const { contextHolder,success, error } = useAlert();
-    const [dataList, setDataList] = useState([]);
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState('New');
     const [id, setId] = useState(0);
     const [refresh, setRefresh] = useState(0);
 
-    useEffect(() => {
-        setLoading(true);
-        getData();
-        setLoading(false);
-    }, []);
-
- const getData = async () => {
-        try {
-            const res = await apiCalls('GET', 'services', null, null); 
-            setDataList(res.data.data);
-        }
-        catch (e) {
-            error(error.message)
-        }
-    }
     const btnNew_Click = () => {
         setTitle("New Service");
         setRefresh(refresh + 1);
@@ -84,7 +68,7 @@ const Services = ({ setLoading }) => {
                 </div>
             </div>
 
-            <ServicesTable dataSource={dataList} onEdit={(e) => btnEdit_Click(e)} />
+            {/*<ServicesTable dataSource={servicesList} onEdit={(e) => btnEdit_Click(e)} />
 
             {/* Drawer on right*/}
             <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}

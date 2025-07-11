@@ -8,7 +8,7 @@ function getHeaderItem(key, label) {
     };
 }
 
-const OrderTable = ({ dataSource, onEdit, serviceList}) => {
+const OrderTable = ({dataSource,  onEdit, serviceList} ) => {
 
     const headerItems = [
         getHeaderItem('1', 'ORDER'),
@@ -22,7 +22,7 @@ const OrderTable = ({ dataSource, onEdit, serviceList}) => {
         getHeaderItem('9', 'LAST MODIFIED'),
         getHeaderItem('10', 'ACTIONS'),
     ];
-
+ 
     return (
         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -66,7 +66,7 @@ const OrderTable = ({ dataSource, onEdit, serviceList}) => {
                                             ? []
                                             : String(items.services).split(',').map(item => (
                                                 <div class="font-normal text-gray-500 italic">
-                                                    { serviceList.find(service => service.id === item).title}
+                                                    {serviceList.find(service => service.id === item).title}
                                                 </div>
                                             ))
                                     }
@@ -80,8 +80,8 @@ const OrderTable = ({ dataSource, onEdit, serviceList}) => {
 
                             {/* scheduled */}
                             <td class="px-6 py-4">
-                            
-                                
+
+
                             </td>
 
                             {/* clients */}
