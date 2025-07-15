@@ -23,43 +23,18 @@ const customeLabelTab = (label, tagColor, tagValue) => {
     )
 }
 
-const Order = ({ orderList, serviceList, tabActiveKey, setTabActiveKey, }) => {
+const Order = ({ orderList, tabActiveKey, setTabActiveKey, }) => {
     const ref = useRef();
     const tabItems = [
-        getTabItems('1', customeLabelTab("All", "blue", "5"), null, <OrderTabs orderList={orderList} serviceList={serviceList} />),
-        getTabItems('2', customeLabelTab("Pending", "yellow", "10"), null, <OrderTabs />),
-        getTabItems('3', customeLabelTab("Completed", "green", "10"), null, <OrderTabs />),
-        getTabItems('4', customeLabelTab("Cancelled", "red", "10"), null, <OrderTabs />),
+        getTabItems('1', customeLabelTab("All", "blue", "5"), null, <OrderTabs orderList={orderList} />),
+        getTabItems('2', customeLabelTab("Pending", "yellow", "10"), null, <OrderTabs orderList={orderList} />),
+        getTabItems('3', customeLabelTab("Completed", "green", "10"), null, <OrderTabs orderList={orderList} />),
+        getTabItems('4', customeLabelTab("Cancelled", "red", "10"), null, <OrderTabs orderList={orderList} />),
     ];
-    const { contextHolder, success, error } = useAlert();
-    const [dataList, setDataList] = useState([]);
-    const [servicesList, setServicesList] = useState([]);
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState('New');
     const [id, setId] = useState(0);
     const [refresh, setRefresh] = useState(0);
-
-    const [isLoading, setIsLoading] = useState(false);
-    const [isFilter, setIsFilter] = useState(true);
-
-    useEffect(() => {
-        getData();
-    }, []);
-
-    const getData = async () => {
-        setIsLoading(true);
-        try {
-            const res = await apiCalls('GET', 'order', null, null);
-            setDataList(res.data.data);
-
-            const res1 = await apiCalls('GET', 'services', null, null);
-            setServicesList(res1.data.data);
-        }
-        catch (e) {
-            error(error.message)
-        }
-        setIsLoading(false);
-    }
 
     const btnNew_Click = () => {
         setTitle("New Order");
@@ -77,14 +52,7 @@ const Order = ({ orderList, serviceList, tabActiveKey, setTabActiveKey, }) => {
 
     const btnSave = async () => {
         const result = await ref.current?.btnSave_Click();
-        setOpen(false);
-        getData();
-        if (result.status === 500 || result.status === 404)
-            error(result.message);
-        if (result.status === 201)
-            success(`The order has been successfully created.`);
-        if (result.status === 200)
-            success(`The order has been modified successfully.`);
+        setOpen(false);      
     }
     return (
         <div class="flex flex-col gap-4 mb-12">
@@ -112,13 +80,8 @@ const Order = ({ orderList, serviceList, tabActiveKey, setTabActiveKey, }) => {
                 </div>
             </div>
 
-                <Tabs items={tabItems} activeKey={tabActiveKey} onChange={(e) => { setTabActiveKey(e) }} />
+            <Tabs items={tabItems} activeKey={tabActiveKey} onChange={(e) => { setTabActiveKey(e) }} />
         
-            {
-                !isLoading && //<p>Table</p>
-                <OrderTable dataSource={dataList} serviceList={servicesList} onEdit={(e) => btnEdit_Click(e)} />
-            }
-
             {/* Drawer on right*/}
             <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
@@ -126,7 +89,6 @@ const Order = ({ orderList, serviceList, tabActiveKey, setTabActiveKey, }) => {
                 <OrderDetail id={id} reload={refresh} ref={ref} />
             </Drawer>
 
-            {contextHolder}
         </div>
     )
 }

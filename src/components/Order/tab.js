@@ -48,7 +48,7 @@ const dataSource = Array.from({ length: 100 }).map((_, i) => ({
     age: 32,
     address: `London, Park Lane no. ${i}`,
 }));
-const OrderTabs = ({ orderList, servicesList }) => {
+const OrderTabs = ({ orderList }) => {
 
     return (
         <div  class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
@@ -57,7 +57,8 @@ const OrderTabs = ({ orderList, servicesList }) => {
                     <Input size="large" placeholder="Search" prefix={<IoSearchOutline />} />
                 </div>
             </div>
-            <OrderTable dataSource={[]} serviceList={[]} onEdit={(e) => (e)} />
+            <OrderTable orderList={orderList} onEdit={(e) => (e)} />
+            
         </div>
     )
 

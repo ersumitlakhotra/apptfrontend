@@ -103,7 +103,8 @@ const MasterPage = () => {
       setList(res.data.data);
     }
     catch (e) {
-      error(error.message)
+      setList([])
+      //error(error.message)
     }
     setIsLoading(false);
   } 
@@ -139,7 +140,7 @@ const MasterPage = () => {
         case "Order":
         {
           getData(setOrderList, "GET", "order");
-          getData(setServicesList, "GET", "services");
+          //getData(setServicesList, "GET", "services");
           break;
         }
       case 'Services':
@@ -170,11 +171,11 @@ const MasterPage = () => {
   } else if (content === 'Tasks') {
     //displayedContent = <Tasks setLoading={onLoadingHandler} />;
   } else if (content === 'Order') {
-    displayedContent = <Order orderList={orderList} servicesList={servicesList} tabActiveKey={orderActiveTab} setTabActiveKey={setOrderActiveTab} />;
+    displayedContent = <Order orderList={orderList} tabActiveKey={orderActiveTab} setTabActiveKey={setOrderActiveTab} />;
   } else if (content === 'Event') {
    // displayedContent = <Event setLoading={onLoadingHandler} />;
   } else if (content === 'Services') {
-   // displayedContent = <Services servicesList={servicesList} />;
+    displayedContent = <Services servicesList={servicesList} setServicesList={setServicesList} saveData={saveData} />;
   } else if (content === 'Users') {
     //displayedContent = <Users userList={userList} />;
   } else if (content === 'Setting') {
@@ -211,47 +212,6 @@ const MasterPage = () => {
           }
         </section>
       </div>
-      {/* <div class='h-screen w-screen bg-gray-50 flex flex-row '>
-      <Sidebar onSelected={onSelected} open={open} />
-      <div class='flex flex-col w-full'>
-        <header class='h-16 border-b bg-white '>
-          <Header onSignout={onSetSignout} open={open} setOpen={setOpen} />
-        </header>
-        <section class='overflow-y-scroll p-8 w-full'>
-          {displayedContent}
-        </section>
-      </div>
-
-
-
-
-      <Header onSignout={onSetSignout} />
-      <div class='h-screen w-screen bg-gray-50 flex fixed mt-16 '>
-        <Sidebar onSelected={onSelected} screen={screenValue} />
-        <div class='overflow-y-scroll w-full p-8'>
-          {displayedContent}
-        </div>
-      </div>
-
-      {isLoading && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 9999, // Ensure it's on top
-          }}
-        >
-          <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
-        </div>
-      )}
-      */}
       {contextHolder}
     </div>
   )

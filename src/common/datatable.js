@@ -1,35 +1,44 @@
-
-const DataHeader = ({ header }) => {
+import { Pagination } from "antd"
+import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
+const DataTable = ({ headerItems, list, body, onChange }) => {
     return (
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-                {header.map(items => (
-                    <th key={items.key} scope="col" id={items.key} class="px-6 py-3">
-                        {items.label}
-                    </th>
-                ))}
-            </tr>
-        </thead>
-    )
-}
-const DataRow = ({ row }) => {
-    return (
-        <tbody>
-            <tr key={row.id} class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
-                <td class="px-6 py-4">
-                    <span class="text-base font-semibold">{row.title}</span>
-                </td>
-            </tr>
-        </tbody>
-    )
-}
-
-const DataTable = ({ header,row }) => {
-    return (
-        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                <DataHeader header={header}/>
-                <DataRow row={row}/>
+        <div class="relative overflow-x-auto">
+            <table class="w-full text-left h-40 overflow-auto">
+                <thead class="h-12 border-b text-gray-700 bg-zinc-50 ">
+                    <tr>
+                        {headerItems.map(items => (
+                            <th scope="col" id={items.key} key={items.key} class={`py-3 font-medium `}>
+                                <div class='flex flex-row justify-between border-e'>
+                                    <p class='w-full px-3 text-sm'>{items.label}</p>
+                                    <div class='cursor-pointer'>
+                                        {items.sort === 'asc' ? <TiArrowSortedDown size={18} onClick={(e) =>items.setSort('desc')} /> :
+                                            items.sort === 'desc' ? <TiArrowSortedUp size={18} onClick={(e) => items.setSort('asc')} /> : ''}</div>
+                                </div>
+                            </th>
+                        ))}
+                    </tr>
+                </thead>
+                <tbody>
+                    {list.length === 0 ?
+                        <tr><td colSpan={headerItems.length} class='text-left border-b p-4 text-sm font-medium text-gray-500'>No data found</td></tr>
+                        :
+                        body
+                    }
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td align="right" colSpan={headerItems.length} class='p-1 place-items-start md:place-items-end'>
+                        <Pagination
+                            total={list.length}
+                            showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+                            defaultPageSize={10}
+                            defaultCurrent={1}
+                            pageSizeOptions={[10,20]}
+                            onChange={onChange}
+                        />
+                    </td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     )
