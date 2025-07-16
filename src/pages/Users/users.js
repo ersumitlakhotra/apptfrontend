@@ -1,22 +1,15 @@
-import { Badge, Button, Divider, Select, Drawer, Space } from "antd";
-import { PlusOutlined, SaveOutlined, SearchOutlined } from '@ant-design/icons';
-import { useRef, useState } from "react";
-import UserTable from "../../components/Users/Table/user_table";
-import useAlert from "../../common/alert";
+import { Badge, Button,  Select, Drawer, Space, Input, Tooltip, Rate, Avatar, Image } from "antd";
+import { DownloadOutlined, EditOutlined, PlusOutlined, SaveOutlined, UserOutlined } from '@ant-design/icons';
+import { useEffect, useRef, useState } from "react";
 import UserDetail from "../../components/Users/Details/user_detail";
+import { IoSearchOutline } from "react-icons/io5";
+import DataTable from "../../common/datatable";
+import { getDate, getTableItem } from "../../common/items";
+import { Tags } from "../../common/tags";
 
-const ROLES_OPTIONS = ['Administrator', 'Manager', 'Employee', 'Users'];
-const STATUS_OPTIONS = ['Active', 'Inactive'];
 
-const Users = ({ userList }) => {
+const Users = ({ userList, saveData }) => {
     const ref= useRef();
-    const [selectedRolesItems, setSelectedRolesItems] = useState([]);
-    const rolesOptions = ROLES_OPTIONS.filter(o => !selectedRolesItems.includes(o));
-
-    const [selectedStatusItems, setSelectedStatusItems] = useState([]);
-    const statusOptions = STATUS_OPTIONS.filter(o => !selectedStatusItems.includes(o));
-
-    const { contextHolder,success, error } = useAlert();
 
 
     const [open, setOpen] = useState(false);
@@ -24,98 +17,139 @@ const Users = ({ userList }) => {
     const [id, setId] = useState(0);
     const [refresh, setRefresh] = useState(0);
 
+    const [filteredList, setFilteredList] = useState(userList);
 
-    const btnNew_Click = () => {
-        setTitle("New User");
-        setRefresh(refresh + 1);
-        setId(0);
-        setOpen(true);
-    }
+    const [searchInput, setSearchInput] = useState('');
+    const [sortStatus, setSortStatus] = useState('');
     
-    const btnEdit_Click = (id) => {
-        setTitle("Edit User");
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+
+    useEffect(() => {
+        setFilteredList(userList)
+        setPage(1, 10, userList);
+    }, [])
+
+    const setPage = (page, pageSize, list = []) => {
+        const indexOfLastItem = page * pageSize;
+        const indexOfFirstItem = indexOfLastItem - pageSize;
+        const searchedList = list.slice(indexOfFirstItem, indexOfLastItem);
+        setFilteredList(searchedList)
+    }
+   
+    const btn_Click = (id) => {
+        setTitle(id === 0 ? "New User" : "Edit User");
         setRefresh(refresh + 1);
         setId(id);
         setOpen(true);
     }
 
-    const btnSave = async() => {
-       const result=await ref.current?.btnSave_Click();
-        setOpen(false);
+    useEffect(() => {
+        const searchedList = userList.filter(item =>
+        (item.fullname.toLowerCase().includes(searchInput.toLowerCase()) &&
+            (sortStatus !== '' ? item.status.toLowerCase() === (sortStatus.toLowerCase()) : item.status.toLowerCase().includes('active')
+            )));
+        if (searchInput === '' && sortStatus === '')
+            setPage(currentPage, itemsPerPage, searchedList)
+        else
+            setPage(1, itemsPerPage, searchedList)
+    }, [searchInput, sortStatus])
 
-        if (result.status === 500 || result.status === 404)
-            error(result.message);
-        if (result.status === 201)
-            success(`The account has been successfully created.`);
-        if (result.status === 200)
-            success(`The account has been modified successfully.`); 
-                 
+    const btnSave = async () => {
+        await ref.current?.save();
     }
 
+    const headerItems = [
+        getTableItem('1', 'User'),
+        getTableItem('2', 'Role'),
+        getTableItem('3', 'Username'),
+        getTableItem('4', 'Account'),
+        getTableItem('5', 'Rating'),
+        getTableItem('6', 'Status'),
+        getTableItem('7', 'Last Modified'),
+        getTableItem('8', 'Action'),
+    ];
     return (
-        <div class='bg-white border rounded-md w-full p-4'>
+        <div class="flex flex-col gap-4 mb-12">
 
-            {/*  Header and new user button*/}
-            <div class='flex items-center justify-between mb-8'>
-                <p class='text-xl font-semibold text-gray-600'>All Users </p>
+            <div class='flex items-center justify-between'>
+                <span class="text-lg font-semibold text-gray-800">Users</span>
                 <div class="flex gap-2">
-                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btnNew_Click(0)}>Add new user</Button>
+                    <Button type='default' icon={<DownloadOutlined />} size="large">Export</Button>
+                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create user</Button>
                 </div>
             </div>
 
-            {/*  Search Filters*/}
-            <div class='flex flex-col gap-2 lg:flex-row '>
-
-                {/*  Search For User*/}
-                <div class="relative">
-                    <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
-                        <SearchOutlined />
+            <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
+                <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
+                    <div class='w-full md:w-1/3'>
+                        <Input size="large" placeholder="Search" prefix={<IoSearchOutline />} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
                     </div>
-                    <input type="text" id="table-search-users" class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search for users" />
+                    <div class='w-full md:w-2/3 flex flex-row md:justify-end justify-start gap-4'>                       
+                        <div class='flex flex-row gap-2 items-center'>
+                            <p class='text-sm text-gray-500 whitespace-nowrap'>Filter by</p>
+                            <Select
+                                value={sortStatus}
+                                style={{ width: 120 }}
+                                onChange={(e) => setSortStatus(e)}
+                                options={[
+                                    { value: '', label: <Badge color={'blue'} text={'Both'} /> },
+                                    { value: 'Active', label: <Badge color={'green'} text={'Active'} /> },
+                                    { value: 'Inactive', label: <Badge color={'red'} text={'Inactive'} /> }
+                                ]}
+                            />
+                        </div>
+
+                    </div>
                 </div>
 
-                {/*  Search Roles combobox*/}
-                <Select mode="multiple" size="middle" placeholder="User Roles" value={selectedRolesItems} onChange={setSelectedRolesItems} style={{ width: '100%', height: 40 }}
-                    options={rolesOptions.map(item => ({
-                        value: item,
-                        label: item,
-                    }))}
-                />
-
-                {/*  Search Status combobox : Active or Inactive*/}
-                <Select mode="multiple" size="middle" placeholder="Status" value={selectedStatusItems} onChange={setSelectedStatusItems} style={{ width: '100%', height: 40 }}
-                    options={statusOptions.map(item => ({
-                        value: item,
-                        label: <Badge key={item} color={(item === 'Active' ? 'green' : 'red')} text={item} />,
-                    }))}
-                />
-
-                {/*  Search Rating combobox*/}
-                <Select defaultValue="1" style={{ width: '100%', height: 40 }} prefix="Rating"
-                    options={[
-                        { value: '5', label: '5' },
-                        { value: '4', label: '4+' },
-                        { value: '3', label: '3+' },
-                        { value: '2', label: '2+' },
-                        { value: '1', label: '0>' }
-                    ]} />
+                <DataTable headerItems={headerItems} list={(searchInput === '' && sortStatus === '') ? userList : filteredList}
+                    onChange={(page, pageSize) => {
+                        setCurrentPage(page);
+                        setItemsPerPage(pageSize);
+                        setPage(page, pageSize, userList)
+                    }}
+                    body={(
+                        filteredList.map(item => (
+                            <tr key={item.id} class="bg-white border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50 ">
+                                <td class="p-3">
+                                    <div class='flex flex-row gap-2 items-center'>                                                    
+                                        {item.profilepic !== null ?
+                                            <Image width={40} height={40} src={item.profilepic} style={{ borderRadius: 20 }} /> :
+                                            <Avatar size={40} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
+                                        }
+                                        <div class='flex flex-col'>
+                                            <p class="text-sm font-semibold">{item.fullname}</p>
+                                            <p class="text-gray-500">{item.email}</p>
+                                        </div>  
+                                    </div>
+                                </td>
+                                <td class="p-3 ">{item.role}</td>
+                                <td class="p-3 ">{item.username}</td>
+                                <td class="p-3 ">{item.accounttype}</td>
+                                <td class="p-3 "><Rate disabled value={item.rating} /></td>
+                                <td class="p-3 ">{Tags(item.status)}</td>
+                                <td class="p-3 ">{getDate(item.modifiedat)}</td>
+                                <td class="p-3">
+                                    <Tooltip placement="top" title={'Edit'} >
+                                        <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
+                                    </Tooltip>
+                                </td>
+                            </tr>
+                        ))
+                    )} />      
             </div>
-
-            <Divider />
-
-            {/* Datatable with datasource
-            <UserTable dataSource={userList} onEdit={(e) => btnEdit_Click(e)} />
 
             {/* Drawer on right*/}
             <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
-                <UserDetail id={id} reload={refresh} ref={ref} />
+                <UserDetail id={id} refresh={refresh} ref={ref} userList={userList} saveData={saveData} setOpen={setOpen} />
             </Drawer>
-
-            {contextHolder}
         </div>
     )
 }
 
 export default Users;
+

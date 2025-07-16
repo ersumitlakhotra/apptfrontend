@@ -167,9 +167,7 @@ const Billing = ({ companyList, saveData, setRefresh }) => {
             <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
                 <Heading label={"Invoice history"} desc={"If you've just made a payment, it may take a few hours for it to appear in the table below."} icon={<CreditCardFilled  />} />
                 <div class='ml-6 mb-6'>
-                    <DataTable header={invoiceTableHeader} row={{ id: 1, title: 'lets setCell' }}>
-
-                    </DataTable>
+                    Datatable
                 </div>
 
             </div>

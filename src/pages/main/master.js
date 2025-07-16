@@ -119,7 +119,7 @@ const MasterPage = () => {
         success(`The ${label} has been successfully created.`);
       if (result.status === 200)
         success(`The ${label} has been modified successfully.`);
-
+     // console.log(result)
       if (result.status === 201 || result.status === 200)
         setRefresh(refresh + 1)
     }
@@ -177,7 +177,7 @@ const MasterPage = () => {
   } else if (content === 'Services') {
     displayedContent = <Services servicesList={servicesList} setServicesList={setServicesList} saveData={saveData} />;
   } else if (content === 'Users') {
-    //displayedContent = <Users userList={userList} />;
+    displayedContent = <Users userList={userList} saveData={saveData} />;
   } else if (content === 'Setting') {
     displayedContent = <Setting companyList={companyList} saveData={saveData} setRefresh={setRefresh} logoList={logoList} tabActiveKey={settingActiveTab} setTabActiveKey={setSettingActiveTab} />;
   }

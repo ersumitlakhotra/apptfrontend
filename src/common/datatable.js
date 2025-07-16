@@ -26,17 +26,17 @@ const DataTable = ({ headerItems, list, body, onChange }) => {
                     }
                 </tbody>
                 <tfoot>
-                <tr>
-                    <td align="right" colSpan={headerItems.length} class='p-1 place-items-start md:place-items-end'>
-                        <Pagination
-                            total={list.length}
-                            showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
-                            defaultPageSize={10}
-                            defaultCurrent={1}
-                            pageSizeOptions={[10,20]}
-                            onChange={onChange}
-                        />
-                    </td>
+                    <tr>
+                        <td align="right" colSpan={headerItems.length} class='p-1 place-items-start md:place-items-end'>
+                            <Pagination
+                                total={list.length}
+                                showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+                                defaultPageSize={10}
+                                defaultCurrent={1}
+                                pageSizeOptions={[10]}
+                                onChange={onChange}
+                            />
+                        </td>
                     </tr>
                 </tfoot>
             </table>

@@ -1,14 +1,14 @@
 import {  useEffect, useRef, useState } from "react";
 import { EditOutlined } from '@ant-design/icons';
 import { IoSearchOutline } from "react-icons/io5";
-import { Button,  Drawer, Input,  Select,  Space, Tooltip } from "antd";
+import { Badge, Button,  Drawer, Input,  Select,  Space, Tooltip } from "antd";
 import { DownloadOutlined,  PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import ServiceDetail from "../../components/Services/service_detail";
 import DataTable from "../../common/datatable";
 import {  getTableItem,getDate } from "../../common/items";
 import { Tags } from "../../common/tags";
 import {Sort} from '../../common/sort.js'
-
+import { FaSortAlphaDown, FaSortAlphaUp } from "react-icons/fa";
 
 const Services = ({ servicesList, setServicesList, saveData }) => {
     const ref= useRef();
@@ -20,15 +20,14 @@ const Services = ({ servicesList, setServicesList, saveData }) => {
 
     const [searchInput, setSearchInput] = useState('');
     const [sortStatus, setSortStatus] = useState('');
-    const [sortByName, setSortByName] = useState('asc');
-    const [sortByPrice, setSortByPrice] = useState('asc');
+    const [sortAscDesc, setSortAscDesc] = useState('name asc');
 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
     useEffect(() => {
         setFilteredList(servicesList)
-        setPage(1,10);
+        setPage(1, 10, servicesList);
     }, [])
 
     const btn_Click = (id) => {
@@ -51,7 +50,7 @@ const Services = ({ servicesList, setServicesList, saveData }) => {
             setPage(currentPage, itemsPerPage, searchedList)
         else
             setPage(1, itemsPerPage, searchedList)
-    }, [searchInput, sortStatus,sortByPrice,sortByName])
+    }, [searchInput, sortStatus,sortAscDesc])
 
     const setPage = (page, pageSize,list=[]) => {
         const indexOfLastItem = page * pageSize;
@@ -59,27 +58,16 @@ const Services = ({ servicesList, setServicesList, saveData }) => {
         const searchedList = list.slice(indexOfFirstItem, indexOfLastItem);
         setFilteredList(searchedList)
     }
-    const setSortByName_onClick = (value) => {
-        setServicesList(Sort('name', value, servicesList))
-        setSortByName(value);
-    }
-    const setSortByPrice_onClick = (value) => {
-        setServicesList(Sort('price', value, servicesList))
-        setSortByPrice(value);
-    } 
     
-    const setSort = (value,label,setBy) => {
-        setServicesList(Sort('price', value, servicesList))
-        setSortByPrice(value);
+    const setSort = (value) => {
+        const getValue = value.split(' ');
+        setServicesList(Sort(getValue[0], getValue[1], servicesList)) 
+        setSortAscDesc(value);
     }
-
-   {/*useEffect(() => {
-        setFilteredList(Sort('price', sortByPrice, filteredList))
-    }, [sortByPrice])
-*/} 
+ 
     const headerItems = [
-        getTableItem('1', 'Name', sortByName, setSortByName_onClick),
-        getTableItem('2', 'Price', sortByPrice, setSortByPrice_onClick),
+        getTableItem('1', 'Name'),
+        getTableItem('2', 'Price'),
         getTableItem('3', 'Time'),
         getTableItem('4', 'Status'),
         getTableItem('5', 'Last Modified'),
@@ -102,18 +90,47 @@ const Services = ({ servicesList, setServicesList, saveData }) => {
                     <div class='w-full md:w-1/3'>
                         <Input size="large" placeholder="Search" prefix={<IoSearchOutline />} value={searchInput} onChange={(e) =>setSearchInput(e.target.value)} />
                     </div>
-                    <div class='w-full md:w-2/3 flex flex-row items-center md:justify-end justify-start gap-3'>
-                        <p class='text-sm text-gray-500'>Filter by:</p>
-                        <Select
-                            value={sortStatus}  
-                            style={{width:120}}
-                            onChange={(e) => setSortStatus(e)}
-                            options={[
-                                { value: '', label:'Both' },
-                                { value: 'Active', label: 'Active' },
-                                { value: 'Inactive', label: 'Inactive' }
-                            ]}
-                        />
+                    <div class='w-full md:w-2/3 flex flex-row md:justify-end justify-start gap-4'>
+                        <div class='flex flex-row gap-2 items-center'>
+                            <p class='text-sm text-gray-500 whitespace-nowrap'>Sort by</p>
+                            <Select
+                                value={sortAscDesc}
+                                style={{ width: 120 }}
+                                onChange={(e) => setSort(e)}
+                                options={[
+                                    {
+                                        label: <span class='flex flex-row justify-between items-center text-xs'>Ascending <FaSortAlphaDown /></span>,
+                                        title: 'Ascending',
+                                        options: [
+                                            { label:"Name", value: 'name asc' },
+                                            { label: 'Price', value: 'price asc' },
+                                        ],
+                                    },
+                                    {
+                                        label: <span class='flex flex-row justify-between items-center text-xs'>Descending <FaSortAlphaUp /></span>,
+                                        title: 'Descending',
+                                        options: [
+                                            { label: 'Name', value: 'name desc' },
+                                            { label: 'Price', value: 'price desc' },
+                                        ],
+                                    },
+                                ]}
+                            />
+                        </div>
+                        <div class='flex flex-row gap-2 items-center'>
+                            <p class='text-sm text-gray-500 whitespace-nowrap'>Filter by</p>
+                            <Select
+                                value={sortStatus}
+                                style={{ width: 120 }}
+                                onChange={(e) => setSortStatus(e)}
+                                options={[
+                                    { value: '', label: <Badge color={'blue'} text={'Both'} /> },
+                                    { value: 'Active', label: <Badge color={'green'} text={'Active'} /> },
+                                    { value: 'Inactive', label: <Badge color={'red'} text={'Inactive'} /> }
+                                ]}
+                            />
+                        </div> 
+                        
                     </div>
                 </div>
 
