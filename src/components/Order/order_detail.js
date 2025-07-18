@@ -1,208 +1,235 @@
 import { useEffect, useImperativeHandle, useState } from "react";
 import { apiCalls } from "../../hook/apiCall";
-import { DatePicker, Divider, Select } from "antd";
+import { Avatar, Badge, DatePicker, Divider, Image, Input, Select } from "antd";
 import dayjs from 'dayjs';
+import { TextboxFlex } from "../../common/textbox";
+import { setCellFormat } from "../../common/cellformat";
 
-const OrderDetail = ({ id, reload, ref }) => {
-    const emptyData = {
-        "customer_name": "",
-        "customer_email": "",
-        "customer_phone": "",
-        "status": "PENDING",
-        "services": "",
-        "price": "0",
-        "trndate":"",
-        "clients": "1",
-        "assignedto": "",
-        "id": "0"
-    }
-    const options_status = [{ value: 'PENDING', color: 'yellow' }, { value: 'CONFIRMED', color: 'success' }, { value: 'CANCELLED', color: 'warning' }];
-    
-    const [dataList, setDataList] = useState(emptyData);
+import {  UserOutlined } from '@ant-design/icons';
+import Slots from "../../common/intervals";
+
+const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, saveData ,setOpen  }) => {
+   
 
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
-    const [status, setStatus] = useState('PENDING');
+    const [order_no, setOrderNo] = useState('');
+    const [status, setStatus] = useState('Pending');
     const [price, setPrice] = useState('0');
+    const [trndate, setTrnDate] = useState('');
+    const [assigned_to, setAssignedTo] = useState('');
+    const [modifiedat, setModifiedat] = useState(new Date());
+    const [slot, setSlot] = useState('');
+    const [servicesItem, setServicesItem] = useState([]);
+    //const filteredOptionsServices = servicesList.filter(o => !selectedItems.includes(o));
 
-    const [servicesList, setServicesList] = useState([]);
-    const [selectedItems, setSelectedItems] = useState([]);
-    const filteredOptionsServices = servicesList.filter(o => !selectedItems.includes(o));
-
-    const [booking, setBooking] = useState('');
-    const [clients, setClients] = useState('1');
-
-    const [userList, setUserList] = useState([]);
-    const [assigned_to, setAssignedto] = useState('');
-
+    const [orderListSlot, setOrderListSlot] = useState([]);
     useEffect(() => {
-        getData();
-    }, [reload]);
-
-    const getData = async () => {
-        if (id !== 0) {
-            const res = await apiCalls('GET', 'order', id, null);
-            setDataList(res.data.data);
+        if (id === 0) {
+            setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');
+            setStatus('Pending'); setPrice('0'); setTrnDate(''); setModifiedat(new Date());
+            setAssignedTo(''); setOrderNo(''); setServicesItem([]); setOrderListSlot([]); setSlot('');
         }
-        else
-            setDataList(emptyData);
-    }
-
-    const getServices = async () => {
-        try {
-            const res = await apiCalls('GET', 'services', null, null);
-            setServicesList(res.data.data);
-        }
-        catch (e) {
-            setServicesList([]);
-        }
-    }
-    const getUsers = async () => {
-        try {
-            const res = await apiCalls('GET', 'user', null, null);
-            setUserList(res.data.data);
-        }
-        catch (e) {
-            setUserList([]);
-        }
-    }
-
-    useEffect(() => {
-        setCustomerName(dataList.customer_name);
-        setCustomerPhone(dataList.customer_phone);
-        setCustomerEmail(dataList.customer_email);
-        setStatus(dataList.status);
-        setPrice(dataList.price);
-        getServices();  
-        const services_Array = (dataList.services === null || String(dataList.services).trim() === '')? [] : String(dataList.services).split(',');
-        setSelectedItems(
-            services_Array.map(item => ({
-            value: item,
-            label: servicesList.find(service => service.id === Number(item)).title
-            }))
-        )
-        setBooking(dataList.trndate);
-        setClients(dataList.clients);
-        getUsers();
-
-    }, [dataList])
-
-    const btnSave_Click = async () => {
-        try {
-            const Body = JSON.stringify({
-                customer_name: customerName,
-                customer_email: customerEmail,
-                customer_phone: customerPhone,
-                status: status,
-                services: `${selectedItems.join(',')}`,
-                price: price,
-                trndate: booking,
-                clients: clients,
-                assignedto: assigned_to,
-            });
-            if (id !== 0) {
-                return await apiCalls('PUT', 'order', id, Body);
+        else {
+            const editList = orderList.find(item => item.id === id)
+            if (editList.customerinfo !== null) {
+                setCustomerName(editList.customerinfo[0].name);
+                setCustomerPhone(editList.customerinfo[0].cell);
+                setCustomerEmail(editList.customerinfo[0].email);
             }
             else
-                return await apiCalls('POST', 'order', null, Body);
-        } catch (error) {
-            return JSON.stringify({
-                status: 500,
-                message: error.message
+            { setCustomerName(''); setCustomerEmail(''); setCustomerPhone(''); }
+
+            setOrderNo(editList.order_no);
+            setStatus(editList.status);          
+            setTrnDate(editList.trndate);
+            setServicesItem(editList.serviceinfo);
+            setModifiedat(editList.modifiedat);
+            setAssignedTo(editList.assignedto);
+            setPrice(editList.price);
+            setSlot(editList.slot);
+        }
+    }, [refresh])
+
+ 
+    const save = async () => {
+        if (customerName !== '' && customerPhone !== '' && servicesItem.length !== 0 && price !== '' && price !== '.' && trndate !== '') {
+            const Body = JSON.stringify({
+                customerinfo: [{
+                    name: customerName,
+                    cell: customerPhone,
+                    email: customerEmail,
+                }],
+                serviceinfo: servicesItem,
+                price: price,
+                status: status,
+                trndate: trndate,
+                assignedto: assigned_to === '' ? 0 : assigned_to,
+                slot:slot
             });
+            saveData("Order", id !== 0 ? 'PUT' : 'POST', "order", id !== 0 ? id : null, Body);
+            setOpen(false);
         }
     }
-
     useImperativeHandle(ref, () => {
         return {
-            btnSave_Click,
+            save,
         };
     })
-    const setCellFormat = (cellValue) => {
-        let phoneNumber = cellValue.replace(/[^0-9]/g, ''); // Remove non-numeric characters
-        if (phoneNumber.length > 3) {
-            phoneNumber = phoneNumber.substring(0, 3) + '-' + phoneNumber.substring(3);
+    const setPriceNumberOnly = (event) => {
+        const inputValue = event.target.value;
+        const regex = /^\d*(\.\d*)?$/;
+
+        if (regex.test(inputValue) || inputValue === '') {
+            setPrice(inputValue);
         }
-        if (phoneNumber.length > 7) {
-            phoneNumber = phoneNumber.substring(0, 7) + '-' + phoneNumber.substring(7);
-        }
-        if (phoneNumber.length < 13)
-        setCustomerPhone(phoneNumber);
+    };
+   
+    const onChangeServicesItem = (value) => {
+        let rate = 0;
+        setServicesItem(value);
+        servicesList.filter(a =>
+            value.some(b => b === a.id)
+        ).map(item => (rate = rate + parseFloat(item.price)))
+
+        setPrice(parseFloat(rate).toFixed(2))
     }
 
+    useEffect(() => {
+        if (trndate !== '' && assigned_to !=='')
+        {
+            setOrderListSlot(orderList.filter(a => (a.trndate.includes(trndate) && a.assignedto === assigned_to))); 
+        }
+        else 
+            setOrderListSlot([])
+    }, [trndate, assigned_to])
+    
     return (
         <div class='flex flex-col font-normal gap-3 mt-2'>
-            <p class="text-gray-400 mb-4">Customer Information</p>
+            <p class="text-gray-400 mb-4">Customer Detail</p>
 
-            {/*  customer_name */}
-            <div class='flex items-center w-full gap-2'>
-                <p class="font-semibold w-32">Name <span class='text-red-600'>*</span></p>
-                <input type="text" name="customer_name" id="customer_name" value={customerName}
-                    class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Customer's Name" onChange={(e) => setCustomerName(e.target.value)} />
-            </div>
-            {/*  customer_phone */}
-            <div class='flex items-center w-full gap-2'>
-                <p class="font-semibold w-32">Phone <span class='text-red-600'>*</span> </p>
-                <input type="tel" name="customer_email" id="customer_email" value={customerPhone}
-                    class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Customer's Phone " onChange={(e) => setCellFormat(e.target.value)} />
-            </div>
+            <TextboxFlex label={'Name'} mandatory={true} input={
+                <Input placeholder="Name" status={customerName === '' ? 'error' : ''} value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+            } />
 
-            {/*  customer_email */}
-            <div class='flex items-center w-full gap-2'>
-                <p class="font-semibold w-32">Email </p>
-                <input type="text" name="customer_email" id="customer_email" value={customerEmail}
-                    class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Customer's Email (Optional)" onChange={(e) => setCustomerEmail(e.target.value)} />
-            </div>
+            <TextboxFlex label={'Cell #'} mandatory={true} input={
+                <Input placeholder="111-222-3333" status={customerPhone === '' ? 'error' : ''} value={customerPhone} onChange={(e) => setCustomerPhone(setCellFormat(e.target.value))} />
+            } />
+
+            <TextboxFlex label={'E-mail'} input={
+                <Input placeholder="abcd@company.com"  value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} />
+            } />
 
             <Divider/>
             <p class="text-gray-400 mb-4">Order Information</p>
-            
-            {/*  status */}
-            <div class='flex items-center w-full gap-2'>
-                <p class="font-semibold w-32">Status <span class='text-red-600'>*</span></p>
-                <Select defaultValue={status} style={{ width: '100%' }} options={options_status}/>
-            </div>
 
-            {/*  services */}
-            <div class='flex items-center w-full gap-2'>
-                <p class="font-semibold w-32">Services <span class='text-red-600'>*</span></p>
-                <Select mode="multiple" placeholder="Services" value={selectedItems} onChange={e => {setSelectedItems(e); console.log(e)}} style={{ width: '100%' }}
-                    options={filteredOptionsServices.map(item => ({
-                        value: item.id,
-                        label: item.title,
+            <TextboxFlex label={'Services'} mandatory={true} input={
+                <Select
+                    status={servicesItem.length === 0 ? 'error':''}
+                    placeholder='Select services'
+                    mode="multiple"
+                    value={servicesItem}
+                    style={{ width: '100%' }}
+                    onChange={(value) => onChangeServicesItem(value)}
+                    options={servicesList.map(item => ({
+                        value:item.id,
+                        label:item.name
                     }))}
+                    optionFilterProp="label"
+                    filterSort={(optionA, optionB) => {
+                        var _a, _b;
+                        return (
+                            (_a = optionA === null || optionA === void 0 ? void 0 : optionA.label) !== null &&
+                                _a !== void 0
+                                ? _a
+                                : ''
+                        )
+                            .toLowerCase()
+                            .localeCompare(
+                                ((_b = optionB === null || optionB === void 0 ? void 0 : optionB.label) !== null &&
+                                    _b !== void 0
+                                    ? _b
+                                    : ''
+                                ).toLowerCase(),
+                            );
+                    }}
                 />
-            </div>
+            } />
 
-              {/*  price */}
-            <div class='flex items-center w-full gap-2'>
-                <p class="font-semibold w-32">Price ($) <span class='text-red-600'>*</span> </p>
-                <input type="text" name="price" id="price" value={price}
-                    class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Price" onChange={(e) => setPrice(e.target.value)} />
-            </div>
+            <TextboxFlex label={'Price ($)'} mandatory={true} input={
+                <Input placeholder="Price" status={(price === '' || price === '.') ? 'error' : ''} value={price} onChange={setPriceNumberOnly} />
+            } />
 
-            {/*  booking */}
+            <TextboxFlex label={'Status'} input={
+                <Select
+                    value={status}
+                    style={{ width: '100%' }}
+                    onChange={(value) => setStatus(value)}
+                    options={[
+                        { value: 'Pending', label: <Badge color={'yellow'} text={'Pending'} /> },
+                        { value: 'In progress', label: <Badge color={'blue'} text={'In progress'} /> },
+                        { value: 'Completed', label: <Badge color={'green'} text={'Completed'} /> },
+                        { value: 'Cancelled', label: <Badge color={'red'} text={'Cancelled'} /> }
+                    ]}
+                />
+            } />
+
+            <Divider />
+            <p class="text-gray-400 mb-4">Booking Details</p>
+
+            <TextboxFlex label={'Date'} mandatory={true} input={
+                <DatePicker status={trndate === '' ? 'error':''} style={{ width: '100%' }} value={trndate === '' ? trndate : dayjs(trndate, 'YYYY-MM-DD')} onChange={(date, dateString) => setTrnDate(dateString)} />
+            } />
+
+            <TextboxFlex label={'Employee'} input={
+                <Select
+                    value={assigned_to}
+                    style={{ width: '100%' }}
+                    onChange={(value) => setAssignedTo(value)}
+                    options={userList.map(item => ({
+                        value: item.id,
+                        label: 
+                        <div class='flex flex-row gap-2 items-center'>
+                            {item.profilepic !== null ?
+                                <Image width={31} height={31} src={item.profilepic} style={{ borderRadius: 15 }} /> :
+                                <Avatar size={30} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
+                            }                         
+                            <p>{item.fullname}</p>                       
+                        </div>
+                    }))}            
+                />
+            } />
+            <TextboxFlex label={' '}  input={
+                 <div class='flex flex-row w-full'>
+                    {(trndate === '' || assigned_to === '') ?
+                        <p class='w-full border p-4 rounded text-sm text-gray-400 outline-dotted'> Please select both ( Date and Employee ) to view the available time slots. </p> :
+                    <Slots inTime={"10:00:00"} outTime={"21:50:00"} orderListSlot={orderListSlot} slot={slot} setSlot={setSlot}/>
+                 }
+                </div>
+            } />
+           
+
+            {/*  booking
             <div class='flex items-center w-full gap-2'>
                 <p class="font-semibold w-32">Booking <span class='text-red-600'>*</span></p>
                     <DatePicker showTime onChange={(value, dateString) => { setBooking(dateString) }} style={{ width: '100%' }}
-                    value={(booking !== '' && booking !== undefined && booking !== null) && dayjs(booking, 'YYYY-MM-DD HH:mm:ss')}/> 
-               
-            </div>
+                    value={(booking !== '' && booking !== undefined && booking !== null) && dayjs(booking, 'YYYY-MM-DD HH:mm:ss')}/>
 
-            {/*  clients */}
-            <div class='flex items-center w-full gap-2'>
-                <p class="font-semibold w-32">Clients <span class='text-red-600'>*</span></p>
-                <input type="text" name="clients" id="clients" value={clients}
-                    class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Clients" onChange={(e) => setClients(e.target.value)} />
-            </div>
+            </div> 
+            
 
-            {/*  assignedTo */}
+ const today = new Date();
+    const dayOfWeekNumber = today.getDay(); // 0 for Sunday, 1 for Monday, etc.
+
+    // Array to map day numbers to day names
+    const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const dayName = weekdays[dayOfWeekNumber];
+
+            */}
+
+
+            {/*  assignedTo 
             <div class='flex items-center w-full gap-2'>
                 <p class="font-semibold w-32">Assigned To </p>
                 <Select placeholder="Assigned To" value={assigned_to} onChange={e => setAssignedto(e.id)} style={{ width: '100%' }}
@@ -212,6 +239,7 @@ const OrderDetail = ({ id, reload, ref }) => {
                     }))}
                 />
             </div>
+            */}
             
         </div>
     )

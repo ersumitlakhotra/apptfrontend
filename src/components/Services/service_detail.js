@@ -3,32 +3,26 @@ import { useEffect, useImperativeHandle, useState } from "react";
 import { Button, Input, Select } from "antd";
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import TextArea from "antd/es/input/TextArea";
-import useAlert from "../../common/alert";
+import { TextboxFlex } from "../../common/textbox";
 
 const ServiceDetail = ({ id, refresh, ref, servicesList, saveData, setOpen }) => {
 
     const [name, setName] = useState('');
-    const [isNameValid, setIsNameValid] = useState('error');
-
     const [price, setPrice] = useState('');
-    const [isPriceValid, setIsPriceValid] = useState('error');
 
     const [timing, setTiming] = useState('30 Minute');
     const [description, setDescription] = useState('');
     const [status, setStatus] = useState('Active');
 
-    const { contextHolder, error } = useAlert();
 
     useEffect(() => {
         if (id === 0) {
-            setName(''); setIsNameValid('error'); setPrice(''); setIsPriceValid('error');setDescription(''); setTiming('30 Minute'); setStatus('Active');
+            setName('');  setPrice('');setDescription(''); setTiming('30 Minute'); setStatus('Active');
         }
         else {
             const editList = servicesList.find(item => item.id === id)
             setName(editList.name);
-            setIsNameValid(editList.name === '' ? 'error':'')
             setPrice(editList.price);
-            setIsPriceValid(editList.price === '' ? 'error' : '')
             setTiming(editList.timing);
             setStatus(editList.status);
             setDescription(editList.description);
@@ -36,7 +30,7 @@ const ServiceDetail = ({ id, refresh, ref, servicesList, saveData, setOpen }) =>
     }, [refresh])
 
     const save = async () => {      
-        if(isNameValid ==='' && isPriceValid ==='')
+        if (name !== '' && price !== '' && price !== '.' )
         {
             const Body = JSON.stringify({
                 name: name.charAt(0).toUpperCase() + name.slice(1),
@@ -67,28 +61,21 @@ const ServiceDetail = ({ id, refresh, ref, servicesList, saveData, setOpen }) =>
 
         if (regex.test(inputValue) || inputValue === '') {
             setPrice(inputValue);
-            setIsPriceValid(inputValue === '' ? 'error' : '')
         }
     };
     return (
         <div class='flex flex-col font-normal gap-2 mt-2'>
             <p class="text-gray-400 mb-4">Service Information</p>
 
-            {/*  title */}
-            <div class='flex items-center w-full gap-2'>
-                <p class="font-semibold w-32">Name <span class='text-red-600'>*</span></p>
-                <Input placeholder="Name" status={isNameValid} value={name} onChange={(e) => { setName(e.target.value); setIsNameValid(e.target.value === '' ? 'error' : '') }} />
-            </div>
+            <TextboxFlex label={'Name'} mandatory={true} input={
+                <Input placeholder="Name" status={name === '' ? 'error' : ''} value={name} onChange={(e) => setName(e.target.value)} />
+            } />
 
-            {/*  price */}
-            <div class='flex items-center w-full gap-2'>
-                <p class="font-semibold w-32">Price ($)<span class='text-red-600'>*</span> </p>
-                <Input placeholder="Price" status={isPriceValid} value={price} onChange={setPriceNumberOnly} />              
-            </div>
+            <TextboxFlex label={'Price ($)'} mandatory={true} input={
+                <Input placeholder="Price" status={(price === '' || price === '.') ? 'error' : ''} value={price} onChange={setPriceNumberOnly} />
+            } />
 
-            {/*  timing */}
-            <div class='flex items-center w-full gap-2'>
-                <p class="font-semibold w-32">Time <span class='text-red-600'>*</span> </p>
+            <TextboxFlex label={'Time'} input={
                 <Select
                     value={timing}
                     style={{ width: '100%' }}
@@ -101,23 +88,20 @@ const ServiceDetail = ({ id, refresh, ref, servicesList, saveData, setOpen }) =>
                         { value: '2 Hour', label: '2 Hour' },
                     ]}
                 />
-            </div>
+            } />
 
-            {/*  desc */}
-            <div class='flex w-full gap-2'>
-                <p class="font-semibold w-32 ">Description</p>
+
+            <TextboxFlex label={'Description'} input={
                 <TextArea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
-            </div>
+            } />
 
-            {/*  Active Inactive */}
-            <div class='flex items-center w-full gap-2'>
-                <p class="font-semibold w-32">Status</p>
+            <TextboxFlex label={'Status'} input={
                 <div class='flex flex-row items-center gap-2 w-full'>
                     <Button color={`${status === 'Active' ? 'cyan' : 'default'}`} variant="outlined" icon={<CheckOutlined />} onClick={() => setStatus('Active')} >Active</Button>
                     <Button color={`${status === 'Inactive' ? 'danger' : 'default'}`} variant="outlined" icon={<CloseOutlined />} onClick={() => setStatus('Inactive')} >Inactive</Button>
                 </div>
-            </div>
-            {contextHolder}
+            } />
+
         </div>
     )
 }

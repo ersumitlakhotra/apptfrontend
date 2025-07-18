@@ -11,4 +11,15 @@ const Textbox = ({ type, label, value, setValue, placeholder, isRequired = false
         </div>
     )
 }
-export default Textbox
+
+const TextboxFlex = ({ label, mandatory=false, input }) => {
+    return (
+        <div class='flex items-center w-full gap-2'>
+            <p class="font-semibold w-32">{label} {mandatory &&<span class='text-red-600'>*</span>}</p>
+            {input}
+        </div>
+    )
+}
+
+
+export {Textbox, TextboxFlex}

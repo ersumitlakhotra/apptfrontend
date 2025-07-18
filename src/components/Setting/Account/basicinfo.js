@@ -2,7 +2,7 @@ import { Avatar, Button, Image } from "antd";
 import { CloudUploadOutlined, UserOutlined } from '@ant-design/icons';
 import { setCellFormat } from "../../../common/cellformat.js"
 import Heading from "../../../common/heading.js";
-import Textbox from "../../../common/textbox.js";
+import {Textbox} from "../../../common/textbox.js";
 import { FcInfo } from "react-icons/fc";
 import { useEffect, useRef, useState } from "react";
 import useAlert from "../../../common/alert.js";

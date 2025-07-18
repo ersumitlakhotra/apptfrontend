@@ -1,11 +1,10 @@
 
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
-import { apiCalls } from "../../../hook/apiCall";
 import { Avatar,  Button,  Image,  Rate, Tabs } from "antd";
 import { CloudUploadOutlined, EyeOutlined, UserOutlined } from '@ant-design/icons';
-import UserAbout from "./Tabs/about.js";
-import UserLoginDetail from "./Tabs/detail.js";
-import useAlert from "../../../common/alert.js";
+import UserAbout from "./about.js";
+import UserLoginDetail from "./detail.js";
+import useAlert from "../../common/alert.js";
 
 function getTabItems(key, label, icon, children) {
     return {key,label,children,icon,};
@@ -13,14 +12,12 @@ function getTabItems(key, label, icon, children) {
 const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
     const [tabActiveKey, setTabActiveKey] = useState("1");
     const [fullname, setFullname] = useState('');
-    const [isFullnameValid, setIsFullnameValid] = useState('error');
     const [cell, setCell] = useState('');
     const [email, setEmail] = useState('');
     const [address, setAddress] = useState('');
     const [gender, setGender] = useState('Male');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [isPasswordValid, setIsPasswordValid] = useState('error');
     const [role, setRole] = useState('Employee');
     const [rating, setRating] = useState(0);
     const [permission, setPermission] = useState('YYYYYYYYYY');
@@ -32,23 +29,21 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
 
     useEffect(() => {
         if (id === 0) {
-            setFullname(''); setIsFullnameValid('error');
+            setFullname('');
             setCell(''); setEmail(''); setAddress('');
             setUsername(''); setPassword(''); setRole('Employee'); setRating(0); 
-            setIsPasswordValid('error'); setPermission('YYYYYYYYYY'); setAccountType('Basic'); setProfile(null);
+            setPermission('YYYYYYYYYY'); setAccountType('Basic'); setProfile(null);
             setGender('Male'); setStatus('Active'); setTabActiveKey("1");
         }
         else {
             const editList = userList.find(item => item.id === id)
             setFullname(editList.fullname);
-            setIsFullnameValid(editList.fullname === '' ? 'error' : '')
             setCell(editList.cell);
             setEmail(editList.email);
             setAddress(editList.address);
             setGender(editList.gender);
             setUsername(editList.username);
             setPassword(editList.password);
-            setIsPasswordValid(editList.password === '' ? 'error' : '')
             setRole(editList.role);
             setRating(editList.rating);
             setPermission(editList.permission);
@@ -87,8 +82,6 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
         getTabItems('1', 'About', <UserOutlined />, <UserAbout 
             fullname={fullname}
             setFullname={setFullname}
-            isFullnameValid={isFullnameValid}
-            setIsFullnameValid={setIsFullnameValid}
             cell={cell}
             setCell={setCell}
             email={email}
@@ -106,8 +99,6 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
             setRole={setRole}
             status={status}
             setStatus={setStatus}
-            isPasswordValid={isPasswordValid}
-            setIsPasswordValid={setIsPasswordValid}
         />),
     ];
     const handleFileChange = (event) => {

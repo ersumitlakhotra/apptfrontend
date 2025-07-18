@@ -1,7 +1,7 @@
 import { Badge, Button,  Select, Drawer, Space, Input, Tooltip, Rate, Avatar, Image } from "antd";
 import { DownloadOutlined, EditOutlined, PlusOutlined, SaveOutlined, UserOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from "react";
-import UserDetail from "../../components/Users/Details/user_detail";
+import UserDetail from "../../components/Users/user_detail";
 import { IoSearchOutline } from "react-icons/io5";
 import DataTable from "../../common/datatable";
 import { getDate, getTableItem } from "../../common/items";
@@ -31,6 +31,17 @@ const Users = ({ userList, saveData }) => {
         setPage(1, 10, userList);
     }, [])
 
+    useEffect(() => {
+        const searchedList = userList.filter(item =>
+        (item.fullname.toLowerCase().includes(searchInput.toLowerCase()) &&
+            (sortStatus !== '' ? item.status.toLowerCase() === (sortStatus.toLowerCase()) : item.status.toLowerCase().includes('active')
+            )));
+        if (searchInput === '' && sortStatus === '')
+            setPage(currentPage, itemsPerPage, searchedList)
+        else
+            setPage(1, itemsPerPage, searchedList)
+    }, [searchInput, sortStatus])
+    
     const setPage = (page, pageSize, list = []) => {
         const indexOfLastItem = page * pageSize;
         const indexOfFirstItem = indexOfLastItem - pageSize;
@@ -45,16 +56,6 @@ const Users = ({ userList, saveData }) => {
         setOpen(true);
     }
 
-    useEffect(() => {
-        const searchedList = userList.filter(item =>
-        (item.fullname.toLowerCase().includes(searchInput.toLowerCase()) &&
-            (sortStatus !== '' ? item.status.toLowerCase() === (sortStatus.toLowerCase()) : item.status.toLowerCase().includes('active')
-            )));
-        if (searchInput === '' && sortStatus === '')
-            setPage(currentPage, itemsPerPage, searchedList)
-        else
-            setPage(1, itemsPerPage, searchedList)
-    }, [searchInput, sortStatus])
 
     const btnSave = async () => {
         await ref.current?.save();

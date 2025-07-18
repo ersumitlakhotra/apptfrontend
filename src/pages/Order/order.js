@@ -14,7 +14,7 @@ import { MdOutlineAssignmentInd } from "react-icons/md";
 import { AvailableCard, WorkingCard } from "../../components/Order/card.js";
 import OrderTabs from "../../components/Order/tab.js";
 
-const customeLabelTab = (label, tagColor, tagValue) => {
+const customLabelTab = (label, tagColor, tagValue) => {
     return (
         <div class='flex flex-row gap-2 items-center'>
             <p>{label}</p>
@@ -23,37 +23,32 @@ const customeLabelTab = (label, tagColor, tagValue) => {
     )
 }
 
-const Order = ({ orderList, tabActiveKey, setTabActiveKey, }) => {
+const Order = ({ orderList, servicesList, userList, tabActiveKey, setTabActiveKey, saveData }) => {
     const ref = useRef();
-    const tabItems = [
-        getTabItems('1', customeLabelTab("All", "blue", "5"), null, <OrderTabs orderList={orderList} />),
-        getTabItems('2', customeLabelTab("Pending", "yellow", "10"), null, <OrderTabs orderList={orderList} />),
-        getTabItems('3', customeLabelTab("Completed", "green", "10"), null, <OrderTabs orderList={orderList} />),
-        getTabItems('4', customeLabelTab("Cancelled", "red", "10"), null, <OrderTabs orderList={orderList} />),
-    ];
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState('New');
     const [id, setId] = useState(0);
     const [refresh, setRefresh] = useState(0);
 
-    const btnNew_Click = () => {
-        setTitle("New Order");
-        setRefresh(refresh + 1);
-        setId(0);
-        setOpen(true);
-    }
-
-    const btnEdit_Click = (id) => {
-        setTitle("Edit Order");
+    const btn_Click = (id) => {
+        setTitle(id === 0 ? "New Order" : "Edit Order");
         setRefresh(refresh + 1);
         setId(id);
         setOpen(true);
     }
 
+    const tabItems = [
+        getTabItems('1', customLabelTab("All", "blue", "5"), null, <OrderTabs orderList={orderList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} />),
+        getTabItems('2', customLabelTab("Pending", "yellow", "10"), null, <OrderTabs orderList={orderList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} />),
+        getTabItems('3', customLabelTab("Completed", "green", "10"), null, <OrderTabs orderList={orderList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} />),
+        getTabItems('4', customLabelTab("Cancelled", "red", "10"), null, <OrderTabs orderList={orderList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} />),
+    ];
+  
+
     const btnSave = async () => {
-        const result = await ref.current?.btnSave_Click();
-        setOpen(false);      
+        await ref.current?.save();
     }
+    
     return (
         <div class="flex flex-col gap-4 mb-12">
 
@@ -61,7 +56,7 @@ const Order = ({ orderList, tabActiveKey, setTabActiveKey, }) => {
                 <span class="text-lg font-semibold text-gray-800">Order</span>
                 <div class="flex gap-2">
                     <Button type='default' icon={<DownloadOutlined />} size="large">Export</Button>
-                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btnNew_Click(0)}>Create order</Button>
+                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create order</Button>
                 </div>
             </div>
 
@@ -86,7 +81,7 @@ const Order = ({ orderList, tabActiveKey, setTabActiveKey, }) => {
             <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
-                <OrderDetail id={id} reload={refresh} ref={ref} />
+                <OrderDetail id={id} refresh={refresh} ref={ref} orderList={orderList} servicesList={servicesList} userList={userList} saveData={saveData} setOpen={setOpen} />
             </Drawer>
 
         </div>
