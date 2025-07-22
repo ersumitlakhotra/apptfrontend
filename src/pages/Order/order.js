@@ -1,14 +1,10 @@
-import { Button, DatePicker, Divider, Drawer, Input, Select, Space, Tabs, Tag } from "antd";
-import { DownloadOutlined, PlusOutlined, SearchOutlined, SaveOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import OrderTable from "../../components/Order/order_table.js"
+import { Button, Drawer, Space, Tabs, Tag } from "antd";
+import { DownloadOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from "react";
-import useAlert from "../../common/alert";
-import { apiCalls } from "../../hook/apiCall";
 import OrderDetail from "../../components/Order/order_detail";
 import { getTabItems } from "../../common/items.js";
 import Heading from "../../common/heading.js";
-
-import Chart from "react-apexcharts";
+import dayjs from 'dayjs';
 import { SiTicktick } from "react-icons/si";
 import { MdOutlineAssignmentInd } from "react-icons/md";
 import { AvailableCard, WorkingCard } from "../../components/Order/card.js";
@@ -37,11 +33,30 @@ const Order = ({ orderList, servicesList, userList, tabActiveKey, setTabActiveKe
         setOpen(true);
     }
 
+    const [pendingList, setPendingList] = useState([]);
+    const [inprogressList, setInprogressList] = useState([]);
+    const [completedList, setCompletedList] = useState([]);
+    const [cancelledList, setCancelledList] = useState([]);
+   
+    useEffect(() => {
+        const pending = orderList.filter(a => a.status.toUpperCase() === 'PENDING');
+        const inprogress = orderList.filter(a => a.status.toUpperCase() === 'IN PROGRESS' && dayjs().format('YYYY-MM-DD') === dayjs(a.trndate).format('YYYY-MM-DD'));
+        const completed = orderList.filter(a => a.status.toUpperCase() === 'COMPLETED');
+        const cancelled = orderList.filter(a => a.status.toUpperCase() === 'CANCELLED');
+
+        setPendingList(pending.length > 0 ? pending : [])
+        setInprogressList(inprogress.length > 0 ? inprogress : [])
+        setCompletedList(completed.length > 0 ? completed : [])
+        setCancelledList(cancelled.length > 0 ? cancelled : [])
+
+    }
+    , [refresh])
+
     const tabItems = [
-        getTabItems('1', customLabelTab("All", "blue", "5"), null, <OrderTabs orderList={orderList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} />),
-        getTabItems('2', customLabelTab("Pending", "yellow", "10"), null, <OrderTabs orderList={orderList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} />),
-        getTabItems('3', customLabelTab("Completed", "green", "10"), null, <OrderTabs orderList={orderList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} />),
-        getTabItems('4', customLabelTab("Cancelled", "red", "10"), null, <OrderTabs orderList={orderList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} />),
+        getTabItems('1', customLabelTab("All", "blue", orderList.length), null, <OrderTabs orderList={orderList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} />),
+        getTabItems('2', customLabelTab("Pending", "yellow", pendingList.length), null, <OrderTabs orderList={pendingList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} />),
+        getTabItems('3', customLabelTab("Completed", "green", completedList.length), null, <OrderTabs orderList={completedList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} />),
+        getTabItems('4', customLabelTab("Cancelled", "red", cancelledList.length), null, <OrderTabs orderList={cancelledList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} />),
     ];
   
 
@@ -62,14 +77,16 @@ const Order = ({ orderList, servicesList, userList, tabActiveKey, setTabActiveKe
 
             <div class='flex flex-col gap-2 md:flex-row '>
                 <div class='w-full bg-white border rounded p-2'>
-                    <Heading label={"Working"} desc={"4 order is in progress "} icon={<SiTicktick size={26}/>} />
-                    <div class='mx-8 my-2 overflow-scroll overflow-y-hidden flex flex-row gap-4 p-2'>
-                        <WorkingCard key={1} />
+                    <Heading label={"Working"} desc={`${inprogressList.length} order is in progress `} icon={<SiTicktick size={26}/>} />
+                    <div class={`mx-8 my-2 ${inprogressList.length > 0 && 'overflow-scroll'} overflow-y-hidden flex flex-row gap-3 p-2`}>                
+                        {inprogressList.map((a) => (
+                                <WorkingCard key={a.id} order_no={a.order_no} slot={a.slot} assignedto={a.assignedto} serviceinfo={a.serviceinfo} userList={userList} servicesList={servicesList} />
+                            ))}
                     </div>
                 </div>
                 <div class='w-full bg-white border rounded p-2'>
                     <Heading label={"Available"} desc={"Sort of ready and able to take on new tasks"} icon={<MdOutlineAssignmentInd size={26} />} />
-                    <div class='mx-8 my-2 overflow-scroll overflow-y-hidden flex flex-row gap-4 p-2 pb-14'>
+                    <div class='mx-8 my-2 overflow-scroll overflow-y-hidden flex flex-row gap-3 p-2 pb-8'>
                         <AvailableCard key={1} />
                     </div>
                 </div>

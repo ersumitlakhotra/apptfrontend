@@ -21,5 +21,13 @@ const TextboxFlex = ({ label, mandatory=false, input }) => {
     )
 }
 
+const TextboxFlexCol = ({ label, mandatory = false, input }) => {
+    return (
+        <div class='flex flex-col w-full gap-1'>
+            <p class="font-medium text-sm w-32">{label} {mandatory && <span class='text-red-600'>*</span>}</p>
+            {input}
+        </div>
+    )
+}
 
-export {Textbox, TextboxFlex}
+export { Textbox, TextboxFlex, TextboxFlexCol }

@@ -1,164 +1,120 @@
 import { useEffect, useImperativeHandle, useState } from "react";
-import { apiCalls } from "../../hook/apiCall";
-import { Button, DatePicker, Flex, Radio, Select, Space } from "antd";
+import {  DatePicker,  Input,  Select } from "antd";
 import dayjs from 'dayjs';
-import { CheckOutlined, CloseOutlined, LineChartOutlined } from '@ant-design/icons';
+import { TextboxFlex } from "../../common/textbox";
+import TextArea from "antd/es/input/TextArea";
 
-const EventDetail = ({ id, reload, ref }) => {
-     const emptyData = {
-            "title": "",
-            "price": "",
-            "timing": "",
-            "status": "Active",
-            "createdat": "",
-            "modifiedat": "",
-            "id": "0"
-        }
-        const [dataList, setDataList] = useState(emptyData);
+const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setOpen }) => {
 
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-    const [status, setStatus] = useState('Active');
     const [discount, setDiscount] = useState(0);
-    const [discountType, setDiscountType] = useState(1);
+    const [servicesItem, setServicesItem] = useState([]);
 
-    const [servicesList, setServicesList] = useState([]);
-    const [selectedItems, setSelectedItems] = useState([]);
-    const filteredOptionsServices = servicesList.filter(o => !selectedItems.includes(o));
+    useEffect(() => {
+        if (id === 0) {
+            setTitle(''); setDescription(''); setStartDate(''); setEndDate('');
+             setDiscount('0');  setServicesItem([]);
+        }
+        else {
+            const editList = eventList.find(item => item.id === id)
+            setTitle(editList.title); 
+            setDescription(editList.description); 
+            setStartDate(editList.startdate); 
+            setEndDate(editList.enddate);
+            setDiscount(editList.discount);
+            setServicesItem(editList.serviceinfo);
+        }
+    }, [refresh])
+
+    const setPriceNumberOnly = (event) => {
+        const inputValue = event.target.value;
+        const regex = /^\d*(\.\d*)?$/;
+
+        if (regex.test(inputValue) || inputValue === '') {
+            setDiscount(inputValue);
+        }
+    };
+    const save = async () => {
+        if (title !== '' && startDate !== '' && servicesItem.length !== 0 && endDate !== '' && discount !== '' && discount !== '.') {
+            const Body = JSON.stringify({
+                title: title,
+                description: description,
+                startdate: startDate,
+                enddate: endDate,
+                serviceinfo: servicesItem,
+                discount: discount
+            });
+            saveData("Event", id !== 0 ? 'PUT' : 'POST', "event", id !== 0 ? id : null, Body);
+            setOpen(false);
+        }
+    }
+
+    useImperativeHandle(ref, () => {
+        return {
+            save,
+        };
+    })
 
 
-        useEffect(() => {
-            getData();
-        }, [reload]);
-    
-        const getData = async () => {
-            if (id !== 0) {
-                const res = await apiCalls('GET', 'event', id, null);
-                setDataList(res.data.data);
-            }
-            else
-                setDataList(emptyData);
-        }
-
-    const getServices = async () => {
-        try {
-            const res = await apiCalls('GET', 'services', null, null);
-            setServicesList(res.data.data);
-        }
-        catch (e) {
-            setServicesList([]);
-        }
-        }
-    
-        useEffect(() => {
-            setTitle(dataList.title);
-            getServices();
-        }, [dataList])
-    
-    
-        const btnSave_Click = async () => {
-            try {
-                const Body = JSON.stringify({
-                    title: title,
-                    description:description,
-                    startdate:startDate,
-                    enddate:endDate,
-                    services: `${selectedItems.join(',')}`,
-                    discounttype:discountType,
-                    discount:discount,
-                    status:status
-                });
-                if (id !== 0) {
-                    return await apiCalls('PUT', 'event', id, Body);
-                }
-                else
-                    return await apiCalls('POST', 'event', null, Body);
-            } catch (error) {
-                return JSON.stringify({
-                    status: 500,
-                    message: error.message
-                });
-            }
-        }
-    
-        useImperativeHandle(ref, () => {
-            return {
-                btnSave_Click,
-            };
-        })
-return(
+    return (
         <div class='flex flex-col font-normal gap-3 mt-2'>
-            <p class="text-gray-400 mb-4">Event Information</p>
+            <p class="text-gray-400 mb-4">Event Detail</p>
 
-        {/*  title */}
-        <div class='flex items-center w-full gap-2'>
-            <p class="font-semibold w-32">Event Title <span class='text-red-600'>*</span></p>
-            <input type="text" name="title" id="title" value={title}
-                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="title" onChange={(e) => setTitle(e.target.value)} />
-        </div>
+            <TextboxFlex label={'Name'} mandatory={true} input={
+                <Input placeholder="Name" status={title === '' ? 'error' : ''} value={title} onChange={(e) => setTitle(e.target.value)} />
+            } />
+            
+            <TextboxFlex label={'Description'} input={
+                <TextArea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} minLength={3} />
+            } />
 
-        {/*  description */}
-        <div class='flex items-center w-full gap-2'>
-            <p class="font-semibold w-32">Description <span class='text-red-600'>*</span></p>
-            <textarea name="description" id="description" value={description}
-                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="description" onChange={(e) => setDescription(e.target.value)} />
-        </div>
+            <TextboxFlex label={'Start Date'} mandatory={true} input={
+                <DatePicker status={startDate === '' ? 'error' : ''} style={{ width: '100%' }} value={startDate === '' ? startDate : dayjs(startDate, 'YYYY-MM-DD')} onChange={(date, dateString) => setStartDate(dateString)} />
+            } />
 
-        {/*  date */}
-        <div class='flex items-center w-full gap-2'>
-            <p class="font-semibold w-32">Date <span class='text-red-600'>*</span></p>
-                <DatePicker placeholder="Start" onChange={(value, dateString) => { setStartDate(dateString) }} style={{ width: '48%' }}
-                    value={(startDate !== '' && startDate !== undefined && startDate !== null) && dayjs(startDate, 'YYYY-MM-DD')} />
-            <DatePicker placeholder="End" onChange={(value, dateString) => { setEndDate(dateString) }} style={{ width: '48%' }}
-                    value={(endDate !== '' && endDate !== undefined && endDate !== null) && dayjs(endDate, 'YYYY-MM-DD')} />
-        </div>
-     
-        {/*  services */}
-        <div class='flex items-center w-full gap-2'>
-            <p class="font-semibold w-32">Services <span class='text-red-600'>*</span></p>
-            <Select mode="multiple" placeholder="Services" value={selectedItems} onChange={e => { setSelectedItems(e); console.log(e) }} style={{ width: '100%' }}
-                options={filteredOptionsServices.map(item => ({
-                    value: item.id,
-                    label: item.title,
-                }))}
-            />
-        </div>
+            <TextboxFlex label={'End Date'} mandatory={true} input={
+                <DatePicker status={endDate === '' ? 'error' : ''} style={{ width: '100%' }} value={endDate === '' ? endDate : dayjs(endDate, 'YYYY-MM-DD')} onChange={(date, dateString) => setEndDate(dateString)} />
+            } />
 
-        {/*  discount */}
-        <div class='flex w-full gap-2'>
-            <p class="font-semibold w-32">Discount <span class='text-red-600'>*</span></p>
-            <div class="flex flex-col w-full gap-3">               
-            <Radio.Group style={{ width: '100%' }}
-                value={discountType}
-                onChange={e => setDiscountType(e.target.value)}
-                options={[
-                    { value: 1, label: 'Flat Price' },
-                    { value: 2, label: 'Percentage' },                 
-                ]}
-            />
+            <TextboxFlex label={'Services'} mandatory={true} input={
+                <Select
+                    status={servicesItem.length === 0 ? 'error' : ''}
+                    placeholder='Select services'
+                    mode="multiple"
+                    value={servicesItem}
+                    style={{ width: '100%' }}
+                    onChange={(value) => setServicesItem(value)}
+                    options={servicesList.map(item => ({
+                        value: item.id,
+                        label: item.name
+                    }))}
+                    optionFilterProp="label"
+                    filterSort={(optionA, optionB) => {
+                        var _a, _b;
+                        return (
+                            (_a = optionA === null || optionA === void 0 ? void 0 : optionA.label) !== null &&
+                                _a !== void 0
+                                ? _a
+                                : ''
+                        )
+                            .toLowerCase()
+                            .localeCompare(
+                                ((_b = optionB === null || optionB === void 0 ? void 0 : optionB.label) !== null &&
+                                    _b !== void 0
+                                    ? _b
+                                    : ''
+                                ).toLowerCase(),
+                            );
+                    }}
+                />
+            } />
 
-            <input type="number" name="price" id="price" value={discount}
-                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="0" onChange={(e) => setDiscount(e.target.value)} />
-
-            </div>
-        </div>
-
-
-       
-
-        {/*  Active Inactive */}
-        <div class='flex items-center w-full gap-2'>
-            <p class="font-semibold w-32">Status</p>
-            <div class='flex flex-row items-center gap-2 w-full'>
-                <Button color={`${status === 'Active' ? 'cyan' : 'default'}`} variant="outlined" icon={<CheckOutlined />} onClick={() => setStatus('Active')} >Active</Button>
-                <Button color={`${status === 'Inactive' ? 'danger' : 'default'}`} variant="outlined" icon={<CloseOutlined />} onClick={() => setStatus('Inactive')} >Inactive</Button>
-            </div>
-        </div>
+            <TextboxFlex label={'Discount $'} mandatory={true} input={
+                <Input placeholder="Price" status={(discount === '' || discount === '.') ? 'error' : ''} value={discount} onChange={setPriceNumberOnly} />
+            } />
 
         </div>
     )

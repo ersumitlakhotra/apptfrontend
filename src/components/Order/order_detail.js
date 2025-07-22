@@ -1,12 +1,11 @@
 import { useEffect, useImperativeHandle, useState } from "react";
-import { apiCalls } from "../../hook/apiCall";
 import { Avatar, Badge, DatePicker, Divider, Image, Input, Select } from "antd";
 import dayjs from 'dayjs';
 import { TextboxFlex } from "../../common/textbox";
 import { setCellFormat } from "../../common/cellformat";
 
 import {  UserOutlined } from '@ant-design/icons';
-import Slots from "../../common/intervals";
+import {Slots} from "../../common/intervals";
 
 const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, saveData ,setOpen  }) => {
    

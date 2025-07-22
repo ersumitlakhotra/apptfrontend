@@ -3,7 +3,6 @@ import Cards from "../../components/Dashboard/Cards/cards";
 import Chart from "react-apexcharts";
 import { Button,  Dropdown, Flex, Space, Tag } from "antd";
 import { DownOutlined } from '@ant-design/icons';
-import OrderTable from "../../components/Order/order_table";
 
 const handleButtonClick = e => {
 
@@ -128,7 +127,7 @@ const Dashboard = ({orderList, servicesList}) => {
                         </Button>
                     </Dropdown>
                 </div>
-                 <OrderTable dataSource={orderList} serviceList={servicesList} />
+                 {/*<OrderTable dataSource={orderList} serviceList={servicesList} />*/}
             </div>
 
 

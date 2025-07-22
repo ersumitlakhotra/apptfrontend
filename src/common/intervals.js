@@ -54,4 +54,4 @@ const generateTimeSlots = (startHour, endHour, intervalMinutes, orderListSlot) =
     return slots;
 };
 
-export default Slots;
+export { Slots, generateTimeSlots };

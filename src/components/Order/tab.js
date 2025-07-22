@@ -1,20 +1,14 @@
-import { Avatar, Button, Image, Input, Table, Tag, Tooltip} from "antd"
+import { Avatar, Button, Image, Input,  Tag, Tooltip} from "antd"
 import { IoSearchOutline } from "react-icons/io5";
-import OrderTable from "./order_table"
 import { getDate, getTableItem } from "../../common/items";
 import DataTable from "../../common/datatable";
 import { useEffect, useState } from "react";
 
-import { DownloadOutlined, EditOutlined, EyeOutlined, PlusOutlined, SaveOutlined, UserOutlined } from '@ant-design/icons';
+import {  EditOutlined, EyeOutlined,   UserOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { Tags } from "../../common/tags";
 
-const dataSource = Array.from({ length: 100 }).map((_, i) => ({
-    key: i,
-    name: `Edward King ${i}`,
-    age: 32,
-    address: `London, Park Lane no. ${i}`,
-}));
+
 const OrderTabs = ({ orderList, servicesList , userList , btn_Click }) => {
   
     const [searchInput, setSearchInput] = useState('');
