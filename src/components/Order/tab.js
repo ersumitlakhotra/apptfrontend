@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 import { Tags } from "../../common/tags";
 
 
-const OrderTabs = ({ orderList, servicesList , userList , btn_Click }) => {
+const OrderTabs = ({key, orderList, servicesList , userList , btn_Click }) => {
   
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(orderList);
@@ -42,7 +42,7 @@ const OrderTabs = ({ orderList, servicesList , userList , btn_Click }) => {
         getTableItem('9', 'Action'),
     ];
     return (
-        <div  class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
+        <div key={key} class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
             <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
                 <div class='w-full md:w-1/3'>
                     <Input size="large" placeholder="Search" prefix={<IoSearchOutline />} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
@@ -79,7 +79,7 @@ const OrderTabs = ({ orderList, servicesList , userList , btn_Click }) => {
                                 {item.serviceinfo !== null &&
                                     servicesList.filter(a =>
                                         item.serviceinfo.some(b => b === a.id)
-                                ).map(c => <Tag color="cyan" bordered={false}>{c.name}</Tag>)
+                                ).map(c => <Tag key={c.id} color="cyan" bordered={false}>{c.name}</Tag>)
                                 }
                             </td>
 
@@ -88,7 +88,7 @@ const OrderTabs = ({ orderList, servicesList , userList , btn_Click }) => {
 
                             <td class="p-3">{item.assignedto === '0' ? '' :
                                 userList.filter(user => user.id === item.assignedto).map(a =>
-                                    <div class='flex flex-row gap-2 items-center'>
+                                    <div key={a.id} class='flex flex-row gap-2 items-center'>
                                         {a.profilepic !== null ?
                                             <Image width={31} height={31} src={a.profilepic} style={{ borderRadius: 15 }} /> :
                                             <Avatar size={30} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />

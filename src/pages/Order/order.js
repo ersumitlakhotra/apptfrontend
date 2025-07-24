@@ -53,10 +53,10 @@ const Order = ({ orderList, servicesList, userList, tabActiveKey, setTabActiveKe
     , [refresh])
 
     const tabItems = [
-        getTabItems('1', customLabelTab("All", "blue", orderList.length), null, <OrderTabs orderList={orderList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} />),
-        getTabItems('2', customLabelTab("Pending", "yellow", pendingList.length), null, <OrderTabs orderList={pendingList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} />),
-        getTabItems('3', customLabelTab("Completed", "green", completedList.length), null, <OrderTabs orderList={completedList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} />),
-        getTabItems('4', customLabelTab("Cancelled", "red", cancelledList.length), null, <OrderTabs orderList={cancelledList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} />),
+        getTabItems('1', customLabelTab("All", "blue", orderList.length), null, <OrderTabs key={1} orderList={orderList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} />),
+        getTabItems('2', customLabelTab("Pending", "yellow", pendingList.length), null, <OrderTabs key={2} orderList={pendingList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} />),
+        getTabItems('3', customLabelTab("Completed", "green", completedList.length), null, <OrderTabs key={3} orderList={completedList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} />),
+        getTabItems('4', customLabelTab("Cancelled", "red", cancelledList.length), null, <OrderTabs key={4} orderList={cancelledList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} />),
     ];
   
 

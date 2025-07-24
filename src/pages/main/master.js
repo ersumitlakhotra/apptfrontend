@@ -148,9 +148,9 @@ const MasterPage = () => {
         }
       case 'Tasks':
         {
-          getData(setOrderList, "GET", "order");
-          getData(setServicesList, "GET", "services");
           getData(setUserList, "GET", "user");
+          getData(setServicesList, "GET", "services");
+          getData(setOrderList, "GET", "order");
           break;
         }
       case 'Event':
