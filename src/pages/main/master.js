@@ -143,6 +143,7 @@ const MasterPage = () => {
           getData(setOrderList, "GET", "order");
           getData(setServicesList, "GET", "services");
           getData(setUserList, "GET", "user");
+          getData(setCompanyList, "GET", "company");
           //getData(setServicesList, "GET", "services");
           break;
         }
@@ -151,6 +152,7 @@ const MasterPage = () => {
           getData(setUserList, "GET", "user");
           getData(setServicesList, "GET", "services");
           getData(setOrderList, "GET", "order");
+          getData(setCompanyList, "GET", "company");
           break;
         }
       case 'Event':
@@ -183,11 +185,11 @@ const MasterPage = () => {
 
   let displayedContent;
   if (content === 'Dashboard') {
-    //displayedContent = <Dashboard orderList={orderList} servicesList={servicesList} />;
+    displayedContent = <Dashboard orderList={orderList} servicesList={servicesList} />;
   } else if (content === 'Tasks') {
-    displayedContent = <Tasks orderList={orderList} userList={userList} servicesList={servicesList} />;
+    displayedContent = <Tasks orderList={orderList} userList={userList} servicesList={servicesList} companyList={companyList} />;
   } else if (content === 'Order') {
-    displayedContent = <Order orderList={orderList} servicesList={servicesList} userList={userList} tabActiveKey={orderActiveTab} setTabActiveKey={setOrderActiveTab} saveData={saveData} />;
+    displayedContent = <Order orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} tabActiveKey={orderActiveTab} setTabActiveKey={setOrderActiveTab} saveData={saveData} />;
   } else if (content === 'Event') {
     displayedContent = <Event eventList={eventList} servicesList={servicesList} saveData={saveData} />;
   } else if (content === 'Services') {

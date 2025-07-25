@@ -5,13 +5,14 @@ import { RightOutlined, LeftOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import Calender from "../../components/Event/calender";
 
-const Tasks = ({ orderList, servicesList, userList }) => {
+const Tasks = ({ orderList, servicesList, userList, companyList }) => {
     const [date, setDate] = useState(null);
     const [orders, setOrders] = useState([]);
     const [refresh, setRefresh] = useState(0);
 
     useEffect(() => {
         setDate(dayjs());
+        setRefresh(refresh + 1);
     }, [])
 
     useEffect(() => {
@@ -31,7 +32,7 @@ const Tasks = ({ orderList, servicesList, userList }) => {
                 </div>
             </div>
             <div class={`w-full bg-white border rounded-lg p-4 flex flex-col gap-4 max-h-[700px]`}>
-                <Calender orderList={orders} servicesList={servicesList} userList={userList} refresh={refresh}/>            
+                <Calender orderList={orders} servicesList={servicesList} userList={userList} companyList={companyList} trndate={date} refresh={refresh}/>            
             </div>
 
 

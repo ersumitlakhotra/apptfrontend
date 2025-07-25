@@ -1,51 +1,89 @@
 
 import { useEffect, useState } from "react";
-import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
-import { Sort } from "../../common/sort";
 import { Avatar, Image, Tag } from "antd";
 
-import { UserOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { UserOutlined } from '@ant-design/icons';
 import { generateTimeSlots } from "../../common/intervals";
 
-const getBorder = (value) => {
-    switch (value.toUpperCase()) {
-        case 'PENDING':
-            return 'border-s-yellow-500 bg-yellow-100 text-yellow-600';
-        case 'IN PROGRESS':
-            return 'border-s-blue-500 bg-blue-100 text-blue-600 ';
-        case 'COMPLETED':
-            return 'border-s-green-500 bg-green-100  text-green-600';
-        case 'CANCELLED':
-            return 'border-s-red-500 bg-red-100 text-red-600';
-        default:
-            return 'border-s-gray-400 bg-grey-100 text-gray-600';
-    }
-}
-const getTag = (value,name) => {
-    switch (value.toUpperCase()) {
-        case 'PENDING':
-            return <Tag color='Yellow' bordered={false}>{name}</Tag>;
-        case 'IN PROGRESS':
-            return <Tag color='Blue' bordered={false}>{name}</Tag>;
-        case 'COMPLETED':
-            return <Tag color='Green' bordered={false}>{name}</Tag>;
-        case 'CANCELLED':
-            return <Tag color='Red' bordered={false}>{name}</Tag>;
-        default:
-            return <Tag color='Gray' bordered={false}>{name}</Tag>;
-    }
-}
-const Calender = ({ orderList, servicesList, userList, refresh }) => {
+import dayjs from 'dayjs';
+import { getBorder, getTag } from "../../common/items";
+
+const Calender = ({ orderList, servicesList, userList, companyList, trndate, refresh }) => {
 
     const [headerItems,setHeaderItems]= useState([])
     const [generateSlots, setGenerateSlots] = useState([]);
 
+    const [inTime, setInTime] = useState('00:00:00');
+    const [outTime, setOutTime] = useState('00:00:00');
+
+    const weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+
     useEffect(() => {
         let i=0;
         setHeaderItems(userList.map(a => ({ key:i=i+1, label:a.fullname, id:a.id,profilepic:a.profilepic})))
-        setGenerateSlots(generateTimeSlots("10:00:00", "21:50:00", 30, []));
     }, [refresh])
 
+   useEffect(() => {
+        if (companyList.length !== 0) {
+            if (companyList.timinginfo !== null) {
+                if (trndate !== '') {
+                    const dayOfWeekNumber = dayjs(trndate).get('day');
+                    const dayName = weekdays[dayOfWeekNumber];
+                    setOpeningHours(dayName);
+                }
+            }
+        }
+   }, [companyList, trndate])
+
+    useEffect(() => {
+        setGenerateSlots(generateTimeSlots(inTime, outTime, 30, []));
+    }, [inTime, outTime])
+
+    const setOpeningHours = (weekday) => {
+        switch (weekday) {
+            case 'sunday':
+                {
+                    setInTime(companyList.timinginfo[0].sunday[0]); setOutTime(companyList.timinginfo[0].sunday[1]); 
+                    break;
+                }
+            case 'monday':
+                {
+                    setInTime(companyList.timinginfo[0].monday[0]); setOutTime(companyList.timinginfo[0].monday[1]); 
+                    break;
+                }
+            case 'tuesday':
+                {
+                    setInTime(companyList.timinginfo[0].tuesday[0]); setOutTime(companyList.timinginfo[0].tuesday[1]); 
+                    break;
+                }
+            case 'wednesday':
+                {
+                    setInTime(companyList.timinginfo[0].wednesday[0]); setOutTime(companyList.timinginfo[0].wednesday[1]); 
+                    break;
+                }
+            case 'thursday':
+                {
+                    setInTime(companyList.timinginfo[0].thursday[0]); setOutTime(companyList.timinginfo[0].thursday[1]); 
+                    break;
+                }
+            case 'friday':
+                {
+                    setInTime(companyList.timinginfo[0].friday[0]); setOutTime(companyList.timinginfo[0].friday[1]); 
+                    break;
+                }
+            case 'saturday':
+                {
+                    setInTime(companyList.timinginfo[0].saturday[0]); setOutTime(companyList.timinginfo[0].saturday[1]); 
+                    break;
+                }
+            default:
+                {
+                    setInTime('00:00:00'); setOutTime('00:00:00'); 
+                    break;
+                }
+
+        }
+    }
     return (
         <div class="relative overflow-x-auto ">
             <table class={`w-full text-left  overflow-auto h-fit`}>
@@ -99,15 +137,4 @@ const Calender = ({ orderList, servicesList, userList, refresh }) => {
 
 export default Calender;
 
-{/*
-    
-     const order = orderList.filter(b => b.assignedto === a.id && b.slot === item.id);
-                                if (order.length > 0) {
-                                    order.map(c => (
-                                        <td class="p-3 font-sans font-semibold text-gray-700">{c.order_n0}</td>
-                                    ))
-                                }
-                                else {
-                                    <td></td>
-                                }
-    */}
+

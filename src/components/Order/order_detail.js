@@ -7,7 +7,7 @@ import { setCellFormat } from "../../common/cellformat";
 import {  UserOutlined } from '@ant-design/icons';
 import {Slots} from "../../common/intervals";
 
-const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, saveData ,setOpen  }) => {
+const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, companyList, saveData ,setOpen  }) => {
    
 
     const [customerName, setCustomerName] = useState('');
@@ -24,6 +24,13 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, save
     //const filteredOptionsServices = servicesList.filter(o => !selectedItems.includes(o));
 
     const [orderListSlot, setOrderListSlot] = useState([]);
+
+    const [inTime, setInTime] = useState('00:00:00');
+    const [outTime, setOutTime] = useState('00:00:00');
+    const [isOpen, setIsOpen] = useState(false);
+
+    const weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+
     useEffect(() => {
         if (id === 0) {
             setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');
@@ -43,6 +50,16 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, save
             setOrderNo(editList.order_no);
             setStatus(editList.status);          
             setTrnDate(editList.trndate);
+            if (companyList.length !== 0) {
+                if (companyList.timinginfo !== null) {
+                    if (editList.trndate !== '')
+                    {
+                        const dayOfWeekNumber = dayjs(editList.trndate).get('day');
+                        const dayName = weekdays[dayOfWeekNumber];
+                        setOpeningHours(dayName);
+                    }
+                }
+            }
             setServicesItem(editList.serviceinfo);
             setModifiedat(editList.modifiedat);
             setAssignedTo(editList.assignedto);
@@ -51,6 +68,63 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, save
         }
     }, [refresh])
 
+    useEffect(() => {
+        if (companyList.length !== 0) {
+            if (companyList.timinginfo !== null) {
+                if (trndate !== '') {
+                    const dayOfWeekNumber = dayjs(trndate).get('day');
+                    const dayName = weekdays[dayOfWeekNumber];
+                    setOpeningHours(dayName);
+                }
+            }
+        }
+    }, [companyList, trndate])
+
+    const setOpeningHours = (weekday) => {
+        switch (weekday.toLowerCase()) {
+            case 'sunday':
+                {
+                    setInTime(companyList.timinginfo[0].sunday[0]); setOutTime(companyList.timinginfo[0].sunday[1]); setIsOpen(companyList.timinginfo[0].sunday[2]);
+                    break;
+                }
+            case 'monday':
+                {
+                    setInTime(companyList.timinginfo[0].monday[0]); setOutTime(companyList.timinginfo[0].monday[1]); setIsOpen(companyList.timinginfo[0].monday[2]);
+                    break;
+                }
+            case 'tuesday':
+                {
+                    setInTime(companyList.timinginfo[0].tuesday[0]); setOutTime(companyList.timinginfo[0].tuesday[1]); setIsOpen(companyList.timinginfo[0].tuesday[2]);
+                    break;
+                }
+            case 'wednesday':
+                {
+                    setInTime(companyList.timinginfo[0].wednesday[0]); setOutTime(companyList.timinginfo[0].wednesday[1]); setIsOpen(companyList.timinginfo[0].wednesday[2]);
+                    break;
+                }
+            case 'thursday':
+                {
+                    setInTime(companyList.timinginfo[0].thursday[0]); setOutTime(companyList.timinginfo[0].thursday[1]); setIsOpen(companyList.timinginfo[0].thursday[2]);
+                    break;
+                }
+            case 'friday':
+                {
+                    setInTime(companyList.timinginfo[0].friday[0]); setOutTime(companyList.timinginfo[0].friday[1]); setIsOpen(companyList.timinginfo[0].friday[2]);
+                    break;
+                }
+            case 'saturday':
+                {
+                    setInTime(companyList.timinginfo[0].saturday[0]); setOutTime(companyList.timinginfo[0].saturday[1]); setIsOpen(companyList.timinginfo[0].saturday[2]);
+                    break;
+                }
+            default:
+                {
+                    setInTime('00:00:00'); setOutTime('00:00:00'); setIsOpen(false);
+                    break;
+                }
+
+        }
+    }
  
     const save = async () => {
         if (customerName !== '' && customerPhone !== '' && servicesItem.length !== 0 && price !== '' && price !== '.' && trndate !== '') {
@@ -203,7 +277,9 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, save
                  <div class='flex flex-row w-full'>
                     {(trndate === '' || assigned_to === '') ?
                         <p class='w-full border p-4 rounded text-sm text-gray-400 outline-dotted'> Please select both ( Date and Employee ) to view the available time slots. </p> :
-                    <Slots inTime={"10:00:00"} outTime={"21:50:00"} orderListSlot={orderListSlot} slot={slot} setSlot={setSlot}/>
+                    isOpen ?                
+                    <Slots inTime={inTime} outTime={outTime} orderListSlot={orderListSlot} slot={slot} setSlot={setSlot}/>
+                            : <p class='w-full border p-4 rounded text-sm text-gray-400 outline-dotted'> Business Closed ! </p> 
                  }
                 </div>
             } />

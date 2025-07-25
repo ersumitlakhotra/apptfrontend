@@ -19,7 +19,7 @@ const customLabelTab = (label, tagColor, tagValue) => {
     )
 }
 
-const Order = ({ orderList, servicesList, userList, tabActiveKey, setTabActiveKey, saveData }) => {
+const Order = ({ orderList, servicesList, userList, companyList, tabActiveKey, setTabActiveKey, saveData }) => {
     const ref = useRef();
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState('New');
@@ -55,8 +55,8 @@ const Order = ({ orderList, servicesList, userList, tabActiveKey, setTabActiveKe
     const tabItems = [
         getTabItems('1', customLabelTab("All", "blue", orderList.length), null, <OrderTabs key={1} orderList={orderList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} />),
         getTabItems('2', customLabelTab("Pending", "yellow", pendingList.length), null, <OrderTabs key={2} orderList={pendingList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} />),
-        getTabItems('3', customLabelTab("Completed", "green", completedList.length), null, <OrderTabs key={3} orderList={completedList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} />),
-        getTabItems('4', customLabelTab("Cancelled", "red", cancelledList.length), null, <OrderTabs key={4} orderList={cancelledList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} />),
+        getTabItems('3', customLabelTab("Completed", "green", completedList.length), null, <OrderTabs key={3} orderList={completedList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} />),
+        getTabItems('4', customLabelTab("Cancelled", "red", cancelledList.length), null, <OrderTabs key={4} orderList={cancelledList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} />),
     ];
   
 
@@ -98,7 +98,7 @@ const Order = ({ orderList, servicesList, userList, tabActiveKey, setTabActiveKe
             <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
-                <OrderDetail id={id} refresh={refresh} ref={ref} orderList={orderList} servicesList={servicesList} userList={userList} saveData={saveData} setOpen={setOpen} />
+                <OrderDetail id={id} refresh={refresh} ref={ref} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} saveData={saveData} setOpen={setOpen} />
             </Drawer>
 
         </div>
