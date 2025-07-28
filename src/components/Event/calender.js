@@ -8,7 +8,7 @@ import { generateTimeSlots } from "../../common/intervals";
 import dayjs from 'dayjs';
 import { getBorder, getTag } from "../../common/items";
 
-const Calender = ({ orderList, servicesList, userList, companyList, trndate, refresh }) => {
+const Calender = ({ orderList, servicesList, userList, companyList, trndate }) => {
 
     const [headerItems,setHeaderItems]= useState([])
     const [generateSlots, setGenerateSlots] = useState([]);
@@ -21,7 +21,7 @@ const Calender = ({ orderList, servicesList, userList, companyList, trndate, ref
     useEffect(() => {
         let i=0;
         setHeaderItems(userList.map(a => ({ key:i=i+1, label:a.fullname, id:a.id,profilepic:a.profilepic})))
-    }, [refresh])
+    }, [userList])
 
    useEffect(() => {
         if (companyList.length !== 0) {

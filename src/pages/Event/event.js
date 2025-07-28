@@ -1,6 +1,6 @@
-import { Button,  Drawer,  Space, Tabs, Tag } from "antd"
+import { Button, Drawer, Space, Tabs, Tag } from "antd"
 import { PlusOutlined, SaveOutlined, DownloadOutlined } from '@ant-design/icons';
-import {useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import EventDetail from "../../components/Event/event_detail.js";
 import { getTabItems } from "../../common/items.js";
 import Events from '../../components/Event/event.js'
@@ -22,28 +22,27 @@ const Event = ({ eventList, servicesList, saveData }) => {
     const [refresh, setRefresh] = useState(0);
 
     const [tabActiveKey, setTabActiveKey] = useState("2");
-    
+
     const btn_Click = (id) => {
         setTitle(id === 0 ? "New Event" : "Edit Event");
         setRefresh(refresh + 1);
         setId(id);
         setOpen(true);
     }
-        const [liveList, setLiveList] = useState([]);
-        const [upcomingList, setUpcomingList] = useState([]);
-        const [pastList, setPastList] = useState([]);
-       
-        useEffect(() => {
-            const liveList = eventList.filter(a => a.case.toUpperCase() === 'LIVE');
-            const upcoming = eventList.filter(a => a.case.toUpperCase() === 'UPCOMING');
-            const past = eventList.filter(a => a.case.toUpperCase() === 'PAST');
-    
-            setLiveList(liveList.length > 0 ? liveList : [])
-            setUpcomingList(upcoming.length > 0 ? upcoming : [])
-            setPastList(past.length > 0 ? past : [])
-    
-        }
-        , [refresh])
+    const [liveList, setLiveList] = useState([]);
+    const [upcomingList, setUpcomingList] = useState([]);
+    const [pastList, setPastList] = useState([]);
+
+    useEffect(() => {
+        const liveList = eventList.filter(a => a.case.toUpperCase() === 'LIVE');
+        const upcoming = eventList.filter(a => a.case.toUpperCase() === 'UPCOMING');
+        const past = eventList.filter(a => a.case.toUpperCase() === 'PAST');
+
+        setLiveList(liveList.length > 0 ? liveList : [])
+        setUpcomingList(upcoming.length > 0 ? upcoming : [])
+        setPastList(past.length > 0 ? past : [])
+
+    }, [refresh])
 
     const tabItems = [
         getTabItems('1', customLabelTab("All", "blue", eventList.length), null, <Events eventList={eventList} servicesList={servicesList} btn_Click={btn_Click} />),
@@ -66,15 +65,15 @@ const Event = ({ eventList, servicesList, saveData }) => {
                     <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create event</Button>
                 </div>
             </div>
-                
+
             <Tabs items={tabItems} activeKey={tabActiveKey} onChange={(e) => { setTabActiveKey(e) }} />
 
 
-                {/* Drawer on right*/}
-                <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
-                    extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave}  >Save</Button></Space>}>
+            {/* Drawer on right*/}
+            <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
+                extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave}  >Save</Button></Space>}>
                 <EventDetail id={id} refresh={refresh} ref={ref} eventList={eventList} servicesList={servicesList} saveData={saveData} setOpen={setOpen} />
-                </Drawer>
+            </Drawer>
         </div>
     )
 }

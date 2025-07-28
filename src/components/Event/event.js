@@ -1,45 +1,88 @@
-import { Tag } from "antd"
-import { CalendarOutlined,  UnorderedListOutlined,  DollarOutlined } from '@ant-design/icons';
+import {  Button,  Input, Tooltip,  Tag } from "antd";
+import { EditOutlined } from '@ant-design/icons';
+import { IoSearchOutline } from "react-icons/io5";
 import { Tags } from "../../common/tags";
 import dayjs from 'dayjs';
-import { getBorder, getTag } from "../../common/items";
+import {  getDate, getTableItem } from "../../common/items";
+import DataTable from "../../common/datatable";
+import { useEffect, useState } from "react";
+
 const Events = ({ eventList, servicesList, btn_Click }) => {
+     const [searchInput, setSearchInput] = useState('');
+
+    const [filteredList, setFilteredList] = useState(eventList);
+      const [currentPage, setCurrentPage] = useState(1);
+         const [itemsPerPage, setItemsPerPage] = useState(10);
+     
+         useEffect(() => {
+             setFilteredList(eventList)
+             setPage(1, 10, eventList);
+         }, [])
+     
+         useEffect(() => {
+             const searchedList = eventList.filter(item =>
+             (item.title.toLowerCase().includes(searchInput.toLowerCase())));
+             if (searchInput === '')
+                 setPage(currentPage, itemsPerPage, searchedList)
+             else
+                 setPage(1, itemsPerPage, searchedList)
+         }, [searchInput])
+         
+         const setPage = (page, pageSize, list = []) => {
+             const indexOfLastItem = page * pageSize;
+             const indexOfFirstItem = indexOfLastItem - pageSize;
+             const searchedList = list.slice(indexOfFirstItem, indexOfLastItem);
+             setFilteredList(searchedList)
+         }
+     const headerItems = [
+            getTableItem('1', 'Name'),
+            getTableItem('2', 'Description'),
+            getTableItem('3', 'Services'),
+            getTableItem('4', 'Price'),
+            getTableItem('5', 'Date'),
+            getTableItem('6', 'Status'),
+            getTableItem('7', 'Last Modified'),
+            getTableItem('8', 'Action'),
+        ];
     return (
         <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
-            {eventList.length > 0 ?
-                eventList.map(item => (
-                    <div key={item.id} onClick={() => btn_Click(item.id)} class={`border-s-4 ${getBorder(item.case)}  p-2 mb-3 `}>
-                        <div class="flex flex-row gap-4">
-                            <div class="flex flex-col w-full">
-                                <p class='text-lg font-semibold'>{item.title}</p>
-                                <p class='text-sm italic '>{item.description} </p>
-                                <p class='mt-2 flex items-center gap-1 text-gray-400 text-sm'>
-                                    <UnorderedListOutlined />
-                                    {
-                                        item.serviceinfo !== null &&
-                                        servicesList.filter(a =>
-                                            item.serviceinfo.some(b => b === a.id)
-                                        ).map(c => getTag(item.case, c.name))
-                                    }
-                                </p>
-                                <p class='mt-1 flex items-center gap-3 text-gray-400 text-sm'>
-                                    <DollarOutlined />
-                                    {item.discount}
-                                </p>
-                                <p class='mt-1 flex items-center gap-3 text-gray-400 text-sm'>
-                                    <CalendarOutlined />
-                                    {dayjs(item.startdate).format('ddd, MMM DD')} - {dayjs(item.enddate).format('ddd, MMM DD')}
-                                </p> 
-                            </div>
 
-                            <div>
-                                {Tags(item.case)}
-                            </div>
-                        </div>
-                    </div>
-                )) :
-                <div class='text-left p-4 text-sm font-medium text-gray-500'>No data found</div>
-            }
+            <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
+                <div class='w-full md:w-1/3'>
+                    <Input size="large" placeholder="Search" prefix={<IoSearchOutline />} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
+                </div>
+            </div>
+
+            <DataTable headerItems={headerItems} list={searchInput === '' ? eventList : filteredList}
+                onChange={(page, pageSize) => {
+                    setCurrentPage(page);
+                    setItemsPerPage(pageSize);
+                    setPage(page, pageSize, eventList)
+                }}
+                body={(
+                    filteredList.map(item => (
+                        <tr key={item.id} class="bg-white border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50 ">
+                            <td class="p-3 text-sm font-semibold">{item.title}</td>
+                            <td class="p-3 text-gray-500">{item.description}</td>
+                            <td class="p-3">
+                                {item.serviceinfo !== null &&
+                                    servicesList.filter(a =>
+                                        item.serviceinfo.some(b => b === a.id)
+                                    ).map(c => <Tag key={c.id} color="cyan" bordered={false}>{c.name}</Tag>)
+                                }
+                            </td>
+                            <td class="p-3 ">$ {item.discount}</td>
+                            <td class="p-3 ">{dayjs(item.startdate).format('ddd, MMM DD')} - {dayjs(item.enddate).format('ddd, MMM DD')}</td>
+                            <td class="p-3 "> {Tags(item.case)}</td>
+                            <td class="p-3 ">{getDate(item.modifiedat)}</td>
+                            <td class="p-3">
+                                <Tooltip placement="top" title={'Edit'} >
+                                    <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
+                                </Tooltip>
+                            </td>
+                        </tr>
+                    ))
+                )} />           
         </div>
     )
 }
