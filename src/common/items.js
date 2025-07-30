@@ -40,16 +40,16 @@ export function getTag  (value, name) {
     switch (value.toUpperCase()) {
         case 'PENDING':
         case 'UPCOMING':
-            return <Tag color='Yellow' bordered={false}>{name}</Tag>;
+            return <Tag color='yellow' bordered={false}>{name}</Tag>;
         case 'IN PROGRESS':
-            return <Tag color='Blue' bordered={false}>{name}</Tag>;
+            return <Tag color='blue' bordered={false}>{name}</Tag>;
         case 'COMPLETED':
         case 'LIVE':
-            return <Tag color='Green' bordered={false}>{name}</Tag>;
+            return <Tag color='green' bordered={false}>{name}</Tag>;
         case 'CANCELLED':
         case 'PAST':
-            return <Tag color='Red' bordered={false}>{name}</Tag>;
+            return <Tag color='red' bordered={false}>{name}</Tag>;
         default:
-            return <Tag color='Gray' bordered={false}>{name}</Tag>;
+            return <Tag color='gray' bordered={false}>{name}</Tag>;
     }
 }

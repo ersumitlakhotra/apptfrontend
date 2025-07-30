@@ -136,6 +136,7 @@ const MasterPage = () => {
         {
           getData(setOrderList, "GET", "order");
           getData(setServicesList, "GET", "services");
+          getData(setUserList, "GET", "user");
           break;
         } 
         case "Order":
@@ -185,7 +186,7 @@ const MasterPage = () => {
 
   let displayedContent;
   if (content === 'Dashboard') {
-    displayedContent = <Dashboard orderList={orderList} servicesList={servicesList} />;
+    displayedContent = <Dashboard orderList={orderList} servicesList={servicesList} userList={userList} />;
   } else if (content === 'Tasks') {
     displayedContent = <Tasks orderList={orderList} userList={userList} servicesList={servicesList} companyList={companyList} />;
   } else if (content === 'Order') {

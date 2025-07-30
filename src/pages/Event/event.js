@@ -78,4 +78,4 @@ const Event = ({ eventList, servicesList, saveData }) => {
     )
 }
 
-export default Event
+export default Event;
