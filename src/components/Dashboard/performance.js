@@ -1,9 +1,9 @@
 
 const Performance = ({ key, label, value, width}) => {
     return (
-        <div key={key} class='flex flex-row items-center text-gray-500'>
+        <div key={key} class='flex flex-row items-center text-gray-800'>
                 <div class='w-10/12 whitespace-nowrap'>
-                    <div class={`p-3 ${width} bg-slate-100 rounded text-sm`}>
+                    <div class={`p-3 ${width} bg-slate-200 rounded text-sm`}>
                     <p>{label}</p>
                     </div>
                 </div>

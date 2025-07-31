@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 import { Tags } from "../../common/tags";
 
 
-const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click }) => {
+const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click,refresh=null }) => {
   
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(orderList);

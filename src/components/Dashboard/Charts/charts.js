@@ -1,5 +1,8 @@
 
 import Chart from "react-apexcharts";
+
+import dayjs from 'dayjs';
+
 const AreaChart = () => {
     return (
         <Chart
@@ -62,5 +65,28 @@ const AreaChartOptions = () => {
         />
     )
 }
-
-export { AreaChart }
+const BarChart = ({ value}) => {
+    const weekdays = ["Sun", "Mon", "Tues", "Wed", "Thu", "Fri", "Sat"];
+    return (
+        <Chart
+            options={{
+                stroke: {
+                    curve: 'smooth',
+                },
+                dataLabels: {
+                    enabled: false
+                }, grid: {
+                    show: false
+                },
+            }}
+            series={[{
+                name: 'Orders',
+                data: value.map(a => ({ x: a.day, y: a.count, fillColor: weekdays[dayjs().get('day')] === a.day ? '#EB8C87' : '' }))
+            }]}
+            type="bar"
+            height={'100%'}
+            width={'100%'}
+        />
+    )
+}
+export { AreaChart , BarChart}

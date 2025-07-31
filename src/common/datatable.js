@@ -9,7 +9,7 @@ const DataTable = ({ headerItems, list, body, onChange }) => {
                         {headerItems.map(items => (
                             <th scope="col" id={items.key} key={items.key} class={`py-3 font-medium `}>
                                 <div class='flex flex-row justify-between border-e'>
-                                    <p class='w-full px-3 text-sm'>{items.label}</p>
+                                    <p class='w-full px-3 text-sm whitespace-nowrap'>{items.label}</p>
                                     <div class='cursor-pointer'>
                                         {items.sort === 'asc' ? <TiArrowSortedDown size={18} onClick={(e) =>items.setSort('desc')} /> :
                                             items.sort === 'desc' ? <TiArrowSortedUp size={18} onClick={(e) => items.setSort('asc')} /> : ''}</div>
