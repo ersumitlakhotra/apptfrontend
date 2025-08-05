@@ -20,6 +20,21 @@ export const apiCalls = async (method, endPoint, id = null, body = null) => {
     // api calls
 };
 
+export const loginAuth = async (username,password) => {
+    const options = {
+        method: "GET",
+        url: API_ENDPOINT + `user/auth/${username}/${password}`,
+        headers: {
+            'content-Type': 'application/json'
+        },
+    };
+    try {
+        return await axios.request(options);
+    } catch (error) {
+        return error;
+    }
+    // api calls
+};
 export const apiCallsCrateCompany = async (method, endPoint, id = null, body = null, cidSpecified = true, cidValue = null) => {
     const companyId = localStorage.getItem('cid');
     const options = {

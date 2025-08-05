@@ -3,7 +3,7 @@ import React,{useEffect, useState} from "react";
 import { LoadingOutlined } from '@ant-design/icons';
 import useAlert from "../../common/alert.js";
 import {  Spin  } from 'antd';
-import { apiCalls } from "../../hook/apiCall.js";
+import { loginAuth } from "../../hook/apiCall.js";
 import { useNavigate } from "react-router-dom";
 
 export const Login = () => {
@@ -24,7 +24,7 @@ const onSubmit = async() => {
   setLoading(true);
   
   try{
-    const res= await apiCalls('GET',`user/auth/${email}/${password}`,null,null,false);
+    const res= await loginAuth(email,password);
     if(res.status === 200)
       { 
         localStorage.setItem('cid', res.data.data.cid); 
