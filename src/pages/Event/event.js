@@ -20,8 +20,7 @@ const Event = ({ eventList, servicesList, saveData }) => {
     const [title, setTitle] = useState('New');
     const [id, setId] = useState(0);
     const [refresh, setRefresh] = useState(0);
-
-    const [tabActiveKey, setTabActiveKey] = useState("2");
+    const [tabActiveKey, setTabActiveKey] = useState("1");
 
     const btn_Click = (id) => {
         setTitle(id === 0 ? "New Event" : "Edit Event");
@@ -45,7 +44,7 @@ const Event = ({ eventList, servicesList, saveData }) => {
     }, [refresh])
 
     const tabItems = [
-        getTabItems('1', customLabelTab("All", "blue", eventList.length), null, <Events eventList={eventList} servicesList={servicesList} btn_Click={btn_Click} />),
+        getTabItems('1', customLabelTab("All", "cyan", eventList.length), null, <Events eventList={eventList} servicesList={servicesList} btn_Click={btn_Click} />),
         getTabItems('2', customLabelTab("Live", "green", liveList.length), null, <Events eventList={liveList} servicesList={servicesList} btn_Click={btn_Click} />),
         getTabItems('3', customLabelTab("Upcoming", "yellow", upcomingList.length), null, <Events eventList={upcomingList} servicesList={servicesList} btn_Click={btn_Click} />),
         getTabItems('4', customLabelTab("Past", "red", pastList.length), null, <Events eventList={pastList} servicesList={servicesList} btn_Click={btn_Click} />)

@@ -1,4 +1,4 @@
-import {  PieChartOutlined, CheckSquareOutlined, ProductOutlined, NotificationOutlined, UnorderedListOutlined, UserOutlined, SettingOutlined, CustomerServiceOutlined } from '@ant-design/icons';
+import {  PieChartOutlined, CheckSquareOutlined, ProductOutlined, NotificationOutlined, UnorderedListOutlined, UserOutlined, SettingOutlined, CustomerServiceOutlined, FallOutlined, FundOutlined } from '@ant-design/icons';
 import SideBarButton from '../sidebar_button';
 
 
@@ -24,6 +24,7 @@ const Sidebar = ({ screen, onSelected, content, open }) => {
     getItem('Event', 14, <NotificationOutlined />),
   ]);
 
+ 
   const management = ([
     //getItem ('Inbox', 5, <MailFilled />,5),
     //  getItem ('Report', 6, <FileTextFilled />,null,<DownOutlined/>,[
@@ -34,21 +35,16 @@ const Sidebar = ({ screen, onSelected, content, open }) => {
     getItem('Services', 21, <UnorderedListOutlined />),
     getItem('Users', 22, <UserOutlined />),
   ]);
-  const misc = ([
-    getItem('Help', 31, <CustomerServiceOutlined />),
-    getItem('Setting', 32, <SettingOutlined />),
+
+  const report = ([
+    getItem('Sales', 31, <FundOutlined />),
+    getItem('Expenses', 32, <FallOutlined />),
   ]);
 
-  {/* const onViewDropList = (index) => {
-    const newItems = [...MenuItems];
-    newItems[index] = {
-      ...MenuItems[index],
-      dropdown: !newItems[index].dropdown,
-      btn: (!newItems[index].dropdown === true ? <UpOutlined /> : <DownOutlined />)
-    };
-    setMenuItems(newItems);
-  };
-  */}
+  const misc = ([
+    getItem('Help', 41, <CustomerServiceOutlined />),
+    getItem('Setting', 42, <SettingOutlined />),
+  ]);
 
   return (
     <div class={` h-full relative duration-300 flex flex-col  ${open ? 'w-72' : 'w-14'}`}>
@@ -59,13 +55,16 @@ const Sidebar = ({ screen, onSelected, content, open }) => {
           <span class={`text-lg font-semibold whitespace-nowrap duration-150 ${!open && ' scale-0'}`}>{process.env.REACT_APP_PROJECT_NAME}</span>
         </header>
 
-        <span class={` text-sm px-5 mt-6 duration-150 ${!open && 'scale-0'} whitespace-nowrap`}>Overview</span>
+        <span class={` text-sm  px-5 mt-6 duration-150 ${!open && 'scale-0'} whitespace-nowrap`}>Overview</span>
         {overview.map(item => (<SideBarButton key={item.key} isOpen={open} icon={item.icon} label={item.label} badge={item.badge} content={content} onSelected={(e) => onSelected(e)} />))}
-
-        <span class={` text-sm px-5 mt-6 duration-150 ${!open && 'scale-0'} whitespace-nowrap`}>Management</span>
+           
+        <span class={` text-sm  px-5 mt-6 duration-150 ${!open && 'scale-0'} whitespace-nowrap`}>Management</span>
         {management.map(item => (<SideBarButton key={item.key} isOpen={open} icon={item.icon} label={item.label} badge={item.badge} content={content} onSelected={(e) => onSelected(e)} />))}
         
-        <span class={` text-sm px-5 mt-6 duration-150 ${!open && 'scale-0'} whitespace-nowrap`}>Misc</span>
+        <span class={` text-sm  px-5 mt-6 duration-150 ${!open && 'scale-0'} whitespace-nowrap`}>Report</span>
+        {report.map(item => (<SideBarButton key={item.key} isOpen={open} icon={item.icon} label={item.label} badge={item.badge} content={content} onSelected={(e) => onSelected(e)} />))}
+ 
+        <span class={` text-sm  px-5 mt-6 duration-150 ${!open && 'scale-0'} whitespace-nowrap`}>Misc</span>
         {misc.map(item => (<SideBarButton key={item.key} isOpen={open} icon={item.icon} label={item.label} badge={item.badge} content={content} onSelected={(e) => onSelected(e)} />))}
        
       </sidebar>

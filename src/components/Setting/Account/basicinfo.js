@@ -50,6 +50,8 @@ const BasicInfo = ({ companyList, saveData, logoList }) => {
 
     const save = async () => {
         const Body = JSON.stringify({
+            name:name,
+            cell:cell,
             addressinfo: [{
                 street: street,
                 city: city,

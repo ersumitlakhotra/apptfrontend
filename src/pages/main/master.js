@@ -26,7 +26,6 @@ const MasterPage = () => {
   const {contextHolder, success, error } = useAlert();
 
   const [settingActiveTab, setSettingActiveTab] = useState('1');
-  const [orderActiveTab, setOrderActiveTab] = useState('1');
  
 
 
@@ -190,7 +189,7 @@ const MasterPage = () => {
   } else if (content === 'Tasks') {
     displayedContent = <Tasks orderList={orderList} userList={userList} servicesList={servicesList} companyList={companyList} />;
   } else if (content === 'Order') {
-    displayedContent = <Order orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} tabActiveKey={orderActiveTab} setTabActiveKey={setOrderActiveTab} saveData={saveData} />;
+    displayedContent = <Order orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} saveData={saveData} />;
   } else if (content === 'Event') {
     displayedContent = <Event eventList={eventList} servicesList={servicesList} saveData={saveData} />;
   } else if (content === 'Services') {

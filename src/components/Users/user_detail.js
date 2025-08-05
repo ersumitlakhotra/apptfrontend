@@ -24,7 +24,7 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
     const [accounttype, setAccountType] = useState('Basic');
     const [profilepic, setProfile] = useState(null);
     const [status, setStatus] = useState('Active');
-    const { contextHolder, error } = useAlert();
+    const { contextHolder, error, warning } = useAlert();
     let refimage=useRef();
 
     useEffect(() => {
@@ -71,6 +71,9 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
             }); 
             saveData("Users", id !== 0 ? 'PUT' : 'POST', "user", id !== 0 ? id : null, Body);
             setOpen(false);
+        }
+        else{
+            warning('Please, fill out the required fields !');
         }
     }
     useImperativeHandle(ref, () => {

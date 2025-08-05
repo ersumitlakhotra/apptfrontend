@@ -9,9 +9,8 @@ const twoColors = {
 
 const WorkingCard = ({ key, order_no,slot, assignedto, userList, serviceinfo, servicesList }) => {
     return (
-        <div key={key} class=' border shadow p-3 flex flex-col  '>
-
-            <div class='flex flex-row gap-2 w-72'>
+        <div key={key} class='border shadow p-3 '>
+            <div class='flex flex-row gap-2'>
                 {assignedto === '0' ? 
                 <>
                         <Avatar size={44} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} /> 
@@ -45,10 +44,10 @@ const WorkingCard = ({ key, order_no,slot, assignedto, userList, serviceinfo, se
                     </>
                     )}
             </div>
-            <div class='flex flex-row justify-between w-72 mt-2' >
-                
+            {/*  <div class='flex flex-row justify-between  mt-2' >
+
                 <div class='flex flex-row gap-1 text-xs font-normal text-blue-400'>
-                    <BorderlessTableOutlined /> 
+                    <BorderlessTableOutlined />
                     <span class='cursor-pointer underline italic '>
                         <Tooltip placement="top" title={'View Order'}>
                             {order_no}
@@ -59,7 +58,7 @@ const WorkingCard = ({ key, order_no,slot, assignedto, userList, serviceinfo, se
                     <ClockCircleOutlined /><p>{slot}</p>
                 </div>
             </div>
-            {/*
+
             <Progress percent={99.9} strokeColor={twoColors} />
 */}
         </div>
@@ -67,11 +66,11 @@ const WorkingCard = ({ key, order_no,slot, assignedto, userList, serviceinfo, se
 }
 const AvailableCard = ({ key }) => {
     return (
-        <div key={key} class=' border shadow p-3 flex flex-col  '>
+        <div key={key} class=' border shadow p-3 '>
 
-            <div class='flex flex-row gap-2 w-72'>
+            <div class='flex flex-row gap-2'>
                 <Image width={42} height={42} src={"https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"} style={{ borderRadius: 4 }} />
-                <div class='flex flex-col items-start w-full  whitespace-nowrap overflow-hidden'>
+                <div class='flex flex-col items-start  whitespace-nowrap overflow-hidden'>
                     <span class='text-gray-800 font-medium font-sans'> Paramvir singh randhawa</span>
                     <p class='text-gray-400 text-xs  font-normal'>Next appointment : 03:00 PM</p>
                 </div>
