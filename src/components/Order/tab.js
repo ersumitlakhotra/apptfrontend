@@ -1,4 +1,4 @@
-import { Avatar, Button, Image, Input,  Tag, Tooltip} from "antd"
+import { Avatar, Button, DatePicker, Image, Input,  Popover,  Tag, Tooltip} from "antd"
 import { IoSearchOutline } from "react-icons/io5";
 import { getDate, getTableItem } from "../../common/items";
 import DataTable from "../../common/datatable";
@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 import { Tags } from "../../common/tags";
 
 
-const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click,refresh=null }) => {
+const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_ViewClick, refresh, fromDate, setFromDate, toDate, setToDate }) => {
   
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(orderList);
@@ -20,7 +20,17 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click,refresh=n
     useEffect(() => {
         setFilteredList(orderList)
         setPage(1, 10, orderList);
-    }, [])
+    }, [refresh, orderList])
+
+    useEffect(() => {
+        const searchedList = orderList.filter(item => 
+            item.customerinfo[0].name.toLowerCase().includes(searchInput.toLowerCase()) || 
+            item.order_no.toString().includes(searchInput.toLowerCase()));
+        if (searchInput === '')
+            setPage(currentPage, itemsPerPage, searchedList)
+        else
+            setPage(1, itemsPerPage, searchedList)
+    }, [searchInput])
 
     const setPage = (page, pageSize, list = []) => {
         const indexOfLastItem = page * pageSize;
@@ -47,6 +57,31 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click,refresh=n
                 <div class='w-full md:w-1/3'>
                     <Input size="large" placeholder="Search" prefix={<IoSearchOutline />} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
                 </div>
+                <div class='w-full md:w-2/3'>
+                    <div class='flex flex-col md:flex-row md:justify-end gap-4 '>
+                        <Popover placement="bottom" title={"Filter by From Date"} content={
+                            <div>
+                                <DatePicker
+                                    style={{ width: '100%' }}
+                                    value={fromDate === '' ? fromDate : dayjs(fromDate, 'YYYY-MM-DD')}
+                                    onChange={(date, dateString) => setFromDate(dateString)} />
+                            </div>
+                        }>
+                            <Button className="text-xs"><span class='font-medium'>From Date :  </span><span class='text-blue-500'> {fromDate}  </span></Button>
+                        </Popover>
+                        <Popover placement="bottom" title={"Filter by To Date"} content={
+                            <div>
+                                <DatePicker
+                                    style={{ width: '100%' }}
+                                    value={toDate === '' ? toDate : dayjs(toDate, 'YYYY-MM-DD')}
+                                    onChange={(date, dateString) => setToDate(dateString)} />
+                            </div>
+                        }>
+                            <Button className="text-xs"><span class='font-medium'>To Date :  </span><span class='text-blue-500'> {toDate}  </span></Button>
+                        </Popover>
+                    </div>
+                    {/**/}
+                </div>
             </div>
             <DataTable headerItems={headerItems} list={(searchInput === '') ? orderList : filteredList}
                 onChange={(page, pageSize) => {
@@ -57,7 +92,7 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click,refresh=n
                 body={(
                     filteredList.map(item => (
                         <tr key={item.id} class="bg-white border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50 ">
-                            <td class="p-3 text-blue-500 italic hover:underline cursor-pointer"># {item.order_no}</td>
+                            <td class="p-3 text-blue-500 italic hover:underline cursor-pointer" onClick={() => btn_ViewClick(item.id)} ># {item.order_no}</td>
 
                             <td class="p-3">
                                 {item.customerinfo !== null &&
@@ -104,7 +139,7 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click,refresh=n
                                     <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
                                 </Tooltip>
                                 <Tooltip placement="top" title={'View'} >
-                                    <Button type="link" icon={<EyeOutlined />} onClick={() => btn_Click(item.id)} />
+                                    <Button type="link" icon={<EyeOutlined />} onClick={() => btn_ViewClick(item.id)} />
                                 </Tooltip>
                             </td>
                         </tr>
