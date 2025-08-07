@@ -40,7 +40,7 @@ function LocalDateTime() {
     dayjs.utc().isUTC(); // true
     return dayjs.utc().local().format("YYYY-MM-DD, hh:mm A "); //2019-03-06T17:11:55+08:00
 };
-function UTC_LocalDateTime(value) {
+function UTC_LocalDateTime(value,format=null) {
     var utc = require("dayjs/plugin/utc");
 
     dayjs.extend(utc);
@@ -57,7 +57,7 @@ function UTC_LocalDateTime(value) {
     // While in UTC mode, all display methods will display in UTC time instead of local time.
     // And all getters and setters will internally use the Date#getUTC* and Date#setUTC* methods instead of the Date#get* and Date#set* methods.
     dayjs.utc().isUTC(); // true
-    return dayjs(value).utc().local().format("YYYY-MM-DD, hh:mm A "); //2019-03-06T17:11:55+08:00
+    return dayjs(value).utc().local().format(format === null ? "YYYY-MM-DD, hh:mm A ":format); //2019-03-06T17:11:55+08:00
 };
 
 export { LocalDate, LocalDateTime, UTC_LocalDateTime }

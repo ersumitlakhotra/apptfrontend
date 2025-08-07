@@ -41,7 +41,7 @@ const Event = ({ eventList, servicesList, saveData }) => {
         setUpcomingList(upcoming.length > 0 ? upcoming : [])
         setPastList(past.length > 0 ? past : [])
 
-    }, [refresh])
+    }, [refresh, eventList])
 
     const tabItems = [
         getTabItems('1', customLabelTab("All", "cyan", eventList.length), null, <Events eventList={eventList} servicesList={servicesList} btn_Click={btn_Click} />),
