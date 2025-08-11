@@ -7,7 +7,7 @@ import { setCellFormat } from "../../common/cellformat";
 import {  UserOutlined } from '@ant-design/icons';
 import {Slots} from "../../common/intervals";
 
-const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, companyList, saveData ,setOpen  }) => {
+const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, companyList, eventList, saveData ,setOpen  }) => {
    
 
     const [customerName, setCustomerName] = useState('');
@@ -16,13 +16,17 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
     const [order_no, setOrderNo] = useState('');
     const [status, setStatus] = useState('Pending');
     const [price, setPrice] = useState('0');
+    const [tax, setTax] = useState('0');
+    const [total, setTotal] = useState('0');
+    const [coupon, setCoupon] = useState('');
+    const [discount, setDiscount] = useState('0');
     const [trndate, setTrnDate] = useState('');
     const [assigned_to, setAssignedTo] = useState('');
     const [modifiedat, setModifiedat] = useState(new Date());
     const [slot, setSlot] = useState('');
     const [servicesItem, setServicesItem] = useState([]);
     //const filteredOptionsServices = servicesList.filter(o => !selectedItems.includes(o));
-
+    const [liveList, setLiveList] = useState([]);
     const [orderListSlot, setOrderListSlot] = useState([]);
 
     const [inTime, setInTime] = useState('00:00:00');
@@ -34,7 +38,7 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
     useEffect(() => {
         if (id === 0) {
             setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');
-            setStatus('Pending'); setPrice('0'); setTrnDate(''); setModifiedat(new Date());
+            setStatus('Pending'); setPrice('0'); setTax('0'); setTotal('0'); setDiscount('0'); setCoupon(''); setTrnDate(''); setModifiedat(new Date());
             setAssignedTo(''); setOrderNo(''); setServicesItem([]); setOrderListSlot([]); setSlot('');
         }
         else {
@@ -60,10 +64,15 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
                     }
                 }
             }
+
             setServicesItem(editList.serviceinfo);
             setModifiedat(editList.modifiedat);
             setAssignedTo(editList.assignedto);
-            setPrice(editList.price);
+            setPrice(editList.price); 
+            setTax(editList.tax); 
+            setTotal(editList.total); 
+            setCoupon(editList.coupon);
+            setDiscount(editList.discount); 
             setSlot(editList.slot);
         }
     }, [refresh])
@@ -79,6 +88,11 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
             }
         }
     }, [companyList, trndate])
+
+    useEffect(() => {
+        const liveList = eventList.filter(a => a.case.toUpperCase() === 'LIVE');
+        setLiveList(liveList.length > 0 ? liveList : [])
+    }, [eventList])
 
     const setOpeningHours = (weekday) => {
         switch (weekday.toLowerCase()) {
@@ -136,6 +150,10 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
                 }],
                 serviceinfo: servicesItem,
                 price: price,
+                discount: discount,
+                tax: tax,
+                total: total,
+                coupon: coupon,
                 status: status,
                 trndate: trndate,
                 assignedto: assigned_to === '' ? 0 : assigned_to,
@@ -150,24 +168,79 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
             save,
         };
     })
-    const setPriceNumberOnly = (event) => {
+    const setPriceNumberOnly = (event,setValue) => {
         const inputValue = event.target.value;
         const regex = /^\d*(\.\d*)?$/;
 
         if (regex.test(inputValue) || inputValue === '') {
-            setPrice(inputValue);
+            setValue(inputValue);
         }
     };
    
     const onChangeServicesItem = (value) => {
         let rate = 0;
+        let discount = 0;
         setServicesItem(value);
+
         servicesList.filter(a =>
             value.some(b => b === a.id)
-        ).map(item => (rate = rate + parseFloat(item.price)))
+        ).map(item => (rate = rate + parseFloat(item.price)));     
 
-        setPrice(parseFloat(rate).toFixed(2))
+       if(coupon !== '')
+       {
+            const couponServices=eventList.filter(a => a.coupon === coupon);
+            let ApplyDiscount = true;
+            for (let i = 0; i < couponServices[0].serviceinfo.length; i++) {
+                if (value.includes(couponServices[0].serviceinfo[i])) {
+                    ApplyDiscount = true;
+                }
+                else{
+                    ApplyDiscount = false;
+                    break;
+                }
+            }
+           if (Boolean(ApplyDiscount))
+           {
+               discount =parseFloat(couponServices[0].discount);
+               setDiscount(parseFloat(discount));
+           }
+           else
+           {
+               setDiscount(0);
+           }
+        }  
+        else
+        {
+            setDiscount(0);
+        }
+
+        setPrice(parseFloat(rate).toFixed(2))  
+        onApplyTaxandCoupon(parseFloat(rate).toFixed(2), parseFloat(discount).toFixed(2))
+    } 
+    
+    const onApplyTaxandCoupon = (priceValue,discountValue) => {
+        const subTotal = parseFloat(priceValue - discountValue).toFixed(2);
+        const taxPercentage= parseInt(tax);
+
+        if (taxPercentage === 0)
+            setTotal(subTotal)     
+        else
+        {
+            if (taxPercentage === 5)
+                setTotal(parseFloat(subTotal * 1.05).toFixed(2))
+
+            if (taxPercentage === 13)
+                setTotal(parseFloat(subTotal * 1.13).toFixed(2))
+
+            if (taxPercentage === 15)
+                setTotal(parseFloat(subTotal * 1.15).toFixed(2))
+            
+        }
     }
+
+    useEffect(() => {
+        onChangeServicesItem(servicesItem)
+    }, [tax, coupon])
 
     useEffect(() => {
         if (trndate !== '' && assigned_to !=='')
@@ -197,6 +270,20 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
             <Divider/>
             <p class="text-gray-400 mb-4">Order Information</p>
 
+            <TextboxFlex label={'Status'} input={
+                <Select
+                    value={status}
+                    style={{ width: '100%' }}
+                    onChange={(value) => setStatus(value)}
+                    options={[
+                        { value: 'Pending', label: <Badge color={'yellow'} text={'Pending'} /> },
+                        { value: 'In progress', label: <Badge color={'blue'} text={'In progress'} /> },
+                        { value: 'Completed', label: <Badge color={'green'} text={'Completed'} /> },
+                        { value: 'Cancelled', label: <Badge color={'red'} text={'Cancelled'} /> }
+                    ]}
+                />
+            } />
+
             <TextboxFlex label={'Services'} mandatory={true} input={
                 <Select
                     status={servicesItem.length === 0 ? 'error':''}
@@ -204,7 +291,7 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
                     mode="multiple"
                     value={servicesItem}
                     style={{ width: '100%' }}
-                    onChange={(value) => onChangeServicesItem(value)}
+                    onChange={(value) =>onChangeServicesItem(value)}
                     options={servicesList.map(item => ({
                         value:item.id,
                         label:item.name
@@ -230,23 +317,45 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
                 />
             } />
 
-            <TextboxFlex label={'Price ($)'} mandatory={true} input={
-                <Input placeholder="Price" status={(price === '' || price === '.') ? 'error' : ''} value={price} onChange={setPriceNumberOnly} />
+            <TextboxFlex label={'Price ($)'}  input={
+                <Input placeholder="Price" style={{ backgroundColor: '#FAFAFA' }} readOnly={true} value={price} onChange={(e) => setPriceNumberOnly(e, setPrice) } />
             } />
 
-            <TextboxFlex label={'Status'} input={
+            <TextboxFlex label={'Discount'} input={
+                <Input placeholder="Discount" style={{ backgroundColor: '#FAFAFA' }} readOnly={true} value={-discount} />
+            } />
+            <TextboxFlex label={'Tax (%)'} mandatory={true} input={
                 <Select
-                    value={status}
+                    value={tax}
                     style={{ width: '100%' }}
-                    onChange={(value) => setStatus(value)}
+                    onChange={(value) => setTax(value)}
                     options={[
-                        { value: 'Pending', label: <Badge color={'yellow'} text={'Pending'} /> },
-                        { value: 'In progress', label: <Badge color={'blue'} text={'In progress'} /> },
-                        { value: 'Completed', label: <Badge color={'green'} text={'Completed'} /> },
-                        { value: 'Cancelled', label: <Badge color={'red'} text={'Cancelled'} /> }
+                        { value: 0, label:'0%' },
+                        { value: 5, label:'5%' },
+                        { value: 13, label:'13%' },
+                        { value: 15, label:'15%' }
                     ]}
                 />
             } />
+
+            <TextboxFlex label={'Total'}  input={
+                <Input placeholder="Total" style={{ backgroundColor:'#FAFAFA'}} readOnly={true} value={total} />
+            } />
+
+            <TextboxFlex label={'Coupon'} input={
+                <Select
+                    value={coupon}
+                    style={{ width: '100%' }}
+                    onChange={(value) => setCoupon(value)}
+                    options={[{value:'',label:''},
+                        ...liveList.map(item => ({
+                        value: item.coupon,
+                        label: item.coupon
+                    }))]}
+                />     
+            } />
+
+           
 
             <Divider />
             <p class="text-gray-400 mb-4">Booking Details</p>

@@ -10,13 +10,17 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
     const [description, setDescription] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-    const [discount, setDiscount] = useState(0);
+    const [price, setPrice] = useState('0');
+    const [discount, setDiscount] = useState('0');
+    const [total, setTotal] = useState('0');
+    const [coupon, setCoupon] = useState('');
     const [servicesItem, setServicesItem] = useState([]);
 
     useEffect(() => {
         if (id === 0) {
             setTitle(''); setDescription(''); setStartDate(''); setEndDate('');
-             setDiscount('0');  setServicesItem([]);
+            setPrice('0'); setDiscount('0'); setTotal('0');  setServicesItem([]);
+            generateNewCode();
         }
         else {
             const editList = eventList.find(item => item.id === id)
@@ -24,17 +28,20 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
             setDescription(editList.description); 
             setStartDate(editList.startdate); 
             setEndDate(editList.enddate);
+            setPrice(editList.price);
             setDiscount(editList.discount);
+            setTotal(editList.total);
+            setCoupon(editList.coupon);
             setServicesItem(editList.serviceinfo);
         }
     }, [refresh])
 
-    const setPriceNumberOnly = (event) => {
+    const setPriceNumberOnly = (event,setValue) => {
         const inputValue = event.target.value;
         const regex = /^\d*(\.\d*)?$/;
 
         if (regex.test(inputValue) || inputValue === '') {
-            setDiscount(inputValue);
+            setValue(inputValue);
         }
     };
     const save = async () => {
@@ -45,7 +52,10 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
                 startdate: startDate,
                 enddate: endDate,
                 serviceinfo: servicesItem,
-                discount: discount
+                price: price,
+                discount: discount,
+                total: total,
+                coupon:coupon
             });
             saveData("Event", id !== 0 ? 'PUT' : 'POST', "event", id !== 0 ? id : null, Body);
             setOpen(false);
@@ -57,7 +67,23 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
             save,
         };
     })
+    const generateNewCode = async () => {
+        const newCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+        setCoupon(newCode);
+    };
 
+    const onChangeServicesItem = (value) => {
+        let rate = 0;
+        setServicesItem(value);
+        servicesList.filter(a =>
+            value.some(b => b === a.id)
+        ).map(item => (rate = rate + parseFloat(item.price)));
+        setPrice(parseFloat(rate).toFixed(2))
+    } 
+
+    useEffect(() => {
+        setTotal(parseFloat(parseFloat(price) - parseFloat(discount)).toFixed(2) )
+    }, [price,discount])
 
     return (
         <div class='flex flex-col font-normal gap-3 mt-2'>
@@ -86,7 +112,7 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
                     mode="multiple"
                     value={servicesItem}
                     style={{ width: '100%' }}
-                    onChange={(value) => setServicesItem(value)}
+                    onChange={(value) => onChangeServicesItem(value)}
                     options={servicesList.map(item => ({
                         value: item.id,
                         label: item.name
@@ -112,8 +138,20 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
                 />
             } />
 
+            <TextboxFlex label={'Price ($)'}  input={
+                <Input placeholder="Price" readOnly={true} style={{ backgroundColor: '#FAFAFA' }} value={price} onChange={(e) =>  setPriceNumberOnly(e, setPrice)} />
+            } />
+
             <TextboxFlex label={'Discount $'} mandatory={true} input={
-                <Input placeholder="Price" status={(discount === '' || discount === '.') ? 'error' : ''} value={discount} onChange={setPriceNumberOnly} />
+                <Input placeholder="Discount" status={(discount === '' || discount === '.') ? 'error' : ''} value={discount} onChange={(e) => setPriceNumberOnly(e, setDiscount)} />
+            } />
+
+            <TextboxFlex label={'Amount'} input={
+                <Input placeholder="Amount" style={{ backgroundColor: '#FAFAFA' }} readOnly={true} value={total} />
+            } />
+
+            <TextboxFlex label={'Coupon'}  input={
+                <Input placeholder="Coupon" style={{ backgroundColor: '#FAFAFA' }}  value={coupon} onChange={setPriceNumberOnly} readOnly={true} />
             } />
 
         </div>

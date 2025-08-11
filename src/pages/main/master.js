@@ -140,10 +140,11 @@ const MasterPage = () => {
         } 
         case "Order":
         {
-          getData(setOrderList, "GET", "order");
           getData(setServicesList, "GET", "services");
           getData(setUserList, "GET", "user");
           getData(setCompanyList, "GET", "company");
+          getData(setEventList, "GET", "event");
+          getData(setOrderList, "GET", "order");
           //getData(setServicesList, "GET", "services");
           break;
         }
@@ -189,7 +190,7 @@ const MasterPage = () => {
   } else if (content === 'Tasks') {
     displayedContent = <Tasks orderList={orderList} userList={userList} servicesList={servicesList} companyList={companyList} />;
   } else if (content === 'Order') {
-    displayedContent = <Order orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} saveData={saveData} />;
+    displayedContent = <Order orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} eventList={eventList} saveData={saveData} />;
   } else if (content === 'Event') {
     displayedContent = <Event eventList={eventList} servicesList={servicesList} saveData={saveData} />;
   } else if (content === 'Services') {

@@ -17,7 +17,7 @@ const customLabelTab = (label, tagColor, tagValue) => {
     )
 }
 
-const Order = ({ orderList, servicesList, userList, companyList, saveData }) => {
+const Order = ({ orderList, servicesList, userList, companyList, eventList, saveData }) => {
     const ref = useRef();
     const [open, setOpen] = useState(false);
     const [openView, setOpenView] = useState(false);
@@ -59,7 +59,7 @@ const Order = ({ orderList, servicesList, userList, companyList, saveData }) => 
         setCompletedList(completed.length > 0 ? completed : [])
         setCancelledList(cancelled.length > 0 ? cancelled : [])
 
-    }, [refresh])
+    }, [refresh, orderList])
 
     useEffect(() => {
         if(fromDate ==='')
@@ -101,7 +101,7 @@ const Order = ({ orderList, servicesList, userList, companyList, saveData }) => 
             <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
-                <OrderDetail id={id} refresh={refresh} ref={ref} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} saveData={saveData} setOpen={setOpen} />
+                <OrderDetail id={id} refresh={refresh} ref={ref} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} eventList={eventList} saveData={saveData} setOpen={setOpen} />
             </Drawer>
 
             {/* Drawer on View*/}

@@ -1,49 +1,50 @@
-import {  Button,  Input, Tooltip,  Tag } from "antd";
+import { Button, Input, Tooltip, Tag } from "antd";
 import { EditOutlined } from '@ant-design/icons';
 import { IoSearchOutline } from "react-icons/io5";
 import { Tags } from "../../common/tags";
 import dayjs from 'dayjs';
-import {  getDate, getTableItem } from "../../common/items";
+import { getDate, getTableItem } from "../../common/items";
 import DataTable from "../../common/datatable";
 import { useEffect, useState } from "react";
 
 const Events = ({ eventList, servicesList, btn_Click }) => {
-     const [searchInput, setSearchInput] = useState('');
+    const [searchInput, setSearchInput] = useState('');
 
     const [filteredList, setFilteredList] = useState(eventList);
-      const [currentPage, setCurrentPage] = useState(1);
-         const [itemsPerPage, setItemsPerPage] = useState(10);
-     
-         useEffect(() => {
-             setFilteredList(eventList)
-             setPage(1, 10, eventList);
-         }, [])
-     
-         useEffect(() => {
-             const searchedList = eventList.filter(item =>
-             (item.title.toLowerCase().includes(searchInput.toLowerCase())));
-             if (searchInput === '')
-                 setPage(currentPage, itemsPerPage, searchedList)
-             else
-                 setPage(1, itemsPerPage, searchedList)
-         }, [searchInput])
-         
-         const setPage = (page, pageSize, list = []) => {
-             const indexOfLastItem = page * pageSize;
-             const indexOfFirstItem = indexOfLastItem - pageSize;
-             const searchedList = list.slice(indexOfFirstItem, indexOfLastItem);
-             setFilteredList(searchedList)
-         }
-     const headerItems = [
-            getTableItem('1', 'Name'),
-            getTableItem('2', 'Description'),
-            getTableItem('3', 'Services'),
-            getTableItem('4', 'Price'),
-            getTableItem('5', 'Date'),
-            getTableItem('6', 'Status'),
-            getTableItem('7', 'Last Modified'),
-            getTableItem('8', 'Action'),
-        ];
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+
+    useEffect(() => {
+        setFilteredList(eventList)
+        setPage(1, 10, eventList);
+    }, [eventList])
+
+    useEffect(() => {
+        const searchedList = eventList.filter(item =>
+            (item.title.toLowerCase().includes(searchInput.toLowerCase())));
+        if (searchInput === '')
+            setPage(currentPage, itemsPerPage, searchedList)
+        else
+            setPage(1, itemsPerPage, searchedList)
+    }, [searchInput])
+
+    const setPage = (page, pageSize, list = []) => {
+        const indexOfLastItem = page * pageSize;
+        const indexOfFirstItem = indexOfLastItem - pageSize;
+        const searchedList = list.slice(indexOfFirstItem, indexOfLastItem);
+        setFilteredList(searchedList)
+    }
+    const headerItems = [
+        getTableItem('1', 'Name'),
+        getTableItem('2', 'Description'),
+        getTableItem('3', 'Services'),
+        getTableItem('4', 'Coupon'),
+        getTableItem('5', 'Amount'),
+        getTableItem('6', 'Date'),
+        getTableItem('7', 'Status'),
+        getTableItem('8', 'Last Modified'),
+        getTableItem('9', 'Action'),
+    ];
     return (
         <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
 
@@ -71,7 +72,8 @@ const Events = ({ eventList, servicesList, btn_Click }) => {
                                     ).map(c => <Tag key={c.id} color="cyan" bordered={false}>{c.name}</Tag>)
                                 }
                             </td>
-                            <td class="p-3 ">$ {item.discount}</td>
+                            <td class="p-3 font-medium ">{item.coupon}</td>
+                            <td class="p-3 ">$ {item.total}</td>
                             <td class="p-3 ">{dayjs(item.startdate).format('ddd, MMM DD')} - {dayjs(item.enddate).format('ddd, MMM DD')}</td>
                             <td class="p-3 "> {Tags(item.case)}</td>
                             <td class="p-3 ">{getDate(item.modifiedat)}</td>
@@ -82,7 +84,7 @@ const Events = ({ eventList, servicesList, btn_Click }) => {
                             </td>
                         </tr>
                     ))
-                )} />           
+                )} />
         </div>
     )
 }
