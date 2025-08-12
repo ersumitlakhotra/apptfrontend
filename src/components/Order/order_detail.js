@@ -17,6 +17,7 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
     const [status, setStatus] = useState('Pending');
     const [price, setPrice] = useState('0');
     const [tax, setTax] = useState('0');
+    const [taxamount, setTaxAmount] = useState('0');
     const [total, setTotal] = useState('0');
     const [coupon, setCoupon] = useState('');
     const [discount, setDiscount] = useState('0');
@@ -38,7 +39,7 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
     useEffect(() => {
         if (id === 0) {
             setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');
-            setStatus('Pending'); setPrice('0'); setTax('0'); setTotal('0'); setDiscount('0'); setCoupon(''); setTrnDate(''); setModifiedat(new Date());
+            setStatus('Pending'); setPrice('0'); setTax('0'); setTotal('0'); setDiscount('0'); setCoupon('');setTaxAmount('0'); setTrnDate(''); setModifiedat(new Date());
             setAssignedTo(''); setOrderNo(''); setServicesItem([]); setOrderListSlot([]); setSlot('');
         }
         else {
@@ -70,6 +71,7 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
             setAssignedTo(editList.assignedto);
             setPrice(editList.price); 
             setTax(editList.tax); 
+            setTaxAmount(editList.taxamount); 
             setTotal(editList.total); 
             setCoupon(editList.coupon);
             setDiscount(editList.discount); 
@@ -152,6 +154,7 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
                 price: price,
                 discount: discount,
                 tax: tax,
+                taxamount: taxamount,
                 total: total,
                 coupon: coupon,
                 status: status,
@@ -177,7 +180,7 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
         }
     };
    
-    const onChangeServicesItem = (value) => {
+    const onChangeServicesItem = (value,coupon,tax) => {
         let rate = 0;
         let discount = 0;
         setServicesItem(value);
@@ -215,32 +218,39 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
         }
 
         setPrice(parseFloat(rate).toFixed(2))  
-        onApplyTaxandCoupon(parseFloat(rate).toFixed(2), parseFloat(discount).toFixed(2))
+        onApplyTaxandCoupon(parseFloat(rate).toFixed(2), parseFloat(discount).toFixed(2), parseInt(tax))
     } 
     
-    const onApplyTaxandCoupon = (priceValue,discountValue) => {
+    const onApplyTaxandCoupon = (priceValue, discountValue, taxPercentage) => {
         const subTotal = parseFloat(priceValue - discountValue).toFixed(2);
-        const taxPercentage= parseInt(tax);
 
         if (taxPercentage === 0)
-            setTotal(subTotal)     
+        {
+            setTotal(subTotal)    
+            setTaxAmount(0)
+        } 
         else
         {
             if (taxPercentage === 5)
+            {
                 setTotal(parseFloat(subTotal * 1.05).toFixed(2))
+                setTaxAmount(parseFloat(subTotal * 0.05).toFixed(2))
+            }
 
             if (taxPercentage === 13)
+            {
                 setTotal(parseFloat(subTotal * 1.13).toFixed(2))
+                setTaxAmount(parseFloat(subTotal * 0.13).toFixed(2))
+            }
 
             if (taxPercentage === 15)
+            {
                 setTotal(parseFloat(subTotal * 1.15).toFixed(2))
+                setTaxAmount(parseFloat(subTotal * 0.15).toFixed(2))
+            }
             
         }
     }
-
-    useEffect(() => {
-        onChangeServicesItem(servicesItem)
-    }, [tax, coupon])
 
     useEffect(() => {
         if (trndate !== '' && assigned_to !=='')
@@ -291,7 +301,7 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
                     mode="multiple"
                     value={servicesItem}
                     style={{ width: '100%' }}
-                    onChange={(value) =>onChangeServicesItem(value)}
+                    onChange={(value) => onChangeServicesItem(value,coupon,tax)}
                     options={servicesList.map(item => ({
                         value:item.id,
                         label:item.name
@@ -328,7 +338,7 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
                 <Select
                     value={tax}
                     style={{ width: '100%' }}
-                    onChange={(value) => setTax(value)}
+                    onChange={(value) => { setTax(value); onChangeServicesItem(servicesItem, coupon, value); }}
                     options={[
                         { value: 0, label:'0%' },
                         { value: 5, label:'5%' },
@@ -346,7 +356,7 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
                 <Select
                     value={coupon}
                     style={{ width: '100%' }}
-                    onChange={(value) => setCoupon(value)}
+                    onChange={(value) => {setCoupon(value); onChangeServicesItem(servicesItem,value,tax); }}
                     options={[{value:'',label:''},
                         ...liveList.map(item => ({
                         value: item.coupon,

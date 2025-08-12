@@ -1,73 +1,65 @@
 import { Avatar, Button, Divider, Image, Progress, Rate, Steps, Tag } from "antd";
 
 import dayjs from 'dayjs';
-import { DownloadOutlined, MailOutlined, PlusOutlined, PrinterOutlined, SaveOutlined, CalendarOutlined, ClockCircleOutlined, UnorderedListOutlined,UserOutlined } from '@ant-design/icons';
+import { DownloadOutlined, MailOutlined, PlusOutlined, PrinterOutlined, SaveOutlined, CalendarOutlined, ClockCircleOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import { UTC_LocalDateTime } from "../../common/localDate";
 import Heading from "../../common/heading";
-const OrderView = ({ id, refresh, ref, orderList, servicesList, userList }) => {
-    
-        const [customerName, setCustomerName] = useState('');
-        const [customerEmail, setCustomerEmail] = useState('');
-        const [customerPhone, setCustomerPhone] = useState('');
-        const [order_no, setOrderNo] = useState('');
-        const [status, setStatus] = useState('Pending');
-        const [price, setPrice] = useState('0');
-        const [trndate, setTrnDate] = useState('');
+const OrderView = ({ id, refresh, orderList, servicesList, userList }) => {
+
+    const [customerName, setCustomerName] = useState('');
+    const [customerEmail, setCustomerEmail] = useState('');
+    const [customerPhone, setCustomerPhone] = useState('');
+    const [order_no, setOrderNo] = useState('');
+    const [status, setStatus] = useState('Pending');
+    const [price, setPrice] = useState('0');
+    const [tax, setTax] = useState('0');
+
+    const [taxamount, setTaxAmount] = useState('0');
+    const [total, setTotal] = useState('0');
+    const [coupon, setCoupon] = useState('');
+    const [discount, setDiscount] = useState('0');
+    const [trndate, setTrnDate] = useState('');
     const [assigned_to, setAssignedTo] = useState('');
     const [createdat, setCreatedat] = useState(new Date());
     const [modifiedat, setModifiedat] = useState(new Date());
-        const [slot, setSlot] = useState('');
-        const [servicesItem, setServicesItem] = useState([]);
-        //const filteredOptionsServices = servicesList.filter(o => !selectedItems.includes(o));
-    
-    
-        const weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-    
-        useEffect(() => {
-            if (id === 0) {
-                setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');
-                setStatus('Pending'); setPrice('0'); setTrnDate(''); setModifiedat(new Date()); setCreatedat(new Date());
-                setAssignedTo(''); setOrderNo(''); setServicesItem([]);setSlot('');
-            }
-            else {
-                const editList = orderList.find(item => item.id === id)
-                if (editList.customerinfo !== null) {
-                    setCustomerName(editList.customerinfo[0].name);
-                    setCustomerPhone(editList.customerinfo[0].cell);
-                    setCustomerEmail(editList.customerinfo[0].email);
-                }
-                else
-                { setCustomerName(''); setCustomerEmail(''); setCustomerPhone(''); }
-    
-                setOrderNo(editList.order_no);
-                setStatus(editList.status);          
-                setTrnDate(editList.trndate);              
-                setServicesItem(editList.serviceinfo);
-                setCreatedat(editList.createdat);
-                setModifiedat(editList.modifiedat);
-                setAssignedTo(editList.assignedto);
-                setPrice(editList.price);
-                setSlot(editList.slot);
-            }
-        }, [refresh])
+    const [slot, setSlot] = useState('');
+    const [servicesItem, setServicesItem] = useState([]);
+    //const filteredOptionsServices = servicesList.filter(o => !selectedItems.includes(o));
 
-    const items = [
-        {
-            title: 'Finished',
-            
-        },
-        {
-            title: 'In Progress',
-            
-        },
-        {
-            title: 'Waiting',
-            
+    useEffect(() => {
+        if (id === 0) {
+            setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');
+            setStatus('Pending'); setPrice('0'); setTax('0'); setTotal('0'); setDiscount('0'); setCoupon(''); setTaxAmount('0'); setTrnDate(''); setModifiedat(new Date()); setCreatedat(new Date());
+            setAssignedTo(''); setOrderNo(''); setServicesItem([]); setSlot('');
+        }
+        else {
+            const editList = orderList.find(item => item.id === id)
+            if (editList.customerinfo !== null) {
+                setCustomerName(editList.customerinfo[0].name);
+                setCustomerPhone(editList.customerinfo[0].cell);
+                setCustomerEmail(editList.customerinfo[0].email);
+            }
+            else { setCustomerName(''); setCustomerEmail(''); setCustomerPhone(''); }
 
-        },
-    ];
-    return(
+            setOrderNo(editList.order_no);
+            setStatus(editList.status);
+            setTrnDate(editList.trndate);
+            setServicesItem(editList.serviceinfo);
+            setCreatedat(editList.createdat);
+            setModifiedat(editList.modifiedat);
+            setAssignedTo(editList.assignedto);
+            setPrice(editList.price);
+            setTax(editList.tax);
+            setTaxAmount(editList.taxamount); 
+            setTotal(editList.total);
+            setCoupon(editList.coupon);
+            setDiscount(editList.discount); 
+            setSlot(editList.slot);
+        }
+    }, [refresh])
+
+    return (
         <div class="flex flex-col gap-2 mb-12  w-full">
             <div class='flex items-center justify-between'>
                 <span class="text-2xl font-bold text-gray-800">Order #{order_no}</span>
@@ -78,8 +70,8 @@ const OrderView = ({ id, refresh, ref, orderList, servicesList, userList }) => {
                 </div>
             </div>
             <div class='flex text-xs text-gray-500'>
-                <p>Order History / Via Appointment / #{order_no} - {UTC_LocalDateTime(createdat,'MMMM, DD YYYY - hh:mm A ')}</p>
-            </div> 
+                <p>Order History / Via Appointment / #{order_no} - {UTC_LocalDateTime(createdat, 'MMMM, DD YYYY - hh:mm A ')}</p>
+            </div>
 
             <div class='flex flex-col md:flex-row gap-4 mt-6'>
 
@@ -89,9 +81,16 @@ const OrderView = ({ id, refresh, ref, orderList, servicesList, userList }) => {
                         <span class="text-lg font-bold text-gray-800">Progress</span>
                         <span class="text-xs text-gray-400">Current Order Status</span>
                         <div class='mt-4'>
-                            <Steps current={2} percent={60} labelPlacement="vertical" size="small" status="error" items={[
-                                { title: 'Pending' }, { title: 'In Progress' }, { title: 'Completed' }
-                            ]} />
+                            <Steps
+                                current={status === 'Pending' ? 0 : (status === 'In progress' ? 1 : 2)} 
+                                percent={60}
+                                labelPlacement="vertical" 
+                                size="small" 
+                                status={status === 'Cancelled' ? "error" : (status === 'Completed' ? "finish" : "process")}
+                                items={[
+                                    { title: 'Pending' }, { title: 'In Progress' }, { title: status === 'Cancelled' ? 'Cancelled' : 'Completed' }
+                                ]} />                      
+
                         </div>
                     </div>
 
@@ -105,17 +104,17 @@ const OrderView = ({ id, refresh, ref, orderList, servicesList, userList }) => {
                                             <Avatar size={50} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
                                         }
                                         <div class='flex flex-col '>
-                                            <span class="text-lg font-semibold text-gray-800 ps-1">{a.fullname}</span> 
+                                            <span class="text-lg font-semibold text-gray-800 ps-1">{a.fullname}</span>
                                             <Rate disabled value={a.rating} />
                                         </div>
-                                       
+
                                     </div>
                                 )}
                         </div>
                         <div class='mt-4 p-4'>
                             <div class='border border-s-4 border-s-cyan-600 p-4 flex flex-col gap-3'>
-                                <span class="text-xs text-gray-400">Working progress</span>
-                                <Progress percent={50} size='small' status="active" strokeColor={{ from: '#108ee9', to: '#87d068' }} />
+                                <span class="text-xs text-gray-400">Working info</span>
+                               {/* <Progress percent={50} size='small' status="active" strokeColor={{ from: '#108ee9', to: '#87d068' }} />*/}
                                 <div class='flex flex-row gap-2'>
                                     <CalendarOutlined />
                                     <span class="text-xs font-medium text-black">Appointment - {UTC_LocalDateTime(trndate, 'MMMM, DD YYYY')}</span>
@@ -152,21 +151,23 @@ const OrderView = ({ id, refresh, ref, orderList, servicesList, userList }) => {
                         <div class='border rounded bg-gray-100 flex flex-col gap-2 p-4 px-8'>
                             <div class='flex items-start justify-between text-xs'>
                                 <span class=" text-gray-600">Subtotal</span>
-                                <span class="font-semibold text-black">$40</span>
+                                <span class="font-semibold text-black">${price}</span>
                             </div>
                             <div class='flex items-start justify-between  text-xs'>
-                                <span class="  text-gray-600">Discount (00%)</span>
-                                <span class=" font-semibold text-black">$0</span>
+                                <span class="  text-gray-600">Discount {coupon !== '' && `- ${coupon}`}</span>
+                                <span class={`font-semibold text-black ${parseFloat(discount).toFixed(2) > 0 && "text-red-400"} `}>
+                                    {parseFloat(discount).toFixed(2) <= 0 ? '$0' : `-$${discount}`}
+                                </span>
                             </div>
                             <div class='flex items-start justify-between  text-xs'>
-                                <span class=" text-gray-600">Tax (13%)</span>
-                                <span class="font-semibold text-black">$7.45</span>
+                                <span class=" text-gray-600">Tax ({tax}%)</span>
+                                <span class="font-semibold text-black">${taxamount}</span>
                             </div>
                             <Divider className="my-2" />
 
                             <div class='flex items-start justify-between text-xs font-semibold text-black'>
                                 <span >Total</span>
-                                <span>$47.45</span>
+                                <span>${total}</span>
                             </div>
                         </div>
                     </div>
@@ -181,7 +182,7 @@ const OrderView = ({ id, refresh, ref, orderList, servicesList, userList }) => {
                                 <li> {customerName}</li>
                                 <li> {customerPhone}</li>
                                 <li> {customerEmail}</li>
-                            </ul>   
+                            </ul>
                         </div>
                     </div>
                 </div>

@@ -14,6 +14,7 @@ import Tasks from "../Tasks/tasks.js";
 import Setting from "../Setting/setting.js";
 import { apiCalls } from "../../hook/apiCall.js";
 import useAlert from "../../common/alert.js";
+import { LocalDate } from "../../common/localDate.js";
 
 const MasterPage = () => {
   const navigate = useNavigate();
@@ -26,7 +27,9 @@ const MasterPage = () => {
   const {contextHolder, success, error } = useAlert();
 
   const [settingActiveTab, setSettingActiveTab] = useState('1');
- 
+
+  const [fromDate, setFromDate] = useState(LocalDate());
+  const [toDate, setToDate] = useState(LocalDate());
 
 
   const [orderList, setOrderList] = useState([]);
@@ -119,7 +122,7 @@ const MasterPage = () => {
         success(`The ${label} has been successfully created.`);
       if (result.status === 200)
         success(`The ${label} has been modified successfully.`);
-     // console.log(result)
+    //  console.log(result)
       if (result.status === 201 || result.status === 200)
         setRefresh(refresh + 1)
     }
@@ -140,11 +143,11 @@ const MasterPage = () => {
         } 
         case "Order":
         {
+          getData(setOrderList, "GET", "order");
           getData(setServicesList, "GET", "services");
           getData(setUserList, "GET", "user");
           getData(setCompanyList, "GET", "company");
           getData(setEventList, "GET", "event");
-          getData(setOrderList, "GET", "order");
           //getData(setServicesList, "GET", "services");
           break;
         }
@@ -186,19 +189,65 @@ const MasterPage = () => {
 
   let displayedContent;
   if (content === 'Dashboard') {
-    displayedContent = <Dashboard orderList={orderList} servicesList={servicesList} userList={userList} />;
+    displayedContent =
+      <Dashboard
+        orderList={orderList}
+        servicesList={servicesList}
+        userList={userList}
+      />;
   } else if (content === 'Tasks') {
-    displayedContent = <Tasks orderList={orderList} userList={userList} servicesList={servicesList} companyList={companyList} />;
+    displayedContent =
+      <Tasks
+        orderList={orderList}
+        userList={userList}
+        servicesList={servicesList}
+        companyList={companyList}
+        screenWidth={500}
+      />;
   } else if (content === 'Order') {
-    displayedContent = <Order orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} eventList={eventList} saveData={saveData} />;
+    displayedContent =
+      <Order
+        orderList={orderList}
+        servicesList={servicesList}
+        userList={userList}
+        companyList={companyList}
+        eventList={eventList}
+        saveData={saveData}
+        fromDate={fromDate}
+        setFromDate={setFromDate}
+        toDate={toDate}
+        setToDate={setToDate}
+      />;
   } else if (content === 'Event') {
-    displayedContent = <Event eventList={eventList} servicesList={servicesList} saveData={saveData} />;
+    displayedContent =
+      <Event
+        eventList={eventList}
+        servicesList={servicesList}
+        saveData={saveData}
+      />;
   } else if (content === 'Services') {
-    displayedContent = <Services servicesList={servicesList} setServicesList={setServicesList} saveData={saveData} />;
+    displayedContent =
+      <Services
+        servicesList={servicesList}
+        setServicesList={setServicesList}
+        saveData={saveData}
+      />;
   } else if (content === 'Users') {
-    displayedContent = <Users userList={userList} saveData={saveData} />;
+    displayedContent =
+      <Users
+        userList={userList}
+        saveData={saveData}
+      />;
   } else if (content === 'Setting') {
-    displayedContent = <Setting companyList={companyList} saveData={saveData} setRefresh={setRefresh} logoList={logoList} tabActiveKey={settingActiveTab} setTabActiveKey={setSettingActiveTab} />;
+    displayedContent =
+      <Setting
+        companyList={companyList}
+        saveData={saveData}
+        setRefresh={setRefresh}
+        logoList={logoList}
+        tabActiveKey={settingActiveTab}
+        setTabActiveKey={setSettingActiveTab}
+      />;
   }
 
   return (

@@ -17,15 +17,13 @@ const customLabelTab = (label, tagColor, tagValue) => {
     )
 }
 
-const Order = ({ orderList, servicesList, userList, companyList, eventList, saveData }) => {
+const Order = ({ orderList, servicesList, userList, companyList, eventList, saveData, fromDate, setFromDate, toDate ,setToDate }) => {
     const ref = useRef();
     const [open, setOpen] = useState(false);
     const [openView, setOpenView] = useState(false);
     const [title, setTitle] = useState('New');
     const [id, setId] = useState(0);
     const [refresh, setRefresh] = useState(0);
-    const [fromDate, setFromDate] = useState(LocalDate());
-    const [toDate, setToDate] = useState(LocalDate());
     const [tabActiveKey, setTabActiveKey] = useState("1");
 
     const btn_Click = (id) => {
@@ -106,7 +104,7 @@ const Order = ({ orderList, servicesList, userList, companyList, eventList, save
 
             {/* Drawer on View*/}
             <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor:'#F9FAFB'}} onClose={() => setOpenView(false)} open={openView}>
-                <OrderView id={id} refresh={refresh} ref={ref} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} saveData={saveData} setOpen={setOpen} />
+                <OrderView id={id} refresh={refresh} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList}  setOpen={setOpen} />
             </Drawer>
 
         </div>

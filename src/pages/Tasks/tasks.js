@@ -1,14 +1,17 @@
-import {  Button } from "antd"
+import {  Button, Drawer } from "antd"
 import { useEffect, useState } from "react";
 
 import { RightOutlined, LeftOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import Calender from "../../components/Event/calender";
+import OrderView from "../../components/Order/order_view";
 
-const Tasks = ({ orderList, servicesList, userList, companyList }) => {
+const Tasks = ({ orderList, servicesList, userList, companyList, screenWidth }) => {
     const [date, setDate] = useState(null);
     const [orders, setOrders] = useState([]);
     const [refresh, setRefresh] = useState(0);
+    const [openView, setOpenView] = useState(false);
+    const [id, setId] = useState(0);
 
     useEffect(() => {
         setDate(dayjs());
@@ -21,6 +24,11 @@ const Tasks = ({ orderList, servicesList, userList, companyList }) => {
         setRefresh(refresh + 1);
     }, [date])
 
+    const btn_ViewClick = (id) => {
+        setRefresh(refresh + 1);
+        setId(id);
+        setOpenView(true);
+    }
     return (
         <div class="flex flex-col gap-4 mb-12">
             <div class='flex  items-center justify-between'>
@@ -31,10 +39,13 @@ const Tasks = ({ orderList, servicesList, userList, companyList }) => {
                     <Button color="default" variant="outlined" icon={<RightOutlined/>} style={{ borderRadius: 0, borderTopRightRadius: 6, borderBottomRightRadius: 6 }} onClick={()=>setDate(dayjs(date).add(1, 'day'))} />
                 </div>
             </div>
-            <div class={`w-full bg-white border rounded-lg p-4 flex flex-col gap-4 max-h-[700px]`}>
-                <Calender orderList={orders} servicesList={servicesList} userList={userList} companyList={companyList} trndate={date} refresh={refresh}/>            
+            <div class={`w-full bg-white border rounded-lg py-2 max-h-[700px] overflow-auto`}>
+                <Calender orderList={orders} servicesList={servicesList} userList={userList} companyList={companyList} trndate={date} refresh={refresh} btn_ViewClick={btn_ViewClick} />            
             </div>
-
+            {/* Drawer on View*/}
+            <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
+                <OrderView id={id} refresh={refresh} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} />
+             </Drawer>
 
         </div>
     )
