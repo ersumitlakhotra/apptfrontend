@@ -1,6 +1,6 @@
 import { Pagination } from "antd"
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
-const DataTable = ({ headerItems, list, body, onChange }) => {
+const DataTable = ({ headerItems, list, body, onChange, isFooter = true }) => {
     return (
         <div class="relative overflow-x-auto">
             <table class="w-full text-left h-40 overflow-auto">
@@ -25,6 +25,7 @@ const DataTable = ({ headerItems, list, body, onChange }) => {
                         body
                     }
                 </tbody>
+                {isFooter &&
                 <tfoot>
                     <tr>
                         <td align="right" colSpan={headerItems.length} class='p-1 place-items-start md:place-items-end'>
@@ -39,6 +40,7 @@ const DataTable = ({ headerItems, list, body, onChange }) => {
                         </td>
                     </tr>
                 </tfoot>
+                }
             </table>
         </div>
     )

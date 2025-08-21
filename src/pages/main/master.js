@@ -15,6 +15,7 @@ import Setting from "../Setting/setting.js";
 import { apiCalls } from "../../hook/apiCall.js";
 import useAlert from "../../common/alert.js";
 import { LocalDate } from "../../common/localDate.js";
+import Sales from "../Sales/sales.js";
 
 const MasterPage = () => {
   const navigate = useNavigate();
@@ -170,6 +171,12 @@ const MasterPage = () => {
           getData(setServicesList, "GET", "services");
           break;
         }
+      case 'Sales':
+        {     
+          getData(setUserList, "GET", "user");  
+          getData(setOrderList, "GET", "order");
+          break;
+        }
       case 'Users':
         {
           getData(setUserList, "GET", "user");
@@ -237,6 +244,12 @@ const MasterPage = () => {
       <Users
         userList={userList}
         saveData={saveData}
+      />;
+  } else if (content === 'Sales') {
+    displayedContent =
+      <Sales
+        orderList={orderList}
+        userList={userList}
       />;
   } else if (content === 'Setting') {
     displayedContent =
