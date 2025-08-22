@@ -16,6 +16,7 @@ import { apiCalls } from "../../hook/apiCall.js";
 import useAlert from "../../common/alert.js";
 import { LocalDate } from "../../common/localDate.js";
 import Sales from "../Sales/sales.js";
+import Expenses from "../Expense/expense.js";
 
 const MasterPage = () => {
   const navigate = useNavigate();
@@ -39,6 +40,7 @@ const MasterPage = () => {
   const [servicesList, setServicesList] = useState([]);
   const [userList, setUserList] = useState([]);
   const [logoList, setLogoList] = useState([]);
+  const [expenseList, setExpenseList] = useState([]);
 
   const onSelected = (newContent) => {
     setIsLoading(true);
@@ -177,6 +179,12 @@ const MasterPage = () => {
           getData(setOrderList, "GET", "order");
           break;
         }
+      case 'Expenses':
+        {
+          getData(setUserList, "GET", "user"); 
+          getData(setExpenseList, "GET", "expense");
+          break;
+        }
       case 'Users':
         {
           getData(setUserList, "GET", "user");
@@ -250,6 +258,13 @@ const MasterPage = () => {
       <Sales
         orderList={orderList}
         userList={userList}
+      />;
+  } else if (content === 'Expenses') {
+    displayedContent =
+      <Expenses
+        expensesList={expenseList}
+        userList={userList}
+        saveData={saveData}
       />;
   } else if (content === 'Setting') {
     displayedContent =
