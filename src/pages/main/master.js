@@ -17,6 +17,7 @@ import useAlert from "../../common/alert.js";
 import { LocalDate } from "../../common/localDate.js";
 import Sales from "../Sales/sales.js";
 import Expenses from "../Expense/expense.js";
+import Payment from "../Payment/payment.js";
 
 const MasterPage = () => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ const MasterPage = () => {
   const {contextHolder, success, error } = useAlert();
 
   const [settingActiveTab, setSettingActiveTab] = useState('1');
+  const [paymentActiveTab, setPaymentActiveTab] = useState('1');
 
   const [fromDate, setFromDate] = useState(LocalDate());
   const [toDate, setToDate] = useState(LocalDate());
@@ -168,6 +170,12 @@ const MasterPage = () => {
           getData(setServicesList, "GET", "services");
           break;
         }
+      case 'Payment':
+        {
+          getData(setUserList, "GET", "user");
+          getData(setExpenseList, "GET", "payment");
+          break;
+        }
       case 'Services':
         {
           getData(setServicesList, "GET", "services");
@@ -182,7 +190,7 @@ const MasterPage = () => {
       case 'Expenses':
         {
           getData(setUserList, "GET", "user"); 
-          getData(setExpenseList, "GET", "expense");
+          getData(setExpenseList, "GET", "payment");
           break;
         }
       case 'Users':
@@ -239,6 +247,15 @@ const MasterPage = () => {
         eventList={eventList}
         servicesList={servicesList}
         saveData={saveData}
+      />;
+  } else if (content === 'Payment') {
+    displayedContent =
+      <Payment
+        expensesList={expenseList}
+        userList={userList}
+        saveData={saveData}
+        tabActiveKey={paymentActiveTab}
+        setTabActiveKey={setPaymentActiveTab}
       />;
   } else if (content === 'Services') {
     displayedContent =

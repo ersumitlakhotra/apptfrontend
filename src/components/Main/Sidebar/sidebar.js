@@ -1,4 +1,14 @@
-import {  PieChartOutlined, CheckSquareOutlined, ProductOutlined, NotificationOutlined, UnorderedListOutlined, UserOutlined, SettingOutlined, CustomerServiceOutlined, FallOutlined, FundOutlined } from '@ant-design/icons';
+import {  
+  PieChartOutlined, 
+  CheckSquareOutlined, 
+  ProductOutlined, 
+  NotificationOutlined, 
+  UnorderedListOutlined, 
+  UserOutlined, 
+  SettingOutlined, 
+  CustomerServiceOutlined,
+   FallOutlined, 
+   FundOutlined, DollarOutlined} from '@ant-design/icons';
 import SideBarButton from '../sidebar_button';
 
 
@@ -22,6 +32,7 @@ const Sidebar = ({ screen, onSelected, content, open }) => {
     getItem('Tasks', 12, <CheckSquareOutlined />, 5),
     getItem('Order', 13, <ProductOutlined />),
     getItem('Event', 14, <NotificationOutlined />),
+    getItem('Payment', 15, <DollarOutlined />),
   ]);
 
  

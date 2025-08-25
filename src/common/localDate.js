@@ -60,4 +60,10 @@ function UTC_LocalDateTime(value,format=null) {
     return dayjs(value).utc().local().format(format === null ? "YYYY-MM-DD, hh:mm A ":format); //2019-03-06T17:11:55+08:00
 };
 
-export { LocalDate, LocalDateTime, UTC_LocalDateTime }
+const firstDateOfMonth = (date = new Date()) =>
+    new Date(date.getFullYear(), date.getMonth(), 1);
+
+const lastDateOfMonth = (date = new Date()) =>
+    new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+export { LocalDate, LocalDateTime, UTC_LocalDateTime, firstDateOfMonth, lastDateOfMonth }
