@@ -70,7 +70,19 @@ const ExpensesDetail = ({ id, refresh, ref, expensesList, saveData, setOpen }) =
         if (regex.test(inputValue) || inputValue === '') {
             setPrice(inputValue);
         }
+
     };
+    useEffect(() => {
+        let net = 0; let tax = 0; let total=0
+        net =parseFloat(netamount);
+        tax = parseFloat(taxamount);
+        total =net + tax;
+        if (isNaN(total))
+            setGrossAmount(0);
+        else
+            setGrossAmount(total.toFixed(2));
+    }, [netamount,taxamount])
+    
     return (
         <div class='flex flex-col font-normal gap-2 mt-2'>
             <p class="text-gray-400 mb-4">Expense Information</p>

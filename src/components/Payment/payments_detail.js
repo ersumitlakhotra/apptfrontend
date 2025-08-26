@@ -72,6 +72,20 @@ const PaymentsDetail = ({ id, refresh, ref, expensesList, userList, saveData, se
             setPrice(inputValue);
         }
     };
+    useEffect(() => {
+        let net = 0; let tax = 0; let total = 0
+        net = parseFloat(netamount);
+        tax = parseFloat(taxamount);
+        if (ptype === "Payroll")
+        total = net - tax;
+        else if (ptype === "Corporation")
+            total = net + tax;
+
+        if (isNaN(total))
+            setGrossAmount(0);
+        else
+            setGrossAmount(total.toFixed(2));
+    }, [ptype,netamount, taxamount])
 
     const pTypeChange = ({ target: { value } }) => {
     setPtype(value);
@@ -81,7 +95,7 @@ const PaymentsDetail = ({ id, refresh, ref, expensesList, userList, saveData, se
             <p class="text-gray-400 mb-4">Payment Information</p>
 
             <TextboxFlex label={'Type'} mandatory={true} input={
-                <Radio.Group options={['Payroll', 'Corporation']} value={ptype} onChange={pTypeChange} />
+                <Radio.Group options={['Payroll', 'Corporation']}  value={ptype} onChange={pTypeChange} />
             } />
            
             <TextboxFlex label={'Employee'} mandatory={true} input={

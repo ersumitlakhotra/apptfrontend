@@ -184,6 +184,7 @@ const MasterPage = () => {
       case 'Sales':
         {     
           getData(setUserList, "GET", "user");  
+          getData(setExpenseList, "GET", "payment");
           getData(setOrderList, "GET", "order");
           break;
         }
@@ -275,6 +276,7 @@ const MasterPage = () => {
       <Sales
         orderList={orderList}
         userList={userList}
+        expensesList={expenseList}
       />;
   } else if (content === 'Expenses') {
     displayedContent =
