@@ -1,16 +1,21 @@
-import { Avatar, Button, DatePicker, Flex, Image, Popover, Tag } from "antd";
-import { DownloadOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Button, DatePicker, Dropdown, Flex, Image, Popover, Space, Tag } from "antd";
+import { DownloadOutlined, UserOutlined, DownOutlined } from '@ant-design/icons';
 
 import { useEffect, useState } from "react";
-import { Bar, Pie } from '../../components/Sales/graph'
+import { Bar, Pie } from '../../components/Sales/graph.js'
 import DataTable from "../../common/datatable";
 import { getTableItem } from "../../common/items";
 
 import { firstDateOfMonth, lastDateOfMonth, LocalDate } from "../../common/localDate.js";
 import dayjs from 'dayjs';
+
+
 const Sales = ({ orderList, userList, expensesList }) => {
     const [barChart, setBarChart] = useState(null);
     const [PieChart, setPieChart] = useState(null);
+
+    const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
     const [filteredList, setFilteredList] = useState([]);
     const [Sales_total, setSales_total] = useState(0);
     const [Expense_total, setExpense_total] = useState(0);
@@ -89,34 +94,55 @@ const Sales = ({ orderList, userList, expensesList }) => {
         setFilteredList(prevArray => [...prevArray, newElement]);
     };
 
-    const handleSales_total = (value) => {
-        setSales_total(prev => (parseFloat(prev) + parseFloat(value)).toFixed(2));
-    };
-    const handleExpense_total = (value) => {
-        setExpense_total(prev => (parseFloat(prev) + parseFloat(value)).toFixed(2));
-    };
-    const handleResult_total = (value) => {
-        setResult_total(value.toFixed(2));
-    };
-    const handleResult_total1 = () => {
-        let tresult = parseFloat(Sales_total) - parseFloat(Expense_total)
-        setResult_total(tresult.toFixed(2));
-        handleFilteredList({
-            key: -1,
-            assignedto: -1,
-            profilepic: null,
-            fullname: "Total",
-            sale: parseFloat(Sales_total).toFixed(2),
-            expense: parseFloat(Expense_total).toFixed(2),
-            result: tresult.toFixed(2)
-        });
-    };
+    useEffect(() => {     
+        let salesArray = [];
+        let expenseArray = [];
+        let seriestotalSale = 0; let seriestotalExpense = 0; let seriesProfitLoss = 0;    
 
-    useEffect(() => {
-        setBarChart(<Bar />)
-        setPieChart(<Pie />)
-    }, [])
+            months.map((a,index) => {
+                let date = currentYear + '-' + String(index + 1).padStart(2, '0')+'-02T00:00:00';
+                let frm = dayjs(firstDateOfMonth(new Date(date))).format("YYYY-MM-DD");
+                let to = dayjs(lastDateOfMonth(new Date(date))).format("YYYY-MM-DD");
+                let totalSale = 0; let totalExpense = 0;
+                const order = orderList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') >= frm && dayjs(a.trndate).format('YYYY-MM-DD') <= to).map(b =>{           
+                        totalSale += parseFloat(b.total);
+                });
+                const expense = expensesList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') >= frm && dayjs(a.trndate).format('YYYY-MM-DD') <= to).map(b =>{
+                    totalExpense += parseFloat(b.grossamount);
+                });
+                salesArray.push(totalSale);
+                expenseArray.push(totalExpense);
 
+                seriestotalSale += parseFloat(totalSale);
+                seriestotalExpense += parseFloat(totalExpense);
+
+            })
+        seriesProfitLoss = parseFloat(seriestotalSale) - parseFloat(seriestotalExpense);
+        let isProfitOrLoss='Profit'
+        if (seriesProfitLoss < 0)
+        {
+            seriesProfitLoss = seriesProfitLoss*-1;
+            isProfitOrLoss='Loss';
+        }
+
+        let seriesArray = [seriestotalSale, seriestotalExpense, seriesProfitLoss];   
+        setBarChart(<Bar sales={salesArray} expense={expenseArray} categories={months} />)     
+        setPieChart(<Pie series={seriesArray} />)
+    }, [currentYear])
+
+    const items = [
+        { key: '2025', label: '2025' },
+        { key: '2026', label: '2026' },
+        { key: '2027', label: '2027' },
+        { key: '2028', label: '2028' },
+    ];
+    const handleMenuClick = e => {
+        setCurrentYear(e.key)
+    };
+    const menuProps = {
+        items,
+        onClick: handleMenuClick,
+    };
     const headerItems = [
         getTableItem('1', 'User'),
         getTableItem('2', 'Sales'),
@@ -135,27 +161,23 @@ const Sales = ({ orderList, userList, expensesList }) => {
 
                 <div class='flex flex-col gap-4 w-full md:w-1/2 '>
                     <div class='flex flex-col gap-4 w-full'>
-                        <Flex gap="small" wrap justify="end">
-                            <Button color="primary" variant="outlined">
-                                Month
-                            </Button>
-                            <Button color="default" variant="text">
-                                Year
-                            </Button>
-                        </Flex>
+                        <div class='flex justify-between items-center'>    
+                            <span class=" text-gray-800 italic ps-4">Monthly report</span>                      
+                            <Dropdown menu={menuProps}>
+                                <Button>
+                                    <Space>
+                                        {currentYear}
+                                        <DownOutlined />
+                                    </Space>
+                                </Button>
+                            </Dropdown>
+                        </div>
                         <div class='w-full bg-white border rounded p-5 text-gray-500 flex flex-col gap-2'>
                             {barChart}
                         </div>
                     </div>
-                    <div class='flex flex-col gap-4 w-full'>
-                        <Flex gap="small" wrap justify="end">
-                            <Button color="primary" variant="outlined">
-                                Month
-                            </Button>
-                            <Button color="default" variant="text">
-                                Year
-                            </Button>
-                        </Flex>
+                    <div class='flex flex-col gap-4 w-full'>  
+                        <span class=" text-gray-800 italic ps-4">Annual report </span>                    
                         <div class='w-full bg-white border rounded p-5 text-gray-500 flex flex-col gap-2'>
                             {PieChart}
                         </div>

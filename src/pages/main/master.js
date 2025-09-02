@@ -148,11 +148,11 @@ const MasterPage = () => {
         } 
         case "Order":
         {
-          getData(setOrderList, "GET", "order");
           getData(setServicesList, "GET", "services");
           getData(setUserList, "GET", "user");
           getData(setCompanyList, "GET", "company");
           getData(setEventList, "GET", "event");
+          getData(setOrderList, "GET", "order");
           //getData(setServicesList, "GET", "services");
           break;
         }

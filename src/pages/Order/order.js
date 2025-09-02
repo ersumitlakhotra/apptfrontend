@@ -17,7 +17,7 @@ const customLabelTab = (label, tagColor, tagValue) => {
     )
 }
 
-const Order = ({ orderList, servicesList, userList, companyList, eventList, saveData, fromDate, setFromDate, toDate ,setToDate }) => {
+const Order = ({ orderList, servicesList, userList, companyList, eventList, saveData, fromDate, setFromDate, toDate, setToDate }) => {
     const ref = useRef();
     const [open, setOpen] = useState(false);
     const [openView, setOpenView] = useState(false);
@@ -45,6 +45,16 @@ const Order = ({ orderList, servicesList, userList, companyList, eventList, save
     const [cancelledList, setCancelledList] = useState([]);
    
     useEffect(() => {
+        if (fromDate === '')
+            setFromDate(LocalDate());
+
+        if (toDate === '')
+            setToDate(LocalDate());
+
+        load();
+    }, [orderList, fromDate, toDate])
+
+    const load = async () => {
         const order = orderList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') >= fromDate && dayjs(a.trndate).format('YYYY-MM-DD') <= toDate);
         const pending = order.filter(a => a.status.toUpperCase() === 'PENDING');
         const inprogress = order.filter(a => a.status.toUpperCase() === 'IN PROGRESS');
@@ -56,18 +66,7 @@ const Order = ({ orderList, servicesList, userList, companyList, eventList, save
         setInprogressList(inprogress.length > 0 ? inprogress : [])
         setCompletedList(completed.length > 0 ? completed : [])
         setCancelledList(cancelled.length > 0 ? cancelled : [])
-
-    }, [refresh, orderList])
-
-    useEffect(() => {
-        if(fromDate ==='')
-            setFromDate(LocalDate());
-
-        if(toDate === '')
-            setToDate(LocalDate());
-        
-        setRefresh(refresh+1)
-    }, [fromDate,toDate])
+    }
 
     const tabItems = [
         getTabItems('1', customLabelTab("All", "cyan", ordersList.length), null, <OrderTabs key={1} orderList={ordersList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),

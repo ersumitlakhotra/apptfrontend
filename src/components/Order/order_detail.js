@@ -33,7 +33,6 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
     const [inTime, setInTime] = useState('00:00:00');
     const [outTime, setOutTime] = useState('00:00:00');
     const [isOpen, setIsOpen] = useState(false);
-
     const weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
     useEffect(() => {
@@ -64,8 +63,7 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
                         setOpeningHours(dayName);
                     }
                 }
-            }
-
+            }           
             setServicesItem(editList.serviceinfo);
             setModifiedat(editList.modifiedat);
             setAssignedTo(editList.assignedto);
@@ -76,8 +74,13 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
             setCoupon(editList.coupon);
             setDiscount(editList.discount); 
             setSlot(editList.slot);
-        }
+        }  
     }, [refresh])
+
+    useEffect(() => {
+        console.log(refresh);
+        console.log(servicesItem);
+    }, [servicesItem])
 
     useEffect(() => {
         if (companyList.length !== 0) {
@@ -253,14 +256,24 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
     }
 
     useEffect(() => {
-        if (trndate !== '' && assigned_to !=='')
+        onChangeServicesItem(servicesItem, coupon, tax); 
+        if (status ==='Cancelled')
         {
-            setOrderListSlot(orderList.filter(a => (a.trndate.includes(trndate) && a.assignedto === assigned_to))); 
+            setPrice(0.00);
+            setTax(0);
+            setCoupon('');
+            setTotal(0.00);
         }
-        else 
+    }, [status])
+
+    useEffect(() => {
+        if (trndate !== '' && assigned_to !== '') {
+            setOrderListSlot(orderList.filter(a => (a.trndate.includes(trndate) && a.assignedto === assigned_to)));
+        }
+        else
             setOrderListSlot([])
     }, [trndate, assigned_to])
-    
+
     return (
         <div class='flex flex-col font-normal gap-3 mt-2'>
             <p class="text-gray-400 mb-4">Customer Detail</p>
@@ -284,7 +297,7 @@ const OrderDetail = ({ id, refresh, ref, orderList, servicesList, userList, comp
                 <Select
                     value={status}
                     style={{ width: '100%' }}
-                    onChange={(value) => setStatus(value)}
+                    onChange={(value) => setStatus(value) }
                     options={[
                         { value: 'Pending', label: <Badge color={'yellow'} text={'Pending'} /> },
                         { value: 'In progress', label: <Badge color={'blue'} text={'In progress'} /> },

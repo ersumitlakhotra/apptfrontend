@@ -1,11 +1,11 @@
 
 import Chart from "react-apexcharts";
-const Bar = () => {
+const Bar = ({sales,expense,categories}) => {
     return (
         <Chart
             options={{
                 xaxis: {
-                    categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999]
+                    categories: categories
                 },
                 stroke: {
                     curve: 'smooth',
@@ -13,24 +13,27 @@ const Bar = () => {
                 dataLabels: {
                     enabled: false
                 },
+                 fill: {
+                     colors: ['#90EE90', '#ff6666']
+                },
             }}
             series={[{
-                name: 'series1',
-                data: [31, 40, 28, 51, 42, 109, 100]
+                name: 'Sales',
+                data: sales
             }, {
-                name: 'series2',
-                data: [11, 32, 45, 32, 34, 52, 41]
+                name: 'Expense',
+                data: expense
             }]}
             type="bar"
             height={300}
         />)
 }
 
-const Pie = () => {
+const Pie = ({ series }) => {
     return (
         <Chart
             options={{
-                labels: ['Pending', 'Completed', 'Cancelled'],
+                labels: ['Sales', 'Expense', 'Profit/Loss'],
                 stroke: {
                     curve: 'smooth',
                 },
@@ -40,7 +43,7 @@ const Pie = () => {
                     show: false
                 },
                 fill: {
-                    colors: ['#FFD580', '#90EE90', '#ff6666']
+                    colors: ['#90EE90', '#ff6666', '#FFD580']
                 },
                 plotOptions: {
                     pie: {
@@ -48,8 +51,8 @@ const Pie = () => {
                     },
                 }
             }}
-            series={[40, 28, 51]}
-            type="donut"
+            series={series}
+            type="pie"
             height={200}
             width={'100%'}
         />)

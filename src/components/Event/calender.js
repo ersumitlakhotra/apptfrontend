@@ -85,13 +85,14 @@ const Calender = ({ orderList, servicesList, userList, companyList, trndate, btn
         }
     }
     return (
+        
         <table class={`text-left h-fit w-full`}>
             <thead class="h-12 sticky top-0 z-40 text-gray-700 font-medium bg-zinc-50">
                 <tr key={-1}>
                     <th scope="col" id={-1} key={-1} class='bg-white z-50 sticky top-0 left-0' > </th>
                     {headerItems.map(items => (
                         <th scope="col" id={items.key} key={items.key} class={`p-3  border-s border-zinc-100 `}>
-                            <div class='flex flex-row items-center'>
+                            <div class='inline-flex items-center'>
                                 {items.profilepic !== null ?
                                     <Image width={40} height={31} src={items.profilepic} style={{ borderRadius: 15 }} /> :
                                     <Avatar size={30} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
