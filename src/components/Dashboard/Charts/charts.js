@@ -3,33 +3,38 @@ import Chart from "react-apexcharts";
 
 import dayjs from 'dayjs';
 
-const AreaChart = () => {
+const AreaChart = ({ sales,expense, categoriesArray }) => {
     return (
         <Chart
             options={{
                 xaxis: {
-                    categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999]
+                    categories: categoriesArray
                 },
                 stroke: {
                     curve: 'smooth',
                 },
                 dataLabels: {
                     enabled: false
+                }, grid: {
+                    show: false
                 },
                 chart: {
                     redrawOnParentResize: true,
                     width: '100%',
+                }, 
+                fill: {
+                    colors: ['#90EE90', '#ff6666']
                 },
             }}
             series={[{
-                name: 'series1',
-                data: [31, 40, 28, 51, 42, 109, 100]
+                name: 'Sales',
+                data: sales
             }, {
-                name: 'series2',
-                data: [11, 32, 45, 32, 34, 52, 41]
+                name: 'Expense',
+                data: expense
             }]}
             type="area"
-            height={500}
+            height={400}
             width={'100%'}
         />
     )
@@ -65,8 +70,8 @@ const AreaChartOptions = () => {
         />
     )
 }
-const BarChart = ({ value}) => {
-    const weekdays = ["Sun", "Mon", "Tues", "Wed", "Thu", "Fri", "Sat"];
+const BarChart = ({ dataArray}) => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
     return (
         <Chart
             options={{
@@ -81,12 +86,41 @@ const BarChart = ({ value}) => {
             }}
             series={[{
                 name: 'Orders',
-                data: value.map(a => ({ x: a.day, y: a.count, fillColor: weekdays[dayjs().get('day')] === a.day ? '#EB8C87' : '' }))
+                data: dataArray.map(a => ({ x: a.month, y: a.count, fillColor: months[dayjs().get('month')] === a.month ? '#a3c2c2' : '' }))
             }]}
             type="bar"
-            height={'100%'}
+            height={400}
             width={'100%'}
         />
     )
 }
-export { AreaChart , BarChart}
+const PieChart = ({ series }) => {
+    return (
+        <Chart
+            options={{
+                labels: ['Pending','In Progress', 'Completed', 'Cancelled'],
+                stroke: {
+                    curve: 'smooth',
+                },
+                dataLabels: {
+                    enabled: true
+                }, grid: {
+                    show: false
+                },
+                fill: {
+                    colors: ['#ffdd99', '#99ddff', '#a6f2a6', '#ff9999', ]
+                },
+                plotOptions: {
+                    pie: {
+                        expandOnClick: false,
+                    },
+                }
+            }}
+            series={series}
+            type="pie"
+            height={500}
+            width={'100%'}
+        />)
+}
+//colors: ['#FFD580','#80d4ff','#90EE90', '#ff6666', ]
+export { AreaChart , BarChart, PieChart}
