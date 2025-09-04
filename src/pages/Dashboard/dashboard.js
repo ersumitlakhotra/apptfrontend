@@ -1,6 +1,6 @@
 import DashHeaderItems from "../../components/Dashboard/HeaderItems/dashboard_header_Items";
 import Cards from "../../components/Dashboard/cards";
-import { Button, Dropdown, Flex, Space } from "antd";
+import { Avatar, Badge, Button, Card, Dropdown, Flex, Image, Space, Tag } from "antd";
 import { AreaChart, BarChart, PieChart } from "../../components/Dashboard/Charts/charts";
 import { useEffect, useState } from "react";
 import Statistics from "../../components/Dashboard/statistics";
@@ -12,9 +12,11 @@ import dayjs from 'dayjs';
 import { Sort } from "../../common/sort";
 import Performance from "../../components/Dashboard/performance";
 import OrderTabs from "../../components/Order/tab";
+import { getBorder } from "../../common/items.js";
+import { Tags } from "../../common/tags.js";
 
 
-const Dashboard = ({ orderList, expensesList, servicesList, userList }) => {
+const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList, onSelected }) => {
     const dashHeaderItems = DashHeaderItems;
 
     const [areaChart, setAreaChart] = useState(null);
@@ -37,6 +39,7 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList }) => {
     const [inprogressList, setInprogressList] = useState([]);
     const [completedList, setCompletedList] = useState([]);
     const [cancelledList, setCancelledList] = useState([]);
+    const [liveList, setLiveList] = useState([]);
 
     const weekdays = ["Sun", "Mon", "Tues", "Wed", "Thu", "Fri", "Sat"];
     useEffect(() => {
@@ -45,8 +48,9 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList }) => {
         const inprogress = total.filter(a => a.status.toUpperCase() === 'IN PROGRESS');
         const completed = total.filter(a => a.status.toUpperCase() === 'COMPLETED');
         const cancelled = total.filter(a => a.status.toUpperCase() === 'CANCELLED');
+        const sortedTotal = [...total].sort((a, b) => new Date(b.modifiedat) - new Date(a.modifiedat));
 
-        setTotalList(total.length > 0 ? total : [])
+        setTotalList(sortedTotal.length > 0 ? sortedTotal : [])
         setPendingList(pending.length > 0 ? pending : [])
         setInprogressList(inprogress.length > 0 ? inprogress : [])
         setCompletedList(completed.length > 0 ? completed : [])
@@ -71,7 +75,8 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList }) => {
             dates.push({ key: i, day: weekdays[dayOfWeekNumber], count: orderList.filter(a => dayjs(d).format('YYYY-MM-DD') === dayjs(a.trndate).format('YYYY-MM-DD')).length }); // Format as desired
 
         }// Reverse to get chronological order
-        setPieChart(<PieChart series={[12,25,66,36]} />)
+        const liveList = eventList.filter(a => a.case.toUpperCase() === 'LIVE');
+        setLiveList(liveList.length > 0 ? liveList : [])
     }, [refresh, userList])
 
     useEffect(() => {
@@ -107,6 +112,7 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList }) => {
         })
 
         setAreaChart(<AreaChart sales={salesArray} expense={expenseArray} categoriesArray={months} />);
+        setPieChart(<PieChart series={[12, 25, 66, 36]} />)
     }, [ currentYearArea])
 
     const twoColors = {
@@ -178,7 +184,7 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList }) => {
                     </div>
                     <div class='flex flex-col gap-4 w-full'>
                         <div class='flex justify-between items-center'>
-                            <span class="text-lg font-semibold text-gray-800">Annual Orders</span>
+                            <span class="text-lg font-semibold text-gray-800">Annual Report</span>
                             <Dropdown menu={menuPropsArea}>
                                 <Button>
                                     <Space>
@@ -192,9 +198,7 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList }) => {
                             {areaChart}
                         </div>
                     </div>
-                </div>
 
-                <div class='flex flex-col gap-4 w-full md:w-2/6'>
                     <div class='flex flex-col gap-4 w-full'>
                         <div class='flex justify-between items-center'>
                             <span class="text-lg font-semibold text-gray-800">Tasks</span>
@@ -209,6 +213,81 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList }) => {
                         </div>
                         <div class='w-full bg-white border rounded p-5 text-gray-500 flex flex-col gap-2'>
                             {pieChart}
+                        </div>
+                    </div>
+                </div>
+
+                <div class='flex flex-col gap-4 w-full md:w-2/6'>
+
+                    <div class='flex flex-col gap-4 w-full'>  
+                        <div class='flex justify-between items-center'>
+                            <Badge count={liveList.length} color="#52c41a" offset={[15, 10]}>
+                                <span class="text-lg font-semibold text-gray-800">Live Events</span>
+                            </Badge>
+                            <Button color="primary" variant="outlined" onClick={() => onSelected('Event')} >
+                                View all
+                            </Button>
+                        </div>
+                        <div class='w-full bg-white border rounded p-5 text-gray-500 max-h-[460px] h-[460px]  overflow-y-auto'>
+                            <div class=' flex flex-col gap-4 mb-4'>
+                                {liveList.length === 0 ? <p class='text-left p-4 text-sm font-medium text-gray-500'> There aren't any live events going on right now.</p>:  
+                                liveList.map(item =>
+                                    <div key={item.id} class={` text-xs flex flex-col gap-1 border-s-4 p-2 border-s-green-300 bg-green-50  text-green-500`}>
+                                        <div class='flex items-center justify-between font-medium'>
+                                            <p class='text-sm' > {item.title}</p>
+                                            <p>$ {item.total}</p>
+                                        </div>
+                                        <div class='flex items-center justify-between font-medium'>
+                                            <span class="text-gray-500">{dayjs(item.startdate).format('ddd, MMM DD')} - {dayjs(item.enddate).format('ddd, MMM DD')}</span>
+                                            <p>{item.coupon}</p>
+                                        </div>
+                                        <div class='flex flex-col overflow-hidden whitespace-nowrap'>
+                                            {item.serviceinfo !== null &&
+                                                servicesList.filter(a =>
+                                                    item.serviceinfo.some(b => b === a.id)
+                                                ).map(c => <Tag key={c.id} color="green" bordered={false}>{c.name}</Tag>)
+                                            }
+                                        </div>
+                                    </div>
+                                )}
+                                
+                            </div>                   
+                        </div>
+                    </div>
+                    <div class='flex flex-col gap-4 w-full'>
+                        <span class="text-lg font-semibold text-gray-800">Recent Activities </span>
+                        <div class='w-full bg-white border rounded p-5 text-gray-500 max-h-[460px] h-[460px]  overflow-y-auto flex flex-col gap-2'>
+                            <div class=' flex flex-col gap-4 mb-4'>
+                                {totalList.length === 0 ? <p class='text-left p-4 text-sm font-medium text-gray-500'> There aren't any activity to show right now.</p> :
+                                   totalList.map(item =>
+                                    <>                                      
+                                        <Badge.Ribbon 
+                                            text={new Date(item.modifiedat) === new Date(item.createdat) ?"Created":"Modified"} 
+                                               color={new Date(item.modifiedat) === new Date(item.createdat) ? "yellow" : "blue"} >
+                                               <Card title={
+                                                   item.assignedto === '0' ? '' :
+                                                       userList.filter(user => user.id === item.assignedto).map(a =>
+                                                           <div key={a.id} class='flex flex-row gap-2 items-center text-sm'>
+                                                               {a.profilepic !== null ?
+                                                                   <Image width={24} height={24} src={a.profilepic} style={{ borderRadius: 15 }} /> :
+                                                                   <Avatar size={24} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
+                                                               }
+                                                               <span class='text-xs  text-gray-500'>{a.fullname}</span>
+                                                           </div>
+                                                       )
+                                               } 
+                                               size="small" backgroundColor='gray'>
+                                               <div class='flex flex-col gap-2'>
+                                                       <div class='flex items-center justify-between'>
+                                                           <span class="text-blue-500 italic hover:underline cursor-pointer"  ># {item.order_no}</span>
+                                                           <span class="">{Tags(item.status)}</span>
+                                                       </div>
+                                               </div>
+                                                   
+                                            </Card>
+                                        </Badge.Ribbon>
+                                    </>)}
+                            </div>
                         </div>
                     </div>
                 </div>

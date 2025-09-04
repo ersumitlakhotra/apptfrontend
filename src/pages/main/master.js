@@ -145,6 +145,7 @@ const MasterPage = () => {
           getData(setServicesList, "GET", "services");
           getData(setUserList, "GET", "user");
           getData(setExpenseList, "GET", "payment");
+          getData(setEventList, "GET", "event");
           break;
         } 
         case "Order":
@@ -220,6 +221,8 @@ const MasterPage = () => {
         servicesList={servicesList}
         userList={userList}
         expensesList={expenseList}
+        eventList={eventList}
+        onSelected={onSelected}
       />;
   } else if (content === 'Tasks') {
     displayedContent =

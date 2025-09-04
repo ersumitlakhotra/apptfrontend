@@ -79,14 +79,30 @@ const BarChart = ({ dataArray}) => {
                     curve: 'smooth',
                 },
                 dataLabels: {
-                    enabled: false
+                    enabled: true,
+                    formatter: function (val) {
+                        return val;
+                    },
+                    offsetY: -20,
+                    style: {
+                        fontSize: '12px',
+                        colors: ["#FFFFFF"]
+                    }
+                }, plotOptions: {
+                    bar: {
+                        borderRadius: 12,
+                        dataLabels: {
+                            position: 'center', // top, center, bottom
+                        },
+                    }
                 }, grid: {
                     show: false
                 },
             }}
             series={[{
                 name: 'Orders',
-                data: dataArray.map(a => ({ x: a.month, y: a.count, fillColor: months[dayjs().get('month')] === a.month ? '#a3c2c2' : '' }))
+                data: dataArray.map(a => ({ x: a.month, y: a.count}))
+                 //data: dataArray.map(a => ({ x: a.month, y: a.count, fillColor: months[dayjs().get('month')] === a.month ? '#a3c2c2' : '' }))
             }]}
             type="bar"
             height={400}
@@ -118,7 +134,7 @@ const PieChart = ({ series }) => {
             }}
             series={series}
             type="pie"
-            height={500}
+            height={300}
             width={'100%'}
         />)
 }
