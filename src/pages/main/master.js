@@ -223,6 +223,7 @@ const MasterPage = () => {
         expensesList={expenseList}
         eventList={eventList}
         onSelected={onSelected}
+        refresh={refresh}
       />;
   } else if (content === 'Tasks') {
     displayedContent =

@@ -1,19 +1,16 @@
 
-
 import { Tag } from 'antd';
 import dayjs from 'dayjs';
 
+export function getItem(key, label, value) {
+    return {key,label,value};
+}
 export function getTabItems  (key, label,icon, children)  {
     return { key, label, icon, children };
 };
 
 export function getTableItem(key, label, sort, setSort) {
-    return {
-        key,
-        label,
-        sort,
-        setSort
-    };
+    return {key,label,sort,setSort};
 } 
 
 export function getDate(dateTime) {

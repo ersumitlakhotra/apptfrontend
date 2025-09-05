@@ -138,5 +138,87 @@ const PieChart = ({ series }) => {
             width={'100%'}
         />)
 }
+const StackedBarChart = ({ categories, pending,inprogress,completed,cancelled }) => {
+    return (
+        <Chart
+            options={{
+                dataLabels: {
+                    enabled: true
+                }, grid: {
+                    show: false
+                },
+                chart: {
+                    type: 'bar',
+                    height: 350,
+                    stacked: true,
+                }, 
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        dataLabels: {
+                            total: {
+                                enabled: true,
+                                offsetX: 0,
+                                style: {
+                                    fontSize: '10px',
+                                    fontWeight: 200
+                                }
+                            }
+                        }
+                    },
+                },
+                stroke: {
+                    width: 1,
+                    colors: ['#fff']
+                },
+                xaxis: {
+                    categories: categories,
+                    labels: {
+                        formatter: function (val) {
+                            return val 
+                        }
+                    }
+                },
+                yaxis: {
+                    title: {
+                        text: undefined
+                    },
+                },
+                tooltip: {
+                    y: {
+                        formatter: function (val) {
+                            return val 
+                        }
+                    }
+                },
+                fill: {
+                    opacity: 1,
+                    colors: ['#ffdd99', '#99ddff', '#a6f2a6', '#ff9999',]
+                },
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'left',
+                    offsetX: 40
+                }
+            }}
+            series={[{
+                name: 'Pending',
+                data: pending,
+            }, {
+                name: 'In Progress',
+                data: inprogress
+            }, {
+                name: 'Completed',
+                data: completed
+            }, {
+                name: 'Cancelled',
+                data: cancelled
+            }]}
+            type="bar"
+            height={400}
+            width={'100%'}
+        />
+    )
+}
 //colors: ['#FFD580','#80d4ff','#90EE90', '#ff6666', ]
-export { AreaChart , BarChart, PieChart}
+export { AreaChart, BarChart, PieChart, StackedBarChart }
