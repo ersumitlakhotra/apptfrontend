@@ -2,8 +2,6 @@ import Card from "../../components/Dashboard/Header/card.js";
 import { useEffect, useState } from "react";
 import Statistics from "../../components/Dashboard/statistics";
 import dayjs from 'dayjs';
-import { Sort } from "../../common/sort";
-import Performance from "../../components/Dashboard/performance";
 import {  getItem } from "../../common/items.js";
 import Appointment from "../../components/Dashboard/Appointments/appointment.js";
 import { YearsList } from "../../common/yearslist.js";
@@ -13,7 +11,7 @@ import LiveEvent from "../../components/Dashboard/LiveEvent/live_event.js";
 import RecentActivities from "../../components/Dashboard/RecentActivities/recent_activities.js";
 
 
-const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList, onSelected, refresh }) => {  
+const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList, onSelected }) => {  
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
     const [totalList, setTotalList] = useState([]);
     const [pendingList, setPendingList] = useState([]);
@@ -33,7 +31,7 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList,
         setInprogressList(inprogress.length > 0 ? inprogress : [])
         setCompletedList(completed.length > 0 ? completed : [])
         setCancelledList(cancelled.length > 0 ? cancelled : [])  
-    }, [refresh, orderList])  
+    }, [orderList])  
 
     const twoColors = {
         '0%': '#108ee9',
@@ -59,13 +57,14 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList,
 
             <div class='flex flex-col gap-4 mt-4  w-full md:flex-row'>
                 <div class='flex flex-col gap-4 w-full md:w-4/6'>
-                    <Appointment orderList={orderList} refresh={refresh} yearList={YearsList(2023)} months={months} />
-                    <AnnualReport orderList={orderList} expensesList={expensesList} refresh={refresh} yearList={YearsList(2023)} months={months} />   
-                    <Task orderList={orderList} userList={userList} refresh={refresh} />                   
+                    <Appointment orderList={orderList} yearList={YearsList(2023)} months={months} />
+                    <AnnualReport orderList={orderList} expensesList={expensesList} yearList={YearsList(2023)} months={months} />   
+                    <Task orderList={orderList} userList={userList} />                   
                 </div>
                 <div class='flex flex-col gap-4 w-full md:w-2/6'>
-                    <LiveEvent eventList={eventList} userList={userList} servicesList={servicesList} refresh={refresh} onSelected={onSelected} />
-                    <RecentActivities orderList={orderList} userList={userList} refresh={refresh} />  
+                    <LiveEvent eventList={eventList} servicesList={servicesList} onSelected={onSelected} />
+                    <RecentActivities orderList={orderList} userList={userList} />  
+
                     <span class="text-lg font-semibold text-gray-800">Statistics</span>
                     <div class='w-full h-96  bg-white border rounded p-5 text-gray-500 flex flex-col gap-6 '>
                         <Statistics key={1} label={"Total"} value={completedList.length + cancelledList.length} total={totalList.length} strokeColor={twoColors} />

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import { useState, useEffect } from "react";
 import Header from "../../components/Main/Header/header.js";
@@ -35,7 +36,6 @@ const MasterPage = () => {
   const [fromDate, setFromDate] = useState(LocalDate());
   const [toDate, setToDate] = useState(LocalDate());
 
-
   const [orderList, setOrderList] = useState([]);
   const [eventList, setEventList] = useState([]);
   const [companyList, setCompanyList] = useState([]);
@@ -57,7 +57,7 @@ const MasterPage = () => {
     };
 
     window.addEventListener('resize', handleResize);
-
+    setRefresh(refresh + 1);
     // Clean up the event listener on component unmount
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -82,6 +82,7 @@ const MasterPage = () => {
     const companyId = localStorage.getItem('cid');
     if (!companyId) {
       navigate("/");
+      console.log("ref")
     }
   }, [navigate, signout]);
 
@@ -141,11 +142,11 @@ const MasterPage = () => {
     switch (content) {
       case "Dashboard":
         {
-          getData(setOrderList, "GET", "order");
           getData(setServicesList, "GET", "services");
           getData(setUserList, "GET", "user");
           getData(setExpenseList, "GET", "payment");
           getData(setEventList, "GET", "event");
+          getData(setOrderList, "GET", "order");
           break;
         } 
         case "Order":
@@ -209,9 +210,7 @@ const MasterPage = () => {
         }
       default: { break }
     }
-
-  },
-    [refresh]);
+  },[refresh]);
 
   let displayedContent;
   if (content === 'Dashboard') {

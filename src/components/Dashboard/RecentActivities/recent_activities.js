@@ -4,14 +4,14 @@ import { UserOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { Tags } from "../../../common/tags";
 
-const RecentActivities = ({ orderList, userList, refresh }) => {
+const RecentActivities = ({ orderList, userList }) => {
     const [totalList, setTotalList] = useState([]);
 
     useEffect(() => {
         const total = orderList.filter(a => dayjs().format('YYYY-MM-DD') === dayjs(a.trndate).format('YYYY-MM-DD'));
         const sortedTotal = [...total].sort((a, b) => new Date(b.modifiedat) - new Date(a.modifiedat));
         setTotalList(sortedTotal.length > 0 ? sortedTotal : [])
-    }, [refresh])
+    }, [orderList])
 
     return (
         <div class='flex flex-col gap-4 w-full'>

@@ -2,13 +2,12 @@ import { Badge, Button, Tag } from "antd";
 import { useEffect, useState } from "react";
 import dayjs from 'dayjs';
 
-const LiveEvent = ({ eventList, userList, servicesList, refresh, onSelected }) => {
+const LiveEvent = ({ eventList, servicesList, onSelected }) => {
     const [liveList, setLiveList] = useState([]);
-
     useEffect(() => {
         const liveList = eventList.filter(a => a.case.toUpperCase() === 'LIVE');
         setLiveList(liveList.length > 0 ? liveList : [])
-    }, [refresh])
+    }, [eventList])
 
     return (
         <div class='flex flex-col gap-4 w-full'>
@@ -21,7 +20,7 @@ const LiveEvent = ({ eventList, userList, servicesList, refresh, onSelected }) =
                 </Button>
             </div>
             <div class='w-full bg-white border rounded p-5 text-gray-500 max-h-[460px] h-[460px]  overflow-y-auto'>
-                <div class=' flex flex-col gap-4 mb-4'>
+                <div class=' flex flex-col gap-4 mb-4'>               
                     {liveList.length === 0 ? <p class='text-left p-4 text-sm font-medium text-gray-500'> There aren't any live events going on right now.</p> :
                         liveList.map(item =>
                             <div key={item.id} class={` text-xs flex flex-col gap-1 border-s-4 p-2 border-s-green-300 bg-green-50  text-green-500`}>
