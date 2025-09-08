@@ -46,14 +46,13 @@ const Payment = ({ expensesList, userList, saveData, tabActiveKey, setTabActiveK
         setIdPayment(id);
         setOpenPayment(true);
     }
-
     const btnSave = async () => {
         await ref.current?.save();
     }
  
     const tabItems = [
-        getTabItems('1', 'Expenses', null, <Expenses key={1} expensesList={expensesData} userList={userList} btn_Click={btn_Click_Expense} fromDate={fromDateExpenses} setFromDate={setFromDateExpenses} toDate={toDateExpenses} setToDate={setToDateExpenses} /> ),
-        getTabItems('2', 'Payments', null, <Payments key={2} expensesList={paymentData} userList={userList} btn_Click={btn_Click_Payment} fromDate={fromDatePayment} setFromDate={setFromDatePayment} toDate={toDatePayment} setToDate={setToDatePayment} /> )
+        getTabItems('1', 'Expenses', null, <Expenses key={1} expensesList={expensesData} userList={userList} btn_Click={btn_Click_Expense} fromDate={fromDateExpenses} setFromDate={setFromDateExpenses} toDate={toDateExpenses} setToDate={setToDateExpenses} saveData={saveData} /> ),
+        getTabItems('2', 'Payments', null, <Payments key={2} expensesList={paymentData} userList={userList} btn_Click={btn_Click_Payment} fromDate={fromDatePayment} setFromDate={setFromDatePayment} toDate={toDatePayment} setToDate={setToDatePayment} saveData={saveData} /> )
     ];
 
     return (

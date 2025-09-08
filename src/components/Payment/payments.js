@@ -1,12 +1,11 @@
 import {  useEffect,  useState } from "react";
-import { EditOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar,  Button,  DatePicker,  Image,   Popover,  Select,  Tooltip } from "antd";
+import { EditOutlined, UserOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Avatar,  Button,  DatePicker,  Image,   Popconfirm,   Popover,  Select,  Tooltip } from "antd";
 import DataTable from "../../common/datatable";
 import {  getTableItem,getDate } from "../../common/items";
-import { UTC_LocalDateTime } from "../../common/localDate.js";
 
 import dayjs from 'dayjs';
-const Payments = ({ key, expensesList,userList, btn_Click, fromDate, setFromDate, toDate, setToDate }) => {
+const Payments = ({ key, expensesList, userList, btn_Click, fromDate, setFromDate, toDate, setToDate, saveData }) => {
 
     const [filteredList, setFilteredList] = useState(expensesList);
 
@@ -50,6 +49,10 @@ const Payments = ({ key, expensesList,userList, btn_Click, fromDate, setFromDate
         getTableItem('8', 'Last Modified'),
         getTableItem('9', 'Action'),
     ];
+    const deleted = (id) => {
+        const Body = JSON.stringify({});
+        saveData("Expense", 'DELETE', "payment", id, Body);
+    };
     return (
         <div key={key} class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
             <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
@@ -109,7 +112,7 @@ const Payments = ({ key, expensesList,userList, btn_Click, fromDate, setFromDate
                 body={(
                     filteredList.map(item => (
                         <tr key={item.id} class="bg-white border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50 ">
-                            <td class="p-3 ">{UTC_LocalDateTime(item.trndate, "MMM DD,YYYY")}</td>
+                            <td class="ps-3 w-44">{`${dayjs(item.fromdate).format("MMM DD,YYYY")} - ${dayjs(item.todate).format("MMM DD,YYYY")} `}</td>
                             <td class="p-3">{item.assignedto === '0' ? '' :
                                 userList.filter(user => user.id === item.assignedto).map(a =>
                                     <div key={a.id} class='flex flex-row gap-2 items-center'>
@@ -130,6 +133,16 @@ const Payments = ({ key, expensesList,userList, btn_Click, fromDate, setFromDate
                             <td class="p-3">
                                 <Tooltip placement="top" title={'Edit'} >
                                     <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
+                                </Tooltip> <Tooltip placement="top" title={'Delete'} >
+                                    <Popconfirm
+                                        title="Delete "
+                                        description="Are you sure to delete?"
+                                        onConfirm={(e) => deleted(item.id)}
+                                        okText="Yes"
+                                        cancelText="No"
+                                    >
+                                        <Button danger type="link" icon={<DeleteOutlined />} />
+                                    </Popconfirm>
                                 </Tooltip>
                             </td>
                         </tr>

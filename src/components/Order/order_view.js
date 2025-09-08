@@ -1,10 +1,8 @@
-import { Avatar, Button, Divider, Image, Progress, Rate, Steps, Tag } from "antd";
-
-import dayjs from 'dayjs';
-import { DownloadOutlined, MailOutlined, PlusOutlined, PrinterOutlined, SaveOutlined, CalendarOutlined, ClockCircleOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { Avatar, Button, Divider, Image,  Rate, Steps, Tag } from "antd";
+import { DownloadOutlined, MailOutlined, PrinterOutlined, CalendarOutlined, ClockCircleOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import { UTC_LocalDateTime } from "../../common/localDate";
-import Heading from "../../common/heading";
 const OrderView = ({ id, refresh, orderList, servicesList, userList }) => {
 
     const [customerName, setCustomerName] = useState('');
@@ -22,7 +20,6 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList }) => {
     const [trndate, setTrnDate] = useState('');
     const [assigned_to, setAssignedTo] = useState('');
     const [createdat, setCreatedat] = useState(new Date());
-    const [modifiedat, setModifiedat] = useState(new Date());
     const [slot, setSlot] = useState('');
     const [servicesItem, setServicesItem] = useState([]);
     //const filteredOptionsServices = servicesList.filter(o => !selectedItems.includes(o));
@@ -30,7 +27,7 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList }) => {
     useEffect(() => {
         if (id === 0) {
             setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');
-            setStatus('Pending'); setPrice('0'); setTax('0'); setTotal('0'); setDiscount('0'); setCoupon(''); setTaxAmount('0'); setTrnDate(''); setModifiedat(new Date()); setCreatedat(new Date());
+            setStatus('Pending'); setPrice('0'); setTax('0'); setTotal('0'); setDiscount('0'); setCoupon(''); setTaxAmount('0'); setTrnDate(''); setCreatedat(new Date());
             setAssignedTo(''); setOrderNo(''); setServicesItem([]); setSlot('');
         }
         else {
@@ -47,7 +44,6 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList }) => {
             setTrnDate(editList.trndate);
             setServicesItem(editList.serviceinfo);
             setCreatedat(editList.createdat);
-            setModifiedat(editList.modifiedat);
             setAssignedTo(editList.assignedto);
             setPrice(editList.price);
             setTax(editList.tax);

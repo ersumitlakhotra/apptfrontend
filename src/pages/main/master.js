@@ -13,7 +13,7 @@ import Services from "../Services/services.js";
 import Event from "../Event/event.js";
 import Tasks from "../Tasks/tasks.js";
 import Setting from "../Setting/setting.js";
-import { apiCalls } from "../../hook/apiCall.js";
+import { apiCalls, apiCallsDelete } from "../../hook/apiCall.js";
 import useAlert from "../../common/alert.js";
 import { LocalDate } from "../../common/localDate.js";
 import Sales from "../Sales/sales.js";
@@ -105,10 +105,10 @@ const MasterPage = () => {
     setIsLoading(false);
   }
 
-  const getData = async (setList, method, endPoint, id = null, body = null) => {
+  const getData = async (setList, method, endPoint, eventDate=false) => {
     setIsLoading(true);
     try {
-      const res = await apiCalls(method, endPoint, id, body);
+      const res = await apiCalls(method, endPoint,null,null,eventDate);
       setList(res.data.data);
     }
     catch (e) {
@@ -122,14 +122,16 @@ const MasterPage = () => {
     setIsLoading(true);
     try {
       const result = await apiCalls(method, endPoint, id, body);
+      console.log(result)
       if (result.status === 500 || result.status === 404)
         error(result.message);
       if (result.status === 201)
         success(`The ${label} has been successfully created.`);
       if (result.status === 200)
         success(`The ${label} has been modified successfully.`);
-    //  console.log(result)
-      if (result.status === 201 || result.status === 200)
+      if (result.status === 203)
+        success(`The ${label} has been deleted successfully.`);
+      if (result.status === 201 || result.status === 200 || result.status === 203)
         setRefresh(refresh + 1)
     }
     catch (e) {
@@ -137,7 +139,6 @@ const MasterPage = () => {
     }  
     setIsLoading(false);
   }
-
   useEffect(() => {
     switch (content) {
       case "Dashboard":
@@ -145,7 +146,7 @@ const MasterPage = () => {
           getData(setServicesList, "GET", "services");
           getData(setUserList, "GET", "user");
           getData(setExpenseList, "GET", "payment");
-          getData(setEventList, "GET", "event");
+          getData(setEventList, "GET", "event",true);
           getData(setOrderList, "GET", "order");
           break;
         } 
@@ -154,7 +155,7 @@ const MasterPage = () => {
           getData(setServicesList, "GET", "services");
           getData(setUserList, "GET", "user");
           getData(setCompanyList, "GET", "company");
-          getData(setEventList, "GET", "event");
+          getData(setEventList, "GET", "event", true);
           getData(setOrderList, "GET", "order");
           //getData(setServicesList, "GET", "services");
           break;
@@ -169,7 +170,7 @@ const MasterPage = () => {
         }
       case 'Event':
         {
-          getData(setEventList, "GET", "event");
+          getData(setEventList, "GET", "event", true);
           getData(setServicesList, "GET", "services");
           break;
         }

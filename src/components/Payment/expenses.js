@@ -1,14 +1,14 @@
-import {  Button, DatePicker, Input,  Popover,  Tooltip} from "antd"
+import {  Button, DatePicker, Input,  Popconfirm,  Popover,  Tooltip} from "antd"
 import { IoSearchOutline } from "react-icons/io5";
 import { getDate, getTableItem } from "../../common/items";
 import DataTable from "../../common/datatable";
 import { useEffect, useState } from "react";
-import {  EditOutlined } from '@ant-design/icons';
+import {  DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { UTC_LocalDateTime } from "../../common/localDate";
 
 
-const Expenses = ({ key, expensesList, btn_Click, fromDate, setFromDate, toDate, setToDate }) => {
+const Expenses = ({ key, expensesList, btn_Click, fromDate, setFromDate, toDate, setToDate, saveData }) => {
   
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(expensesList);
@@ -37,8 +37,6 @@ const Expenses = ({ key, expensesList, btn_Click, fromDate, setFromDate, toDate,
         setFilteredList(searchedList)
     }
  
-
-
     const headerItems = [
         getTableItem('1', 'Date'),
         getTableItem('2', 'Name'),
@@ -50,6 +48,11 @@ const Expenses = ({ key, expensesList, btn_Click, fromDate, setFromDate, toDate,
         getTableItem('8', 'Last Modified'),
         getTableItem('9', 'Action'),
     ];
+    const deleted = (id) => {
+        const Body = JSON.stringify({});
+        saveData("Expense", 'DELETE', "payment", id, Body);
+    };
+
     return (
         <div key={key} class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
             <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
@@ -104,6 +107,17 @@ const Expenses = ({ key, expensesList, btn_Click, fromDate, setFromDate, toDate,
                             <td class="p-3">
                                 <Tooltip placement="top" title={'Edit'} >
                                     <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
+                                </Tooltip>
+                                <Tooltip placement="top" title={'Delete'} >
+                                    <Popconfirm
+                                        title="Delete "
+                                        description="Are you sure to delete?"
+                                        onConfirm={(e) => deleted(item.id) }
+                                        okText="Yes"
+                                        cancelText="No"
+                                    >
+                                        <Button danger type="link" icon={<DeleteOutlined />} />
+                                    </Popconfirm>
                                 </Tooltip>
                             </td>
                         </tr>

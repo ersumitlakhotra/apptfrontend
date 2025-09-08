@@ -12,7 +12,8 @@ const PaymentsDetail = ({ id, refresh, ref, expensesList, userList, saveData, se
 
     const [etype, setEtype] = useState('Payment');
     const [ptype, setPtype] = useState('Payroll');
-    const [trndate, setTrnDate] = useState(LocalDate());
+    const [fromdate, setFromDate] = useState(LocalDate());
+    const [todate, setToDate] = useState(LocalDate());
     const [assigned_to, setAssignedTo] = useState('');
     const [netamount, setNetAmount] = useState('0.00');
     const [taxamount, setTaxAmount] = useState('0.00');
@@ -21,13 +22,14 @@ const PaymentsDetail = ({ id, refresh, ref, expensesList, userList, saveData, se
 
     useEffect(() => {
         if (id === 0) {
-            setEtype('Payment'); setPtype('Payroll'); setTrnDate(LocalDate()); setAssignedTo(''); setNetAmount('0.00'); setTaxAmount('0.00'); setGrossAmount('0.00'); setNotes('');
+            setEtype('Payment'); setPtype('Payroll'); setFromDate(LocalDate()); setToDate(LocalDate()); setAssignedTo(''); setNetAmount('0.00'); setTaxAmount('0.00'); setGrossAmount('0.00'); setNotes('');
         }
         else {
             const editList = expensesList.find(item => item.id === id)
             setEtype(editList.etype);
             setPtype(editList.ptype);
-            setTrnDate(editList.trndate);
+            setFromDate(editList.fromdate);
+            setToDate(editList.todate);
             setAssignedTo(editList.assignedto);
             setNetAmount(editList.netamount);
             setTaxAmount(editList.taxamount);
@@ -37,11 +39,13 @@ const PaymentsDetail = ({ id, refresh, ref, expensesList, userList, saveData, se
     }, [refresh])
 
     const save = async () => {
-        if (trndate !== '' && netamount !== '.' && netamount !== '' && taxamount !== '.' && taxamount !== '' && grossamount !== '.' && grossamount !== '') {
+        if (fromdate !== '' && todate !== '' && netamount !== '.' && netamount !== '' && taxamount !== '.' && taxamount !== '' && grossamount !== '.' && grossamount !== '') {
             const Body = JSON.stringify({
                 etype: etype,
                 ptype: ptype,
-                trndate: trndate,
+                trndate: fromdate,
+                fromdate: fromdate,
+                todate: todate,
                 assignedto:assigned_to,
                 netamount: netamount,
                 taxamount: taxamount,
@@ -119,8 +123,11 @@ const PaymentsDetail = ({ id, refresh, ref, expensesList, userList, saveData, se
             } />
 
 
-            <TextboxFlex label={'Date'} mandatory={true} input={
-                <DatePicker status={trndate === '' ? 'error' : ''} style={{ width: '100%' }} value={trndate === '' ? trndate : dayjs(trndate, 'YYYY-MM-DD')} onChange={(date, dateString) => setTrnDate(dateString)} />
+            <TextboxFlex label={'From'} mandatory={true} input={
+                <DatePicker status={fromdate === '' ? 'error' : ''} style={{ width: '100%' }} value={fromdate === '' ? fromdate : dayjs(fromdate, 'YYYY-MM-DD')} onChange={(date, dateString) => setFromDate(dateString)} />
+            } />
+            <TextboxFlex label={'To'} mandatory={true} input={
+                <DatePicker status={todate === '' ? 'error' : ''} style={{ width: '100%' }} value={todate === '' ? todate : dayjs(todate, 'YYYY-MM-DD')} onChange={(date, dateString) => setToDate(dateString)} />
             } />
             <TextboxFlex label={'Price ($)'} mandatory={true} input={
                 <Input placeholder="Price" status={(netamount === '' || netamount === '.') ? 'error' : ''} value={netamount} onChange={(e) => setPriceNumberOnly(e, setNetAmount)} />
