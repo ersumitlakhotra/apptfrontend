@@ -11,3 +11,11 @@ export function setCellFormat (cellValue)  {
     else
         return phoneNumber.substring(0, 12);
 }
+
+export function setPriceNumberOnly(inputValue) {
+        const regex = /^\d*(\.\d*)?$/;
+
+        if (regex.test(inputValue) || inputValue === '') {
+            return  inputValue;
+        }
+    };

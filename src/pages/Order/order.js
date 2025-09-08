@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Button, Drawer, Space, Tabs, Tag } from "antd";
 import { DownloadOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from "react";
@@ -25,9 +26,10 @@ const Order = ({ orderList, servicesList, userList, companyList, eventList, save
     const [id, setId] = useState(0);
     const [refresh, setRefresh] = useState(0);
     const [tabActiveKey, setTabActiveKey] = useState("1");
+    const [order_no, setOrderNo] = useState('');
 
     const btn_Click = (id) => {
-        setTitle(id === 0 ? "New Order" : "Edit Order");
+        setTitle(id === 0 ? "New Order" : `Edit Order - ${order_no}`);
         setRefresh(refresh + 1);
         setId(id);
         setOpen(true);
@@ -98,7 +100,7 @@ const Order = ({ orderList, servicesList, userList, companyList, eventList, save
             <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
-                <OrderDetail id={id} refresh={refresh} ref={ref} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} eventList={eventList} saveData={saveData} setOpen={setOpen} />
+                <OrderDetail id={id} refresh={refresh} ref={ref} setOrderNo={setOrderNo} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} eventList={eventList} saveData={saveData} setOpen={setOpen} />
             </Drawer>
 
             {/* Drawer on View*/}
