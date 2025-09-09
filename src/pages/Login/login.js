@@ -26,8 +26,9 @@ const onSubmit = async() => {
   try{
     const res= await loginAuth(email,password);
     if(res.status === 200)
-      { 
-        localStorage.setItem('cid', res.data.data.cid); 
+    {
+      localStorage.setItem('cid', res.data.data.cid);
+      localStorage.setItem('uid', res.data.data.id); 
         navigate("/main"); //success('Login Successfully');     
       }       
     else         

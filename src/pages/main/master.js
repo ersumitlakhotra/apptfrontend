@@ -13,7 +13,7 @@ import Services from "../Services/services.js";
 import Event from "../Event/event.js";
 import Tasks from "../Tasks/tasks.js";
 import Setting from "../Setting/setting.js";
-import { apiCalls, apiCallsDelete } from "../../hook/apiCall.js";
+import { apiCalls } from "../../hook/apiCall.js";
 import useAlert from "../../common/alert.js";
 import { LocalDate } from "../../common/localDate.js";
 import Sales from "../Sales/sales.js";
@@ -122,17 +122,24 @@ const MasterPage = () => {
     setIsLoading(true);
     try {
       const result = await apiCalls(method, endPoint, id, body);
-      console.log(result)
+
       if (result.status === 500 || result.status === 404)
         error(result.message);
-      if (result.status === 201)
-        success(`The ${label} has been successfully created.`);
-      if (result.status === 200)
-        success(`The ${label} has been modified successfully.`);
-      if (result.status === 203)
-        success(`The ${label} has been deleted successfully.`);
-      if (result.status === 201 || result.status === 200 || result.status === 203)
+      else {
+        let status = result.status === 201 ? 'created' : result.status === 200 ? 'modified' : 'deleted'
+        const Log = JSON.stringify({
+          ltype: label,
+          lid: result.data.data.id,
+          lname: '',
+          userid: localStorage.getItem('uid'),
+          status: status,
+
+        });
+        await apiCalls('POST', 'logs', null, Log);
+        success(`The ${label} has been ${status} successfully.`);
         setRefresh(refresh + 1)
+      }
+
     }
     catch (e) {
       error(error.message)
