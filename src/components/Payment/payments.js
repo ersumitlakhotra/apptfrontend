@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {  useEffect,  useState } from "react";
 import { EditOutlined, UserOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Avatar,  Button,  DatePicker,  Image,   Popconfirm,   Popover,  Select,  Tooltip } from "antd";
@@ -5,9 +6,9 @@ import DataTable from "../../common/datatable";
 import {  getTableItem,getDate } from "../../common/items";
 
 import dayjs from 'dayjs';
-const Payments = ({ key, expensesList, userList, btn_Click, fromDate, setFromDate, toDate, setToDate, saveData }) => {
+const Payments = ({ key, expensesData, expensesList,userList, btn_Click, fromDate, setFromDate, toDate, setToDate, saveData }) => {
 
-    const [filteredList, setFilteredList] = useState(expensesList);
+    const [filteredList, setFilteredList] = useState(expensesData);
 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -15,18 +16,18 @@ const Payments = ({ key, expensesList, userList, btn_Click, fromDate, setFromDat
     const [assigned_to, setAssignedTo] = useState('');
 
     useEffect(() => {
-        setFilteredList(expensesList)
-        setPage(1, 10, expensesList);
-    }, [expensesList])
+        setFilteredList(expensesData)
+        setPage(1, 10, expensesData);
+    }, [expensesData])
 
     useEffect(() => {
         
 
         if (assigned_to === '')
-            setPage(currentPage, itemsPerPage, expensesList)
+            setPage(currentPage, itemsPerPage, expensesData)
         else
         {
-            const searchedList = expensesList.filter(item =>item.assignedto === assigned_to);
+            const searchedList = expensesData.filter(item =>item.assignedto === assigned_to);
             setPage(1, itemsPerPage, searchedList)
         }
     }, [assigned_to])
@@ -102,11 +103,11 @@ const Payments = ({ key, expensesList, userList, btn_Click, fromDate, setFromDat
                     {/**/}
                 </div>
             </div>
-            <DataTable headerItems={headerItems} list={(assigned_to === '') ? expensesList : filteredList}
+            <DataTable headerItems={headerItems} list={(assigned_to === '') ? expensesData : filteredList}
                 onChange={(page, pageSize) => {
                     setCurrentPage(page);
                     setItemsPerPage(pageSize);
-                    setPage(page, pageSize, expensesList)
+                    setPage(page, pageSize, expensesData)
                 }}
 
                 body={(

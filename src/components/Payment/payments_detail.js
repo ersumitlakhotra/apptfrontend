@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import { useEffect, useImperativeHandle, useState } from "react";
 import { Avatar, DatePicker, Image, Input, Radio, Select } from "antd";
@@ -7,6 +8,7 @@ import { TextboxFlex } from "../../common/textbox";
 import { LocalDate } from "../../common/localDate";
 
 import dayjs from 'dayjs';
+import useAlert from "../../common/alert";
 
 const PaymentsDetail = ({ id, refresh, ref, expensesList, userList, saveData, setOpen }) => {
 
@@ -20,6 +22,7 @@ const PaymentsDetail = ({ id, refresh, ref, expensesList, userList, saveData, se
     const [grossamount, setGrossAmount] = useState('0.00');
     const [notes, setNotes] = useState('');
 
+    const { contextHolder, warning } = useAlert();
     useEffect(() => {
         if (id === 0) {
             setEtype('Payment'); setPtype('Payroll'); setFromDate(LocalDate()); setToDate(LocalDate()); setAssignedTo(''); setNetAmount('0.00'); setTaxAmount('0.00'); setGrossAmount('0.00'); setNotes('');
@@ -38,8 +41,12 @@ const PaymentsDetail = ({ id, refresh, ref, expensesList, userList, saveData, se
         }
     }, [refresh])
 
-    const save = async () => {
-        if (fromdate !== '' && todate !== '' && netamount !== '.' && netamount !== '' && taxamount !== '.' && taxamount !== '' && grossamount !== '.' && grossamount !== '') {
+    const save = async () => {    
+        const result = expensesList.filter(a => a.assignedto === assigned_to.toString() && a.etype.toUpperCase() === 'PAYMENT' &&
+                ((fromdate >= dayjs(a.fromdate).format('YYYY-MM-DD') &&  fromdate <= dayjs(a.todate).format('YYYY-MM-DD') ) ||
+                (todate >= dayjs(a.fromdate).format('YYYY-MM-DD') && todate <= dayjs(a.todate).format('YYYY-MM-DD')))
+        )
+        if (fromdate !== '' && todate !== '' && netamount !== '.' && netamount !== '' && taxamount !== '.' && taxamount !== '' && grossamount !== '.' && grossamount !== '' && result.length === 0 ) {
             const Body = JSON.stringify({
                 etype: etype,
                 ptype: ptype,
@@ -54,6 +61,9 @@ const PaymentsDetail = ({ id, refresh, ref, expensesList, userList, saveData, se
             });
             saveData("Payment", id !== 0 ? 'PUT' : 'POST', "payment", id !== 0 ? id : null, Body);
             setOpen(false);
+        }
+        else if (result.length > 0 && fromdate !== '' && todate !== '' ){
+                warning('Payment have already been made for this time period!');      
         }
     }
 
@@ -94,6 +104,7 @@ const PaymentsDetail = ({ id, refresh, ref, expensesList, userList, saveData, se
     const pTypeChange = ({ target: { value } }) => {
     setPtype(value);
   };
+  
     return (
         <div class='flex flex-col font-normal gap-2 mt-2'>
             <p class="text-gray-400 mb-4">Payment Information</p>
@@ -142,7 +153,7 @@ const PaymentsDetail = ({ id, refresh, ref, expensesList, userList, saveData, se
                 <TextArea placeholder="Notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
             } />
 
-
+            {contextHolder}
         </div>
     )
 }

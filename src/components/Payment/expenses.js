@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {  Button, DatePicker, Input,  Popconfirm,  Popover,  Tooltip} from "antd"
 import { IoSearchOutline } from "react-icons/io5";
 import { getDate, getTableItem } from "../../common/items";
@@ -8,21 +9,21 @@ import dayjs from 'dayjs';
 import { UTC_LocalDateTime } from "../../common/localDate";
 
 
-const Expenses = ({ key, expensesList, btn_Click, fromDate, setFromDate, toDate, setToDate, saveData }) => {
+const Expenses = ({ key, expensesData, expensesList, btn_Click, fromDate, setFromDate, toDate, setToDate, saveData }) => {
   
     const [searchInput, setSearchInput] = useState('');
-    const [filteredList, setFilteredList] = useState(expensesList);
+    const [filteredList, setFilteredList] = useState(expensesData);
 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
     useEffect(() => {
-        setFilteredList(expensesList)
-        setPage(1, 10, expensesList);
-    }, [expensesList])
+        setFilteredList(expensesData)
+        setPage(1, 10, expensesData);
+    }, [expensesData])
 
   useEffect(() => {
-        const searchedList = expensesList.filter(item => 
+      const searchedList = expensesData.filter(item => 
             item.name.toLowerCase().includes(searchInput.toLowerCase()));
         if (searchInput === '')
             setPage(currentPage, itemsPerPage, searchedList)
@@ -85,11 +86,11 @@ const Expenses = ({ key, expensesList, btn_Click, fromDate, setFromDate, toDate,
                     {/**/}
                 </div>
             </div>
-            <DataTable headerItems={headerItems} list={(searchInput === '' ) ? expensesList : filteredList}
+            <DataTable headerItems={headerItems} list={(searchInput === '') ? expensesData : filteredList}
                 onChange={(page, pageSize) => {
                     setCurrentPage(page);
                     setItemsPerPage(pageSize);
-                    setPage(page, pageSize, expensesList)
+                    setPage(page, pageSize, expensesData)
                 }}
 
                 body={(

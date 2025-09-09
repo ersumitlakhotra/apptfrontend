@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Button, Drawer,Space, Tabs, Tooltip } from "antd";
+import { Button, Drawer,Space, Tabs } from "antd";
 import { DownloadOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { getTabItems } from "../../common/items";
 import { firstDateOfMonth,lastDateOfMonth } from "../../common/localDate.js";
@@ -51,8 +51,8 @@ const Payment = ({ expensesList, userList, saveData, tabActiveKey, setTabActiveK
     }
  
     const tabItems = [
-        getTabItems('1', 'Expenses', null, <Expenses key={1} expensesList={expensesData} userList={userList} btn_Click={btn_Click_Expense} fromDate={fromDateExpenses} setFromDate={setFromDateExpenses} toDate={toDateExpenses} setToDate={setToDateExpenses} saveData={saveData} /> ),
-        getTabItems('2', 'Payments', null, <Payments key={2} expensesList={paymentData} userList={userList} btn_Click={btn_Click_Payment} fromDate={fromDatePayment} setFromDate={setFromDatePayment} toDate={toDatePayment} setToDate={setToDatePayment} saveData={saveData} /> )
+        getTabItems('1', 'Expenses', null, <Expenses key={1} expensesList={expensesList} expensesData={expensesData} userList={userList} btn_Click={btn_Click_Expense} fromDate={fromDateExpenses} setFromDate={setFromDateExpenses} toDate={toDateExpenses} setToDate={setToDateExpenses} saveData={saveData} /> ),
+        getTabItems('2', 'Payments', null, <Payments key={2} expensesList={expensesList} expensesData={paymentData} userList={userList} btn_Click={btn_Click_Payment} fromDate={fromDatePayment} setFromDate={setFromDatePayment} toDate={toDatePayment} setToDate={setToDatePayment} saveData={saveData} /> )
     ];
 
     return (

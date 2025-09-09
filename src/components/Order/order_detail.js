@@ -9,6 +9,7 @@ import { setCellFormat, setPriceNumberOnly } from "../../common/cellformat";
 import { UserOutlined } from '@ant-design/icons';
 import { generateTimeSlots } from "../../common/intervals";
 import useAlert from "../../common/alert";
+import { LocalDate } from "../../common/localDate";
 
 const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, userList, companyList, eventList, saveData, setOpen }) => {
 
@@ -23,7 +24,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
     const [total, setTotal] = useState('0');
     const [coupon, setCoupon] = useState('');
     const [discount, setDiscount] = useState('0');
-    const [trndate, setTrnDate] = useState('');
+    const [trndate, setTrnDate] = useState(LocalDate());
     const [assigned_to, setAssignedTo] = useState('');
     const [slot, setSlot] = useState('');
     const [servicesItem, setServicesItem] = useState([]);
@@ -41,7 +42,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
     useEffect(() => {
         if (id === 0) {
             setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');
-            setStatus('Pending'); setPrice('0'); setTax('0'); setTotal('0'); setDiscount('0'); setCoupon(''); setTaxAmount('0'); setTrnDate('');
+            setStatus('Pending'); setPrice('0'); setTax('0'); setTotal('0'); setDiscount('0'); setCoupon(''); setTaxAmount('0'); setTrnDate(LocalDate());
             setAssignedTo(''); setOrderNo(''); setServicesItem([]); setSlot('');
         }
         else {
