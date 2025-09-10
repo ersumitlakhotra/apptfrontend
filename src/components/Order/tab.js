@@ -4,12 +4,12 @@ import { IoSearchOutline } from "react-icons/io5";
 import { getDate, getTableItem } from "../../common/items";
 import DataTable from "../../common/datatable";
 import { useEffect, useState } from "react";
-import {  EditOutlined, EyeOutlined,   UserOutlined } from '@ant-design/icons';
+import {  ContainerOutlined, EditOutlined, EyeOutlined,   UserOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { Tags } from "../../common/tags";
 
 
-const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_ViewClick, refresh, fromDate, setFromDate, toDate, setToDate }) => {
+const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_ViewClick, btn_LogsClick, refresh, fromDate, setFromDate, toDate, setToDate }) => {
   
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(orderList);
@@ -118,7 +118,7 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_View
                                 }
                             </td>
 
-                            <td class="p-3 font-semibold">$ {item.price}</td>
+                            <td class="p-3 font-semibold">$ {item.total}</td>
                             <td class="p-3">{Tags(item.status)}</td>
 
                             <td class="p-3">{item.assignedto === '0' ? '' :
@@ -140,6 +140,9 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_View
                                 </Tooltip>
                                 <Tooltip placement="top" title={'View'} >
                                     <Button type="link" icon={<EyeOutlined />} onClick={() => btn_ViewClick(item.id)} />
+                                </Tooltip>
+                                <Tooltip placement="top" title={'Logs'} >
+                                    <Button type="link" icon={<ContainerOutlined /> } onClick={() => btn_LogsClick(item.id)} />
                                 </Tooltip>
                             </td>
                         </tr>

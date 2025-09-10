@@ -1,0 +1,56 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import { Avatar, Badge,  Collapse, Image } from "antd";
+import { UserOutlined } from '@ant-design/icons';
+import { useEffect, useState } from "react";
+import { UTC_LocalDateTime } from "../../common/localDate";
+import OrderLogs from "./order_log";
+const LogsView = ({ id,ltype, logsList, userList }) => {
+    const [logsData, setLogsData] = useState([]);
+
+    useEffect(() => {
+        const editList = logsList.filter(item => item.lid === id && item.ltype === ltype);
+        if (editList.length === 0)
+            setLogsData([]);
+        else
+            setLogsData(editList);
+    }, [id])
+    
+    return (
+        <div class='flex flex-col font-normal gap-3 mt-2'>
+            {logsData.length === 0 ? <p class='text-left p-4 text-sm font-medium text-gray-500'> There aren't any history to show right now.</p> :
+                logsData.map(item =>
+                    <>
+                        <Badge.Ribbon
+                            text={item.status}
+                            color={item.status.toUpperCase() === "CREATED" ? "yellow" : item.status.toUpperCase() === "MODIFIED" ? "blue" : "red"} >
+                            <Collapse
+                                items={[{
+                                    key: item.id,
+                                    label: (<div class='flex items-center justify-between pe-20 ' >
+                                        <>
+                                            {item.assignedto === '0' ? '' :
+                                                userList.filter(user => user.id === item.userid).map(a =>
+                                                    <div key={a.id} class='flex flex-row gap-2 items-center text-sm'>
+                                                        {a.profilepic !== null ?
+                                                            <Image width={24} height={24} src={a.profilepic} style={{ borderRadius: 15 }} /> :
+                                                            <Avatar size={24} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
+                                                        }
+                                                        <span class='text-xs font-semibold text-gray-500'>{a.fullname}</span>
+                                                    </div>
+                                                )}
+                                        </>
+                                        <span class='text-xs  text-gray-500'>{UTC_LocalDateTime(item.createdat, 'MMM, DD YYYY - hh:mm A ')}</span>
+                                    </div>),
+                                    children:
+                                        item.ltype.toUpperCase() === "ORDER" ? <OrderLogs key={item.id} orderList={item.datainfo}/>:<></>
+                                }]}
+                            />
+
+                        </Badge.Ribbon>
+                    </>)}
+
+        </div>
+    )
+}
+
+export default LogsView;

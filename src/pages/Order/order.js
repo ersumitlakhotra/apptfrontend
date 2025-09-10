@@ -8,6 +8,7 @@ import { getTabItems } from "../../common/items.js";
 import dayjs from 'dayjs';
 import OrderTabs from "../../components/Order/tab.js";
 import { LocalDate } from "../../common/localDate.js";
+import LogsView from "../../components/Logs/logs_view.js";
 
 const customLabelTab = (label, tagColor, tagValue) => {
     return (
@@ -18,10 +19,12 @@ const customLabelTab = (label, tagColor, tagValue) => {
     )
 }
 
-const Order = ({ orderList, servicesList, userList, companyList, eventList, saveData, fromDate, setFromDate, toDate, setToDate }) => {
+const Order = ({ orderList, servicesList, userList, companyList, eventList, logsList, saveData, fromDate, setFromDate, toDate, setToDate }) => {
     const ref = useRef();
+
     const [open, setOpen] = useState(false);
     const [openView, setOpenView] = useState(false);
+    const [openLogs, setOpenLogs] = useState(false);
     const [title, setTitle] = useState('New');
     const [id, setId] = useState(0);
     const [refresh, setRefresh] = useState(0);
@@ -38,6 +41,10 @@ const Order = ({ orderList, servicesList, userList, companyList, eventList, save
         setRefresh(refresh + 1);
         setId(id);
         setOpenView(true);
+    }
+    const btn_LogsClick = (id) => {
+        setId(id);
+        setOpenLogs(true);
     }
 
     const [ordersList, setOrdersList] = useState([]);
@@ -71,11 +78,11 @@ const Order = ({ orderList, servicesList, userList, companyList, eventList, save
     }
 
     const tabItems = [
-        getTabItems('1', customLabelTab("All", "cyan", ordersList.length), null, <OrderTabs key={1} orderList={ordersList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
-        getTabItems('2', customLabelTab("Pending", "yellow", pendingList.length), null, <OrderTabs key={2} orderList={pendingList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
-        getTabItems('3', customLabelTab("InProgress", "blue", inprogressList.length), null, <OrderTabs key={3} orderList={inprogressList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
-        getTabItems('4', customLabelTab("Completed", "green", completedList.length), null, <OrderTabs key={4} orderList={completedList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
-        getTabItems('5', customLabelTab("Cancelled", "red", cancelledList.length), null, <OrderTabs key={5} orderList={cancelledList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
+        getTabItems('1', customLabelTab("All", "cyan", ordersList.length), null, <OrderTabs key={1} orderList={ordersList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
+        getTabItems('2', customLabelTab("Pending", "yellow", pendingList.length), null, <OrderTabs key={2} orderList={pendingList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
+        getTabItems('3', customLabelTab("InProgress", "blue", inprogressList.length), null, <OrderTabs key={3} orderList={inprogressList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
+        getTabItems('4', customLabelTab("Completed", "green", completedList.length), null, <OrderTabs key={4} orderList={completedList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
+        getTabItems('5', customLabelTab("Cancelled", "red", cancelledList.length), null, <OrderTabs key={5} orderList={cancelledList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
     ];
   
 
@@ -108,6 +115,10 @@ const Order = ({ orderList, servicesList, userList, companyList, eventList, save
                 <OrderView id={id} refresh={refresh} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList}  setOpen={setOpen} />
             </Drawer>
 
+            {/* Drawer on logs */}
+            <Drawer title={"Logs Detail"} placement='right' width={500} onClose={() => setOpenLogs(false)} open={openLogs}>
+                <LogsView id={id} ltype={'Order'} logsList={logsList} userList={userList} />
+            </Drawer>
         </div>
     )
 }

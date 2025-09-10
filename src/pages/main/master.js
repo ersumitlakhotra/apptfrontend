@@ -43,6 +43,7 @@ const MasterPage = () => {
   const [userList, setUserList] = useState([]);
   const [logoList, setLogoList] = useState([]);
   const [expenseList, setExpenseList] = useState([]);
+  const [logsList, setLogsList] = useState([]);
 
   const onSelected = (newContent) => {
     setIsLoading(true);
@@ -105,10 +106,10 @@ const MasterPage = () => {
     setIsLoading(false);
   }
 
-  const getData = async (setList, method, endPoint, eventDate=false) => {
+  const getData = async (setList, endPoint, eventDate=false) => {
     setIsLoading(true);
     try {
-      const res = await apiCalls(method, endPoint,null,null,eventDate);
+      const res = await apiCalls("GET", endPoint,null,null,eventDate);
       setList(res.data.data);
     }
     catch (e) {
@@ -126,14 +127,14 @@ const MasterPage = () => {
       if (result.status === 500 || result.status === 404)
         error(result.message);
       else {
-        let status = result.status === 201 ? 'created' : result.status === 200 ? 'modified' : 'deleted'
+        let status = result.status === 201 ? 'Created' : result.status === 200 ? 'Modified' : 'Deleted'
         const Log = JSON.stringify({
           ltype: label,
           lid: result.data.data.id,
           lname: '',
           userid: localStorage.getItem('uid'),
           status: status,
-
+          datainfo: [body] 
         });
         await apiCalls('POST', 'logs', null, Log);
         success(`The ${label} has been ${status} successfully.`);
@@ -150,69 +151,70 @@ const MasterPage = () => {
     switch (content) {
       case "Dashboard":
         {
-          getData(setServicesList, "GET", "services");
-          getData(setUserList, "GET", "user");
-          getData(setExpenseList, "GET", "payment");
-          getData(setEventList, "GET", "event",true);
-          getData(setOrderList, "GET", "order");
+          getData(setServicesList,"services");
+          getData(setUserList,"user");
+          getData(setExpenseList,"payment");
+          getData(setEventList,"event",true);
+          getData(setOrderList,"order");
           break;
         } 
         case "Order":
         {
-          getData(setServicesList, "GET", "services");
-          getData(setUserList, "GET", "user");
-          getData(setCompanyList, "GET", "company");
-          getData(setEventList, "GET", "event", true);
-          getData(setOrderList, "GET", "order");
-          //getData(setServicesList, "GET", "services");
+          getData(setServicesList,"services");
+          getData(setUserList,"user");
+          getData(setCompanyList,"company");
+          getData(setEventList,"event", true);
+          getData(setLogsList,"logs");
+          getData(setOrderList,"order");
+          //getData(setServicesList, "services");
           break;
         }
       case 'Tasks':
         {
-          getData(setUserList, "GET", "user");
-          getData(setServicesList, "GET", "services");
-          getData(setOrderList, "GET", "order");
-          getData(setCompanyList, "GET", "company");
+          getData(setUserList,"user");
+          getData(setServicesList,"services");
+          getData(setOrderList,"order");
+          getData(setCompanyList,"company");
           break;
         }
       case 'Event':
         {
-          getData(setEventList, "GET", "event", true);
-          getData(setServicesList, "GET", "services");
+          getData(setEventList,"event", true);
+          getData(setServicesList, "services");
           break;
         }
       case 'Payment':
         {
-          getData(setUserList, "GET", "user");
-          getData(setExpenseList, "GET", "payment");
+          getData(setUserList,"user");
+          getData(setExpenseList,"payment");
           break;
         }
       case 'Services':
         {
-          getData(setServicesList, "GET", "services");
+          getData(setServicesList,"services");
           break;
         }
       case 'Sales':
         {     
-          getData(setUserList, "GET", "user");  
-          getData(setExpenseList, "GET", "payment");
-          getData(setOrderList, "GET", "order");
+          getData(setUserList,"user");  
+          getData(setExpenseList,"payment");
+          getData(setOrderList,"order");
           break;
         }
       case 'Expenses':
         {
-          getData(setUserList, "GET", "user"); 
-          getData(setExpenseList, "GET", "payment");
+          getData(setUserList,"user"); 
+          getData(setExpenseList,"payment");
           break;
         }
       case 'Users':
         {
-          getData(setUserList, "GET", "user");
+          getData(setUserList,"user");
           break;
         }
       case 'Setting':
         {
-          getData(setCompanyList, "GET", "company");
+          getData(setCompanyList,"company");
           getLogo("GET", "logo");
           break;
         }
@@ -249,6 +251,7 @@ const MasterPage = () => {
         userList={userList}
         companyList={companyList}
         eventList={eventList}
+        logsList={logsList}
         saveData={saveData}
         fromDate={fromDate}
         setFromDate={setFromDate}
