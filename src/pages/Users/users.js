@@ -1,14 +1,16 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Badge, Button,  Select, Drawer, Space, Input, Tooltip, Rate, Avatar, Image } from "antd";
-import { DownloadOutlined, EditOutlined, PlusOutlined, SaveOutlined, UserOutlined } from '@ant-design/icons';
+import { DownloadOutlined, EditOutlined, PlusOutlined, SaveOutlined, UserOutlined, ContainerOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from "react";
 import UserDetail from "../../components/Users/user_detail";
 import { IoSearchOutline } from "react-icons/io5";
 import DataTable from "../../common/datatable";
 import { getDate, getTableItem } from "../../common/items";
 import { Tags } from "../../common/tags";
+import LogsView from "../../components/Logs/logs_view.js";
 
 
-const Users = ({ userList, saveData }) => {
+const Users = ({ userList, logsList, saveData }) => {
     const ref= useRef();
 
 
@@ -17,6 +19,7 @@ const Users = ({ userList, saveData }) => {
     const [id, setId] = useState(0);
     const [refresh, setRefresh] = useState(0);
 
+    const [openLogs, setOpenLogs] = useState(false);
     const [filteredList, setFilteredList] = useState(userList);
 
     const [searchInput, setSearchInput] = useState('');
@@ -55,7 +58,10 @@ const Users = ({ userList, saveData }) => {
         setId(id);
         setOpen(true);
     }
-
+    const btn_LogsClick = (id) => {
+        setId(id);
+        setOpenLogs(true);
+    }
 
     const btnSave = async () => {
         await ref.current?.save();
@@ -136,6 +142,9 @@ const Users = ({ userList, saveData }) => {
                                     <Tooltip placement="top" title={'Edit'} >
                                         <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
                                     </Tooltip>
+                                    <Tooltip placement="top" title={'Logs'} >
+                                        <Button type="link" icon={<ContainerOutlined />} onClick={() => btn_LogsClick(item.id)} />
+                                    </Tooltip>
                                 </td>
                             </tr>
                         ))
@@ -147,6 +156,10 @@ const Users = ({ userList, saveData }) => {
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
                 <UserDetail id={id} refresh={refresh} ref={ref} userList={userList} saveData={saveData} setOpen={setOpen} />
+            </Drawer>
+            {/* Drawer on logs */}
+            <Drawer title={"Logs Detail"} placement='right' width={500} onClose={() => setOpenLogs(false)} open={openLogs}>
+                <LogsView id={id} ltype={'Users'} logsList={logsList} userList={userList} servicesList={[]} />
             </Drawer>
         </div>
     )

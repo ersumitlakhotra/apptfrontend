@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Button, Input, Tooltip, Tag } from "antd";
-import { EditOutlined } from '@ant-design/icons';
+import { EditOutlined, ContainerOutlined } from '@ant-design/icons';
 import { IoSearchOutline } from "react-icons/io5";
 import { Tags } from "../../common/tags";
 import dayjs from 'dayjs';
@@ -7,7 +8,7 @@ import { getDate, getTableItem } from "../../common/items";
 import DataTable from "../../common/datatable";
 import { useEffect, useState } from "react";
 
-const Events = ({ eventList, servicesList, btn_Click }) => {
+const Events = ({ eventList, servicesList, btn_Click, btn_LogsClick }) => {
     const [searchInput, setSearchInput] = useState('');
 
     const [filteredList, setFilteredList] = useState(eventList);
@@ -80,6 +81,9 @@ const Events = ({ eventList, servicesList, btn_Click }) => {
                             <td class="p-3">
                                 <Tooltip placement="top" title={'Edit'} >
                                     <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
+                                </Tooltip>
+                                <Tooltip placement="top" title={'Logs'} >
+                                    <Button type="link" icon={<ContainerOutlined />} onClick={() => btn_LogsClick(item.id)} />
                                 </Tooltip>
                             </td>
                         </tr>

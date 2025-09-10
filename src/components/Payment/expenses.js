@@ -4,12 +4,12 @@ import { IoSearchOutline } from "react-icons/io5";
 import { getDate, getTableItem } from "../../common/items";
 import DataTable from "../../common/datatable";
 import { useEffect, useState } from "react";
-import {  DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, ContainerOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { UTC_LocalDateTime } from "../../common/localDate";
 
 
-const Expenses = ({ key, expensesData, expensesList, btn_Click, fromDate, setFromDate, toDate, setToDate, saveData }) => {
+const Expenses = ({ key, expensesData, btn_Click, btn_LogsClick, fromDate, setFromDate, toDate, setToDate, saveData }) => {
   
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(expensesData);
@@ -108,6 +108,9 @@ const Expenses = ({ key, expensesData, expensesList, btn_Click, fromDate, setFro
                             <td class="p-3">
                                 <Tooltip placement="top" title={'Edit'} >
                                     <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
+                                </Tooltip>
+                                <Tooltip placement="top" title={'Logs'} >
+                                    <Button type="link" icon={<ContainerOutlined />} onClick={() => btn_LogsClick(item.id)} />
                                 </Tooltip>
                                 <Tooltip placement="top" title={'Delete'} >
                                     <Popconfirm

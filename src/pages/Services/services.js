@@ -2,17 +2,19 @@ import {  useEffect, useRef, useState } from "react";
 import { EditOutlined } from '@ant-design/icons';
 import { IoSearchOutline } from "react-icons/io5";
 import { Badge, Button,  Drawer, Input,  Select,  Space, Tooltip } from "antd";
-import { DownloadOutlined,  PlusOutlined, SaveOutlined } from '@ant-design/icons';
+import { DownloadOutlined, PlusOutlined, SaveOutlined, ContainerOutlined } from '@ant-design/icons';
 import ServiceDetail from "../../components/Services/service_detail";
 import DataTable from "../../common/datatable";
 import {  getTableItem,getDate } from "../../common/items";
 import { Tags } from "../../common/tags";
 import {Sort} from '../../common/sort.js'
 import { FaSortAlphaDown, FaSortAlphaUp } from "react-icons/fa";
+import LogsView from "../../components/Logs/logs_view.js";
 
-const Services = ({ servicesList, setServicesList, saveData }) => {
+const Services = ({ servicesList, setServicesList, logsList, userList, saveData }) => {
     const ref= useRef();
     const [open, setOpen] = useState(false);
+    const [openLogs, setOpenLogs] = useState(false);
     const [title, setTitle] = useState('New');
     const [id, setId] = useState(0);
     const [refresh, setRefresh] = useState(0);
@@ -36,7 +38,10 @@ const Services = ({ servicesList, setServicesList, saveData }) => {
         setId(id);
         setOpen(true);
     }
-
+    const btn_LogsClick = (id) => {
+        setId(id);
+        setOpenLogs(true);
+    }
     const btnSave = async () => {
         await ref.current?.save(); 
      }
@@ -153,6 +158,9 @@ const Services = ({ servicesList, setServicesList, saveData }) => {
                                 <Tooltip placement="top" title={'Edit'} >
                                     <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
                                 </Tooltip>
+                                <Tooltip placement="top" title={'Logs'} >
+                                    <Button type="link" icon={<ContainerOutlined />} onClick={() => btn_LogsClick(item.id)} />
+                                </Tooltip>
                             </td>
                         </tr>
                     ))
@@ -164,7 +172,10 @@ const Services = ({ servicesList, setServicesList, saveData }) => {
 
                 <ServiceDetail id={id} refresh={refresh} ref={ref} servicesList={servicesList} saveData={saveData} setOpen={setOpen} />
             </Drawer>
-
+            {/* Drawer on logs */}
+            <Drawer title={"Logs Detail"} placement='right' width={500} onClose={() => setOpenLogs(false)} open={openLogs}>
+                <LogsView id={id} ltype={'Services'} logsList={logsList} userList={userList} servicesList={servicesList} />
+            </Drawer>
         </div>
     )
 }

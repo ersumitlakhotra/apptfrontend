@@ -17,7 +17,6 @@ import { apiCalls } from "../../hook/apiCall.js";
 import useAlert from "../../common/alert.js";
 import { LocalDate } from "../../common/localDate.js";
 import Sales from "../Sales/sales.js";
-import Expenses from "../Expense/expense.js";
 import Payment from "../Payment/payment.js";
 
 const MasterPage = () => {
@@ -179,18 +178,23 @@ const MasterPage = () => {
         }
       case 'Event':
         {
+          getData(setUserList, "user");
+          getData(setLogsList, "logs");
           getData(setEventList,"event", true);
           getData(setServicesList, "services");
           break;
         }
       case 'Payment':
         {
+          getData(setLogsList, "logs");
           getData(setUserList,"user");
           getData(setExpenseList,"payment");
           break;
         }
       case 'Services':
         {
+          getData(setUserList, "user");
+          getData(setLogsList, "logs");
           getData(setServicesList,"services");
           break;
         }
@@ -201,14 +205,9 @@ const MasterPage = () => {
           getData(setOrderList,"order");
           break;
         }
-      case 'Expenses':
-        {
-          getData(setUserList,"user"); 
-          getData(setExpenseList,"payment");
-          break;
-        }
       case 'Users':
         {
+          getData(setLogsList, "logs");
           getData(setUserList,"user");
           break;
         }
@@ -263,6 +262,8 @@ const MasterPage = () => {
       <Event
         eventList={eventList}
         servicesList={servicesList}
+        logsList={logsList}
+        userList={userList}
         saveData={saveData}
       />;
   } else if (content === 'Payment') {
@@ -270,6 +271,7 @@ const MasterPage = () => {
       <Payment
         expensesList={expenseList}
         userList={userList}
+        logsList={logsList}
         saveData={saveData}
         tabActiveKey={paymentActiveTab}
         setTabActiveKey={setPaymentActiveTab}
@@ -278,6 +280,8 @@ const MasterPage = () => {
     displayedContent =
       <Services
         servicesList={servicesList}
+        logsList={logsList}
+        userList={userList}
         setServicesList={setServicesList}
         saveData={saveData}
       />;
@@ -285,6 +289,7 @@ const MasterPage = () => {
     displayedContent =
       <Users
         userList={userList}
+        logsList={logsList}
         saveData={saveData}
       />;
   } else if (content === 'Sales') {
@@ -293,13 +298,6 @@ const MasterPage = () => {
         orderList={orderList}
         userList={userList}
         expensesList={expenseList}
-      />;
-  } else if (content === 'Expenses') {
-    displayedContent =
-      <Expenses
-        expensesList={expenseList}
-        userList={userList}
-        saveData={saveData}
       />;
   } else if (content === 'Setting') {
     displayedContent =

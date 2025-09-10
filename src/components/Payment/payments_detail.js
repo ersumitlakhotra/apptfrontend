@@ -42,7 +42,7 @@ const PaymentsDetail = ({ id, refresh, ref, expensesList, userList, saveData, se
     }, [refresh])
 
     const save = async () => {    
-        const result = expensesList.filter(a => a.assignedto === assigned_to.toString() && a.etype.toUpperCase() === 'PAYMENT' &&
+        const result = expensesList.filter(a => a.assignedto === assigned_to.toString() && a.etype.toUpperCase() === 'PAYMENT' && a.id !== id &&
                 ((fromdate >= dayjs(a.fromdate).format('YYYY-MM-DD') &&  fromdate <= dayjs(a.todate).format('YYYY-MM-DD') ) ||
                 (todate >= dayjs(a.fromdate).format('YYYY-MM-DD') && todate <= dayjs(a.todate).format('YYYY-MM-DD')))
         )

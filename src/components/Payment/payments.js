@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {  useEffect,  useState } from "react";
-import { EditOutlined, UserOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined, UserOutlined, DeleteOutlined, ContainerOutlined } from '@ant-design/icons';
 import { Avatar,  Button,  DatePicker,  Image,   Popconfirm,   Popover,  Select,  Tooltip } from "antd";
 import DataTable from "../../common/datatable";
 import {  getTableItem,getDate } from "../../common/items";
 
 import dayjs from 'dayjs';
-const Payments = ({ key, expensesData, expensesList,userList, btn_Click, fromDate, setFromDate, toDate, setToDate, saveData }) => {
+const Payments = ({ key, expensesData, userList, btn_LogsClick, btn_Click, fromDate, setFromDate, toDate, setToDate, saveData }) => {
 
     const [filteredList, setFilteredList] = useState(expensesData);
 
@@ -134,7 +134,11 @@ const Payments = ({ key, expensesData, expensesList,userList, btn_Click, fromDat
                             <td class="p-3">
                                 <Tooltip placement="top" title={'Edit'} >
                                     <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
-                                </Tooltip> <Tooltip placement="top" title={'Delete'} >
+                                </Tooltip>
+                                <Tooltip placement="top" title={'Logs'} >
+                                    <Button type="link" icon={<ContainerOutlined />} onClick={() => btn_LogsClick(item.id)} />
+                                </Tooltip>
+                                <Tooltip placement="top" title={'Delete'} >
                                     <Popconfirm
                                         title="Delete "
                                         description="Are you sure to delete?"

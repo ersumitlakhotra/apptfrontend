@@ -8,13 +8,16 @@ import Expenses from '../../components/Payment/expenses.js'
 import dayjs from 'dayjs';
 import ExpensesDetail from "../../components/Payment/expenses_detail.js";
 import PaymentsDetail from "../../components/Payment/payments_detail.js";
+import LogsView from "../../components/Logs/logs_view.js";
 
-const Payment = ({ expensesList, userList, saveData, tabActiveKey, setTabActiveKey }) => {
+const Payment = ({ expensesList, userList, logsList, saveData, tabActiveKey, setTabActiveKey }) => {
     const ref = useRef();
     const [openExpense, setOpenExpense] = useState(false);
     const [titleExpense, setTitleExpense] = useState('New');
     const [idExpense, setIdExpense] = useState(0);
     const [openPayment, setOpenPayment] = useState(false);
+    const [id, setId] = useState(0);
+    const [openLogs, setOpenLogs] = useState(false);
     const [titlePayment, setTitlePayment] = useState('New');
     const [idPayment, setIdPayment] = useState(0);
     const [refresh, setRefresh] = useState(0);
@@ -46,13 +49,17 @@ const Payment = ({ expensesList, userList, saveData, tabActiveKey, setTabActiveK
         setIdPayment(id);
         setOpenPayment(true);
     }
+    const btn_LogsClick = (id) => {
+        setId(id);
+        setOpenLogs(true);
+    }
     const btnSave = async () => {
         await ref.current?.save();
     }
  
     const tabItems = [
-        getTabItems('1', 'Expenses', null, <Expenses key={1} expensesList={expensesList} expensesData={expensesData} userList={userList} btn_Click={btn_Click_Expense} fromDate={fromDateExpenses} setFromDate={setFromDateExpenses} toDate={toDateExpenses} setToDate={setToDateExpenses} saveData={saveData} /> ),
-        getTabItems('2', 'Payments', null, <Payments key={2} expensesList={expensesList} expensesData={paymentData} userList={userList} btn_Click={btn_Click_Payment} fromDate={fromDatePayment} setFromDate={setFromDatePayment} toDate={toDatePayment} setToDate={setToDatePayment} saveData={saveData} /> )
+        getTabItems('1', 'Expenses', null, <Expenses key={1} expensesList={expensesList} expensesData={expensesData} userList={userList} btn_Click={btn_Click_Expense} btn_LogsClick={btn_LogsClick} fromDate={fromDateExpenses} setFromDate={setFromDateExpenses} toDate={toDateExpenses} setToDate={setToDateExpenses} saveData={saveData} /> ),
+        getTabItems('2', 'Payments', null, <Payments key={2} expensesList={expensesList} expensesData={paymentData} userList={userList} btn_Click={btn_Click_Payment} btn_LogsClick={btn_LogsClick} fromDate={fromDatePayment} setFromDate={setFromDatePayment} toDate={toDatePayment} setToDate={setToDatePayment} saveData={saveData} /> )
     ];
 
     return (
@@ -81,6 +88,10 @@ const Payment = ({ expensesList, userList, saveData, tabActiveKey, setTabActiveK
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
                 <PaymentsDetail id={idPayment} refresh={refresh} ref={ref} expensesList={paymentData} userList={userList} saveData={saveData} setOpen={setOpenPayment} />
+            </Drawer>
+            {/* Drawer on logs */}
+            <Drawer title={"Logs Detail"} placement='right' width={500} onClose={() => setOpenLogs(false)} open={openLogs}>
+                <LogsView id={id} ltype={tabActiveKey==='1' ?'Expense':'Payment'} logsList={logsList} userList={userList} servicesList={[]} />
             </Drawer>
 
         </div>
