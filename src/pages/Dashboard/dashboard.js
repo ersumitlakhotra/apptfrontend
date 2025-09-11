@@ -1,7 +1,5 @@
 import Card from "../../components/Dashboard/Header/card.js";
-import { useEffect, useState } from "react";
-import Statistics from "../../components/Dashboard/statistics";
-import dayjs from 'dayjs';
+import Statistics from "../../components/Dashboard/Statistics/statistics.js";
 import {  getItem } from "../../common/items.js";
 import Appointment from "../../components/Dashboard/Appointments/appointment.js";
 import { YearsList } from "../../common/yearslist.js";
@@ -11,33 +9,9 @@ import LiveEvent from "../../components/Dashboard/LiveEvent/live_event.js";
 import RecentActivities from "../../components/Dashboard/RecentActivities/recent_activities.js";
 
 
-const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList, onSelected }) => {  
+const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList, logsList, onSelected }) => {  
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
-    const [totalList, setTotalList] = useState([]);
-    const [pendingList, setPendingList] = useState([]);
-    const [inprogressList, setInprogressList] = useState([]);
-    const [completedList, setCompletedList] = useState([]);
-    const [cancelledList, setCancelledList] = useState([]);
-    useEffect(() => {
-        const total = orderList.filter(a => dayjs().format('YYYY-MM-DD') === dayjs(a.trndate).format('YYYY-MM-DD'));
-        const pending = total.filter(a => a.status.toUpperCase() === 'PENDING');
-        const inprogress = total.filter(a => a.status.toUpperCase() === 'IN PROGRESS');
-        const completed = total.filter(a => a.status.toUpperCase() === 'COMPLETED');
-        const cancelled = total.filter(a => a.status.toUpperCase() === 'CANCELLED');
-        const sortedTotal = [...total].sort((a, b) => new Date(b.modifiedat) - new Date(a.modifiedat));
-
-        setTotalList(sortedTotal.length > 0 ? sortedTotal : [])
-        setPendingList(pending.length > 0 ? pending : [])
-        setInprogressList(inprogress.length > 0 ? inprogress : [])
-        setCompletedList(completed.length > 0 ? completed : [])
-        setCancelledList(cancelled.length > 0 ? cancelled : [])  
-    }, [orderList])  
-
-    const twoColors = {
-        '0%': '#108ee9',
-        '100%': '#87d068',
-    }; 
-
+    
     const dashHeaderItems = [
         getItem('1', 'Total Page Views', '4,500'),
         getItem('2', 'Revenue Over Time', '51,000'),
@@ -63,17 +37,8 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList,
                 </div>
                 <div class='flex flex-col gap-4 w-full md:w-2/6'>
                     <LiveEvent eventList={eventList} servicesList={servicesList} onSelected={onSelected} />
-                    <RecentActivities orderList={orderList} userList={userList} />  
-
-                    <span class="text-lg font-semibold text-gray-800">Statistics</span>
-                    <div class='w-full h-96  bg-white border rounded p-5 text-gray-500 flex flex-col gap-6 '>
-                        <Statistics key={1} label={"Total"} value={completedList.length + cancelledList.length} total={totalList.length} strokeColor={twoColors} />
-                        <Statistics key={2} label={"Pending"} value={pendingList.length} total={totalList.length} strokeColor='#ffff66' />
-                        <Statistics key={3} label={"In process"} value={inprogressList.length} total={totalList.length} strokeColor='#66a3ff' />
-                        <Statistics key={4} label={"Completed"} value={completedList.length} total={totalList.length} strokeColor='#66ff66' />
-                        <Statistics key={5} label={"Cancelled"} value={cancelledList.length} total={totalList.length} strokeColor='#ff6666' />
-
-                    </div>           
+                    <RecentActivities orderList={orderList} userList={userList} eventList={eventList} servicesList={servicesList} expensesList={expensesList} logsList={logsList} />  
+                    <Statistics orderList={orderList} />                        
                 </div>
             </div>   
 

@@ -154,6 +154,7 @@ const MasterPage = () => {
           getData(setUserList,"user");
           getData(setExpenseList,"payment");
           getData(setEventList,"event",true);
+          getData(setLogsList, "logs");
           getData(setOrderList,"order");
           break;
         } 
@@ -230,6 +231,7 @@ const MasterPage = () => {
         userList={userList}
         expensesList={expenseList}
         eventList={eventList}
+        logsList={logsList}
         onSelected={onSelected}
         refresh={refresh}
       />;

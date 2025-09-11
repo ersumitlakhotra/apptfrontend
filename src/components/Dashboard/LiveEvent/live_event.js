@@ -1,6 +1,7 @@
-import { Badge, Button, Tag } from "antd";
+import { Badge, Button } from "antd";
 import { useEffect, useState } from "react";
 import dayjs from 'dayjs';
+import Services from "../../../common/services";
 
 const LiveEvent = ({ eventList, servicesList, onSelected }) => {
     const [liveList, setLiveList] = useState([]);
@@ -33,11 +34,7 @@ const LiveEvent = ({ eventList, servicesList, onSelected }) => {
                                     <p>{item.coupon}</p>
                                 </div>
                                 <div class='flex flex-col overflow-hidden whitespace-nowrap'>
-                                    {item.serviceinfo !== null &&
-                                        servicesList.filter(a =>
-                                            item.serviceinfo.some(b => b === a.id)
-                                        ).map(c => <Tag key={c.id} color="green" bordered={false}>{c.name}</Tag>)
-                                    }
+                                    <Services servicesItem={item.serviceinfo} servicesList={servicesList}/>
                                 </div>
                             </div>
                         )}

@@ -117,7 +117,7 @@ const Order = ({ orderList, servicesList, userList, companyList, eventList, logs
 
             {/* Drawer on logs */}
             <Drawer title={"Logs Detail"} placement='right' width={500} onClose={() => setOpenLogs(false)} open={openLogs}>
-                <LogsView id={id} ltype={'Order'} logsList={logsList} userList={userList} servicesList={servicesList} />
+                <LogsView id={id} ltype={'Order'} logsList={logsList} orderList={orderList} userList={userList} servicesList={servicesList} />
             </Drawer>
         </div>
     )

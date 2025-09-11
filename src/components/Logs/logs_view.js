@@ -9,7 +9,7 @@ import UsersLogs from "./users.log";
 import ExpenseLogs from "./expense_log";
 import PaymentLogs from "./payment_log";
 import AssignedTo from "../../common/assigned_to";
-const LogsView = ({ id, ltype, logsList, userList, servicesList }) => {
+const LogsView = ({ id, ltype, logsList,orderList, userList, servicesList }) => {
     const [logsData, setLogsData] = useState([]);
 
     useEffect(() => {
@@ -37,7 +37,7 @@ const LogsView = ({ id, ltype, logsList, userList, servicesList }) => {
                                             <span class='text-xs  text-gray-500'>{UTC_LocalDateTime(item.createdat, 'MMM, DD YYYY - hh:mm A ')}</span>
                                         </div>),
                                     children:
-                                        item.ltype.toUpperCase() === "ORDER" ? <OrderLogs key={item.id} dataList={item.datainfo} userList={userList} servicesList={servicesList} /> :
+                                        item.ltype.toUpperCase() === "ORDER" ? <OrderLogs key={item.id} id={item.lid} dataList={item.datainfo} orderList={orderList} userList={userList} servicesList={servicesList} /> :
                                             item.ltype.toUpperCase() === "EVENT" ? <EventLogs key={item.id} dataList={item.datainfo} servicesList={servicesList} /> :
                                                 item.ltype.toUpperCase() === "SERVICES" ? <ServicesLogs key={item.id} dataList={item.datainfo} servicesList={servicesList} /> :
                                                     item.ltype.toUpperCase() === "USERS" ? <UsersLogs key={item.id} dataList={item.datainfo} servicesList={servicesList} /> :

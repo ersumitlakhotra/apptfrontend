@@ -1,52 +1,87 @@
-import { Avatar, Badge, Card, Image } from "antd";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { Badge, Button, Collapse, Dropdown,  Space } from "antd";
 import { useEffect, useState } from "react";
-import { UserOutlined } from '@ant-design/icons';
+import { DownOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { Tags } from "../../../common/tags";
+import { LocalDate, UTC_LocalDateTime } from "../../../common/localDate";
+import AssignedTo from "../../../common/assigned_to";
+import EventLogs from "../../Logs/event_log";
+import ServicesLogs from "../../Logs/services_log";
+import UsersLogs from "../../Logs/users.log";
+import ExpenseLogs from "../../Logs/expense_log";
+import PaymentLogs from "../../Logs/payment_log";
+import OrderLogs from "../../Logs/order_log";
 
-const RecentActivities = ({ orderList, userList }) => {
-    const [totalList, setTotalList] = useState([]);
+const RecentActivities = ({ orderList, expensesList, servicesList, userList, eventList, logsList }) => {
+    const [logsData, setLogsData] = useState([]);
+    const [currentOption, setCurrentOption] = useState('Today');
+    const items = [
+        { key: 'Today', label: 'Today' },
+        { key: 'Last 1 hour', label: 'Last 1 hour' },
+        { key: 'Last 6 hours', label: 'Last 6 hours' },
+        { key: 'Last 12 hours', label: 'Last 12 hours' },
+    ];
+    const onItemChanged = e => { setCurrentOption(e.key) };
+    const menuProps = { items, onClick: onItemChanged, };
 
     useEffect(() => {
-        const total = orderList.filter(a => dayjs().format('YYYY-MM-DD') === dayjs(a.trndate).format('YYYY-MM-DD'));
-        const sortedTotal = [...total].sort((a, b) => new Date(b.modifiedat) - new Date(a.modifiedat));
-        setTotalList(sortedTotal.length > 0 ? sortedTotal : [])
-    }, [orderList])
+        let editList = [];
+        if (currentOption === 'Today')
+            editList = logsList.filter(item => UTC_LocalDateTime(item.createdat, 'YYYY-MM-DD') === LocalDate());
+        else {
+            let hours = currentOption === 'Last 1 hour' ? 1 : currentOption === 'Last 6 hours' ? 6 : 12;
+            editList = logsList.filter(item => (new Date(item.createdat).getHours() - parseInt(hours)) && dayjs(item.createdat).format('YYYY-MM-DD') === LocalDate());
+        }
+
+        if (editList.length === 0)
+            setLogsData([]);
+        else
+            setLogsData(editList);
+
+    }, [currentOption,orderList])
 
     return (
         <div class='flex flex-col gap-4 w-full'>
-            <span class="text-lg font-semibold text-gray-800">Recent Activities </span>
-            <div class='w-full bg-white border rounded p-5 text-gray-500 max-h-[460px] h-[460px]  overflow-y-auto flex flex-col gap-2'>
+            <div class='flex justify-between items-center'>
+                <span class="text-lg font-semibold text-gray-800">Recent Activities</span>
+                <Dropdown menu={menuProps}>
+                    <Button>
+                        <Space>
+                            {currentOption}
+                            <DownOutlined />
+                        </Space>
+                    </Button>
+                </Dropdown>
+            </div>
+            <div class='w-full bg-white border rounded p-5 text-gray-500 max-h-[460px] h-[460px]  overflow-y-auto'>
                 <div class=' flex flex-col gap-4 mb-4'>
-                    {totalList.length === 0 ? <p class='text-left p-4 text-sm font-medium text-gray-500'> There aren't any activity to show right now.</p> :
-                        totalList.map(item =>
-                            <>
+                    {logsData.length === 0 ? <p class='text-left p-4 text-sm font-medium text-gray-500'> There aren't any history to show right now.</p> :
+                        logsData.map(item =>
+                            <>                                                                                   
                                 <Badge.Ribbon
-                                    text={new Date(item.modifiedat) === new Date(item.createdat) ? "Created" : "Modified"}
-                                    color={new Date(item.modifiedat) === new Date(item.createdat) ? "yellow" : "blue"} >
-                                    <Card title={
-                                        item.assignedto === '0' ? '' :
-                                            userList.filter(user => user.id === item.assignedto).map(a =>
-                                                <div key={a.id} class='flex flex-row gap-2 items-center text-sm'>
-                                                    {a.profilepic !== null ?
-                                                        <Image width={24} height={24} src={a.profilepic} style={{ borderRadius: 15 }} /> :
-                                                        <Avatar size={24} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
-                                                    }
-                                                    <span class='text-xs  text-gray-500'>{a.fullname}</span>
-                                                </div>
-                                            )
-                                    }
-                                        size="small" backgroundColor='gray'>
-                                        <div class='flex flex-col gap-2'>
-                                            <div class='flex items-center justify-between'>
-                                                <span class="text-blue-500 italic hover:underline cursor-pointer"  ># {item.order_no}</span>
-                                                <span class="">{Tags(item.status)}</span>
-                                            </div>
-                                        </div>
+                                    text={item.ltype}
+                                    color={item.status.toUpperCase() === "CREATED" ? "yellow" : item.status.toUpperCase() === "MODIFIED" ? "blue" : "red"} >
+                                    <Collapse
+                                        items={[{
+                                            key: item.id,
+                                            label: (
+                                                <div class='flex items-center justify-between pe-20 ' >
+                                                    <AssignedTo userId={item.userid} userList={userList} class='text-xs font-semibold text-gray-500' />
+                                                    <span class='text-xs  text-gray-500'>{UTC_LocalDateTime(item.createdat, 'MMM, DD YYYY - hh:mm A ')}</span>
+                                                </div>),
+                                            children:
+                                                item.ltype.toUpperCase() === "ORDER" ? <OrderLogs key={item.id} id={item.lid} dataList={item.datainfo} orderList={orderList} userList={userList} servicesList={servicesList} /> :
+                                                    item.ltype.toUpperCase() === "EVENT" ? <EventLogs key={item.id} dataList={item.datainfo} servicesList={servicesList} /> :
+                                                        item.ltype.toUpperCase() === "SERVICES" ? <ServicesLogs key={item.id} dataList={item.datainfo} servicesList={servicesList} /> :
+                                                            item.ltype.toUpperCase() === "USERS" ? <UsersLogs key={item.id} dataList={item.datainfo} servicesList={servicesList} /> :
+                                                                item.ltype.toUpperCase() === "EXPENSE" ? <ExpenseLogs key={item.id} dataList={item.datainfo} servicesList={servicesList} /> :
+                                                                    item.ltype.toUpperCase() === "PAYMENT" ? <PaymentLogs key={item.id} dataList={item.datainfo} userList={userList} servicesList={servicesList} /> : <></>
+                                        }]}
+                                    />
 
-                                    </Card>
                                 </Badge.Ribbon>
                             </>)}
+
                 </div>
             </div>
         </div>
