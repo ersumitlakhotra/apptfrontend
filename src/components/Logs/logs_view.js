@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Avatar, Badge,  Collapse, Image } from "antd";
-import { UserOutlined } from '@ant-design/icons';
+import { Badge, Collapse } from "antd";
 import { useEffect, useState } from "react";
 import { UTC_LocalDateTime } from "../../common/localDate";
 import OrderLogs from "./order_log";
@@ -9,6 +8,7 @@ import ServicesLogs from "./services_log";
 import UsersLogs from "./users.log";
 import ExpenseLogs from "./expense_log";
 import PaymentLogs from "./payment_log";
+import AssignedTo from "../../common/assigned_to";
 const LogsView = ({ id, ltype, logsList, userList, servicesList }) => {
     const [logsData, setLogsData] = useState([]);
 
@@ -19,7 +19,7 @@ const LogsView = ({ id, ltype, logsList, userList, servicesList }) => {
         else
             setLogsData(editList);
     }, [id])
-    
+
     return (
         <div class='flex flex-col font-normal gap-3 mt-2'>
             {logsData.length === 0 ? <p class='text-left p-4 text-sm font-medium text-gray-500'> There aren't any history to show right now.</p> :
@@ -31,23 +31,13 @@ const LogsView = ({ id, ltype, logsList, userList, servicesList }) => {
                             <Collapse
                                 items={[{
                                     key: item.id,
-                                    label: (<div class='flex items-center justify-between pe-20 ' >
-                                        <>
-                                            {item.assignedto === '0' ? '' :
-                                                userList.filter(user => user.id === item.userid).map(a =>
-                                                    <div key={a.id} class='flex flex-row gap-2 items-center text-sm'>
-                                                        {a.profilepic !== null ?
-                                                            <Image width={24} height={24} src={a.profilepic} style={{ borderRadius: 15 }} /> :
-                                                            <Avatar size={24} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
-                                                        }
-                                                        <span class='text-xs font-semibold text-gray-500'>{a.fullname}</span>
-                                                    </div>
-                                                )}
-                                        </>
-                                        <span class='text-xs  text-gray-500'>{UTC_LocalDateTime(item.createdat, 'MMM, DD YYYY - hh:mm A ')}</span>
-                                    </div>),
+                                    label: (
+                                        <div class='flex items-center justify-between pe-20 ' >
+                                            <AssignedTo userId={item.userid} userList={userList} class='text-xs font-semibold text-gray-500' />
+                                            <span class='text-xs  text-gray-500'>{UTC_LocalDateTime(item.createdat, 'MMM, DD YYYY - hh:mm A ')}</span>
+                                        </div>),
                                     children:
-                                        item.ltype.toUpperCase() === "ORDER" ? <OrderLogs key={item.id} dataList={item.datainfo} servicesList={servicesList} /> :
+                                        item.ltype.toUpperCase() === "ORDER" ? <OrderLogs key={item.id} dataList={item.datainfo} userList={userList} servicesList={servicesList} /> :
                                             item.ltype.toUpperCase() === "EVENT" ? <EventLogs key={item.id} dataList={item.datainfo} servicesList={servicesList} /> :
                                                 item.ltype.toUpperCase() === "SERVICES" ? <ServicesLogs key={item.id} dataList={item.datainfo} servicesList={servicesList} /> :
                                                     item.ltype.toUpperCase() === "USERS" ? <UsersLogs key={item.id} dataList={item.datainfo} servicesList={servicesList} /> :

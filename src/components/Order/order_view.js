@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Avatar, Button, Divider, Image,  Rate, Steps, Tag } from "antd";
+import { Avatar, Button, Divider, Image,  Rate, Steps } from "antd";
 import { DownloadOutlined, MailOutlined, PrinterOutlined, CalendarOutlined, ClockCircleOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import { UTC_LocalDateTime } from "../../common/localDate";
+import Services from "../../common/services";
 const OrderView = ({ id, refresh, orderList, servicesList, userList }) => {
 
     const [customerName, setCustomerName] = useState('');
@@ -121,13 +122,7 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList }) => {
                                 </div>
                                 <div class='flex flex-row gap-2'>
                                     <UnorderedListOutlined />
-                                    <div>
-                                        {servicesItem !== null &&
-                                            servicesList.filter(a =>
-                                                servicesItem.some(b => b === a.id)
-                                            ).map(c => <Tag key={c.id} size='small' color="cyan" bordered={false}>{c.name}</Tag>)
-                                        }
-                                    </div>
+                                    <Services servicesItem={servicesItem} servicesList={servicesList} />       
                                 </div>
                             </div>
                         </div>

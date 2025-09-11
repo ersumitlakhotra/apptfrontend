@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Button, Drawer, Space, Tabs, Tag } from "antd"
 import { PlusOutlined, SaveOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from "react";
@@ -5,6 +6,8 @@ import EventDetail from "../../components/Event/event_detail.js";
 import { getTabItems } from "../../common/items.js";
 import Events from '../../components/Event/event.js'
 import LogsView from "../../components/Logs/logs_view.js";
+import dayjs from 'dayjs';
+import { firstDateOfMonth, lastDateOfMonth } from "../../common/localDate.js";
 
 const customLabelTab = (label, tagColor, tagValue) => {
     return (
@@ -23,6 +26,8 @@ const Event = ({ eventList, servicesList, logsList, userList, saveData }) => {
     const [refresh, setRefresh] = useState(0);
     const [tabActiveKey, setTabActiveKey] = useState("1");
     const [openLogs, setOpenLogs] = useState(false);
+    const [fromDate, setFromDate] = useState(dayjs(firstDateOfMonth(new Date())).format("YYYY-MM-DD"));
+    const [toDate, setToDate] = useState(dayjs(lastDateOfMonth(new Date())).format("YYYY-MM-DD"));
 
     const btn_Click = (id) => {
         setTitle(id === 0 ? "New Event" : "Edit Event");
@@ -34,26 +39,30 @@ const Event = ({ eventList, servicesList, logsList, userList, saveData }) => {
         setId(id);
         setOpenLogs(true);
     }
+    const [eventTotal, setEventTotal] = useState([]);
     const [liveList, setLiveList] = useState([]);
     const [upcomingList, setUpcomingList] = useState([]);
     const [pastList, setPastList] = useState([]);
 
     useEffect(() => {
-        const liveList = eventList.filter(a => a.case.toUpperCase() === 'LIVE');
-        const upcoming = eventList.filter(a => a.case.toUpperCase() === 'UPCOMING');
-        const past = eventList.filter(a => a.case.toUpperCase() === 'PAST');
+        const event = eventList.filter(a => (dayjs(a.startdate).format('YYYY-MM-DD') >= fromDate && dayjs(a.startdate).format('YYYY-MM-DD') <= toDate) || 
+            (dayjs(a.enddate).format('YYYY-MM-DD') >= fromDate && dayjs(a.enddate).format('YYYY-MM-DD') <= toDate));
+        const liveList = event.filter(a => a.case.toUpperCase() === 'LIVE');
+        const upcoming = event.filter(a => a.case.toUpperCase() === 'UPCOMING');
+        const past = event.filter(a => a.case.toUpperCase() === 'PAST');
 
+        setEventTotal(event.length > 0 ? event : [])
         setLiveList(liveList.length > 0 ? liveList : [])
         setUpcomingList(upcoming.length > 0 ? upcoming : [])
         setPastList(past.length > 0 ? past : [])
 
-    }, [refresh, eventList])
+    }, [refresh, eventList, fromDate,toDate])
 
     const tabItems = [
-        getTabItems('1', customLabelTab("All", "cyan", eventList.length), null, <Events eventList={eventList} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} />),
-        getTabItems('2', customLabelTab("Live", "green", liveList.length), null, <Events eventList={liveList} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} />),
-        getTabItems('3', customLabelTab("Upcoming", "yellow", upcomingList.length), null, <Events eventList={upcomingList} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} />),
-        getTabItems('4', customLabelTab("Past", "red", pastList.length), null, <Events eventList={pastList} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} />)
+        getTabItems('1', customLabelTab("All", "cyan", eventList.length), null, <Events eventList={eventTotal} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
+        getTabItems('2', customLabelTab("Live", "green", liveList.length), null, <Events eventList={liveList} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
+        getTabItems('3', customLabelTab("Upcoming", "yellow", upcomingList.length), null, <Events eventList={upcomingList} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
+        getTabItems('4', customLabelTab("Past", "red", pastList.length), null, <Events eventList={pastList} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />)
     ];
 
     const btnSave = async () => {

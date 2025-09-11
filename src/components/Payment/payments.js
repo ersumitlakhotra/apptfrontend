@@ -6,6 +6,7 @@ import DataTable from "../../common/datatable";
 import {  getTableItem,getDate } from "../../common/items";
 
 import dayjs from 'dayjs';
+import AssignedTo from "../../common/assigned_to";
 const Payments = ({ key, expensesData, userList, btn_LogsClick, btn_Click, fromDate, setFromDate, toDate, setToDate, saveData }) => {
 
     const [filteredList, setFilteredList] = useState(expensesData);
@@ -114,17 +115,7 @@ const Payments = ({ key, expensesData, userList, btn_LogsClick, btn_Click, fromD
                     filteredList.map(item => (
                         <tr key={item.id} class="bg-white border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50 ">
                             <td class="ps-3 w-44">{`${dayjs(item.fromdate).format("MMM DD,YYYY")} - ${dayjs(item.todate).format("MMM DD,YYYY")} `}</td>
-                            <td class="p-3">{item.assignedto === '0' ? '' :
-                                userList.filter(user => user.id === item.assignedto).map(a =>
-                                    <div key={a.id} class='flex flex-row gap-2 items-center'>
-                                        {a.profilepic !== null ?
-                                            <Image width={31} height={31} src={a.profilepic} style={{ borderRadius: 15 }} /> :
-                                            <Avatar size={30} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
-                                        }
-                                        <p>{a.fullname}</p>
-                                    </div>
-                                )}
-                            </td>
+                            <td class="p-3"><AssignedTo userId={item.assignedto} userList={userList} /></td>
                             <td class="p-3 ">{item.ptype}</td>
                             <td class="p-3 ">$ {item.netamount}</td>
                             <td class="p-3 ">$ {item.taxamount}</td>

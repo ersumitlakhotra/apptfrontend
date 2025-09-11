@@ -1,12 +1,12 @@
-import { Avatar, Button, DatePicker, Dropdown, Flex, Image, Popover, Space, Tag } from "antd";
+/* eslint-disable array-callback-return */
+/* eslint-disable react-hooks/exhaustive-deps */
+import { Avatar, Button, DatePicker, Dropdown,  Image, Popover, Space, Tag } from "antd";
 import { DownloadOutlined, UserOutlined, DownOutlined } from '@ant-design/icons';
-
 import { useEffect, useState } from "react";
 import { Bar, Pie } from '../../components/Sales/graph.js'
 import DataTable from "../../common/datatable";
 import { getTableItem } from "../../common/items";
-
-import { firstDateOfMonth, lastDateOfMonth, LocalDate } from "../../common/localDate.js";
+import { firstDateOfMonth, lastDateOfMonth } from "../../common/localDate.js";
 import dayjs from 'dayjs';
 
 
@@ -104,10 +104,10 @@ const Sales = ({ orderList, userList, expensesList }) => {
                 let frm = dayjs(firstDateOfMonth(new Date(date))).format("YYYY-MM-DD");
                 let to = dayjs(lastDateOfMonth(new Date(date))).format("YYYY-MM-DD");
                 let totalSale = 0; let totalExpense = 0;
-                const order = orderList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') >= frm && dayjs(a.trndate).format('YYYY-MM-DD') <= to).map(b =>{           
+                 orderList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') >= frm && dayjs(a.trndate).format('YYYY-MM-DD') <= to).map(b =>{           
                         totalSale += parseFloat(b.total);
                 });
-                const expense = expensesList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') >= frm && dayjs(a.trndate).format('YYYY-MM-DD') <= to).map(b =>{
+                 expensesList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') >= frm && dayjs(a.trndate).format('YYYY-MM-DD') <= to).map(b =>{
                     totalExpense += parseFloat(b.grossamount);
                 });
                 salesArray.push(totalSale);

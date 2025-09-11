@@ -1,12 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Avatar, Button, DatePicker, Image, Input,  Popover,  Tag, Tooltip} from "antd"
+import {  Button, DatePicker,  Input,  Popover,   Tooltip} from "antd"
 import { IoSearchOutline } from "react-icons/io5";
 import { getDate, getTableItem } from "../../common/items";
 import DataTable from "../../common/datatable";
 import { useEffect, useState } from "react";
-import {  ContainerOutlined, EditOutlined, EyeOutlined,   UserOutlined } from '@ant-design/icons';
+import {  ContainerOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { Tags } from "../../common/tags";
+import Services from "../../common/services";
+import AssignedTo from "../../common/assigned_to";
 
 
 const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_ViewClick, btn_LogsClick, refresh, fromDate, setFromDate, toDate, setToDate }) => {
@@ -110,29 +112,10 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_View
                                 </>}
                             </td>
 
-                            <td class="p-3">
-                                {item.serviceinfo !== null &&
-                                    servicesList.filter(a =>
-                                        item.serviceinfo.some(b => b === a.id)
-                                ).map(c => <Tag key={c.id} color="cyan" bordered={false}>{c.name}</Tag>)
-                                }
-                            </td>
-
+                            <td class="p-3"><Services servicesItem={item.serviceinfo} servicesList={servicesList} /></td>
                             <td class="p-3 font-semibold">$ {item.total}</td>
                             <td class="p-3">{Tags(item.status)}</td>
-
-                            <td class="p-3">{item.assignedto === '0' ? '' :
-                                userList.filter(user => user.id === item.assignedto).map(a =>
-                                    <div key={a.id} class='flex flex-row gap-2 items-center'>
-                                        {a.profilepic !== null ?
-                                            <Image width={31} height={31} src={a.profilepic} style={{ borderRadius: 15 }} /> :
-                                            <Avatar size={30} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
-                                        }
-                                        <p>{a.fullname}</p>
-                                    </div>
-                                )}
-                            </td>
-
+                            <td class="p-3"><AssignedTo userId={item.assignedto} userList={userList} /></td>
                             <td class="p-3 ">{getDate(item.modifiedat)}</td>
                             <td class="p-3">
                                 <Tooltip placement="top" title={'Edit'} >

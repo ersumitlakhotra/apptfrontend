@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { LocalDate } from "../../common/localDate";
 import dayjs from 'dayjs';
+import AssignedTo from "../../common/assigned_to";
 
 const PaymentLogs = ({ dataList, userList }) => {
     const [ptype, setPtype] = useState('Payroll');
@@ -26,10 +27,7 @@ const PaymentLogs = ({ dataList, userList }) => {
     return (
         <ul class='list-disc ps-5'>
             <li>{ptype}</li>
-            <li>{assigned_to === '0' ? '' :
-                userList.filter(user => user.id === assigned_to).map(a =>                           
-                        <p>{a.fullname}</p>
-                )}</li>
+            <li><AssignedTo userId={assigned_to} userList={userList} /></li>
             <li>{`${dayjs(fromdate).format("MMM DD,YYYY")} - ${dayjs(todate).format("MMM DD,YYYY")} `}</li>
             <li>${netamount} {ptype === 'Payroll' ? '-':'+'} ${taxamount} = ${grossamount}</li>
            

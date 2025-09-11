@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import dayjs from 'dayjs';
-import { Tag } from "antd";
+import Services from "../../common/services";
 
 const EventLogs = ({ dataList, servicesList }) => {
     const [title, setTitle] = useState('');
@@ -24,12 +24,7 @@ const EventLogs = ({ dataList, servicesList }) => {
             <ul class='list-disc ps-5'>
                 <li>{title}</li>
                 <li>${total}</li>
-                <li> {servicesItem !== null &&
-                    servicesList.filter(a =>
-                        servicesItem.some(b => b === a.id)
-                    ).map(c => <Tag key={c.id} color="cyan" bordered={false}>{c.name}</Tag>)
-                }
-                </li>
+                <li> <Services servicesItem={servicesItem} servicesList={servicesList} /></li>
                 <li>{dayjs(startDate).format('ddd, MMM DD')} - {dayjs(endDate).format('ddd, MMM DD')} </li>
            </ul>
 
