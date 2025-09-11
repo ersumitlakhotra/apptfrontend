@@ -54,11 +54,11 @@ const RecentActivities = ({ orderList, expensesList, servicesList, userList, eve
                 </Dropdown>
             </div>
             <div class='w-full bg-white border rounded p-5 text-gray-500 max-h-[460px] h-[460px]  overflow-y-auto'>
-                <div class=' flex flex-col gap-4 mb-4'>
+                <div class='flex flex-col gap-4 mb-4'>
                     {logsData.length === 0 ? <p class='text-left p-4 text-sm font-medium text-gray-500'> There aren't any history to show right now.</p> :
-                        logsData.map(item =>
-                            <>                                                                                   
+                        logsData.map(item =>                                                                                 
                                 <Badge.Ribbon
+                                    key={item.id}
                                     text={item.ltype}
                                     color={item.status.toUpperCase() === "CREATED" ? "yellow" : item.status.toUpperCase() === "MODIFIED" ? "blue" : "red"} >
                                     <Collapse
@@ -79,9 +79,7 @@ const RecentActivities = ({ orderList, expensesList, servicesList, userList, eve
                                         }]}
                                     />
 
-                                </Badge.Ribbon>
-                            </>)}
-
+                                </Badge.Ribbon>)}
                 </div>
             </div>
         </div>

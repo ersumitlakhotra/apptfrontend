@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Avatar,  Button,  Image,  Rate, Tabs } from "antd";

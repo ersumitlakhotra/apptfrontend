@@ -1,20 +1,81 @@
-import { Avatar, Space, Dropdown } from 'antd';
-import ProfileItems from './profilemenu.js';
+/* eslint-disable array-callback-return */
+/* eslint-disable react-hooks/exhaustive-deps */
+import { Space, Dropdown, Drawer, Button } from 'antd';
+import { MenuUnfoldOutlined, SaveOutlined, BellOutlined, BookOutlined, ClockCircleOutlined, LockOutlined, LogoutOutlined, QuestionCircleOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 
-import { MenuUnfoldOutlined } from '@ant-design/icons';
+import { useEffect, useRef, useState } from 'react';
+import AssignedTo from '../../../common/assigned_to.js';
+import UserDetail from '../../Users/user_detail.js';
 
-const Header = ({ onSignout, open, setOpen }) => {
-  const items = ProfileItems;
+function getItem(key, label, icon, extra, disabled, danger) {
+  return {
+    key,
+    label,
+    icon,
+    extra,
+    disabled,
+    danger,
+  };
+}
+const Header = ({ onSignout, open, setOpen, getData, saveData, refresh }) => {
+  const ref = useRef();
+  const [userList, setUserList] = useState([]);
+  const [id, setId] = useState('0');
+  const [fullname, setFullname] = useState('');
+  const [permission, setPermission] = useState('YYYYYYYYYY');
+  const [profilepic, setProfile] = useState(null);
+  const [openAccount, setOpenAccount] = useState(false);
+
+  const btnSave = async () => {
+    await ref.current?.save();
+  }
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    setId(localStorage.getItem('uid'));
+    getData(setUserList, "user");
+  }, []);
+
+  useEffect(() => {
+    if (userList.length > 0) {
+      userList.filter(a => a.id === id).map(b => {
+       setFullname(b.fullname);
+        setPermission(b.permission);
+        setProfile(b.profilepic);
+        setItems([
+          getItem('1', b.fullname, null, null, true),
+          { type: 'divider', },
+          getItem('2', 'Account', <UserOutlined />),
+          getItem('3', 'Settings', <SettingOutlined />, '⌘S'),
+          getItem('4', 'Privacy', <LockOutlined />, '⌘P'),
+          getItem('5', 'Notifications', <BellOutlined />),
+          { type: 'divider', },
+          getItem('6', 'Help Guide', <BookOutlined />),
+          getItem('7', 'Help Center', <QuestionCircleOutlined />),
+          { type: 'divider', },
+          getItem('8', 'Limited Access', <ClockCircleOutlined />),
+          { type: 'divider', },
+          getItem('9', 'Sign Out', <LogoutOutlined />, null, null, true),
+        ])
+      })   
+    }
+  }, [userList]);
 
   const handleMenuClick = e => {
     switch (e.key) {
+      case '2': // Account
+        {
+          setOpenAccount(true);         
+          break;
+        }
       case '9': // Sign Out
         {
           localStorage.removeItem('cid');
+          localStorage.removeItem('uid');
           onSignout();
           break;
         }
-      default: { console.log('click left button', e.key); break; }
+      default: {  break; }
     }
 
   };
@@ -22,14 +83,20 @@ const Header = ({ onSignout, open, setOpen }) => {
     items,
     onClick: handleMenuClick
   };
+
   return (
-    <div class='flex items-center justify-between p-3 overflow-x-hidden '>
+    <div class='flex items-center justify-between p-3 pe-8 overflow-x-hidden '>
       <MenuUnfoldOutlined className='cursor-pointer' onClick={() => setOpen(!open)} />
       <Dropdown menu={menuProps} overlayStyle={{ width: '250px', gap: 5 }}>
         <Space>
-          <Avatar size={40} src={<img src='https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg' alt="Rounded avatar"></img>} />
+          <AssignedTo userId={id} userList={userList} imageWidth={40} imageHeight={40} AvatarSize={40} allowText={false}  />        
         </Space>
       </Dropdown>
+
+      <Drawer title={"Account"} placement='right' width={500} onClose={() => setOpenAccount(false)} open={openAccount}
+        extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
+        <UserDetail id={id} refresh={refresh} ref={ref} userList={userList} saveData={saveData} setOpen={setOpenAccount} />
+      </Drawer>
     </div>
   )
 }

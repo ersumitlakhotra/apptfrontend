@@ -43,7 +43,7 @@ const Users = ({ userList, logsList, saveData }) => {
             setPage(currentPage, itemsPerPage, searchedList)
         else
             setPage(1, itemsPerPage, searchedList)
-    }, [searchInput, sortStatus])
+    }, [userList,searchInput, sortStatus])
     
     const setPage = (page, pageSize, list = []) => {
         const indexOfLastItem = page * pageSize;

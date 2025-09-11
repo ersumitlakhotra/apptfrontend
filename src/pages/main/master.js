@@ -318,7 +318,7 @@ const MasterPage = () => {
       <Sidebar onSelected={onSelected} content={content} open={open} />
       <div class='flex flex-col w-full bg-gray-50 '>
         <header class='h-16 border-b bg-white '>
-          <Header onSignout={onSetSignout} open={open} setOpen={setOpen} />
+          <Header onSignout={onSetSignout} open={open} setOpen={setOpen} getData={getData} saveData={saveData} refresh={refresh}  />
         </header>
         <section class='overflow-y-scroll p-8 w-full'>
           {isLoading ? (
