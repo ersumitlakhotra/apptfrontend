@@ -1,7 +1,6 @@
 
 import Chart from "react-apexcharts";
 
-import dayjs from 'dayjs';
 
 const AreaChart = ({ sales,expense, categoriesArray }) => {
     return (
@@ -40,12 +39,28 @@ const AreaChart = ({ sales,expense, categoriesArray }) => {
     )
 }
 
-const AreaChartOptions = () => {
+const AreaChartCard = ({ categoriesArray, series, color,name }) => {
     return (
         <Chart
             options={{
                 xaxis: {
-                    categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999]
+                    categories: categoriesArray,
+                    labels: {
+                        show: false, // This line hides the x-axis labels
+                    }, axisBorder: {
+                        show: false // Hides the border of the x-axis
+                    }, 
+                    axisTicks: {
+                        show: false // Hides the X-axis ticks
+                    }
+                },
+                yaxis: {
+                    labels: {
+                        show: false, // This line hides the x-axis labels
+                    },
+                     axisBorder: {
+                        show: false // Hides the border of the x-axis
+                    }, 
                 },
                 stroke: {
                     curve: 'smooth',
@@ -56,22 +71,28 @@ const AreaChartOptions = () => {
                 chart: {
                     redrawOnParentResize: true,
                     width: '100%',
+                    toolbar: {
+                        show: false
+                    },
+                },
+                grid: {
+                    show: false // Hides the entire grid area, including its borders
+                }, 
+                fill: {
+                    colors: [color]
                 },
             }}
             series={[{
-                name: 'series1',
-                data: [31, 40, 28, 51, 42, 109, 100]
-            }, {
-                name: 'series2',
-                data: [11, 32, 45, 32, 34, 52, 41]
+                name: name,
+                data: series
             }]}
             type="area"
-            height={500}
+            height={100}
         />
     )
 }
 const BarChart = ({ dataArray}) => {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
+    //const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
     return (
         <Chart
             options={{
@@ -221,4 +242,4 @@ const StackedBarChart = ({ categories, pending,inprogress,completed,cancelled })
     )
 }
 //colors: ['#FFD580','#80d4ff','#90EE90', '#ff6666', ]
-export { AreaChart, BarChart, PieChart, StackedBarChart }
+export { AreaChart, BarChart, PieChart, StackedBarChart, AreaChartCard }
