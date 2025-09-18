@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {  useEffect,  useState } from "react";
-import { EditOutlined, UserOutlined, DeleteOutlined, ContainerOutlined } from '@ant-design/icons';
-import { Avatar,  Button,  DatePicker,  Image,   Popconfirm,   Popover,  Select,  Tooltip } from "antd";
+import { EditOutlined,  DeleteOutlined, ContainerOutlined } from '@ant-design/icons';
+import {  Button,  DatePicker,     Popconfirm,   Popover,  Select,  Tooltip } from "antd";
 import DataTable from "../../common/datatable";
 import {  getTableItem,getDate } from "../../common/items";
 
@@ -67,14 +67,7 @@ const Payments = ({ key, expensesData, userList, btn_LogsClick, btn_Click, fromD
                             onChange={(value) => setAssignedTo(value)}
                             options={[{ value: '', label: 'All Users' }, ...userList.map(item => ({
                                 value: item.id,
-                                label:
-                                    <div class='flex flex-row gap-2 items-center'>
-                                        {item.profilepic !== null ?
-                                            <Image width={31} height={31} src={item.profilepic} style={{ borderRadius: 15 }} /> :
-                                            <Avatar size={30} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
-                                        }
-                                        <p>{item.fullname}</p>
-                                    </div>
+                                label:<AssignedTo key={item.id} userId={item.id} userList={userList} />                                 
                             }))]}
                         />
                 </div>

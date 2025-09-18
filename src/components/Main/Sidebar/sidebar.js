@@ -58,7 +58,7 @@ const Sidebar = ({ screen, onSelected, content, open }) => {
   ]);
 
   return (
-    <div class={` h-full relative duration-300 flex flex-col ${open ? 'w-72' : 'w-14'}`}>
+    <div class={` h-full  duration-300 ${open ? 'w-72' : 'w-14'}`}>
       <sidebar class='w-full flex flex-col ' >
 
         <header class='h-16  p-3 flex items-center gap-3 cursor-pointer '>

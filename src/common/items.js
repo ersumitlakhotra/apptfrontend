@@ -10,7 +10,11 @@ export function getTabItems  (key, label,icon, children)  {
 };
 
 export function getTableItem(key, label, sort, setSort) {
-    return {key,label,sort,setSort};
+    return { key, label, sort, setSort };
+} 
+
+export function getExcelItem(header, width) {
+    return { key:header, header, width };
 } 
 
 export function getDate(dateTime) {

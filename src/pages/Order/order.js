@@ -1,14 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Button, Drawer, Space, Tabs, Tag } from "antd";
-import { DownloadOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
+import {  PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from "react";
 import OrderDetail from "../../components/Order/order_detail";
 import OrderView from "../../components/Order/order_view";
-import { getTabItems } from "../../common/items.js";
+import {  getTabItems } from "../../common/items.js";
 import dayjs from 'dayjs';
 import OrderTabs from "../../components/Order/tab.js";
 import { LocalDate } from "../../common/localDate.js";
 import LogsView from "../../components/Logs/logs_view.js";
+import ExportToExcel from "../../common/export.js";
 
 const customLabelTab = (label, tagColor, tagValue) => {
     return (
@@ -52,6 +53,7 @@ const Order = ({ orderList, servicesList, userList, companyList, eventList, logs
     const [inprogressList, setInprogressList] = useState([]);
     const [completedList, setCompletedList] = useState([]);
     const [cancelledList, setCancelledList] = useState([]);
+    const [exportList, setExportList] = useState([]);
    
     useEffect(() => {
         if (fromDate === '')
@@ -78,25 +80,26 @@ const Order = ({ orderList, servicesList, userList, companyList, eventList, logs
     }
 
     const tabItems = [
-        getTabItems('1', customLabelTab("All", "cyan", ordersList.length), null, <OrderTabs key={1} orderList={ordersList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
-        getTabItems('2', customLabelTab("Pending", "yellow", pendingList.length), null, <OrderTabs key={2} orderList={pendingList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
-        getTabItems('3', customLabelTab("InProgress", "blue", inprogressList.length), null, <OrderTabs key={3} orderList={inprogressList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
-        getTabItems('4', customLabelTab("Completed", "green", completedList.length), null, <OrderTabs key={4} orderList={completedList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
-        getTabItems('5', customLabelTab("Cancelled", "red", cancelledList.length), null, <OrderTabs key={5} orderList={cancelledList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
+        getTabItems('1', customLabelTab("All", "cyan", ordersList.length), null, <OrderTabs key={1} orderList={ordersList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
+        getTabItems('2', customLabelTab("Pending", "yellow", pendingList.length), null, <OrderTabs key={2} orderList={pendingList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
+        getTabItems('3', customLabelTab("InProgress", "blue", inprogressList.length), null, <OrderTabs key={3} orderList={inprogressList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
+        getTabItems('4', customLabelTab("Completed", "green", completedList.length), null, <OrderTabs key={4} orderList={completedList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
+        getTabItems('5', customLabelTab("Cancelled", "red", cancelledList.length), null, <OrderTabs key={5} orderList={cancelledList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
     ];
   
 
     const btnSave = async () => {
         await ref.current?.save();
     }
-    
+
+
     return (
         <div class="flex flex-col gap-4 mb-12 w-full">
 
             <div class='flex items-center justify-between'>
                 <span class="text-lg font-semibold text-gray-800">Order</span>
-                <div class="flex gap-2">
-                    <Button type='default' icon={<DownloadOutlined />} size="large">Export</Button>
+                <div class="flex gap-2">             
+                    <ExportToExcel data={exportList} fileName="Order" servicesList={servicesList} userList={userList} />
                     <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create order</Button>
                 </div>
             </div>  

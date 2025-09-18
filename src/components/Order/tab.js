@@ -1,17 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import {  Button, DatePicker,  Input,  Popover,   Tooltip} from "antd"
+import {   Button, DatePicker,    Input,  Popover,   Select,   Tooltip} from "antd"
 import { IoSearchOutline } from "react-icons/io5";
 import { getDate, getTableItem } from "../../common/items";
 import DataTable from "../../common/datatable";
 import { useEffect, useState } from "react";
-import {  ContainerOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
+import { ContainerOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { Tags } from "../../common/tags";
 import Services from "../../common/services";
 import AssignedTo from "../../common/assigned_to";
 
 
-const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_ViewClick, btn_LogsClick, refresh, fromDate, setFromDate, toDate, setToDate }) => {
+const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_ViewClick, btn_LogsClick, refresh, fromDate, setFromDate, toDate, setToDate ,setExportList }) => {
   
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(orderList);
@@ -19,26 +19,36 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_View
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
+    const [assigned_to, setAssignedTo] = useState('');
+
     useEffect(() => {
-        setFilteredList(orderList)
+        setFilteredList(orderList);
+        setExportList(orderList);
+        setSearchInput('');
+        setAssignedTo('');
         setPage(1, 10, orderList);
     }, [refresh, orderList])
 
     useEffect(() => {
-        const searchedList = orderList.filter(item => 
-            item.customerinfo[0].name.toLowerCase().includes(searchInput.toLowerCase()) || 
+        let searchedList = orderList.filter(item =>
+            item.customerinfo[0].name.toLowerCase().includes(searchInput.toLowerCase()) ||
             item.order_no.toString().includes(searchInput.toLowerCase()));
-        if (searchInput === '')
+        if (assigned_to !== '')
+            searchedList = searchedList.filter(item => item.assignedto === assigned_to)
+
+        setExportList(searchedList);
+        if (searchInput === '' && assigned_to === '')
             setPage(currentPage, itemsPerPage, searchedList)
         else
             setPage(1, itemsPerPage, searchedList)
-    }, [searchInput])
+    }, [searchInput, assigned_to])
 
     const setPage = (page, pageSize, list = []) => {
         const indexOfLastItem = page * pageSize;
         const indexOfFirstItem = indexOfLastItem - pageSize;
         const searchedList = list.slice(indexOfFirstItem, indexOfLastItem);
-        setFilteredList(searchedList)
+        setFilteredList(searchedList);
+        
     }
  
 
@@ -56,10 +66,22 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_View
     return (
         <div key={key} class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
             <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
-                <div class='w-full md:w-1/3'>
+                <div class='w-full md:w-1/4'>
                     <Input size="large" placeholder="Search" prefix={<IoSearchOutline />} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
                 </div>
-                <div class='w-full md:w-2/3'>
+                <div class='w-full md:w-1/4'>
+                    <Select
+                        value={assigned_to}
+                        style={{ width: '100%' }}
+                        size="large"
+                        onChange={(value) => setAssignedTo(value)}
+                        options={[{ value: '', label: 'All Users' }, ...userList.map(item => ({
+                            value: item.id,
+                            label: <AssignedTo key={item.id} userId={item.id} userList={userList} />                                                                     
+                        }))]}
+                    />
+                </div>
+                <div class='w-full md:w-2/4'>
                     <div class='flex flex-col md:flex-row md:justify-end gap-4 '>
                         <Popover placement="bottom" title={"Filter by From Date"} content={
                             <div>
@@ -85,7 +107,7 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_View
                     {/**/}
                 </div>
             </div>
-            <DataTable headerItems={headerItems} list={(searchInput === '') ? orderList : filteredList}
+            <DataTable headerItems={headerItems} list={(searchInput === '' && assigned_to === '') ? orderList : filteredList}
                 onChange={(page, pageSize) => {
                     setCurrentPage(page);
                     setItemsPerPage(pageSize);

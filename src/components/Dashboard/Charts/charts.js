@@ -70,7 +70,7 @@ const AreaChartCard = ({ categoriesArray, series, color,name }) => {
                 },
                 chart: {
                     redrawOnParentResize: true,
-                    width: '100%',
+                    width: '90%',
                     toolbar: {
                         show: false
                     },
