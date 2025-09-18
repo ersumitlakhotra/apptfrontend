@@ -1,13 +1,15 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable array-callback-return */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Avatar, Button, DatePicker, Dropdown,  Image, Popover, Space, Tag } from "antd";
-import { DownloadOutlined, UserOutlined, DownOutlined } from '@ant-design/icons';
+import {  UserOutlined, DownOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import { Bar, Pie } from '../../components/Sales/graph.js'
 import DataTable from "../../common/datatable";
 import { getTableItem } from "../../common/items";
 import { firstDateOfMonth, lastDateOfMonth } from "../../common/localDate.js";
 import dayjs from 'dayjs';
+import ExportToExcel from "../../common/export.js";
 
 
 const Sales = ({ orderList, userList, expensesList }) => {
@@ -20,7 +22,7 @@ const Sales = ({ orderList, userList, expensesList }) => {
     const [Sales_total, setSales_total] = useState(0);
     const [Expense_total, setExpense_total] = useState(0);
     const [Result_total, setResult_total] = useState(0);
-
+    const [exportList, setExportList] = useState([]);
 
     const [fromDate, setFromDate] = useState(dayjs(firstDateOfMonth(new Date())).format("YYYY-MM-DD"));
     const [toDate, setToDate] = useState(dayjs(lastDateOfMonth(new Date())).format("YYYY-MM-DD"));
@@ -88,10 +90,12 @@ const Sales = ({ orderList, userList, expensesList }) => {
             expense: expense_total.toFixed(2),
             result: result_total.toFixed(2)
         });
+
     }, [orderList, fromDate, toDate])
 
     const handleFilteredList = (newElement) => {
         setFilteredList(prevArray => [...prevArray, newElement]);
+        setExportList(prevArray => [...prevArray, newElement]);
     };
 
     useEffect(() => {     
@@ -154,7 +158,7 @@ const Sales = ({ orderList, userList, expensesList }) => {
 
             <div class='flex items-center justify-between'>
                 <span class="text-lg font-semibold text-gray-800">Sales Report</span>
-                <Button type='default' icon={<DownloadOutlined />} size="large">Export</Button>
+                <ExportToExcel data={exportList} fileName="Sales" servicesList={[]} userList={userList} />
             </div>
 
             <div class='flex flex-col gap-4 w-full md:flex-row'>

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {  Button, DatePicker, Input,  Popconfirm,  Popover,  Tooltip} from "antd"
 import { IoSearchOutline } from "react-icons/io5";
-import { getDate, getTableItem } from "../../common/items";
+import {  getTableItem } from "../../common/items";
 import DataTable from "../../common/datatable";
 import { useEffect, useState } from "react";
 import { DeleteOutlined, EditOutlined, ContainerOutlined } from '@ant-design/icons';
@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 import { UTC_LocalDateTime } from "../../common/localDate";
 
 
-const Expenses = ({ key, expensesData, btn_Click, btn_LogsClick, fromDate, setFromDate, toDate, setToDate, saveData }) => {
+const Expenses = ({ key, expensesData, btn_Click, btn_LogsClick, fromDate, setFromDate, toDate, setToDate, saveData, setExportList }) => {
   
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(expensesData);
@@ -19,12 +19,14 @@ const Expenses = ({ key, expensesData, btn_Click, btn_LogsClick, fromDate, setFr
 
     useEffect(() => {
         setFilteredList(expensesData)
+        setExportList(expensesData)
         setPage(1, 10, expensesData);
     }, [expensesData])
 
   useEffect(() => {
       const searchedList = expensesData.filter(item => 
             item.name.toLowerCase().includes(searchInput.toLowerCase()));
+      setExportList(searchedList);
         if (searchInput === '')
             setPage(currentPage, itemsPerPage, searchedList)
         else
@@ -104,7 +106,7 @@ const Expenses = ({ key, expensesData, btn_Click, btn_LogsClick, fromDate, setFr
                             <td class="p-3 ">$ {item.taxamount}</td>
                             <td class="p-3 ">$ {item.grossamount}</td>
                             <td class="p-3 ">{item.notes}</td>
-                            <td class="p-3">{getDate(item.modifiedat)}</td>
+                            <td class="p-3">{UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A')}</td>
                             <td class="p-3">
                                 <Tooltip placement="top" title={'Edit'} >
                                     <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />

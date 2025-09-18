@@ -3,14 +3,16 @@ import {  useEffect, useRef, useState } from "react";
 import { EditOutlined } from '@ant-design/icons';
 import { IoSearchOutline } from "react-icons/io5";
 import { Badge, Button,  Drawer, Input,  Select,  Space, Tooltip } from "antd";
-import { DownloadOutlined, PlusOutlined, SaveOutlined, ContainerOutlined } from '@ant-design/icons';
+import {  PlusOutlined, SaveOutlined, ContainerOutlined } from '@ant-design/icons';
 import ServiceDetail from "../../components/Services/service_detail";
 import DataTable from "../../common/datatable";
-import {  getTableItem,getDate } from "../../common/items";
+import {  getTableItem } from "../../common/items";
 import { Tags } from "../../common/tags";
 import {Sort} from '../../common/sort.js'
 import { FaSortAlphaDown, FaSortAlphaUp } from "react-icons/fa";
 import LogsView from "../../components/Logs/logs_view.js";
+import ExportToExcel from "../../common/export.js";
+import { UTC_LocalDateTime } from "../../common/localDate.js";
 
 const Services = ({ servicesList, setServicesList, logsList, userList, saveData }) => {
     const ref= useRef();
@@ -27,9 +29,10 @@ const Services = ({ servicesList, setServicesList, logsList, userList, saveData 
 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
-
+    const [exportList, setExportList] = useState([]);
     useEffect(() => {
-        setFilteredList(servicesList)
+        setFilteredList(servicesList);
+        setExportList(servicesList);
         setPage(1, 10, servicesList);
     }, [])
 
@@ -52,6 +55,8 @@ const Services = ({ servicesList, setServicesList, logsList, userList, saveData 
         (item.name.toLowerCase().includes(searchInput.toLowerCase()) &&
             (sortStatus !== '' ? item.status.toLowerCase() === (sortStatus.toLowerCase()) : item.status.toLowerCase().includes('active')
             )));
+
+        setExportList(searchedList);
         if (searchInput === '' && sortStatus === '')
             setPage(currentPage, itemsPerPage, searchedList)
         else
@@ -85,7 +90,7 @@ const Services = ({ servicesList, setServicesList, logsList, userList, saveData 
             <div class='flex items-center justify-between'>
                 <span class="text-lg font-semibold text-gray-800">Services</span>
                 <div class="flex gap-2">
-                    <Button type='default' icon={<DownloadOutlined />} size="large">Export</Button>
+                    <ExportToExcel data={exportList} fileName="Services" servicesList={servicesList} userList={userList} />
                     <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create service</Button>
                 </div>
             </div>
@@ -154,7 +159,7 @@ const Services = ({ servicesList, setServicesList, logsList, userList, saveData 
                             <td class="p-3 ">$ {item.price}</td>
                             <td class="p-3 ">{item.timing}</td>
                             <td class="p-3">{Tags(item.status)}</td>
-                            <td class="p-3">{getDate(item.modifiedat)}</td>
+                            <td class="p-3">{UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A')}</td>
                             <td class="p-3">
                                 <Tooltip placement="top" title={'Edit'} >
                                     <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />

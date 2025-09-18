@@ -1,13 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Badge, Button,  Select, Drawer, Space, Input, Tooltip, Rate, Avatar, Image } from "antd";
-import { DownloadOutlined, EditOutlined, PlusOutlined, SaveOutlined, UserOutlined, ContainerOutlined } from '@ant-design/icons';
+import {  EditOutlined, PlusOutlined, SaveOutlined, UserOutlined, ContainerOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from "react";
 import UserDetail from "../../components/Users/user_detail";
 import { IoSearchOutline } from "react-icons/io5";
 import DataTable from "../../common/datatable";
-import { getDate, getTableItem } from "../../common/items";
+import { getTableItem } from "../../common/items";
 import { Tags } from "../../common/tags";
 import LogsView from "../../components/Logs/logs_view.js";
+import ExportToExcel from "../../common/export.js";
+import { UTC_LocalDateTime } from "../../common/localDate.js";
 
 
 const Users = ({ userList, logsList, saveData }) => {
@@ -28,9 +30,10 @@ const Users = ({ userList, logsList, saveData }) => {
 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
-
+    const [exportList, setExportList] = useState([]);
     useEffect(() => {
-        setFilteredList(userList)
+        setFilteredList(userList);
+        setExportList(userList);
         setPage(1, 10, userList);
     }, [])
 
@@ -39,6 +42,8 @@ const Users = ({ userList, logsList, saveData }) => {
         (item.fullname.toLowerCase().includes(searchInput.toLowerCase()) &&
             (sortStatus !== '' ? item.status.toLowerCase() === (sortStatus.toLowerCase()) : item.status.toLowerCase().includes('active')
             )));
+
+        setExportList(searchedList);
         if (searchInput === '' && sortStatus === '')
             setPage(currentPage, itemsPerPage, searchedList)
         else
@@ -83,7 +88,7 @@ const Users = ({ userList, logsList, saveData }) => {
             <div class='flex items-center justify-between'>
                 <span class="text-lg font-semibold text-gray-800">Users</span>
                 <div class="flex gap-2">
-                    <Button type='default' icon={<DownloadOutlined />} size="large">Export</Button>
+                    <ExportToExcel data={exportList} fileName="User" servicesList={[]} userList={userList} />
                     <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create user</Button>
                 </div>
             </div>
@@ -137,7 +142,7 @@ const Users = ({ userList, logsList, saveData }) => {
                                 <td class="p-3 ">{item.accounttype}</td>
                                 <td class="p-3 "><Rate disabled value={item.rating} /></td>
                                 <td class="p-3 ">{Tags(item.status)}</td>
-                                <td class="p-3 ">{getDate(item.modifiedat)}</td>
+                                <td class="p-3 ">{UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A')}</td>
                                 <td class="p-3">
                                     <Tooltip placement="top" title={'Edit'} >
                                         <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />

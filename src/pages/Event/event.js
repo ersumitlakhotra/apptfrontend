@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Button, Drawer, Space, Tabs, Tag } from "antd"
-import { PlusOutlined, SaveOutlined, DownloadOutlined } from '@ant-design/icons';
+import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from "react";
 import EventDetail from "../../components/Event/event_detail.js";
 import { getTabItems } from "../../common/items.js";
@@ -8,6 +8,7 @@ import Events from '../../components/Event/event.js'
 import LogsView from "../../components/Logs/logs_view.js";
 import dayjs from 'dayjs';
 import { firstDateOfMonth, lastDateOfMonth } from "../../common/localDate.js";
+import ExportToExcel from "../../common/export.js";
 
 const customLabelTab = (label, tagColor, tagValue) => {
     return (
@@ -43,6 +44,7 @@ const Event = ({ eventList, servicesList, logsList, userList, saveData }) => {
     const [liveList, setLiveList] = useState([]);
     const [upcomingList, setUpcomingList] = useState([]);
     const [pastList, setPastList] = useState([]);
+    const [exportList, setExportList] = useState([]);
 
     useEffect(() => {
         const event = eventList.filter(a => (dayjs(a.startdate).format('YYYY-MM-DD') >= fromDate && dayjs(a.startdate).format('YYYY-MM-DD') <= toDate) || 
@@ -59,10 +61,10 @@ const Event = ({ eventList, servicesList, logsList, userList, saveData }) => {
     }, [refresh, eventList, fromDate,toDate])
 
     const tabItems = [
-        getTabItems('1', customLabelTab("All", "cyan", eventList.length), null, <Events eventList={eventTotal} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
-        getTabItems('2', customLabelTab("Live", "green", liveList.length), null, <Events eventList={liveList} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
-        getTabItems('3', customLabelTab("Upcoming", "yellow", upcomingList.length), null, <Events eventList={upcomingList} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />),
-        getTabItems('4', customLabelTab("Past", "red", pastList.length), null, <Events eventList={pastList} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} />)
+        getTabItems('1', customLabelTab("All", "cyan", eventList.length), null, <Events eventList={eventTotal} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
+        getTabItems('2', customLabelTab("Live", "green", liveList.length), null, <Events eventList={liveList} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
+        getTabItems('3', customLabelTab("Upcoming", "yellow", upcomingList.length), null, <Events eventList={upcomingList} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
+        getTabItems('4', customLabelTab("Past", "red", pastList.length), null, <Events eventList={pastList} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />)
     ];
 
     const btnSave = async () => {
@@ -75,7 +77,7 @@ const Event = ({ eventList, servicesList, logsList, userList, saveData }) => {
             <div class='flex items-center justify-between'>
                 <span class="text-lg font-semibold text-gray-800">Events</span>
                 <div class="flex gap-2">
-                    <Button type='default' icon={<DownloadOutlined />} size="large">Export</Button>
+                    <ExportToExcel data={exportList} fileName="Event" servicesList={servicesList} userList={userList} />
                     <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create event</Button>
                 </div>
             </div>

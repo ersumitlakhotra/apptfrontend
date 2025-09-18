@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {   Button, DatePicker,    Input,  Popover,   Select,   Tooltip} from "antd"
 import { IoSearchOutline } from "react-icons/io5";
-import { getDate, getTableItem } from "../../common/items";
+import {  getTableItem } from "../../common/items";
 import DataTable from "../../common/datatable";
 import { useEffect, useState } from "react";
 import { ContainerOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 import { Tags } from "../../common/tags";
 import Services from "../../common/services";
 import AssignedTo from "../../common/assigned_to";
+import { UTC_LocalDateTime } from "../../common/localDate";
 
 
 const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_ViewClick, btn_LogsClick, refresh, fromDate, setFromDate, toDate, setToDate ,setExportList }) => {
@@ -138,7 +139,7 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_View
                             <td class="p-3 font-semibold">$ {item.total}</td>
                             <td class="p-3">{Tags(item.status)}</td>
                             <td class="p-3"><AssignedTo userId={item.assignedto} userList={userList} /></td>
-                            <td class="p-3 ">{getDate(item.modifiedat)}</td>
+                            <td class="p-3 ">{UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A')}</td>
                             <td class="p-3">
                                 <Tooltip placement="top" title={'Edit'} >
                                     <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Button, Drawer,Space, Tabs } from "antd";
-import { DownloadOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
+import {  PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { getTabItems } from "../../common/items";
 import { firstDateOfMonth,lastDateOfMonth } from "../../common/localDate.js";
 import Payments from '../../components/Payment/payments.js'
@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 import ExpensesDetail from "../../components/Payment/expenses_detail.js";
 import PaymentsDetail from "../../components/Payment/payments_detail.js";
 import LogsView from "../../components/Logs/logs_view.js";
+import ExportToExcel from "../../common/export.js";
 
 const Payment = ({ expensesList, userList, logsList, saveData, tabActiveKey, setTabActiveKey }) => {
     const ref = useRef();
@@ -31,6 +32,7 @@ const Payment = ({ expensesList, userList, logsList, saveData, tabActiveKey, set
 
     const [expensesData, setExpensesData] = useState([]);
     const [paymentData, setPaymentData] = useState([]);
+    const [exportList, setExportList] = useState([]);
 
     useEffect(() => {
         setExpensesData(expensesList.filter(a => a.etype.toUpperCase() === 'EXPENSE' && dayjs(a.trndate).format('YYYY-MM-DD') >= fromDateExpenses && dayjs(a.trndate).format('YYYY-MM-DD') <= toDateExpenses));
@@ -58,8 +60,8 @@ const Payment = ({ expensesList, userList, logsList, saveData, tabActiveKey, set
     }
  
     const tabItems = [
-        getTabItems('1', 'Expenses', null, <Expenses key={1} expensesList={expensesList} expensesData={expensesData} userList={userList} btn_Click={btn_Click_Expense} btn_LogsClick={btn_LogsClick} fromDate={fromDateExpenses} setFromDate={setFromDateExpenses} toDate={toDateExpenses} setToDate={setToDateExpenses} saveData={saveData} /> ),
-        getTabItems('2', 'Payments', null, <Payments key={2} expensesList={expensesList} expensesData={paymentData} userList={userList} btn_Click={btn_Click_Payment} btn_LogsClick={btn_LogsClick} fromDate={fromDatePayment} setFromDate={setFromDatePayment} toDate={toDatePayment} setToDate={setToDatePayment} saveData={saveData} /> )
+        getTabItems('1', 'Expenses', null, <Expenses key={1} expensesList={expensesList} expensesData={expensesData} userList={userList} btn_Click={btn_Click_Expense} btn_LogsClick={btn_LogsClick} fromDate={fromDateExpenses} setFromDate={setFromDateExpenses} toDate={toDateExpenses} setToDate={setToDateExpenses} saveData={saveData} setExportList={setExportList} /> ),
+        getTabItems('2', 'Payments', null, <Payments key={2} expensesList={expensesList} expensesData={paymentData} userList={userList} btn_Click={btn_Click_Payment} btn_LogsClick={btn_LogsClick} fromDate={fromDatePayment} setFromDate={setFromDatePayment} toDate={toDatePayment} setToDate={setToDatePayment} saveData={saveData} setExportList={setExportList} /> )
     ];
 
     return (
@@ -68,7 +70,7 @@ const Payment = ({ expensesList, userList, logsList, saveData, tabActiveKey, set
             <div class='flex items-center justify-between'>
                 <span class="text-lg font-semibold text-gray-800">Payment</span>
                 <div class="flex gap-2">
-                    <Button type='default' icon={<DownloadOutlined />} size="large">Export</Button>
+                    <ExportToExcel data={exportList} fileName={tabActiveKey === '1' ? 'Expense':'Payment'} servicesList={[]} userList={userList} />
                     <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click_Expense(0)}>Create expense</Button>
                     <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click_Payment(0)}>Create payment</Button>
                 </div>
