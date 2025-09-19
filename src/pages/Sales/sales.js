@@ -10,9 +10,10 @@ import { getTableItem } from "../../common/items";
 import { firstDateOfMonth, lastDateOfMonth } from "../../common/localDate.js";
 import dayjs from 'dayjs';
 import ExportToExcel from "../../common/export.js";
+import { YearsList } from "../../common/yearslist.js";
 
 
-const Sales = ({ orderList, userList, expensesList }) => {
+const Sales = ({ orderList, userList, expensesList, companyList }) => {
     const [barChart, setBarChart] = useState(null);
     const [PieChart, setPieChart] = useState(null);
 
@@ -23,15 +24,20 @@ const Sales = ({ orderList, userList, expensesList }) => {
     const [Expense_total, setExpense_total] = useState(0);
     const [Result_total, setResult_total] = useState(0);
     const [exportList, setExportList] = useState([]);
+    const [yearList, setYearList] = useState(YearsList(new Date().getFullYear())); 
 
     const [fromDate, setFromDate] = useState(dayjs(firstDateOfMonth(new Date())).format("YYYY-MM-DD"));
     const [toDate, setToDate] = useState(dayjs(lastDateOfMonth(new Date())).format("YYYY-MM-DD"));
+   
+    useEffect(() => {
+        setYearList(YearsList(new Date(companyList.createdat).getFullYear()));
+    }, [companyList])
 
     useEffect(() => {
         const order = orderList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') >= fromDate && dayjs(a.trndate).format('YYYY-MM-DD') <= toDate);
         const expense = expensesList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') >= fromDate && dayjs(a.trndate).format('YYYY-MM-DD') <= toDate && a.etype === 'Expense');
         const payment = expensesList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') >= fromDate && dayjs(a.trndate).format('YYYY-MM-DD') <= toDate && a.etype === 'Payment');
-        setFilteredList([]);
+        setFilteredList([]); setExportList([]);
         setSales_total(0);
         setExpense_total(0);
         setResult_total(0);
@@ -134,19 +140,9 @@ const Sales = ({ orderList, userList, expensesList }) => {
         setPieChart(<Pie series={seriesArray} />)
     }, [currentYear])
 
-    const items = [
-        { key: '2025', label: '2025' },
-        { key: '2026', label: '2026' },
-        { key: '2027', label: '2027' },
-        { key: '2028', label: '2028' },
-    ];
-    const handleMenuClick = e => {
-        setCurrentYear(e.key)
-    };
-    const menuProps = {
-        items,
-        onClick: handleMenuClick,
-    };
+    const onYearChanged = e => { setCurrentYear(e.key) };
+    const menuProps = { items: yearList, onClick: onYearChanged, };
+
     const headerItems = [
         getTableItem('1', 'User'),
         getTableItem('2', 'Sales'),

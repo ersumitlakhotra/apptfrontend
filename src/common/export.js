@@ -185,10 +185,6 @@ const ExportToExcel = ({ data, fileName, servicesList, userList }) => {
       default: { break; }
     }
 
-    // Add rows from your data
-    worksheet.addRow(1)
-
-    // Generate buffer and save
     try {
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], {

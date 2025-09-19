@@ -13,7 +13,7 @@ import { lastDateOfMonth, LocalDate } from "../../common/localDate.js";
 import dayjs from 'dayjs';
 import { AreaChartCard } from "../../components/Dashboard/Charts/charts.js";
 
-const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList, logsList, onSelected }) => {  
+const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList, logsList, companyList, onSelected }) => {  
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
     const [orderChart, setOrderChart] = useState(null);
     const [totalOrders, setTotalOrders] = useState(0);
@@ -23,6 +23,11 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList,
     const [totalExpenses, setTotalExpenses] = useState(0);
     const [revenueChart, setRevenueChart] = useState(null);
     const [totalRevenue, setTotalRevenue] = useState(0);
+    const [yearList, setYearList] = useState(YearsList(new Date().getFullYear())); 
+
+    useEffect(() => {
+        setYearList(YearsList(new Date(companyList.createdat).getFullYear()));
+    }, [companyList])
 
     useEffect(() => {
         let categoryArray = [];
@@ -88,8 +93,8 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList,
 
             <div class='flex flex-col gap-4 mt-4  w-full md:flex-row'>
                 <div class='flex flex-col gap-4 w-full md:w-4/6'>
-                    <Appointment orderList={orderList} yearList={YearsList(2023)} months={months} />
-                    <AnnualReport orderList={orderList} expensesList={expensesList} yearList={YearsList(2023)} months={months} />   
+                    <Appointment orderList={orderList} yearList={yearList} months={months} />
+                    <AnnualReport orderList={orderList} expensesList={expensesList} yearList={yearList} months={months} />   
                     <Task orderList={orderList} userList={userList} />                   
                 </div>
                 <div class='flex flex-col gap-4 w-full md:w-2/6'>

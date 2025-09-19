@@ -82,7 +82,6 @@ const MasterPage = () => {
     const companyId = localStorage.getItem('cid');
     if (!companyId) {
       navigate("/");
-      console.log("ref")
     }
   }, [navigate, signout]);
 
@@ -150,6 +149,7 @@ const MasterPage = () => {
     switch (content) {
       case "Dashboard":
         {
+          getData(setCompanyList, "company");
           getData(setServicesList,"services");
           getData(setUserList,"user");
           getData(setExpenseList,"payment");
@@ -200,7 +200,8 @@ const MasterPage = () => {
           break;
         }
       case 'Sales':
-        {     
+        {
+          getData(setCompanyList, "company");
           getData(setUserList,"user");  
           getData(setExpenseList,"payment");
           getData(setOrderList,"order");
@@ -231,7 +232,8 @@ const MasterPage = () => {
         userList={userList}
         expensesList={expenseList}
         eventList={eventList}
-        logsList={logsList}
+        logsList={logsList} 
+        companyList={companyList}
         onSelected={onSelected}
         refresh={refresh}
       />;
@@ -300,6 +302,7 @@ const MasterPage = () => {
         orderList={orderList}
         userList={userList}
         expensesList={expenseList}
+        companyList={companyList}
       />;
   } else if (content === 'Setting') {
     displayedContent =
