@@ -17,12 +17,11 @@ function getItem(key, label, icon, extra, disabled, danger) {
     danger,
   };
 }
-const Header = ({ onSignout, open, setOpen, getData, saveData, refresh }) => {
+const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermissionInfo }) => {
   const ref = useRef();
   const [userList, setUserList] = useState([]);
   const [id, setId] = useState('0');
   const [fullname, setFullname] = useState('');
-  const [permission, setPermission] = useState('YYYYYYYYYY');
   const [profilepic, setProfile] = useState(null);
   const [openAccount, setOpenAccount] = useState(false);
 
@@ -39,9 +38,22 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh }) => {
   useEffect(() => {
     if (userList.length > 0) {
       userList.filter(a => a.id === id).map(b => {
-       setFullname(b.fullname);
-        setPermission(b.permission);
+        setFullname(b.fullname);
+        setPermissionInfo(b.permissioninfo);
         setProfile(b.profilepic);
+        setItems([
+          getItem('1',
+            <div class='flex flex-row gap-4'>
+              <AssignedTo userId={id} userList={userList} imageWidth={60} imageHeight={60} AvatarSize={60} allowText={false} preview={false} />
+              <div class='flex flex-col'>
+                <p>{b.fullname} </p>
+                <p>{b.cell} </p>      
+              </div>
+          </div> , null, null,true),
+          { type: 'divider', },
+          getItem('9', 'Sign Out', <LogoutOutlined />, null, null, true),
+        ])
+{/*
         setItems([
           getItem('1', b.fullname, null, null, true),
           { type: 'divider', },
@@ -56,7 +68,7 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh }) => {
           getItem('8', 'Limited Access', <ClockCircleOutlined />),
           { type: 'divider', },
           getItem('9', 'Sign Out', <LogoutOutlined />, null, null, true),
-        ])
+        ])*/}
       })   
     }
   }, [userList]);
@@ -87,11 +99,14 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh }) => {
   return (
     <div class='flex items-center justify-between p-3 pe-8 overflow-x-hidden '>
       <MenuUnfoldOutlined className='cursor-pointer' onClick={() => setOpen(!open)} />
-      <Dropdown menu={menuProps} overlayStyle={{ width: '250px', gap: 5 }}>
-        <Space>
-          <AssignedTo userId={id} userList={userList} imageWidth={40} imageHeight={40} AvatarSize={40} allowText={false}  />        
-        </Space>
-      </Dropdown>
+      <div class='flex flex-row gap-2'>
+        <Dropdown menu={menuProps} overlayStyle={{ width: '250px', gap: 5 }}>
+          <Space>
+            <AssignedTo userId={id} userList={userList} imageWidth={40} imageHeight={40} AvatarSize={40} allowText={false} preview={false} />
+          </Space>
+        </Dropdown>
+      </div>
+     
 
       <Drawer title={"Account"} placement='right' width={500} onClose={() => setOpenAccount(false)} open={openAccount}
         extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>

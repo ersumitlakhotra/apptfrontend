@@ -29,6 +29,9 @@ const MasterPage = () => {
   const [open, setOpen] = useState(true);
   const {contextHolder, success, error } = useAlert();
 
+
+  const [permissioninfo, setPermissionInfo] = useState(null);
+
   const [settingActiveTab, setSettingActiveTab] = useState('1');
   const [paymentActiveTab, setPaymentActiveTab] = useState('1');
 
@@ -63,6 +66,8 @@ const MasterPage = () => {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
+  
+ 
 
   useEffect(
     () => {
@@ -145,6 +150,7 @@ const MasterPage = () => {
     }  
     setIsLoading(false);
   }
+
   useEffect(() => {
     switch (content) {
       case "Dashboard":
@@ -224,7 +230,7 @@ const MasterPage = () => {
   },[refresh]);
 
   let displayedContent;
-  if (content === 'Dashboard') {
+  if (content === 'Dashboard' ) {
     displayedContent =
       <Dashboard
         orderList={orderList}
@@ -313,15 +319,15 @@ const MasterPage = () => {
         logoList={logoList}
         tabActiveKey={settingActiveTab}
         setTabActiveKey={setSettingActiveTab}
-      />;
+      />;    
   }
 
   return (
     <div class='h-screen w-full flex flex-row '>
-      <Sidebar onSelected={onSelected} content={content} open={open} />
+      <Sidebar onSelected={onSelected} content={content} open={open} permissioninfo={permissioninfo} />
       <div class='flex flex-col w-full bg-gray-50 '>
         <header class='h-16 border-b bg-white '>
-          <Header onSignout={onSetSignout} open={open} setOpen={setOpen} getData={getData} saveData={saveData} refresh={refresh}  />
+          <Header onSignout={onSetSignout} open={open} setOpen={setOpen} getData={getData} saveData={saveData} refresh={refresh} setPermissionInfo={setPermissionInfo}  />
         </header>
         <section class='overflow-y-scroll p-8 w-full'>
           {isLoading ? (

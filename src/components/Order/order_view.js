@@ -22,6 +22,7 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList }) => {
     const [assigned_to, setAssignedTo] = useState('');
     const [createdat, setCreatedat] = useState(new Date());
     const [slot, setSlot] = useState('');
+    const [bookedvia, setBookedVia] = useState('Walk-In');
     const [servicesItem, setServicesItem] = useState([]);
     //const filteredOptionsServices = servicesList.filter(o => !selectedItems.includes(o));
 
@@ -29,7 +30,7 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList }) => {
         if (id === 0) {
             setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');
             setStatus('Pending'); setPrice('0'); setTax('0'); setTotal('0'); setDiscount('0'); setCoupon(''); setTaxAmount('0'); setTrnDate(''); setCreatedat(new Date());
-            setAssignedTo(''); setOrderNo(''); setServicesItem([]); setSlot('');
+            setAssignedTo(''); setOrderNo(''); setServicesItem([]); setSlot(''); setBookedVia('Walk-In')
         }
         else {
             const editList = orderList.find(item => item.id === id)
@@ -51,8 +52,9 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList }) => {
             setTaxAmount(editList.taxamount); 
             setTotal(editList.total);
             setCoupon(editList.coupon);
-            setDiscount(editList.discount); 
+            setDiscount(editList.discount);
             setSlot(editList.slot);
+            setBookedVia(editList.bookedvia);
         }
     }, [refresh])
 
@@ -60,14 +62,14 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList }) => {
         <div class="flex flex-col gap-2 mb-12  w-full">
             <div class='flex items-center justify-between'>
                 <span class="text-2xl font-bold text-gray-800">Order #{order_no}</span>
-                <div class="flex gap-2">
+                {/*<div class="flex gap-2">
                     <Button type='default' icon={<PrinterOutlined />} size="middle">Print</Button>
                     <Button type='default' icon={<MailOutlined />} size="middle">Email</Button>
                     <Button type='default' icon={<DownloadOutlined />} size="middle">Export</Button>
-                </div>
+                </div>*/}
             </div>
             <div class='flex text-xs text-gray-500'>
-                <p>Order History / Via Appointment / #{order_no} - {UTC_LocalDateTime(createdat, 'MMMM, DD YYYY - hh:mm A ')}</p>
+                <p>Order History / Via {bookedvia} / #{order_no} - {UTC_LocalDateTime(createdat, 'MMMM, DD YYYY - hh:mm A ')}</p>
             </div>
 
             <div class='flex flex-col md:flex-row gap-4 mt-6'>
@@ -136,7 +138,7 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList }) => {
                                 <span class="text-lg font-bold text-gray-800">Payment</span>
                                 <span class="text-xs text-gray-400">Final Payment Amount</span>
                             </div>
-                            <Button type='default' icon={<DownloadOutlined />} size="middle">Download Invoice</Button>
+                            {/*<Button type='default' icon={<DownloadOutlined />} size="middle">Download Invoice</Button>*/}
                         </div>
 
                         <div class='border rounded bg-gray-100 flex flex-col gap-2 p-4 px-8'>

@@ -4,8 +4,8 @@ import { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Avatar,  Button,  Image,  Rate, Tabs } from "antd";
 import { CloudUploadOutlined, EyeOutlined, UserOutlined } from '@ant-design/icons';
 import UserAbout from "./about.js";
-import UserLoginDetail from "./detail.js";
 import useAlert from "../../common/alert.js";
+import UserLoginPermissions from "./permissions.js";
 
 function getTabItems(key, label, icon, children) {
     return {key,label,children,icon,};
@@ -21,10 +21,21 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
     const [password, setPassword] = useState('');
     const [role, setRole] = useState('Employee');
     const [rating, setRating] = useState(0);
-    const [permission, setPermission] = useState('YYYYYYYYYY');
     const [accounttype, setAccountType] = useState('Basic');
     const [profilepic, setProfile] = useState(null);
     const [status, setStatus] = useState('Active');
+
+
+    const [dashboard, setDashboard] = useState(false);
+    const [tasks, setTasks] = useState(false);
+    const [order, setOrder] = useState(false);
+    const [event, setEvent] = useState(false);
+    const [payment, setPayment] = useState(false);
+    const [services, setServices] = useState(false);
+    const [users, setUsers] = useState(false);
+    const [sales, setSales] = useState(false);
+    const [setting, setSetting] = useState(false);
+
     const { contextHolder, error, warning } = useAlert();
     let refimage=useRef();
 
@@ -33,8 +44,10 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
             setFullname('');
             setCell(''); setEmail(''); setAddress('');
             setUsername(''); setPassword(''); setRole('Employee'); setRating(0); 
-            setPermission('YYYYYYYYYY'); setAccountType('Basic'); setProfile(null);
-            setGender('Male'); setStatus('Active'); setTabActiveKey("1");
+           setAccountType('Basic'); setProfile(null);
+            setGender('Male'); setStatus('Active'); setTabActiveKey("1"); 
+            setDashboard(false); setTasks(false); setOrder(false); setEvent(false); setPayment(false);
+            setServices(false); setUsers(false); setSales(false); setSetting(false); 
         }
         else {
             const editList = userList.find(item => item.id === id)
@@ -47,13 +60,65 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
             setPassword(editList.password);
             setRole(editList.role);
             setRating(editList.rating);
-            setPermission(editList.permission);
             setAccountType(editList.accounttype);
             setProfile(editList.profilepic)
             setStatus(editList.status);
+            if (editList.permissioninfo !== null) {
+                setDashboard(editList.permissioninfo[0].dashboard);
+                setTasks(editList.permissioninfo[0].tasks);
+                setOrder(editList.permissioninfo[0].order);
+                setEvent(editList.permissioninfo[0].event);
+                setPayment(editList.permissioninfo[0].payment);
+                setServices(editList.permissioninfo[0].services);
+                setUsers(editList.permissioninfo[0].users);
+                setSales(editList.permissioninfo[0].sales);
+                setSetting(editList.permissioninfo[0].setting);
+            }
+            else { setDashboard(false); setTasks(false); setOrder(false); setEvent(false); setPayment(false); 
+                setServices(false); setUsers(false); setSales(false); setSetting(false); }
         }
     }, [refresh])
 
+    function getPermission (){
+        if (role === 'Employee') {
+            return [{
+                dashboard: false,
+                tasks: false,
+                order: false,
+                event: false,
+                payment: false,
+                services: false,
+                users: false,
+                sales: false,
+                setting: false,
+            }]
+        } if (role === 'Administrator') {
+            return [{
+                dashboard: true,
+                tasks: true,
+                order: true,
+                event: true,
+                payment: true,
+                services: true,
+                users: true,
+                sales: true,
+                setting: true,
+            }]
+        }  
+        if (role === 'User') {
+            return [{
+                dashboard: dashboard,
+                tasks: tasks,
+                order: order,
+                event: event,
+                payment: payment,
+                services: services,
+                users: users,
+                sales: sales,
+                setting: setting,
+            }]
+        }
+    }
     const save = async () => {
         if (fullname !== '' && password !== '') {
             const Body = JSON.stringify({
@@ -65,7 +130,7 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
                 password: password,
                 role: role,
                 rating: rating,
-                permission: permission,
+                permissioninfo: getPermission(),
                 status: status,
                 accounttype: accounttype,
                 profilepic: profilepic
@@ -93,17 +158,35 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
             address={address}
             setAddress={setAddress}
             gender={gender}
-            setGender={setGender}
-            />),
-        getTabItems('2', 'Detail', <EyeOutlined />, <UserLoginDetail
-            username={username}
+            setGender={setGender} username={username}
             password={password}
             setPassword={setPassword}
             role={role}
             setRole={setRole}
             status={status}
             setStatus={setStatus}
-        />),
+            />),
+            (role === 'User' &&
+        getTabItems('2', 'Permissions', <EyeOutlined />, <UserLoginPermissions
+            dashboard={dashboard}
+            setDashboard={setDashboard}
+            tasks={tasks}
+            setTasks={setTasks}
+            order={order}
+            setOrder={setOrder}
+            event={event}
+            setEvent={setEvent}
+            payment={payment}
+            setPayment={setPayment}
+            services={services}
+            setServices={setServices}
+            users={users}
+            setUsers={setUsers}
+            sales={sales}
+            setSales={setSales}
+            setting={setting}
+            setSetting={setSetting}
+        />))
     ];
     const handleFileChange = (event) => {
         const file = event.target.files[0]; // Access the first selected file
