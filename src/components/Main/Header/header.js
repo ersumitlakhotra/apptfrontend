@@ -1,7 +1,7 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Space, Dropdown, Drawer, Button } from 'antd';
-import { MenuUnfoldOutlined, SaveOutlined, BellOutlined, BookOutlined, ClockCircleOutlined, LockOutlined, LogoutOutlined, QuestionCircleOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { Space, Dropdown, Drawer, Button, Badge } from 'antd';
+import { MenuUnfoldOutlined, SaveOutlined, BellOutlined, BookOutlined, ClockCircleOutlined, LockOutlined, LogoutOutlined, QuestionCircleOutlined, SettingOutlined, UserOutlined, BellFilled } from '@ant-design/icons';
 
 import { useEffect, useRef, useState } from 'react';
 import AssignedTo from '../../../common/assigned_to.js';
@@ -44,7 +44,7 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermi
         setItems([
           getItem('1',
             <div class='flex flex-row gap-4'>
-              <AssignedTo userId={id} userList={userList} imageWidth={60} imageHeight={60} AvatarSize={60} allowText={false} preview={false} />
+              <AssignedTo userId={id} userList={userList} imageWidth={40} imageHeight={40} AvatarSize={40} allowText={false} preview={false} />
               <div class='flex flex-col'>
                 <p>{b.fullname} </p>
                 <p>{b.cell} </p>      
@@ -99,12 +99,16 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermi
   return (
     <div class='flex items-center justify-between p-3 pe-8 overflow-x-hidden '>
       <MenuUnfoldOutlined className='cursor-pointer' onClick={() => setOpen(!open)} />
-      <div class='flex flex-row gap-2'>
+      <div class='flex flex-row gap-6 mt-1 cursor-pointer'>
+        <Badge count={5}>
+          <BellFilled style={{ fontSize: '22px', marginTop:6, color: 'gray' }} />
+        </Badge>
         <Dropdown menu={menuProps} overlayStyle={{ width: '250px', gap: 5 }}>
           <Space>
-            <AssignedTo userId={id} userList={userList} imageWidth={40} imageHeight={40} AvatarSize={40} allowText={false} preview={false} />
+            <AssignedTo userId={id} userList={userList} imageWidth={30} imageHeight={30} AvatarSize={30} allowText={false} preview={false} />
           </Space>
         </Dropdown>
+       
       </div>
      
 

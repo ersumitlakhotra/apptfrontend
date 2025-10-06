@@ -61,7 +61,7 @@ const Event = ({ eventList, servicesList, logsList, userList, saveData }) => {
     }, [refresh, eventList, fromDate,toDate])
 
     const tabItems = [
-        getTabItems('1', customLabelTab("All", "cyan", eventList.length), null, <Events eventList={eventTotal} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
+        getTabItems('1', customLabelTab("All", "cyan", eventTotal.length), null, <Events eventList={eventTotal} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
         getTabItems('2', customLabelTab("Live", "green", liveList.length), null, <Events eventList={liveList} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
         getTabItems('3', customLabelTab("Upcoming", "yellow", upcomingList.length), null, <Events eventList={upcomingList} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
         getTabItems('4', customLabelTab("Past", "red", pastList.length), null, <Events eventList={pastList} servicesList={servicesList} btn_Click={btn_Click} btn_LogsClick={btn_LogsClick} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />)

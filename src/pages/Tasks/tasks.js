@@ -1,9 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {  Button, Drawer } from "antd"
 import { useEffect, useState } from "react";
 
 import { RightOutlined, LeftOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import Calender from "../../components/Event/calender";
+import Calender from "../../components/Task/calender";
 import OrderView from "../../components/Order/order_view";
 
 const Tasks = ({ orderList, servicesList, userList, companyList, screenWidth }) => {
@@ -30,7 +31,8 @@ const Tasks = ({ orderList, servicesList, userList, companyList, screenWidth }) 
         setOpenView(true);
     }
     return (
-        <div class="flex flex-col gap-4 mb-12">
+        <div class="flex flex-col gap-4 mb-12  w-full">
+            
             <div class='flex  items-center justify-between'>
                 <span class="text-lg font-semibold text-gray-800">Task</span>
                 <div class='flex flex-row items-center'>
@@ -39,9 +41,11 @@ const Tasks = ({ orderList, servicesList, userList, companyList, screenWidth }) 
                     <Button color="default" variant="outlined" icon={<RightOutlined/>} style={{ borderRadius: 0, borderTopRightRadius: 6, borderBottomRightRadius: 6 }} onClick={()=>setDate(dayjs(date).add(1, 'day'))} />
                 </div>
             </div>
+
             <div class={`w-full bg-white border rounded-lg py-2 max-h-[700px] overflow-auto`}>
                 <Calender orderList={orders} servicesList={servicesList} userList={userList} companyList={companyList} trndate={date} refresh={refresh} btn_ViewClick={btn_ViewClick} />            
             </div>
+
             {/* Drawer on View*/}
             <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
                 <OrderView id={id} refresh={refresh} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} />

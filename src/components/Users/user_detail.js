@@ -40,12 +40,13 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
     let refimage=useRef();
 
     useEffect(() => {
+        setTabActiveKey("1"); 
         if (id === 0) {
             setFullname('');
             setCell(''); setEmail(''); setAddress('');
             setUsername(''); setPassword(''); setRole('Employee'); setRating(0); 
            setAccountType('Basic'); setProfile(null);
-            setGender('Male'); setStatus('Active'); setTabActiveKey("1"); 
+            setGender('Male'); setStatus('Active');
             setDashboard(false); setTasks(false); setOrder(false); setEvent(false); setPayment(false);
             setServices(false); setUsers(false); setSales(false); setSetting(false); 
         }

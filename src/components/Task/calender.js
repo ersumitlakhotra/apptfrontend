@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import { useEffect, useState } from "react";
-import { Avatar, Image, Tag } from "antd";
+import { Avatar, Image } from "antd";
 
 import { UserOutlined } from '@ant-design/icons';
 import { generateTimeSlots } from "../../common/intervals";
@@ -84,8 +85,7 @@ const Calender = ({ orderList, servicesList, userList, companyList, trndate, btn
 
         }
     }
-    return (
-        
+    return (   
         <table class={`text-left h-fit w-full`}>
             <thead class="h-12 sticky top-0 z-40 text-gray-700 font-medium bg-zinc-50">
                 <tr key={-1}>
