@@ -5,7 +5,7 @@ import { MenuUnfoldOutlined, SaveOutlined, BellOutlined, BookOutlined, ClockCirc
 
 import { useEffect, useRef, useState } from 'react';
 import AssignedTo from '../../../common/assigned_to.js';
-import UserDetail from '../../Users/user_detail.js';
+import NotificationDetail from '../Notification/notification_detail.js';
 
 function getItem(key, label, icon, extra, disabled, danger) {
   return {
@@ -18,22 +18,32 @@ function getItem(key, label, icon, extra, disabled, danger) {
   };
 }
 const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermissionInfo }) => {
-  const ref = useRef();
   const [userList, setUserList] = useState([]);
+  const [notificationList, setNotificationList] = useState([]);
   const [id, setId] = useState('0');
   const [fullname, setFullname] = useState('');
   const [profilepic, setProfile] = useState(null);
-  const [openAccount, setOpenAccount] = useState(false);
+  const [openNotification, setOpenNotification] = useState(false);
+  const [unread, setUnread] = useState([]);
+  const [unreadUpdate, setUnreadUpdate] = useState(false);
+  const [tabActiveKey, setTabActiveKey] = useState("1");
 
-  const btnSave = async () => {
-    await ref.current?.save();
-  }
+
   const [items, setItems] = useState([]);
 
   useEffect(() => {
     setId(localStorage.getItem('uid'));
     getData(setUserList, "user");
-  }, []);
+    getData(setNotificationList, "notification");
+  }, [refresh]); 
+  
+  
+  useEffect(() => {
+    const unread = notificationList.filter(a => a.read === '1');
+    setUnread(unread.length > 0 ? unread:[])
+  }, [notificationList]);
+
+
 
   useEffect(() => {
     if (userList.length > 0) {
@@ -75,11 +85,6 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermi
 
   const handleMenuClick = e => {
     switch (e.key) {
-      case '2': // Account
-        {
-          setOpenAccount(true);         
-          break;
-        }
       case '9': // Sign Out
         {
           localStorage.removeItem('cid');
@@ -89,32 +94,44 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermi
         }
       default: {  break; }
     }
-
   };
   const menuProps = {
     items,
     onClick: handleMenuClick
   };
 
+  const updateOnClose = () => {
+    unreadUpdate && save();
+    setOpenNotification(false);
+  }
+
+  const save = async () => {
+    unread.map(item => {
+      const Body = JSON.stringify({
+        message: item.message,
+        read: 0,
+      });
+      saveData("Notification", 'PUT', "notification", item.id, Body, false);
+    })
+  }
+ 
   return (
     <div class='flex items-center justify-between p-3 pe-8 overflow-x-hidden '>
       <MenuUnfoldOutlined className='cursor-pointer' onClick={() => setOpen(!open)} />
       <div class='flex flex-row gap-6 mt-1 cursor-pointer'>
-        <Badge count={5}>
-          <BellFilled style={{ fontSize: '22px', marginTop:6, color: 'gray' }} />
+        <Badge count={unread.length}>
+          <BellFilled style={{ fontSize: '22px', marginTop: 6, color: 'gray' }} onClick={() => { setOpenNotification(true); setUnreadUpdate(false); setTabActiveKey('1'); }} />
         </Badge>
         <Dropdown menu={menuProps} overlayStyle={{ width: '250px', gap: 5 }}>
           <Space>
             <AssignedTo userId={id} userList={userList} imageWidth={30} imageHeight={30} AvatarSize={30} allowText={false} preview={false} />
           </Space>
         </Dropdown>
-       
-      </div>
-     
 
-      <Drawer title={"Account"} placement='right' width={500} onClose={() => setOpenAccount(false)} open={openAccount}
-        extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
-        <UserDetail id={id} refresh={refresh} ref={ref} userList={userList} saveData={saveData} setOpen={setOpenAccount} />
+      </div>
+
+      <Drawer title={"Notification"} placement='right' width={400} onClose={() => updateOnClose()} open={openNotification}>
+        <NotificationDetail refresh={refresh} notificationList={notificationList} setUnreadUpdate={setUnreadUpdate} tabActiveKey={tabActiveKey} setTabActiveKey={setTabActiveKey} />
       </Drawer>
     </div>
   )

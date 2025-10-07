@@ -42,7 +42,7 @@ function LocalDateTime() {
 };
 function UTC_LocalDateTime(value,format=null) {
     var utc = require("dayjs/plugin/utc");
-
+    
     dayjs.extend(utc);
 
     // default local time
@@ -57,7 +57,14 @@ function UTC_LocalDateTime(value,format=null) {
     // While in UTC mode, all display methods will display in UTC time instead of local time.
     // And all getters and setters will internally use the Date#getUTC* and Date#setUTC* methods instead of the Date#get* and Date#set* methods.
     dayjs.utc().isUTC(); // true
+
     return dayjs(value).utc().local().format(format === null ? "YYYY-MM-DD, hh:mm A ":format); //2019-03-06T17:11:55+08:00
+};
+
+function UTC_LocalDateTime_relative(value) {
+    var relativeTime = require("dayjs/plugin/relativeTime");
+    dayjs.extend(relativeTime);    
+    return dayjs(UTC_LocalDateTime(value, "YYYY-MM-DD")).fromNow(); //2019-03-06T17:11:55+08:00
 };
 
 const firstDateOfMonth = (date = new Date()) =>
@@ -66,4 +73,4 @@ const firstDateOfMonth = (date = new Date()) =>
 const lastDateOfMonth = (date = new Date()) =>
     new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
-export { LocalDate, LocalDateTime, UTC_LocalDateTime, firstDateOfMonth, lastDateOfMonth }
+export { LocalDate, LocalDateTime, UTC_LocalDateTime, firstDateOfMonth, lastDateOfMonth, UTC_LocalDateTime_relative }

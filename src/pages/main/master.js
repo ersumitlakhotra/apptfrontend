@@ -122,13 +122,15 @@ const MasterPage = () => {
     setIsLoading(false);
   } 
   
-  const saveData = async (label, method, endPoint, id = null, body = null) => {
+  const saveData = async (label, method, endPoint, id = null, body = null,notify=true) => {
     setIsLoading(true);
     try {
       const result = await apiCalls(method, endPoint, id, body);
 
       if (result.status === 500 || result.status === 404)
-        error(result.message);
+      {
+        notify && error(result.message);
+      }
       else {
         let status = result.status === 201 ? 'Created' : result.status === 200 ? 'Modified' : 'Deleted'
         const Log = JSON.stringify({
@@ -140,13 +142,13 @@ const MasterPage = () => {
           datainfo: [body] 
         });
         await apiCalls('POST', 'logs', null, Log);
-        success(`The ${label} has been ${status} successfully.`);
+        notify && success(`The ${label} has been ${status} successfully.`);
         setRefresh(refresh + 1)
       }
 
     }
     catch (e) {
-      error(error.message)
+      notify && error(error.message)
     }  
     setIsLoading(false);
   }
