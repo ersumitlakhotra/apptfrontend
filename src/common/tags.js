@@ -15,12 +15,14 @@ export function Tags(value) {
         case 'COMPLETED':
         case 'ACTIVE':
         case 'LIVE':
+        case 'PAID':
             {
                 return <Tag color='green'>{value}</Tag>
             }
         case 'CANCELLED':
         case 'INACTIVE':
         case 'PAST':
+        case 'UNPAID':
             {
                 return <Tag color='red'>{value}</Tag>
             }

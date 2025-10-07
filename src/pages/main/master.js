@@ -46,6 +46,7 @@ const MasterPage = () => {
   const [logoList, setLogoList] = useState([]);
   const [expenseList, setExpenseList] = useState([]);
   const [logsList, setLogsList] = useState([]);
+  const [billingList, setBillingList] = useState([]);
 
   const onSelected = (newContent) => {
     setIsLoading(true);
@@ -225,6 +226,7 @@ const MasterPage = () => {
         {
           getData(setCompanyList,"company");
           getLogo("GET", "logo");
+          getData(setBillingList, "billing");
           break;
         }
       default: { break }
@@ -316,6 +318,7 @@ const MasterPage = () => {
     displayedContent =
       <Setting
         companyList={companyList}
+        billingList={billingList}
         saveData={saveData}
         setRefresh={setRefresh}
         logoList={logoList}

@@ -1,11 +1,16 @@
 import Heading from "../../../common/heading"
-import { CloseOutlined, CreditCardFilled, EditOutlined, WalletFilled } from '@ant-design/icons';
+import { CloseOutlined, CreditCardFilled, EditOutlined, WalletFilled, DownloadOutlined, EyeOutlined } from '@ant-design/icons';
 import PricingCard from "./pricing_card";
-import { Button, Divider, Input, Select, Space, Tooltip } from "antd";
+import { Button, Divider, Drawer, Input, Select, Space, Tooltip } from "antd";
 import Accordion from "../../../common/accordion.js";
 import DataTable from "../../../common/datatable";
 import { getTableItem } from "../../../common/items.js";
 import { useEffect, useState } from "react";
+import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
+import dayjs from 'dayjs';
+import { Tags } from "../../../common/tags.js";
+import InvoiceView from "./invoice_view.js";
+import Invoice from "./invoice.js";
 
 function YearDisplay() {
     const years = [];
@@ -16,14 +21,8 @@ function YearDisplay() {
     }
     return years;
 }
-const Billing = ({ companyList, saveData, setRefresh }) => {
-    const invoiceTableHeader = [
-        getTableItem('1', 'STATUS'),
-        getTableItem('2', 'INVOICE'),
-        getTableItem('3', 'DATE'),
-        getTableItem('4', 'TOTAL'),
-        getTableItem('5', 'ACTION'),
-    ];
+const Billing = ({ companyList,billingList, saveData, setRefresh }) => {
+   
     const [plan, setPlan] = useState('');
     const [pricing, setPricing] = useState('');
     const [name, setName] = useState('');
@@ -32,6 +31,10 @@ const Billing = ({ companyList, saveData, setRefresh }) => {
     const [year, setYear] = useState('');
     const [cvv, setCVV] = useState('');
     const [isEdit, setIsEdit] = useState(false);
+
+    const [id, setId] = useState(0);
+    const [reload, setReload] = useState(0);
+    const [openView, setOpenView] = useState(false);
 
     useEffect(() => {
         if (companyList.length !== 0) {
@@ -46,6 +49,19 @@ const Billing = ({ companyList, saveData, setRefresh }) => {
             }
         }
     }, [companyList])
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+
+    useEffect(() => {
+        setPage(1, 10, billingList);
+    }, [billingList])
+
+    const setPage = (page, pageSize, list = []) => {
+        const indexOfLastItem = page * pageSize;
+        const indexOfFirstItem = indexOfLastItem - pageSize;
+        const searchedList = list.slice(indexOfFirstItem, indexOfLastItem);
+    }
 
     const saveBillingDetails = async () => {
         const Body = JSON.stringify({
@@ -79,6 +95,22 @@ const Billing = ({ companyList, saveData, setRefresh }) => {
         if (textValue.length < 20)
             setNumber(textValue);
 
+    }
+
+    const headerItems = [
+        getTableItem('1', 'Invoice #'),
+        getTableItem('2', 'Date'),
+        getTableItem('3', 'Due'),
+        getTableItem('4', 'Sub Total'),
+        getTableItem('5', 'Tax'),
+        getTableItem('6', 'Total'),
+        getTableItem('7', 'Status'),
+        getTableItem('8', 'Action'),
+    ];
+    const btn_ViewClick = (id) => {
+        setReload(reload + 1);
+        setId(id);
+        setOpenView(true);
     }
     return (
         <div class='flex flex-col gap-8'>
@@ -167,10 +199,45 @@ const Billing = ({ companyList, saveData, setRefresh }) => {
             <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
                 <Heading label={"Invoice history"} desc={"If you've just made a payment, it may take a few hours for it to appear in the table below."} icon={<CreditCardFilled  />} />
                 <div class='ml-6 mb-6'>
-                    Datatable
+                    <DataTable headerItems={headerItems} list={billingList}
+                        onChange={(page, pageSize) => {
+                            setCurrentPage(page);
+                            setItemsPerPage(pageSize);
+                            setPage(page, pageSize, billingList)
+                        }}
+                        body={(
+                            billingList.map(item => (
+                                <tr key={item.id} class="bg-white border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50 ">
+                                    <td class="p-3 text-blue-500 italic hover:underline cursor-pointer" ># {item.invoice}</td>
+                                    <td class="p-3">{dayjs(item.trndate).format('DD MMM YYYY')}</td>
+                                    <td class="p-3">{dayjs(item.duedate).format('DD MMM YYYY')}</td>
+                                    <td class="p-3 font-semibold">$ {item.subtotal}</td>
+                                    <td class="p-3 font-semibold">$ {item.taxamount}</td>
+                                    <td class="p-3 font-semibold">$ {item.totalamount}</td>
+                                     <td class="p-3">{Tags(item.status)}</td>
+                                    <td class="p-3">
+                                        <Tooltip placement="top" title={'View'} >
+                                            <Button type="link" icon={<EyeOutlined />} onClick={() => btn_ViewClick(item.id)} />
+                                        </Tooltip>
+                                        <Tooltip placement="top" title={'Download'} >
+                                            <PDFDownloadLink document={<Invoice id={item.id} refresh={reload} billingList={billingList} />} fileName="invoice.pdf">
+                                                {({ blob, url, loading, error }) =>
+                                                    loading ? 'Loading document...' : <Button type="link" icon={<DownloadOutlined />} />
+                                                }
+                                            </PDFDownloadLink>
+                                            
+                                        </Tooltip>
+                                    </td>
+                                </tr>
+                            ))
+                        )} />                 
                 </div>
-
             </div>
+
+            {/* Drawer on View*/}
+            <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
+                <InvoiceView id={id} refresh={reload} billingList={billingList} setOpen={setOpenView} />
+            </Drawer>
         </div>
     )
 

@@ -12,10 +12,10 @@ import { BsTwitterX } from "react-icons/bs";
 import { TbWorldWww } from "react-icons/tb";
 import { useEffect, useState } from "react";
 
-const Setting = ({ companyList, saveData, setRefresh, tabActiveKey, setTabActiveKey, logoList }) => {
+const Setting = ({ companyList, saveData, setRefresh, tabActiveKey, setTabActiveKey, logoList, billingList }) => {
     const tabItems = [
         getTabItems('1', 'Account', <IdcardOutlined />, <Account companyList={companyList} saveData={saveData} logoList={logoList} setRefresh={setRefresh} />),
-        getTabItems('2', 'Billing & plans', <ContainerOutlined />, <Billing companyList={companyList} saveData={saveData} setRefresh={setRefresh} />),
+        getTabItems('2', 'Billing & plans', <ContainerOutlined />, <Billing companyList={companyList} billingList={billingList} saveData={saveData} setRefresh={setRefresh} />),
         getTabItems('3', 'Notifications', <NotificationOutlined />, <Notification />),
         getTabItems('4', 'Social links', <ShareAltOutlined />, <SocialLink companyList={companyList} saveData={saveData} />),
     ];
