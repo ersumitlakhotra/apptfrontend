@@ -236,7 +236,7 @@ const Billing = ({ companyList,billingList, saveData, setRefresh }) => {
 
             {/* Drawer on View*/}
             <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
-                <InvoiceView id={id} refresh={reload} billingList={billingList} setOpen={setOpenView} />
+                <InvoiceView id={id} refresh={reload} billingList={billingList} />
             </Drawer>
         </div>
     )
