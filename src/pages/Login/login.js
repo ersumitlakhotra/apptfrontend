@@ -5,6 +5,8 @@ import useAlert from "../../common/alert.js";
 import {  Spin  } from 'antd';
 import { loginAuth } from "../../hook/apiCall.js";
 import { useNavigate } from "react-router-dom";
+import { setLocalStorageWithExpiry } from "../../common/localStorage.js";
+
 
 export const Login = () => {
 const navigate = useNavigate();
@@ -22,13 +24,14 @@ useEffect(() => {
 
 const onSubmit = async() => {
   setLoading(true);
-  
   try{
     const res= await loginAuth(email,password);
     if(res.status === 200)
     {
       localStorage.setItem('cid', res.data.data.cid);
-      localStorage.setItem('uid', res.data.data.id); 
+      setLocalStorageWithExpiry('uid', res.data.data.id, 720);
+      setLocalStorageWithExpiry('email', email, 720);
+      setLocalStorageWithExpiry('password', password, 720);
         navigate("/main"); //success('Login Successfully');     
       }       
     else         

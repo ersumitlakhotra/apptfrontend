@@ -13,13 +13,32 @@ const UserAbout = ({ fullname, setFullname, cell, setCell, email, setEmail, addr
                 <Input placeholder="Full name" status={fullname === '' ? 'error' : ''} value={fullname} onChange={(e) => setFullname(e.target.value)} />
             }/>
 
+            <TextboxFlex label={'Role'} input={
+                <Select
+                    defaultValue={role}
+                    value={role}
+                    style={{ width: '100%' }}
+                    onChange={(value) => setRole(value)}
+                    options={[
+                        { value: 'Administrator', label: 'Administrator' },
+                        { value: 'User', label: 'User' },
+                        { value: 'Employee', label: 'Employee' }
+                    ]}
+                />
+            } />
+
             <TextboxFlex label={'Cell #'} input={
                 <Input placeholder="111-222-3333" value={cell} onChange={(e) => setCell(setCellFormat(e.target.value))} />
             } />
-
-            <TextboxFlex label={'E-Mail'} input={
-                <Input placeholder="abcd@company.com" value={email} onChange={(e) => setEmail(e.target.value)} />  
+            
+            <TextboxFlex label={'E-Mail'} mandatory={true} input={
+                <Input placeholder="abcd@company.com"   value={email} status={email === ''? 'error' : ''} onChange={(e) => setEmail(e.target.value)} />  
             } />
+
+            {role !== 'Employee' &&
+            <TextboxFlex label={'Password'} mandatory={true} input={
+                <Input placeholder="password" status={password === '' ? 'error' : ''} value={password} onChange={(e) => setPassword(e.target.value)} />
+            } />}
 
             <TextboxFlex label={'Address'} input={
                 <Input placeholder="Address" value={address} onChange={(e) => setAddress(e.target.value)} />
@@ -32,39 +51,12 @@ const UserAbout = ({ fullname, setFullname, cell, setCell, email, setEmail, addr
                 </Radio.Group>
             } />
 
-            <p class="text-gray-400 mb-4 mt-4">Login Details</p>
-
-            <TextboxFlex label={'Username'} input={
-                username === '' ?
-                    <div class='flex flex-row  items-center justify-between gap-2 w-full'>
-                        <p class="font-normal  text-red-500 w-full ">Username will be generated automatically</p>
-                    </div>
-                    : <p class="font-normal  w-full ">{username}</p>
-            } />
-
-            <TextboxFlex label={'Password'} mandatory={true} input={
-                <Input placeholder="password" status={password === '' ? 'error' : ''} value={password} onChange={(e) => setPassword(e.target.value)} />
-            } />
-
-            <TextboxFlex label={'Role'} input={
-                <Select
-                    defaultValue={role}
-                    style={{ width: '100%' }}
-                    onChange={(value) => setRole(value)}
-                    options={[
-                        { value: 'Administrator', label: 'Administrator' },
-                        { value: 'User', label: 'User' },
-                        { value: 'Employee', label: 'Employee' }
-                    ]}
-                />
-            } />
-
             <TextboxFlex label={'Status'} input={
                 <div class='flex flex-row items-center gap-2 w-full'>
                     <Button color={`${status === 'Active' ? 'cyan' : 'default'}`} variant="outlined" icon={<CheckOutlined />} onClick={() => setStatus('Active')} >Active</Button>
                     <Button color={`${status === 'Inactive' ? 'danger' : 'default'}`} variant="outlined" icon={<CloseOutlined />} onClick={() => setStatus('Inactive')} >Inactive</Button>
                 </div>
-            } />      
+            } />              
 
         </div>
     )

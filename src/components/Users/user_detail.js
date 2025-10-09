@@ -6,6 +6,7 @@ import { CloudUploadOutlined, EyeOutlined, UserOutlined } from '@ant-design/icon
 import UserAbout from "./about.js";
 import useAlert from "../../common/alert.js";
 import UserLoginPermissions from "./permissions.js";
+import { getPermission, isValidEmail } from "../../common/cellformat.js";
 
 function getTabItems(key, label, icon, children) {
     return {key,label,children,icon,};
@@ -80,33 +81,7 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
         }
     }, [refresh])
 
-    function getPermission (){
-        if (role === 'Employee') {
-            return [{
-                dashboard: false,
-                tasks: false,
-                order: false,
-                event: false,
-                payment: false,
-                services: false,
-                users: false,
-                sales: false,
-                setting: false,
-            }]
-        } if (role === 'Administrator') {
-            return [{
-                dashboard: true,
-                tasks: true,
-                order: true,
-                event: true,
-                payment: true,
-                services: true,
-                users: true,
-                sales: true,
-                setting: true,
-            }]
-        }  
-        if (role === 'User') {
+    function getUserPermission (){     
             return [{
                 dashboard: dashboard,
                 tasks: tasks,
@@ -117,11 +92,10 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
                 users: users,
                 sales: sales,
                 setting: setting,
-            }]
-        }
+            }]       
     }
     const save = async () => {
-        if (fullname !== '' && password !== '') {
+        if (fullname !== '' && password !== '' && isValidEmail(email) ) {
             const Body = JSON.stringify({
                 fullname: fullname,
                 cell: cell,
@@ -131,7 +105,7 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
                 password: password,
                 role: role,
                 rating: rating,
-                permissioninfo: getPermission(),
+                permissioninfo: role === 'User' ? getUserPermission: getPermission(role),
                 status: status,
                 accounttype: accounttype,
                 profilepic: profilepic
@@ -140,6 +114,9 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
             setOpen(false);
         }
         else{
+            if (!isValidEmail(email))
+                warning('Please, fill out the valid email address !');
+            else
             warning('Please, fill out the required fields !');
         }
     }

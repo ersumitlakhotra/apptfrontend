@@ -2,8 +2,9 @@
 import React, { useState } from "react";
 import { LoadingOutlined } from '@ant-design/icons';
 import {  Spin  } from 'antd';
-import { apiCalls } from "../../hook/apiCall.js";
+import {  createAuth, createAdminUser } from "../../hook/apiCall.js";
 import useAlert from "../../common/alert.js";
+import { getPermission } from "../../common/cellformat.js";
 
 export const Signup = () => {
   const [business_name, setBusinessName]= useState('');
@@ -22,24 +23,25 @@ const onSubmit = async() => {
       email:email,
       cell:cell,
     }); 
-    const res= await apiCalls('POST','company',null,body,false);
+    const res = await createAuth('POST','company',body);
     if(res.status === 201)
     {
-      const id =res.data.data.id;
+      const cid =res.data.data.id;
       try{
-        const userBody= JSON.stringify( {
-          username:email,
-          password:password,
-          role:'Administrator',
-          permission:'YYYYYYYYYYYYYYYYYYYY',
-          email:email,
-          cell:cell,
-          rating:'1',
-          status:'Active',
-          accounttype:'Basic',
-          fullname:business_name
+        const userBody = JSON.stringify({
+          fullname: business_name,
+          cell: cell,
+          email: email,
+          gender: 'Male', 
+          username: email,
+          password: password,
+          role: 'Administrator',
+          rating: '5',
+          permissioninfo: getPermission('Administrator'),
+          status: 'Active', 
+          accounttype: 'Basic'
         }); 
-        const resUser= await apiCalls('POST','user',null,userBody,true,id);
+        const resUser = await createAdminUser('POST', 'user', userBody, cid); 
         if(resUser.status === 201)       
           success('Congratulation, your account has been successfully created.');       
         else        

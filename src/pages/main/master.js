@@ -13,11 +13,12 @@ import Services from "../Services/services.js";
 import Event from "../Event/event.js";
 import Tasks from "../Tasks/tasks.js";
 import Setting from "../Setting/setting.js";
-import { apiCalls } from "../../hook/apiCall.js";
+import { apiCalls, loginAuth } from "../../hook/apiCall.js";
 import useAlert from "../../common/alert.js";
 import { LocalDate } from "../../common/localDate.js";
 import Sales from "../Sales/sales.js";
 import Payment from "../Payment/payment.js";
+import { setLocalStorageWithExpiry } from "../../common/localStorage.js";
 
 const MasterPage = () => {
   const navigate = useNavigate();
@@ -92,6 +93,10 @@ const MasterPage = () => {
   }, [navigate, signout]);
 
   const onSetSignout = () => {
+    localStorage.removeItem('cid');
+    localStorage.removeItem('uid');
+    localStorage.removeItem('email');
+    localStorage.removeItem('password');
     setSignout(true);
   }
 
@@ -154,7 +159,59 @@ const MasterPage = () => {
     setIsLoading(false);
   }
 
-  useEffect(() => {
+  const isUserValid = () => {
+    let result = true;
+    const now = new Date();
+    const itemString = localStorage.getItem('uid');
+    if (itemString) {
+      const item = JSON.parse(itemString);
+      if (now.getTime() > item.expiry) {
+        const email = JSON.parse(localStorage.getItem('email')).value;
+        const password = JSON.parse(localStorage.getItem('password')).value;
+        localStorage.removeItem('cid');
+        localStorage.removeItem('uid');
+        localStorage.removeItem('email');
+        localStorage.removeItem('password');// Remove expired item
+        result = onSubmit(email, password);
+      }
+
+      if (!result) {
+        onSetSignout();
+      }
+    }
+    else
+    {
+      onSetSignout();
+    }
+
+    return result;
+  };
+
+const onSubmit = async(email,password) => {
+  setIsLoading(true);
+  try{
+    const res= await loginAuth(email,password);
+    if(res.status === 200)
+    {
+      localStorage.setItem('cid', res.data.data.cid);
+      setLocalStorageWithExpiry('uid', res.data.data.id, 720);
+      setLocalStorageWithExpiry('email', email, 720);
+      setLocalStorageWithExpiry('password', password, 720);   
+      return true;
+    }
+    else         
+      return false;
+  }
+  catch(err){
+    return false;
+  }
+  finally{
+    setIsLoading(false);
+  }
+}
+
+
+  useEffect(() => {  
     switch (content) {
       case "Dashboard":
         {

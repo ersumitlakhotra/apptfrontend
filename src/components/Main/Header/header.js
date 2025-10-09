@@ -32,9 +32,13 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermi
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    setId(localStorage.getItem('uid'));
-    getData(setUserList, "user");
-    getData(setNotificationList, "notification");
+    const itemString = localStorage.getItem('uid');
+    if (itemString) {
+      const uid = JSON.parse(itemString).value;
+      setId(uid);
+      getData(setUserList, "user");
+      getData(setNotificationList, "notification");
+    }
   }, [refresh]); 
   
   
@@ -86,9 +90,7 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermi
   const handleMenuClick = e => {
     switch (e.key) {
       case '9': // Sign Out
-        {
-          localStorage.removeItem('cid');
-          localStorage.removeItem('uid');
+        {      
           onSignout();
           break;
         }

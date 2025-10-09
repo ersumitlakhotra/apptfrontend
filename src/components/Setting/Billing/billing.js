@@ -220,7 +220,7 @@ const Billing = ({ companyList,billingList, saveData, setRefresh }) => {
                                             <Button type="link" icon={<EyeOutlined />} onClick={() => btn_ViewClick(item.id)} />
                                         </Tooltip>
                                         <Tooltip placement="top" title={'Download'} >
-                                            <PDFDownloadLink document={<Invoice id={item.id} refresh={reload} billingList={billingList} />} fileName="invoice.pdf">
+                                            <PDFDownloadLink document={<Invoice id={item.id} refresh={reload} billingList={billingList} companyList={companyList} />} fileName="invoice.pdf">
                                                 {({ blob, url, loading, error }) =>
                                                     loading ? 'Loading document...' : <Button type="link" icon={<DownloadOutlined />} />
                                                 }
@@ -236,7 +236,7 @@ const Billing = ({ companyList,billingList, saveData, setRefresh }) => {
 
             {/* Drawer on View*/}
             <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
-                <InvoiceView id={id} refresh={reload} billingList={billingList} />
+                <InvoiceView id={id} refresh={reload} billingList={billingList} companyList={companyList}/>
             </Drawer>
         </div>
     )

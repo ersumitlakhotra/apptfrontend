@@ -56,7 +56,6 @@ const Sidebar = ({ screen, onSelected, content, open, permissioninfo }) => {
        setServices(false); setUsers(false); setSales(false); setSetting(false);
  }
 
-    console.log(permissioninfo)
    }, [permissioninfo]);
 
   const overview=([
