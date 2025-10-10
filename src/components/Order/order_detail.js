@@ -24,8 +24,9 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
     const [total, setTotal] = useState('0');
     const [coupon, setCoupon] = useState('');
     const [discount, setDiscount] = useState('0');
+    const [discountEdit, setDiscountEdit] = useState('0');
     const [trndate, setTrnDate] = useState(LocalDate());
-    const [assigned_to, setAssignedTo] = useState('');
+    const [assigned_to, setAssignedTo] = useState('0');
     const [slot, setSlot] = useState('');
     const [servicesItem, setServicesItem] = useState([]);
     const [availableSlot, setAvailableSlot] = useState([]);
@@ -43,7 +44,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
         if (id === 0) {
             setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');
             setStatus('Pending'); setPrice('0'); setTax('0'); setTotal('0'); setDiscount('0'); setCoupon(''); setTaxAmount('0'); setTrnDate(LocalDate());
-            setAssignedTo(''); setOrderNo(''); setServicesItem([]); setSlot('');
+            setAssignedTo('0'); setOrderNo(''); setServicesItem([]); setSlot('');
         }
         else {
             const editList = orderList.find(item => item.id === id)
@@ -65,6 +66,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setTotal(editList.total);
             setCoupon(editList.coupon);
             setDiscount(editList.discount);
+            setDiscountEdit(editList.discount)
             setSlot(editList.slot);
         }
         const liveList = eventList.filter(a => a.case.toUpperCase() === 'LIVE');
@@ -211,6 +213,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
         else {
             setDiscount(0);
         }
+
         setPrice(parseFloat(rate).toFixed(2))
         onApplyTaxandCoupon(parseFloat(rate).toFixed(2), parseFloat(discount).toFixed(2), parseInt(tax))
 
@@ -367,7 +370,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     value={assigned_to}
                     style={{ width: '100%' }}
                     onChange={(value) => setAssignedTo(value)}
-                    options={userList.map(item => ({
+                    options={[{value:'0',label:'None'},...userList.map(item => ({
                         value: item.id,
                         label:
                             <div class='flex flex-row gap-2 items-center'>
@@ -377,7 +380,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                                 }
                                 <p>{item.fullname}</p>
                             </div>
-                    }))}
+                    }))]}
                 />
             } />
             <TextboxFlex label={'Slot'} mandatory={true} input={

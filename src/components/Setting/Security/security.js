@@ -14,6 +14,7 @@ const Security = ({ companyList, saveData }) => {
         if (companyList.length !== 0) {          
             setPassword(companyList.password);
         }
+        console.log(companyList)
     }, [companyList])
 
     const save = async () => {

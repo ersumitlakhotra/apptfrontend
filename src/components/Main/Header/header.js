@@ -1,9 +1,9 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Space, Dropdown, Drawer, Button, Badge } from 'antd';
-import { MenuUnfoldOutlined, SaveOutlined, BellOutlined, BookOutlined, ClockCircleOutlined, LockOutlined, LogoutOutlined, QuestionCircleOutlined, SettingOutlined, UserOutlined, BellFilled } from '@ant-design/icons';
+import { Space, Dropdown, Drawer,  Badge } from 'antd';
+import { MenuUnfoldOutlined, LogoutOutlined,  BellFilled } from '@ant-design/icons';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import AssignedTo from '../../../common/assigned_to.js';
 import NotificationDetail from '../Notification/notification_detail.js';
 
@@ -33,7 +33,7 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermi
 
   useEffect(() => {
       setId(localStorage.getItem('uid'));
-      getData(setUserList, "user");
+      getData(setUserList, "users");
       getData(setNotificationList, "notification");
   }, [refresh]);
 
