@@ -32,19 +32,15 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermi
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    const itemString = localStorage.getItem('uid');
-    if (itemString) {
-      const uid = JSON.parse(itemString).value;
-      setId(uid);
+      setId(localStorage.getItem('uid'));
       getData(setUserList, "user");
       getData(setNotificationList, "notification");
-    }
-  }, [refresh]); 
-  
-  
+  }, [refresh]);
+
+
   useEffect(() => {
     const unread = notificationList.filter(a => a.read === '1');
-    setUnread(unread.length > 0 ? unread:[])
+    setUnread(unread.length > 0 ? unread : [])
   }, [notificationList]);
 
 
@@ -61,13 +57,13 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermi
               <AssignedTo userId={id} userList={userList} imageWidth={40} imageHeight={40} AvatarSize={40} allowText={false} preview={false} />
               <div class='flex flex-col'>
                 <p>{b.fullname} </p>
-                <p>{b.cell} </p>      
+                <p>{b.cell} </p>
               </div>
-          </div> , null, null,true),
+            </div>, null, null, true),
           { type: 'divider', },
           getItem('9', 'Sign Out', <LogoutOutlined />, null, null, true),
         ])
-{/*
+        {/*
         setItems([
           getItem('1', b.fullname, null, null, true),
           { type: 'divider', },
@@ -83,18 +79,18 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermi
           { type: 'divider', },
           getItem('9', 'Sign Out', <LogoutOutlined />, null, null, true),
         ])*/}
-      })   
+      })
     }
   }, [userList]);
 
   const handleMenuClick = e => {
     switch (e.key) {
       case '9': // Sign Out
-        {      
+        {
           onSignout();
           break;
         }
-      default: {  break; }
+      default: { break; }
     }
   };
   const menuProps = {
@@ -116,7 +112,7 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermi
       saveData("Notification", 'PUT', "notification", item.id, Body, false);
     })
   }
- 
+
   return (
     <div class='flex items-center justify-between p-3 pe-8 overflow-x-hidden '>
       <MenuUnfoldOutlined className='cursor-pointer' onClick={() => setOpen(!open)} />

@@ -1,8 +1,8 @@
 import { Button, Tabs, Image, Avatar } from "antd"
 import { getTabItems } from "../../common/items.js"
-import { ContainerOutlined, IdcardOutlined, NotificationOutlined, ShareAltOutlined, UserOutlined } from '@ant-design/icons';
+import { ContainerOutlined, IdcardOutlined, NotificationOutlined, ShareAltOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
 import Account from "../../components/Setting/Account/account.js";
-import Notification from "../../components/Setting/notification.js";
+import Notification from "../../components/Setting/Notification/notification.js";
 import SocialLink from "../../components/Setting/Social/sociallink.js";
 import Billing from "../../components/Setting/Billing/billing.js";
 import Heading from "../../common/heading.js";
@@ -11,13 +11,15 @@ import { FaInstagram, FaLinkedinIn } from "react-icons/fa";
 import { BsTwitterX } from "react-icons/bs";
 import { TbWorldWww } from "react-icons/tb";
 import { useEffect, useState } from "react";
+import Security from "../../components/Setting/Security/security.js";
 
 const Setting = ({ companyList, saveData, setRefresh, tabActiveKey, setTabActiveKey, logoList, billingList }) => {
     const tabItems = [
         getTabItems('1', 'Account', <IdcardOutlined />, <Account companyList={companyList} saveData={saveData} logoList={logoList} setRefresh={setRefresh} />),
         getTabItems('2', 'Billing & plans', <ContainerOutlined />, <Billing companyList={companyList} billingList={billingList} saveData={saveData} setRefresh={setRefresh} />),
         getTabItems('3', 'Notifications', <NotificationOutlined />, <Notification />),
-        getTabItems('4', 'Social links', <ShareAltOutlined />, <SocialLink companyList={companyList} saveData={saveData} />),
+        getTabItems('4', 'Security', <LockOutlined />, <Security companyList={companyList} saveData={saveData} />),
+        getTabItems('5', 'Social links', <ShareAltOutlined />, <SocialLink companyList={companyList} saveData={saveData} />),
     ];
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');

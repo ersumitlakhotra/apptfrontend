@@ -20,7 +20,6 @@ const UserAbout = ({ fullname, setFullname, cell, setCell, email, setEmail, addr
                     style={{ width: '100%' }}
                     onChange={(value) => setRole(value)}
                     options={[
-                        { value: 'Administrator', label: 'Administrator' },
                         { value: 'User', label: 'User' },
                         { value: 'Employee', label: 'Employee' }
                     ]}

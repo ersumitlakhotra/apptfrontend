@@ -193,8 +193,8 @@ const onSubmit = async(email,password) => {
     const res= await loginAuth(email,password);
     if(res.status === 200)
     {
-      localStorage.setItem('cid', res.data.data.cid);
-      setLocalStorageWithExpiry('uid', res.data.data.id, 720);
+      setLocalStorageWithExpiry('cid', res.data.data.cid);
+      setLocalStorageWithExpiry('uid', res.data.data.id);
       setLocalStorageWithExpiry('email', email, 720);
       setLocalStorageWithExpiry('password', password, 720);   
       return true;

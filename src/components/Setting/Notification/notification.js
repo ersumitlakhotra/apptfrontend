@@ -1,5 +1,5 @@
 import { Divider, Switch } from "antd";
-import Heading from "../../common/heading"
+import Heading from "../../../common/heading"
 import { MailFilled, CheckOutlined, CloseOutlined } from '@ant-design/icons';
 
 const Notification = () => {

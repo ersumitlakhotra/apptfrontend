@@ -36,7 +36,7 @@ export const loginAuth = async (username,password) => {
     }
     // api calls
 };
-export const createAuth = async (method, endPoint, body) => {
+export const createCompany = async (method, endPoint, body) => {
     const options = {
         method: method,
         url: API_ENDPOINT + `${endPoint}`,

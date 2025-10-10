@@ -31,6 +31,7 @@ const Users = ({ userList, logsList, saveData }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [exportList, setExportList] = useState([]);
+    
     useEffect(() => {
         setFilteredList(userList);
         setExportList(userList);

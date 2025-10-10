@@ -55,7 +55,6 @@ const Sidebar = ({ screen, onSelected, content, open, permissioninfo }) => {
        setDashboard(false); setTasks(false); setOrder(false); setEvent(false); setPayment(false);
        setServices(false); setUsers(false); setSales(false); setSetting(false);
  }
-
    }, [permissioninfo]);
 
   const overview=([

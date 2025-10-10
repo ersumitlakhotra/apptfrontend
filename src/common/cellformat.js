@@ -25,30 +25,17 @@ export function isValidEmail (email) {
     return re.test(String(email).toLowerCase());
 };
 
-export function getPermission(role) {
-    if (role === 'Employee') {
-        return [{
-            dashboard: false,
-            tasks: false,
-            order: false,
-            event: false,
-            payment: false,
-            services: false,
-            users: false,
-            sales: false,
-            setting: false,
-        }]
-    } if (role === 'Administrator') {
-        return [{
-            dashboard: true,
-            tasks: true,
-            order: true,
-            event: true,
-            payment: true,
-            services: true,
-            users: true,
-            sales: true,
-            setting: true,
-        }]
-    }  
+export function getAdminPermission() {
+    return [{
+        dashboard: true,
+        tasks: true,
+        order: true,
+        event: true,
+        payment: true,
+        services: true,
+        users: true,
+        sales: true,
+        setting: true,
+    }]
+
 }

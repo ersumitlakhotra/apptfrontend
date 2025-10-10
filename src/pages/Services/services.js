@@ -30,6 +30,7 @@ const Services = ({ servicesList, setServicesList, logsList, userList, saveData 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [exportList, setExportList] = useState([]);
+
     useEffect(() => {
         setFilteredList(servicesList);
         setExportList(servicesList);
@@ -61,7 +62,7 @@ const Services = ({ servicesList, setServicesList, logsList, userList, saveData 
             setPage(currentPage, itemsPerPage, searchedList)
         else
             setPage(1, itemsPerPage, searchedList)
-    }, [searchInput, sortStatus,sortAscDesc])
+    }, [servicesList,searchInput, sortStatus,sortAscDesc])
 
     const setPage = (page, pageSize,list=[]) => {
         const indexOfLastItem = page * pageSize;

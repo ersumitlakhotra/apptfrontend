@@ -6,7 +6,7 @@ import { CloudUploadOutlined, EyeOutlined, UserOutlined } from '@ant-design/icon
 import UserAbout from "./about.js";
 import useAlert from "../../common/alert.js";
 import UserLoginPermissions from "./permissions.js";
-import { getPermission, isValidEmail } from "../../common/cellformat.js";
+import {  isValidEmail } from "../../common/cellformat.js";
 
 function getTabItems(key, label, icon, children) {
     return {key,label,children,icon,};
@@ -82,7 +82,7 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
     }, [refresh])
 
     function getUserPermission (){     
-            return [{
+        if (role === 'User') { return [{
                 dashboard: dashboard,
                 tasks: tasks,
                 order: order,
@@ -92,10 +92,25 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
                 users: users,
                 sales: sales,
                 setting: setting,
-            }]       
+            }]   
+        }
+        if (role === 'Employee') {
+            return [{
+                dashboard: false,
+                tasks: false,
+                order: false,
+                event: false,
+                payment: false,
+                services: false,
+                users: false,
+                sales: false,
+                setting: false,
+            }]
+        }     
     }
+
     const save = async () => {
-        if (fullname !== '' && password !== '' && isValidEmail(email) ) {
+        if (fullname !== '' && (role === "User" ? password !== '':true) && isValidEmail(email) ) {
             const Body = JSON.stringify({
                 fullname: fullname,
                 cell: cell,
@@ -105,7 +120,7 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
                 password: password,
                 role: role,
                 rating: rating,
-                permissioninfo: role === 'User' ? getUserPermission: getPermission(role),
+                permissioninfo:getUserPermission(),
                 status: status,
                 accounttype: accounttype,
                 profilepic: profilepic
