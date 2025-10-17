@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { LocalDate } from '../common/localDate';
 
-const API_ENDPOINT ="http://ec2-3-97-8-159.ca-central-1.compute.amazonaws.com:3000/api/";
+const API_ENDPOINT ="https://volmz5lsitlia26lmzkjjt537m0umece.lambda-url.ca-central-1.on.aws/api/";
 
 export const apiCalls = async (method, endPoint, id = null, body = null, eventDate = false) => {
     const companyId = localStorage.getItem('cid'); 
