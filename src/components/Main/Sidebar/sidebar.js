@@ -11,6 +11,7 @@ import {
    FundOutlined, DollarOutlined} from '@ant-design/icons';
 import SideBarButton from '../sidebar_button';
 import { useEffect, useState } from 'react';
+import logo from '../../../Images/logo.png';
 
 
 function getItem(label, key, icon,isVisible, badge, btn, children, dropdown) {
@@ -91,9 +92,9 @@ const Sidebar = ({ screen, onSelected, content, open, permissioninfo }) => {
     <div class={` h-full  duration-300 ${open ? 'w-72' : 'w-14'}`}>
       <sidebar class='w-full flex flex-col ' >
 
-        <header class='h-16  p-3 flex items-center gap-3 cursor-pointer '>
-          <img class="w-8 h-8 rounded-full bg-white" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg" alt="Rounded avatar" />
-          <span class={`text-lg font-semibold whitespace-nowrap duration-150 ${!open && ' scale-0'}`}>{process.env.REACT_APP_PROJECT_NAME}</span>
+        <header class='h-16  p-3 flex items-center gap-1 cursor-pointer '>
+          <img class="w-10 h-8 rounded-full bg-white" src={logo} alt="Rounded avatar" />
+          <span class={`font-semibold whitespace-nowrap duration-150 ${!open && ' scale-0'}`}>{process.env.REACT_APP_PROJECT_NAME}</span>
         </header>
 
         <span class={` text-sm  px-5 mt-6 duration-150 ${!open && 'scale-0'}  ${overview.filter(item => item.isVisible === true).length === 0 && 'hidden'} whitespace-nowrap`}>Overview</span>

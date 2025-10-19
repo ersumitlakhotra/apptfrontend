@@ -10,13 +10,15 @@ import {
  Route
 } from "react-router-dom";
 
+import logo from './Images/logo.png'
+
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="signup" element={<Signup />} />
-        <Route path="resetpassword" element={<ResetPassword />} />
+        <Route path="/" element={<Login logo={logo} />} />
+        <Route path="signup" element={<Signup   logo={logo}/>} />
+        <Route path="resetpassword" element={<ResetPassword  logo={logo} />} />
         <Route path="main" element={<MasterPage />} />
       </Routes>
     </Router>
