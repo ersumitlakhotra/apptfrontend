@@ -4,7 +4,7 @@ import { Button, Dropdown, Space, Spin } from "antd";
 import { useEffect, useState } from "react";
 import { DownOutlined, LoadingOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { lastDateOfMonth } from "../../../common/localDate";
+import { get_Date, lastDateOfMonth } from "../../../common/localDate";
 import { AreaChart } from "../Chart/graph";
 
 const DailyReport = ({ orderList, expensesList, yearList }) => {
@@ -44,10 +44,10 @@ const DailyReport = ({ orderList, expensesList, yearList }) => {
             categoryArray.push(dayjs(new Date(currentYear, currentMonth, day)).format("MMM DD"));
             let sales = 0;
             let expenses = 0;
-            orderList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') === dayjs(new Date(currentYear, currentMonth, day)).format("YYYY-MM-DD")).map(b => {
+            orderList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') === dayjs(new Date(currentYear, currentMonth, day)).format("YYYY-MM-DD")).map(b => {
                 sales += parseFloat(b.total);
             });
-            expensesList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') === dayjs(new Date(currentYear, currentMonth, day)).format("YYYY-MM-DD")).map(b => {
+            expensesList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') === dayjs(new Date(currentYear, currentMonth, day)).format("YYYY-MM-DD")).map(b => {
                 expenses += parseFloat(b.grossamount);
             });
             salesSeries.push(sales);

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import dayjs from 'dayjs';
 import Services from "../../common/services";
+import { get_Date } from "../../common/localDate";
 
 const EventLogs = ({ dataList, servicesList }) => {
     const [title, setTitle] = useState('');
@@ -25,7 +25,7 @@ const EventLogs = ({ dataList, servicesList }) => {
                 <li>{title}</li>
                 <li>${total}</li>
                 <li> <Services servicesItem={servicesItem} servicesList={servicesList} /></li>
-                <li>{dayjs(startDate).format('ddd, MMM DD')} - {dayjs(endDate).format('ddd, MMM DD')} </li>
+                <li>{get_Date(startDate,'ddd, MMM DD')} - {get_Date(endDate,'ddd, MMM DD')} </li>
            </ul>
 
         </div>

@@ -7,7 +7,7 @@ import {  getTableItem } from "../../common/items";
 
 import dayjs from 'dayjs';
 import AssignedTo from "../../common/assigned_to";
-import { UTC_LocalDateTime } from "../../common/localDate";
+import { get_Date, UTC_LocalDateTime } from "../../common/localDate";
 const Payments = ({ key, expensesData, userList, btn_LogsClick, btn_Click, fromDate, setFromDate, toDate, setToDate, saveData, setExportList }) => {
 
     const [filteredList, setFilteredList] = useState(expensesData);
@@ -109,7 +109,7 @@ const Payments = ({ key, expensesData, userList, btn_LogsClick, btn_Click, fromD
                 body={(
                     filteredList.map(item => (
                         <tr key={item.id} class="bg-white border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50 ">
-                            <td class="ps-3 w-44">{`${dayjs(item.fromdate).format("MMM DD,YYYY")} - ${dayjs(item.todate).format("MMM DD,YYYY")} `}</td>
+                            <td class="ps-3 w-44">{`${get_Date(item.fromdate,"MMM DD,YYYY")} - ${get_Date(item.todate,"MMM DD,YYYY")} `}</td>
                             <td class="p-3"><AssignedTo userId={item.assignedto} userList={userList} /></td>
                             <td class="p-3 ">{item.ptype}</td>
                             <td class="p-3 ">$ {item.netamount}</td>

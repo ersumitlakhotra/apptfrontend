@@ -4,7 +4,7 @@ import { Button, Dropdown, Space, Spin } from "antd";
 import { useEffect, useState } from "react";
 import { DownOutlined, LoadingOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { firstDateOfMonth, lastDateOfMonth } from "../../../common/localDate";
+import { firstDateOfMonth, get_Date, lastDateOfMonth, LocalDate } from "../../../common/localDate";
 import {  PieChart, StackedBarChart } from "../Charts/charts";
 
 const Task = ({ orderList, userList }) => {
@@ -26,9 +26,9 @@ const Task = ({ orderList, userList }) => {
         let jan = new Date(year, 0, 1);
         let dec = new Date(year, 11, 31);
         const total = (
-            currentOption === 'Today' ? orderList.filter(a => dayjs().format('YYYY-MM-DD') === dayjs(a.trndate).format('YYYY-MM-DD')) :
-                currentOption === 'This Month' ? orderList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') >= frmMonth && dayjs(a.trndate).format('YYYY-MM-DD') <= toMonth) :
-                    orderList.filter(a => orderList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') >= jan && dayjs(a.trndate).format('YYYY-MM-DD') <= dec )))
+            currentOption === 'Today' ? orderList.filter(a => LocalDate() === get_Date(a.trndate,'YYYY-MM-DD')) :
+                currentOption === 'This Month' ? orderList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= frmMonth && get_Date(a.trndate,'YYYY-MM-DD') <= toMonth) :
+                    orderList.filter(a => orderList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= jan && get_Date(a.trndate,'YYYY-MM-DD') <= dec )))
 
         const pending = total.filter(a => a.status.toUpperCase() === 'PENDING');
         const inprogress = total.filter(a => a.status.toUpperCase() === 'IN PROGRESS');

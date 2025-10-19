@@ -5,9 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import OrderDetail from "../../components/Order/order_detail";
 import OrderView from "../../components/Order/order_view";
 import {  getTabItems } from "../../common/items.js";
-import dayjs from 'dayjs';
 import OrderTabs from "../../components/Order/tab.js";
-import { LocalDate } from "../../common/localDate.js";
+import { LocalDate, get_Date } from "../../common/localDate.js";
 import LogsView from "../../components/Logs/logs_view.js";
 import ExportToExcel from "../../common/export.js";
 
@@ -66,7 +65,7 @@ const Order = ({ orderList, servicesList, userList, companyList, eventList, logs
     }, [orderList, fromDate, toDate])
 
     const load = async () => {
-        const order = orderList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') >= fromDate && dayjs(a.trndate).format('YYYY-MM-DD') <= toDate);
+        const order = orderList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= fromDate && get_Date(a.trndate,'YYYY-MM-DD') <= toDate);
         const pending = order.filter(a => a.status.toUpperCase() === 'PENDING');
         const inprogress = order.filter(a => a.status.toUpperCase() === 'IN PROGRESS');
         const completed = order.filter(a => a.status.toUpperCase() === 'COMPLETED');

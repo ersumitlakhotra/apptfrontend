@@ -6,7 +6,7 @@ import DataTable from "../../common/datatable";
 import { useEffect, useState } from "react";
 import { DeleteOutlined, EditOutlined, ContainerOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { UTC_LocalDateTime } from "../../common/localDate";
+import { get_Date, UTC_LocalDateTime } from "../../common/localDate";
 
 
 const Expenses = ({ key, expensesData, btn_Click, btn_LogsClick, fromDate, setFromDate, toDate, setToDate, saveData, setExportList }) => {
@@ -98,7 +98,7 @@ const Expenses = ({ key, expensesData, btn_Click, btn_LogsClick, fromDate, setFr
                 body={(
                     filteredList.map(item => (
                         <tr key={item.id} class="bg-white border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50 ">
-                            <td class="p-3 ">{UTC_LocalDateTime(item.trndate, "MMM DD,YYYY")}</td>
+                            <td class="p-3 ">{get_Date(item.trndate, "MMM DD,YYYY")}</td>
                             <td class="p-3 font-semibold">{item.name}</td>
                             <td class="p-3 ">{item.quantity}</td>
 

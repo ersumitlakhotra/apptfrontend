@@ -7,7 +7,7 @@ import { getTabItems } from "../../common/items.js";
 import Events from '../../components/Event/event.js'
 import LogsView from "../../components/Logs/logs_view.js";
 import dayjs from 'dayjs';
-import { firstDateOfMonth, lastDateOfMonth } from "../../common/localDate.js";
+import { firstDateOfMonth, get_Date, lastDateOfMonth } from "../../common/localDate.js";
 import ExportToExcel from "../../common/export.js";
 
 const customLabelTab = (label, tagColor, tagValue) => {
@@ -47,8 +47,8 @@ const Event = ({ eventList, servicesList, logsList, userList, saveData }) => {
     const [exportList, setExportList] = useState([]);
 
     useEffect(() => {
-        const event = eventList.filter(a => (dayjs(a.startdate).format('YYYY-MM-DD') >= fromDate && dayjs(a.startdate).format('YYYY-MM-DD') <= toDate) || 
-            (dayjs(a.enddate).format('YYYY-MM-DD') >= fromDate && dayjs(a.enddate).format('YYYY-MM-DD') <= toDate));
+        const event = eventList.filter(a => (get_Date(a.startdate,'YYYY-MM-DD') >= fromDate && get_Date(a.startdate,'YYYY-MM-DD') <= toDate) || 
+            (get_Date(a.enddate,'YYYY-MM-DD') >= fromDate && get_Date(a.enddate,'YYYY-MM-DD') <= toDate));
         const liveList = event.filter(a => a.case.toUpperCase() === 'LIVE');
         const upcoming = event.filter(a => a.case.toUpperCase() === 'UPCOMING');
         const past = event.filter(a => a.case.toUpperCase() === 'PAST');

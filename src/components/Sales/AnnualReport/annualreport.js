@@ -4,7 +4,7 @@ import { Button, Dropdown, Space, Spin } from "antd";
 import { useEffect, useState } from "react";
 import { DownOutlined, LoadingOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { firstDateOfMonth, lastDateOfMonth } from "../../../common/localDate";
+import { firstDateOfMonth, get_Date, lastDateOfMonth } from "../../../common/localDate";
 import {Pie } from "../Chart/graph";
 
 const MonthlyReport = ({ orderList, expensesList, yearList, months }) => {
@@ -24,10 +24,10 @@ const MonthlyReport = ({ orderList, expensesList, yearList, months }) => {
             let frm = dayjs(firstDateOfMonth(new Date(date))).format("YYYY-MM-DD");
             let to = dayjs(lastDateOfMonth(new Date(date))).format("YYYY-MM-DD");
             let totalSale = 0; let totalExpense = 0;
-            orderList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') >= frm && dayjs(a.trndate).format('YYYY-MM-DD') <= to).map(b => {
+            orderList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= frm && get_Date(a.trndate,'YYYY-MM-DD') <= to).map(b => {
                 totalSale += parseFloat(b.total);
             });
-            expensesList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') >= frm && dayjs(a.trndate).format('YYYY-MM-DD') <= to).map(b => {
+            expensesList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= frm && get_Date(a.trndate,'YYYY-MM-DD') <= to).map(b => {
                 totalExpense += parseFloat(b.grossamount);
             });
             salesArray.push(totalSale);

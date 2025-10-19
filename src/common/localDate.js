@@ -66,6 +66,9 @@ function UTC_LocalDateTime_relative(value) {
     dayjs.extend(relativeTime);    
     return dayjs(UTC_LocalDateTime(value, "YYYY-MM-DD")).fromNow(); //2019-03-06T17:11:55+08:00
 };
+function get_Date(value,format) {
+    return dayjs.utc(value).format(format); //2019-03-06T17:11:55+08:00
+};
 
 const firstDateOfMonth = (date = new Date()) =>
     new Date(date.getFullYear(), date.getMonth(), 1);
@@ -73,4 +76,4 @@ const firstDateOfMonth = (date = new Date()) =>
 const lastDateOfMonth = (date = new Date()) =>
     new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
-export { LocalDate, LocalDateTime, UTC_LocalDateTime, firstDateOfMonth, lastDateOfMonth, UTC_LocalDateTime_relative }
+export { LocalDate, LocalDateTime, UTC_LocalDateTime, firstDateOfMonth, lastDateOfMonth, UTC_LocalDateTime_relative, get_Date }

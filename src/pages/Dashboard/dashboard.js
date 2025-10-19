@@ -9,7 +9,7 @@ import Task from "../../components/Dashboard/Task/task.js";
 import LiveEvent from "../../components/Dashboard/LiveEvent/live_event.js";
 import RecentActivities from "../../components/Dashboard/RecentActivities/recent_activities.js";
 import { useEffect, useState } from "react";
-import { lastDateOfMonth, LocalDate } from "../../common/localDate.js";
+import { get_Date, lastDateOfMonth, LocalDate } from "../../common/localDate.js";
 import dayjs from 'dayjs';
 import { AreaChartCard } from "../../components/Dashboard/Charts/charts.js";
 
@@ -48,10 +48,10 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList,
             let sales = 0;
             let expenses = 0;
             let revenue = 0;
-            const order = orderList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') === dayjs(new Date(year, month, day)).format("YYYY-MM-DD")).map(b => {
+            const order = orderList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') === dayjs(new Date(year, month, day)).format("YYYY-MM-DD")).map(b => {
                 sales += parseFloat(b.total);
             }); 
-            expensesList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') === dayjs(new Date(year, month, day)).format("YYYY-MM-DD")).map(b => {
+            expensesList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') === dayjs(new Date(year, month, day)).format("YYYY-MM-DD")).map(b => {
                 expenses += parseFloat(b.grossamount);
                         });
 

@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 import { Tags } from "../../common/tags";
 import Services from "../../common/services";
 import AssignedTo from "../../common/assigned_to";
-import { UTC_LocalDateTime } from "../../common/localDate";
+import { UTC_LocalDateTime, get_Date } from "../../common/localDate";
 
 
 const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_ViewClick, btn_LogsClick, refresh, fromDate, setFromDate, toDate, setToDate ,setExportList }) => {
@@ -130,7 +130,7 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_View
 
                             <td class="p-3">
                                 {(item.trndate !== null && item.trndate !== '') && <>
-                                    <p class="font-semibold">{dayjs(item.trndate).format('DD MMM YYYY')}</p>
+                                    <p class="font-semibold">{get_Date(item.trndate,'DD MMM YYYY')}</p>
                                     <p class="text-xs font-medium text-gray-400">{item.slot}</p>
                                 </>}
                             </td>

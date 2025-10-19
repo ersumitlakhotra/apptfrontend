@@ -4,7 +4,7 @@ import { Button, Dropdown, Space, Spin } from "antd";
 import { useEffect, useState } from "react";
 import { DownOutlined, LoadingOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { firstDateOfMonth, lastDateOfMonth } from "../../../common/localDate";
+import { firstDateOfMonth, get_Date, lastDateOfMonth } from "../../../common/localDate";
 import { BarChart } from "../Charts/charts";
 
 const Appointment = ({ orderList, yearList, months }) => {
@@ -21,7 +21,7 @@ const Appointment = ({ orderList, yearList, months }) => {
             let frm = dayjs(firstDateOfMonth(new Date(date))).format("YYYY-MM-DD");
             let to = dayjs(lastDateOfMonth(new Date(date))).format("YYYY-MM-DD");
 
-            const order = orderList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') >= frm && dayjs(a.trndate).format('YYYY-MM-DD') <= to);
+            const order = orderList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= frm && get_Date(a.trndate,'YYYY-MM-DD') <= to);
             dataArray.push({ month: a, count: order.length });
         })
         setChart(<BarChart dataArray={dataArray} />)

@@ -5,7 +5,7 @@ import { Avatar, DatePicker, Image, Input, Radio, Select } from "antd";
 import { UserOutlined } from '@ant-design/icons';
 import TextArea from "antd/es/input/TextArea";
 import { TextboxFlex } from "../../common/textbox";
-import { LocalDate } from "../../common/localDate";
+import { get_Date, LocalDate } from "../../common/localDate";
 
 import dayjs from 'dayjs';
 import useAlert from "../../common/alert";
@@ -43,8 +43,8 @@ const PaymentsDetail = ({ id, refresh, ref, expensesList, userList, saveData, se
 
     const save = async () => {    
         const result = expensesList.filter(a => a.assignedto === assigned_to.toString() && a.etype.toUpperCase() === 'PAYMENT' && a.id !== id &&
-                ((fromdate >= dayjs(a.fromdate).format('YYYY-MM-DD') &&  fromdate <= dayjs(a.todate).format('YYYY-MM-DD') ) ||
-                (todate >= dayjs(a.fromdate).format('YYYY-MM-DD') && todate <= dayjs(a.todate).format('YYYY-MM-DD')))
+                ((fromdate >= get_Date(a.fromdate,'YYYY-MM-DD') &&  fromdate <= get_Date(a.todate,'YYYY-MM-DD') ) ||
+                (todate >= get_Date(a.fromdate,'YYYY-MM-DD') && todate <= get_Date(a.todate,'YYYY-MM-DD')))
         )
         if (fromdate !== '' && todate !== '' && netamount !== '.' && netamount !== '' && taxamount !== '.' && taxamount !== '' && grossamount !== '.' && grossamount !== '' && result.length === 0 ) {
             const Body = JSON.stringify({

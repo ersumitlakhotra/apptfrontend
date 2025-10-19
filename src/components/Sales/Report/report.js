@@ -3,17 +3,17 @@
 import { Avatar, Image, Tag } from "antd";
 import { useEffect, useState } from "react";
 import {  UserOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
 import DataTable from "../../../common/datatable.js";
 import { getTableItem } from "../../../common/items";
+import { get_Date } from "../../../common/localDate.js";
 
 const Report = ({ orderList, expensesList, userList, fromDate, toDate, setExportList }) => {
     const [filteredList, setFilteredList] = useState([]);
 
     useEffect(() => {
-        const order = orderList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') >= fromDate && dayjs(a.trndate).format('YYYY-MM-DD') <= toDate);
-        const expense = expensesList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') >= fromDate && dayjs(a.trndate).format('YYYY-MM-DD') <= toDate && a.etype === 'Expense');
-        const payment = expensesList.filter(a => dayjs(a.trndate).format('YYYY-MM-DD') >= fromDate && dayjs(a.trndate).format('YYYY-MM-DD') <= toDate && a.etype === 'Payment');
+        const order = orderList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= fromDate && get_Date(a.trndate,'YYYY-MM-DD') <= toDate);
+        const expense = expensesList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= fromDate && get_Date(a.trndate,'YYYY-MM-DD') <= toDate && a.etype === 'Expense');
+        const payment = expensesList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= fromDate && get_Date(a.trndate,'YYYY-MM-DD') <= toDate && a.etype === 'Payment');
         setFilteredList([]); setExportList([]);
         let sales_total = 0; let expense_total = 0; let result_total = 0;
         userList.map(user => {

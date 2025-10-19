@@ -8,7 +8,7 @@ import { getTableItem } from "../../common/items";
 import DataTable from "../../common/datatable";
 import { useEffect, useState } from "react";
 import Services from "../../common/services";
-import { UTC_LocalDateTime } from "../../common/localDate";
+import { get_Date, UTC_LocalDateTime } from "../../common/localDate";
 
 const Events = ({ eventList, servicesList, btn_Click, btn_LogsClick, fromDate, setFromDate, toDate, setToDate, setExportList }) => {
     const [searchInput, setSearchInput] = useState('');
@@ -97,7 +97,7 @@ const Events = ({ eventList, servicesList, btn_Click, btn_LogsClick, fromDate, s
                             <td class="p-3"><Services servicesItem={item.serviceinfo} servicesList={servicesList} /></td>
                             <td class="p-3 font-medium ">{item.coupon}</td>
                             <td class="p-3 ">$ {item.total}</td>
-                            <td class="p-3 ">{dayjs(item.startdate).format('ddd, MMM DD')} - {dayjs(item.enddate).format('ddd, MMM DD')}</td>
+                            <td class="p-3 ">{get_Date(item.startdate,'ddd, MMM DD')} - {get_Date(item.enddate,'ddd, MMM DD')}</td>
                             <td class="p-3 "> {Tags(item.case)}</td>
                             <td class="p-3 ">{UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A')}</td>
                             <td class="p-3">

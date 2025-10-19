@@ -1,7 +1,7 @@
 import { Badge, Button } from "antd";
 import { useEffect, useState } from "react";
-import dayjs from 'dayjs';
 import Services from "../../../common/services";
+import { get_Date } from "../../../common/localDate";
 
 const LiveEvent = ({ eventList, servicesList, onSelected }) => {
     const [liveList, setLiveList] = useState([]);
@@ -30,7 +30,7 @@ const LiveEvent = ({ eventList, servicesList, onSelected }) => {
                                     <p>$ {item.total}</p>
                                 </div>
                                 <div class='flex items-center justify-between font-medium'>
-                                    <span class="text-gray-500">{dayjs(item.startdate).format('ddd, MMM DD')} - {dayjs(item.enddate).format('ddd, MMM DD')}</span>
+                                    <span class="text-gray-500">{get_Date(item.startdate,'ddd, MMM DD')} - {get_Date(item.enddate,'ddd, MMM DD')}</span>
                                     <p>{item.coupon}</p>
                                 </div>
                                 <div class='flex flex-col overflow-hidden whitespace-nowrap'>

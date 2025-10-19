@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import dayjs from 'dayjs';
 import { Tags } from "../../common/tags";
 import AssignedTo from "../../common/assigned_to";
 import Services from "../../common/services";
+import { get_Date } from "../../common/localDate";
 
 const OrderLogs = ({ dataList, id, orderList, servicesList, userList }) => {
     const [customerName, setCustomerName] = useState('');
@@ -41,7 +41,7 @@ const OrderLogs = ({ dataList, id, orderList, servicesList, userList }) => {
                 <li>{Tags(status)}</li>
                 <li>${total}</li>
                 <li>{customerName} ({customerPhone})</li>
-                <li>{dayjs(trndate).format('DD MMM YYYY')} {slot} </li>
+                <li>{get_Date(trndate,'DD MMM YYYY')} {slot} </li>
                 <li><Services servicesItem={servicesItem} servicesList={servicesList} /></li>
                 <li><AssignedTo userId={assigned_to} userList={userList}/></li>
            </ul>

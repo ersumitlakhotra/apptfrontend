@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import { LocalDate } from "../../common/localDate";
-import dayjs from 'dayjs';
+import { get_Date, LocalDate } from "../../common/localDate";
 import AssignedTo from "../../common/assigned_to";
 
 const PaymentLogs = ({ dataList, userList }) => {
@@ -28,7 +27,7 @@ const PaymentLogs = ({ dataList, userList }) => {
         <ul class='list-disc ps-5'>
             <li>{ptype}</li>
             <li><AssignedTo userId={assigned_to} userList={userList} /></li>
-            <li>{`${dayjs(fromdate).format("MMM DD,YYYY")} - ${dayjs(todate).format("MMM DD,YYYY")} `}</li>
+            <li>{`${get_Date(fromdate,"MMM DD,YYYY")} - ${get_Date(todate,"MMM DD,YYYY")} `}</li>
             <li>${netamount} {ptype === 'Payroll' ? '-':'+'} ${taxamount} = ${grossamount}</li>
            
         </ul>

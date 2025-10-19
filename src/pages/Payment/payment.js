@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button, Drawer,Space, Tabs } from "antd";
 import {  PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { getTabItems } from "../../common/items";
-import { firstDateOfMonth,lastDateOfMonth } from "../../common/localDate.js";
+import { firstDateOfMonth,get_Date,lastDateOfMonth } from "../../common/localDate.js";
 import Payments from '../../components/Payment/payments.js'
 import Expenses from '../../components/Payment/expenses.js'
 import dayjs from 'dayjs';
@@ -35,8 +35,8 @@ const Payment = ({ expensesList, userList, logsList, saveData, tabActiveKey, set
     const [exportList, setExportList] = useState([]);
 
     useEffect(() => {
-        setExpensesData(expensesList.filter(a => a.etype.toUpperCase() === 'EXPENSE' && dayjs(a.trndate).format('YYYY-MM-DD') >= fromDateExpenses && dayjs(a.trndate).format('YYYY-MM-DD') <= toDateExpenses));
-        setPaymentData(expensesList.filter(a => a.etype.toUpperCase() === 'PAYMENT' && dayjs(a.trndate).format('YYYY-MM-DD') >= fromDatePayment && dayjs(a.trndate).format('YYYY-MM-DD') <= toDatePayment));
+        setExpensesData(expensesList.filter(a => a.etype.toUpperCase() === 'EXPENSE' && get_Date(a.trndate,'YYYY-MM-DD') >= fromDateExpenses && get_Date(a.trndate,'YYYY-MM-DD') <= toDateExpenses));
+        setPaymentData(expensesList.filter(a => a.etype.toUpperCase() === 'PAYMENT' && get_Date(a.trndate,'YYYY-MM-DD') >= fromDatePayment && get_Date(a.trndate,'YYYY-MM-DD') <= toDatePayment));
     }, [expensesList, fromDateExpenses, toDateExpenses, fromDatePayment, toDatePayment])
 
     const btn_Click_Expense = (id) => {

@@ -6,6 +6,7 @@ import { RightOutlined, LeftOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import Calender from "../../components/Task/calender";
 import OrderView from "../../components/Order/order_view";
+import { get_Date } from "../../common/localDate";
 
 const Tasks = ({ orderList, servicesList, userList, companyList, screenWidth }) => {
     const [date, setDate] = useState(null);
@@ -20,7 +21,7 @@ const Tasks = ({ orderList, servicesList, userList, companyList, screenWidth }) 
     }, [])
 
     useEffect(() => {
-        const order = orderList.filter(a => dayjs(date).format('YYYY-MM-DD') === dayjs(a.trndate).format('YYYY-MM-DD'));
+        const order = orderList.filter(a => dayjs(date).format('YYYY-MM-DD') === get_Date(a.trndate,'YYYY-MM-DD'));
         setOrders(order.length > 0 ? order : []);
         setRefresh(refresh + 1);
     }, [date])

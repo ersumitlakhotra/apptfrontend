@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import dayjs from 'dayjs';
 import Performance from "./performance";
+import { get_Date, LocalDate } from "../../../common/localDate";
 
 const Statistics = ({ orderList }) => {
     const [totalList, setTotalList] = useState([]);
@@ -9,7 +9,7 @@ const Statistics = ({ orderList }) => {
     const [completedList, setCompletedList] = useState([]);
     const [cancelledList, setCancelledList] = useState([]);
     useEffect(() => {
-        const total = orderList.filter(a => dayjs().format('YYYY-MM-DD') === dayjs(a.trndate).format('YYYY-MM-DD'));
+        const total = orderList.filter(a => LocalDate() === get_Date(a.trndate,'YYYY-MM-DD'));
         const pending = total.filter(a => a.status.toUpperCase() === 'PENDING');
         const inprogress = total.filter(a => a.status.toUpperCase() === 'IN PROGRESS');
         const completed = total.filter(a => a.status.toUpperCase() === 'COMPLETED');
