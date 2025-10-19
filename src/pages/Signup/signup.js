@@ -22,6 +22,7 @@ export const Signup = ({logo}) => {
         email: email,
         cell: cell,
         password: password,
+        slot:60,
         timinginfo: [{
           monday: ['09:00:00', '21:00:00', true],
           tuesday: ['09:00:00', '21:00:00', true],

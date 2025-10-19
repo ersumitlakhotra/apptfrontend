@@ -13,6 +13,7 @@ const Calender = ({ orderList, servicesList, userList, companyList, trndate, btn
 
     const [headerItems, setHeaderItems] = useState([])
     const [generateSlots, setGenerateSlots] = useState([]);
+    const [slotGap, setSlotGap] = useState(30);
 
     const [inTime, setInTime] = useState('00:00:00');
     const [outTime, setOutTime] = useState('00:00:00');
@@ -33,11 +34,12 @@ const Calender = ({ orderList, servicesList, userList, companyList, trndate, btn
                     setOpeningHours(dayName);
                 }
             }
+            setSlotGap(companyList.slot)
         }
     }, [companyList, trndate])
 
     useEffect(() => {
-        setGenerateSlots(generateTimeSlots(inTime, outTime, 30, []));
+        setGenerateSlots(generateTimeSlots(inTime, outTime, slotGap, []));
     }, [inTime, outTime])
 
     const setOpeningHours = (weekday) => {

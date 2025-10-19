@@ -33,6 +33,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
     //const filteredOptionsServices = servicesList.filter(o => !selectedItems.includes(o));
     const [liveList, setLiveList] = useState([]);
 
+    const [slotGap, setSlotGap] = useState(30);
     const [inTime, setInTime] = useState('00:00:00');
     const [outTime, setOutTime] = useState('00:00:00');
     const [isOpen, setIsOpen] = useState(false);
@@ -80,7 +81,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             orderListSlot = (orderList.filter(a => (a.trndate.includes(trndate) && a.assignedto === assigned_to)));
         }
         if (isOpen)
-            setAvailableSlot(generateTimeSlots(inTime, outTime, 30, orderListSlot, slot));
+            setAvailableSlot(generateTimeSlots(inTime, outTime, slotGap, orderListSlot, slot));
         else
         {
             setAvailableSlot([{ id: 'Business Closed' }]);
@@ -96,7 +97,8 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     const dayName = weekdays[dayOfWeekNumber];
                     setOpeningHours(dayName);
                 }
-            }
+            }          
+            setSlotGap(companyList.slot)
         }
 
     }, [companyList, trndate])
