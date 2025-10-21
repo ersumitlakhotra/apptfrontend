@@ -27,7 +27,7 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
     const [status, setStatus] = useState('Active');
 
 
-    const [dashboard, setDashboard] = useState(false);
+    const [dashboard, setDashboard] = useState(true);
     const [tasks, setTasks] = useState(false);
     const [order, setOrder] = useState(false);
     const [event, setEvent] = useState(false);
@@ -48,7 +48,7 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
             setUsername(''); setPassword(''); setRole('Employee'); setRating(0); 
            setAccountType('Basic'); setProfile(null);
             setGender('Male'); setStatus('Active');
-            setDashboard(false); setTasks(false); setOrder(false); setEvent(false); setPayment(false);
+            setDashboard(true); setTasks(false); setOrder(false); setEvent(false); setPayment(false);
             setServices(false); setUsers(false); setSales(false); setSetting(false); 
         }
         else {
@@ -76,7 +76,8 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
                 setSales(editList.permissioninfo[0].sales);
                 setSetting(editList.permissioninfo[0].setting);
             }
-            else { setDashboard(false); setTasks(false); setOrder(false); setEvent(false); setPayment(false); 
+            else {
+                setDashboard(true); setTasks(false); setOrder(false); setEvent(false); setPayment(false); 
                 setServices(false); setUsers(false); setSales(false); setSetting(false); }
         }
     }, [refresh])

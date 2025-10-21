@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {  
   PieChartOutlined, 
   CheckSquareOutlined, 
@@ -27,7 +28,7 @@ function getItem(label, key, icon,isVisible, badge, btn, children, dropdown) {
   };
 }
 
-const Sidebar = ({ screen, onSelected, content, open, permissioninfo }) => {
+const Sidebar = ({ onSelected, content, open, permissioninfo }) => {
 
   const [dashboard, setDashboard] = useState(false);
   const [tasks, setTasks] = useState(false);
@@ -40,23 +41,23 @@ const Sidebar = ({ screen, onSelected, content, open, permissioninfo }) => {
   const [setting, setSetting] = useState(false);
 
   useEffect(() => {
-     if (permissioninfo !== null) {
-       setDashboard(permissioninfo[0].dashboard);
-       setTasks(permissioninfo[0].tasks);
-       setOrder(permissioninfo[0].order);
-       setEvent(permissioninfo[0].event);
-       setPayment(permissioninfo[0].payment);
-       setServices(permissioninfo[0].services);
-       setUsers(permissioninfo[0].users);
-       setSales(permissioninfo[0].sales);
-       setSetting(permissioninfo[0].setting);
-     }
-     else
-     {
-       setDashboard(false); setTasks(false); setOrder(false); setEvent(false); setPayment(false);
-       setServices(false); setUsers(false); setSales(false); setSetting(false);
- }
-   }, [permissioninfo]);
+    if (permissioninfo !== null) {
+      setDashboard(permissioninfo[0].dashboard);
+      setTasks(permissioninfo[0].tasks);
+      setOrder(permissioninfo[0].order);
+      setEvent(permissioninfo[0].event);
+      setPayment(permissioninfo[0].payment);
+      setServices(permissioninfo[0].services);
+      setUsers(permissioninfo[0].users);
+      setSales(permissioninfo[0].sales);
+      setSetting(permissioninfo[0].setting);    
+    }
+    else {
+      setDashboard(false); setTasks(false); setOrder(false); setEvent(false); setPayment(false);
+      setServices(false); setUsers(false); setSales(false); setSetting(false);
+    }
+  }, [permissioninfo]);
+
 
   const overview=([
     getItem('Dashboard', 11, <PieChartOutlined />, dashboard),

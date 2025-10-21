@@ -30,7 +30,6 @@ const MasterPage = () => {
   const [open, setOpen] = useState(true);
   const {contextHolder, success, error } = useAlert();
 
-
   const [permissioninfo, setPermissionInfo] = useState(null);
 
   const [settingActiveTab, setSettingActiveTab] = useState('1');
