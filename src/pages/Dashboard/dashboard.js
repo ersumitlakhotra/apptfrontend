@@ -52,7 +52,7 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList,
                 sales += parseFloat(b.total);
             }); 
             expensesList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') === dayjs(new Date(year, month, day)).format("YYYY-MM-DD")).map(b => {
-                expenses += parseFloat(b.grossamount);
+                expenses += b.ptype === 'Payroll' ? parseFloat(b.netamount) : parseFloat(b.grossamount);
                         });
 
             orderSeries.push(order.length);

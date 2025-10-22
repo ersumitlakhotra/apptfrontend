@@ -137,7 +137,7 @@ const MasterPage = () => {
         notify && error(result.message);
       }
       else {
-        let status = result.status === 201 ? 'Created' : result.status === 200 ? 'Modified' : 'Deleted'
+        let status = result.status === 201 ? 'Created' : result.status === 200 ? 'Modified' : 'Deleted';
         const Log = JSON.stringify({
           ltype: label,
           lid: result.data.data.id,
@@ -146,14 +146,14 @@ const MasterPage = () => {
           status: status,
           datainfo: [body] 
         });
+
         await apiCalls('POST', 'logs', null, Log);
         notify && success(`The ${label} has been ${status} successfully.`);
         setRefresh(refresh + 1)
       }
-
     }
     catch (e) {
-      notify && error(error.message)
+      notify && error(e.message)
     }  
     setIsLoading(false);
   }

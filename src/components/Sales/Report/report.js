@@ -24,7 +24,7 @@ const Report = ({ orderList, expensesList, userList, fromDate, toDate, setExport
                 totalSale += parseFloat(s.total);
             })
             userPayments.map(p => {
-                totalPayment += parseFloat(p.grossamount);
+                totalPayment += p.ptype === 'Payroll' ? parseFloat(p.netamount) : parseFloat(p.grossamount);
             })
             result = (totalSale - totalPayment).toFixed(2);
 
