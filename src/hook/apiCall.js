@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { LocalDate } from '../common/localDate';
 
-const API_ENDPOINT ="https://volmz5lsitlia26lmzkjjt537m0umece.lambda-url.ca-central-1.on.aws/api/";
+const API_ENDPOINT = "http://localhost:3000/api/";
+//const API_ENDPOINT = "https://volmz5lsitlia26lmzkjjt537m0umece.lambda-url.ca-central-1.on.aws/api/";
 
 export const apiCalls = async (method, endPoint, id = null, body = null, eventDate = false) => {
     const companyId = localStorage.getItem('cid'); 
@@ -67,7 +68,38 @@ export const createAdminUser = async (method, endPoint, body, companyId) => {
         return error;
     }
 };
-
+export const getCompanyViaStore = async (method, endPoint, store) => {
+    const options = {
+        method: method,
+        url: API_ENDPOINT + `${endPoint}/${store}`,
+        headers: {
+            'content-Type': 'application/json'
+        },
+        data: []
+    };
+    try {
+        return await axios.request(options);
+    } catch (error) {
+        return error;
+    }
+    // api calls
+};
+export const apiCallsViaBooking = async (method, endPoint, companyId, id = null, date =null ) => {
+    const options = {
+        method: method,
+        url: API_ENDPOINT + `${endPoint}/${companyId}` + (id != null ? `/${id}` : '') + (date != null ? date : '') ,
+        headers: {
+            'content-Type': 'application/json'
+        },
+        data: []
+    };
+    try {
+        return await axios.request(options);
+    } catch (error) {
+        return error;
+    }
+    // api calls
+};
 
 
 
