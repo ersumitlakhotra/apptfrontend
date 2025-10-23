@@ -1,7 +1,7 @@
 
 import { Button, Col, Row } from 'antd';
-const Slots = ({ inTime, outTime, orderListSlot, slot, setSlot }) => {
-    const slots = generateTimeSlots(inTime, outTime, 30, orderListSlot);
+const Slots = ({ inTime, outTime, intervalMinutes, orderListSlot, slot, setSlot }) => {
+    const slots = generateTimeSlots(inTime, outTime, intervalMinutes, orderListSlot, slot);
 
     return (
         <Row key={new Date()} gutter={[16, 16]}>

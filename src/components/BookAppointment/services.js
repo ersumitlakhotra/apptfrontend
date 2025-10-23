@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 import { Input, Tag } from "antd";
 import { IoSearchOutline } from "react-icons/io5";
 
-const Services = ({ servicesList, next, service, setService }) => {
+const Services = ({ servicesList, eventList, next, service, setService }) => {
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(servicesList);
+    const [liveList, setLiveList] = useState([]);
 
     useEffect(() => {
         const searchedList = servicesList.filter(item =>
@@ -16,7 +17,10 @@ const Services = ({ servicesList, next, service, setService }) => {
         else
             setFilteredList(searchedList);
 
-    }, [searchInput])
+        const liveList = eventList.filter(a => a.case.toUpperCase() === 'LIVE');
+        setLiveList(liveList.length > 0 ? liveList : [])
+
+    }, [searchInput, servicesList, eventList])
 
     return (
         <div>
@@ -30,9 +34,15 @@ const Services = ({ servicesList, next, service, setService }) => {
                             {a.name}
                             <p class='text-gray-400 text-sm font-normal'>{a.description}</p>
                         </div>
-                        <div class='flex flex-row gap-1'>
+                        <div class='flex flex-row gap-1 items-center '>
                             <Tag color='orange'>{a.timing}</Tag>
-                            <Tag color='blue'>$ {a.price}</Tag>
+                            
+                            <div class='flex flex-row gap-1'>
+                                <div class={`flex items-center ${liveList.filter(b => b.serviceinfo[0] === a.id).length > 0 && 'line-through'}`}>
+                                    <Tag color={`${liveList.filter(b => b.serviceinfo[0] === a.id).length > 0 ? 'blue':'green'}`}>$ {a.price}</Tag>
+                                </div>
+                                {liveList.filter(b => b.serviceinfo[0] === a.id).map(c => <Tag color='green'>$ {c.total}</Tag> )}
+                            </div>
                         </div>
                     </div>
 

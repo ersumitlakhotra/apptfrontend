@@ -84,14 +84,14 @@ export const getCompanyViaStore = async (method, endPoint, store) => {
     }
     // api calls
 };
-export const apiCallsViaBooking = async (method, endPoint, companyId, id = null, date =null ) => {
+export const apiCallsViaBooking = async (method, endPoint, companyId, body = [], id = null, date = null, eventDate = false ) => {
     const options = {
         method: method,
-        url: API_ENDPOINT + `${endPoint}/${companyId}` + (id != null ? `/${id}` : '') + (date != null ? date : '') ,
+        url: API_ENDPOINT + `${endPoint}/${companyId}` + (id != null ? `/${id}` : '') + (date != null ? `/${date}` : '')+ (eventDate ? `/'${LocalDate()}'` : ''),
         headers: {
             'content-Type': 'application/json'
         },
-        data: []
+        data: body
     };
     try {
         return await axios.request(options);

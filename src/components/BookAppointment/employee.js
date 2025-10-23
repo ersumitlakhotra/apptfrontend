@@ -17,7 +17,7 @@ const Employee = ({ userList,next , user , setUser }) => {
         else
             setFilteredList(searchedList);
 
-    }, [searchInput])
+    }, [searchInput, userList])
 
     return (
         <div>

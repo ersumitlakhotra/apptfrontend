@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import { Button, message, Spin, Steps, theme } from 'antd';
+import { Button, message, Spin, Steps, theme, Modal } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -11,20 +11,28 @@ import Slot from '../../components/BookAppointment/slot.js';
 import Details from '../../components/BookAppointment/detail.js';
 import { apiCallsViaBooking, getCompanyViaStore } from '../../hook/apiCall';
 import { LocalDate } from '../../common/localDate.js';
+import dayjs from 'dayjs';
+import useAlert from '../../common/alert.js';
 
 function BookAppointment() {
     const [searchParams, setSearchParams] = useSearchParams();
+
+    const { contextHolder, success, error } = useAlert();
     const [isLoading, setIsLoading] = useState(false);
     const [isLocationValid, setIsLocationValid] = useState(true);
     const [companyList, setCompanyList] = useState([]);
     const [servicesList, setServicesList] = useState([]);
     const [userList, setUserList] = useState([]);
     const [orderList, setOrderList] = useState([]);
+    const [eventList, setEventList] = useState([]);
     const [trndate, setTrnDate] = useState(LocalDate());
 
     const [cid, setCid] = useState(0);
     const [service, setService] = useState(0);
     const [user, setUser] = useState(0);
+    const [slot, setSlot] = useState('');
+    const [customerName, setCustomerName] = useState('');
+    const [customerPhone, setCustomerPhone] = useState('');
 
     const storeId = searchParams.get('store') || 'All';
 
@@ -34,25 +42,42 @@ function BookAppointment() {
 
     useEffect(() => {
         getData(setServicesList, "services");
+        getData(setEventList, "event", null,true);
         getData(setUserList, "user");
+        getData(setOrderList, "order/booking", dayjs.utc(trndate, 'YYYY-MM-DD'));
     }, [cid]); 
     
     useEffect(() => {
         if (trndate === '')
             setTrnDate(LocalDate());
         if (cid !== 0) {
-            getData(setOrderList, "order/booking");
+            getData(setOrderList, "order/booking", dayjs.utc(trndate, 'YYYY-MM-DD'));
         }
     }, [trndate]);
 
-    const getData = async (setList, endPoint, date=null) => {
+    const getData = async (setList, endPoint, date=null,eventDate=false) => {
         setIsLoading(true);
         try {
-            const res = await apiCallsViaBooking("GET", endPoint, cid, null,date);
+            const res = await apiCallsViaBooking("GET", endPoint, cid, [], null, date, eventDate);
             setList(res.data.data);
         }
         catch (e) {
             setList([])
+            //error(error.message)
+        }
+        setIsLoading(false);
+    }
+    const saveData = async ( endPoint,body) => {
+        setIsLoading(true);
+        try {
+            const result = await apiCallsViaBooking("POST", endPoint, cid, body, null, null);
+            if (result.status === 201)
+                success(`The  has been  successfully.`);
+            else
+                error()
+            let status = result.status === 201 ? 'Created' : result.status === 200 ? 'Modified' : 'Deleted';
+        }
+        catch (e) {
             //error(error.message)
         }
         setIsLoading(false);
@@ -93,7 +118,7 @@ function BookAppointment() {
         },
         {
             title: 'Services',
-            content: <Services servicesList={servicesList} next={next} service={service} setService={setService}  />,
+            content: <Services servicesList={servicesList} eventList={eventList} next={next} service={service} setService={setService}  />,
         },
         {
             title: 'Employee',
@@ -101,11 +126,11 @@ function BookAppointment() {
         },
         {
             title: 'Slot',
-            content: <Slot trndate={trndate} setTrnDate={setTrnDate} orderList={orderList} setOrderList={setOrderList} assigned_to={user}/>,
+            content: <Slot allCompany={companyList} cid={cid} trndate={trndate} setTrnDate={setTrnDate} orderList={orderList} assigned_to={user} next={next} slot={slot} setSlot={setSlot} />,
         },
         {
             title: 'Details',
-            content: <Details />,
+            content: <Details customerName={customerName} setCustomerName={setCustomerName} customerPhone={customerPhone} setCustomerPhone={setCustomerPhone} />,
         },
     ]; 
     const items = steps.map(item => ({ key: item.title, title: item.title }));
@@ -120,6 +145,27 @@ function BookAppointment() {
         whiteSpace: 'nowrap',
         overflowX: 'auto'
     };
+    const save = async () => {       
+            const Body = JSON.stringify({
+                customerinfo: [{
+                    name: customerName,
+                    cell: customerPhone,
+                    email: '',
+                }],
+                serviceinfo: service.split(),
+                //price: price,
+                //discount: discount,
+                //tax: tax,
+                //taxamount: taxamount,
+                //total: total,
+                //coupon: coupon,
+                status: 'In progress',
+                trndate: trndate,
+                assignedto: user ,
+                slot: slot
+            });
+           // saveData("Order", id !== 0 ? 'PUT' : 'POST', "order", id !== 0 ? id : null, Body); 
+    }
     return (
         <div class='w-full'>
             <div class="relative max-w-xl mx-auto mt-8">
@@ -153,11 +199,11 @@ function BookAppointment() {
                         <Steps current={current} items={items} />
                         <div style={contentStyle}>{steps[current].content}</div>
                         <div style={{ marginTop: 24 }}>
-                            {current < steps.length - 1 && (
+                            {/*current < steps.length - 1 && (
                                 <Button type="primary" onClick={() => next()}>
                                     Next
                                 </Button>
-                            )}
+                            )*/}
                             {current === steps.length - 1 && (
                                 <Button variant='solid' color="cyan" onClick={() => message.success('Processing complete!')}>
                                     Complete
@@ -176,6 +222,7 @@ invalid location
                     </div>
                 }
             </div>
+            {contextHolder}
         </div>
     );
 }

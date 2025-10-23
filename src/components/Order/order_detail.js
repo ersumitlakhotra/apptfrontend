@@ -345,7 +345,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 <Input placeholder="Total" style={{ backgroundColor: '#FAFAFA' }} readOnly={true} value={total} />
             } />
 
-            <TextboxFlex label={'Coupon'} input={
+            <TextboxFlex label={'Event'} input={
                 <Select
                     value={coupon}
                     style={{ width: '100%' }}
@@ -353,7 +353,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     options={[{ value: '', label: '' },
                     ...liveList.map(item => ({
                         value: item.coupon,
-                        label: item.coupon
+                        label: item.title
                     }))]}
                 />
             } />

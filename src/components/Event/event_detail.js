@@ -109,7 +109,6 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
                 <Select
                     status={servicesItem.length === 0 ? 'error' : ''}
                     placeholder='Select services'
-                    mode="multiple"
                     value={servicesItem}
                     style={{ width: '100%' }}
                     onChange={(value) => onChangeServicesItem(value)}
