@@ -3,6 +3,7 @@ import { Button, Col, DatePicker, Popover, Row,Tag } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { generateTimeSlots } from '../../common/intervals';
+import { LocalDate, LocalTime } from '../../common/localDate';
 
 const Slot = ({ allCompany, cid, trndate, setTrnDate, orderList, assigned_to, next, slot, setSlot }) => {
 
@@ -74,17 +75,26 @@ const Slot = ({ allCompany, cid, trndate, setTrnDate, orderList, assigned_to, ne
         orderListSlot = (orderList.filter(a => (a.trndate.includes(trndate) && a.assignedto === assigned_to)));
         setIsOpen(isOpen);
         if (isOpen)
+        {
+            if(trndate === LocalDate())
+                inTime = LocalTime();
             setAvailableSlot(generateTimeSlots(inTime, outTime, slotGap, orderListSlot, slot));
+        }
         else {
             setAvailableSlot([]);
         }
     }
+    const disabledDate = (current) => {
+        // Can not select dates before today
+        return current && current < dayjs().startOf('day');
+    };
     return (
         <div>
             <Popover placement="bottom" title={"Select Booking Date"} content={
                 <div>
                     <DatePicker
                         style={{ width: '100%' }}
+                        disabledDate={disabledDate}
                         value={trndate === '' ? trndate : dayjs(trndate, 'YYYY-MM-DD')}
                         onChange={(date, dateString) => setTrnDate(dateString)} />
                 </div>
