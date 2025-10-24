@@ -13,7 +13,6 @@ import { apiCallsViaBooking, getCompanyViaStore } from '../../hook/apiCall';
 import { get_Date, LocalDate } from '../../common/localDate.js';
 import dayjs from 'dayjs';
 import useAlert from '../../common/alert.js';
-import barber from '../../Images/barber.jpeg';
 
 const BookAppointment =()=> {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -33,6 +32,7 @@ const BookAppointment =()=> {
     const [storeName, setStoreName] = useState('');
     const [storeCell, setStoreCell] = useState('');
     const [service, setService] = useState(0);
+    const [serviceName, setServiceName] = useState('');
     const [user, setUser] = useState(0);
     const [employeeName, setEmployeeName] = useState('');
     const [slot, setSlot] = useState('');
@@ -109,28 +109,29 @@ const BookAppointment =()=> {
    
     const steps = [
         {
-            title: 'Location',
+            title: storeName === '' ? 'Select Location':storeName,
             content: <Location companyList={companyList} next={next} cid={cid} setCid={setCid} setStoreName={setStoreName} setStoreCell={setStoreCell} />,
         },
         {
-            title: 'Services',
+            title: serviceName === '' ? 'Select Services' : serviceName,
             content: <Services 
             servicesList={servicesList} 
             eventList={eventList} 
             next={next} 
             service={service}  setService={setService} 
+            setServiceName={setServiceName}
             setPrice={setPrice} setDiscount={setDiscount} setTotal={setTotal} setCoupon={setCoupon}  />,
         },
         {
-            title: 'Employee',
+            title: employeeName === '' ? 'Select Employee' : employeeName,
             content: <Employee userList={userList} next={next} user={user} setUser={setUser} setEmployeeName={setEmployeeName} />,
         },
         {
-            title: 'Slot',
+            title: slot === '' ? 'Select Slot':get_Date(trndate,'DD MMM YYYY')+' '+ slot,
             content: <Slot allCompany={companyList} cid={cid} trndate={trndate} setTrnDate={setTrnDate} orderList={orderList} assigned_to={user} next={next} slot={slot} setSlot={setSlot} />,
         },
         {
-            title: 'Details',
+            title: customerName === '' ? 'Enter Details' : customerName,
             content: <Details customerName={customerName} setCustomerName={setCustomerName} customerPhone={customerPhone} setCustomerPhone={setCustomerPhone} />,
         },
     ]; 
@@ -223,13 +224,13 @@ const BookAppointment =()=> {
     }
     return (
         <div class='w-full'>
-            <div class="relative max-w-xl mx-auto mt-8">
-                <img class="h-64 w-full object-cover rounded-md" src={barber} alt="Random image" />
+           {/*<div class="relative max-w-xl mx-auto mt-8">
+                <img class="h-64 w-full object-cover rounded-md"  alt="Random image" />
                 <div class="absolute inset-0 bg-gray-700 opacity-60 rounded-md"></div>
                 <div class="absolute inset-0 flex items-center justify-center">
                     <h2 class="text-white text-3xl font-bold">Book an Appointment</h2>
                 </div>
-            </div>
+            </div>*/}
             <div class='w-full p-8'>
                 {isLoading ? (
                     <div

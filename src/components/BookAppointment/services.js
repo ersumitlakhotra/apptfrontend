@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Input, Tag } from "antd";
 import { IoSearchOutline } from "react-icons/io5";
 
-const Services = ({ servicesList, eventList, next, service, setService ,setPrice,setDiscount,setTotal,setCoupon}) => {
+const Services = ({ servicesList, eventList, next, service, setService, setServiceName ,setPrice,setDiscount,setTotal,setCoupon}) => {
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(servicesList);
     const [liveList, setLiveList] = useState([]);
@@ -22,8 +22,9 @@ const Services = ({ servicesList, eventList, next, service, setService ,setPrice
 
     }, [searchInput, servicesList, eventList])
 
-    const onService_Select=(id,price) => {
+    const onService_Select=(id,name,price) => {
         setService(id); 
+        setServiceName(name);
         setPrice(price);
         setDiscount('0');
         setCoupon('');
@@ -43,7 +44,7 @@ const Services = ({ servicesList, eventList, next, service, setService ,setPrice
             <Input size="large" placeholder="Search" prefix={<IoSearchOutline />} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
             </div>
             {filteredList.map(a => (
-                <div key={a.id} class={`w-full bg-white rounded-lg p-4 shadow cursor-pointer mb-4 ${a.id === service && 'border-green-500 bg-green-200 border'}`} onClick={() => onService_Select(a.id,a.price)}>
+                <div key={a.id} class={`w-full bg-white rounded-lg p-4 shadow cursor-pointer mb-4 ${a.id === service && 'border-green-500 bg-green-200 border'}`} onClick={() => onService_Select(a.id, a.name,a.price)}>
                     <div class='flex flex-col gap-3 text-gray-800 text-lg font-medium font-sans '>
                         <div class='flex flex-col'>
                             {a.name}
