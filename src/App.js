@@ -12,6 +12,7 @@ import {
 } from "react-router-dom";
 
 import logo from './Images/logo.png'
+import barber from './Images/barber.jpeg'
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
         <Route path="signup" element={<Signup   logo={logo}/>} />
         <Route path="resetpassword" element={<ResetPassword logo={logo} />} />
         <Route path="main" element={<MasterPage />} />
-        <Route path="book-appointment" element={<BookAppointment />} />
+        <Route path="book-appointment" element={<BookAppointment barber={barber} />} />
       </Routes>
     </Router>
   );

@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import { Button, message, Spin, Steps, theme, Modal } from 'antd';
+import { Button,  Spin, Steps, theme, Modal } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Location from '../../components/BookAppointment/locations.js';
 import Services from '../../components/BookAppointment/services.js';
@@ -14,9 +14,7 @@ import { get_Date, LocalDate } from '../../common/localDate.js';
 import dayjs from 'dayjs';
 import useAlert from '../../common/alert.js';
 
-import barber from '../../Images/barber.jpeg';
-
-function BookAppointment() {
+function BookAppointment({barber}) {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const { contextHolder, success, error,warning } = useAlert();
