@@ -6,7 +6,7 @@ import Accordion from "../../../common/accordion.js";
 import DataTable from "../../../common/datatable";
 import { getTableItem } from "../../../common/items.js";
 import { useEffect, useState } from "react";
-import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
 import { Tags } from "../../../common/tags.js";
 import InvoiceView from "./invoice_view.js";

@@ -14,6 +14,8 @@ import { get_Date, LocalDate } from '../../common/localDate.js';
 import dayjs from 'dayjs';
 import useAlert from '../../common/alert.js';
 
+import barber from '../../Images/barber.jpeg';
+
 function BookAppointment() {
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -223,7 +225,7 @@ function BookAppointment() {
     return (
         <div class='w-full'>
             <div class="relative max-w-xl mx-auto mt-8">
-                <img class="h-64 w-full object-cover rounded-md" src="https://images.unsplash.com/photo-1680725779155-456faadefa26" alt="Random image" />
+                <img class="h-64 w-full object-cover rounded-md" src={barber} alt="Random image" />
                 <div class="absolute inset-0 bg-gray-700 opacity-60 rounded-md"></div>
                 <div class="absolute inset-0 flex items-center justify-center">
                     <h2 class="text-white text-3xl font-bold">Book an Appointment</h2>
@@ -252,27 +254,32 @@ function BookAppointment() {
                     <>
                         <Steps current={current} items={items} />
                         <div style={contentStyle}>{steps[current].content}</div>
-                        <div style={{ marginTop: 24 }}>
-                            {/*current < steps.length - 1 && (
+                            <div style={{ marginTop: 24 }}>
+                                {/*current < steps.length - 1 && (
                                 <Button type="primary" onClick={() => next()}>
                                     Next
                                 </Button>
                             )*/}
-                            {current === steps.length - 1 && (
-                                <Button variant='solid' color="cyan" onClick={() => save()}>
-                                    Complete
-                                </Button>
-                            )}
-                            {current > 0 && (
-                                <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
-                                    Previous
-                                </Button>
-                            )}
-                        </div>
+                                {current > 0 && (
+                                    <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
+                                        Previous
+                                    </Button>
+                                )}
+                                {current === steps.length - 1 && (
+                                    <Button variant='solid' color="cyan" onClick={() => save()}>
+                                        Book Appointment
+                                    </Button>
+                                )}
+                            </div>
                     </>
                     :
                     <div class='flex flex-row justify-center items-center'>
-invalid location
+                            <div class='flex flex-col gap-3 items-start'>
+                                <p class='text-4xl font-sans font-semibold'> Page not found</p>
+                                <p >Uh oh, we can't seem to find the page you're looking for.</p>
+                                <p >Are you sure the website URL is correct ?</p>
+                                <p >Get in touch with the site owner.</p>
+                                </div>
                     </div>
                 }
             </div>

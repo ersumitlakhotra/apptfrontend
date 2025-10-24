@@ -1,6 +1,6 @@
 import { Button, Tabs, Image, Avatar } from "antd"
 import { getTabItems } from "../../common/items.js"
-import { ContainerOutlined, IdcardOutlined, NotificationOutlined, ShareAltOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
+import { ContainerOutlined, IdcardOutlined, NotificationOutlined, ShareAltOutlined, UserOutlined, LockOutlined, QrcodeOutlined } from '@ant-design/icons';
 import Account from "../../components/Setting/Account/account.js";
 import Notification from "../../components/Setting/Notification/notification.js";
 import SocialLink from "../../components/Setting/Social/sociallink.js";
@@ -12,6 +12,7 @@ import { BsTwitterX } from "react-icons/bs";
 import { TbWorldWww } from "react-icons/tb";
 import { useEffect, useState } from "react";
 import Security from "../../components/Setting/Security/security.js";
+import QRcode from "../../components/Setting/QRcode/qrcode.js";
 
 const Setting = ({ companyList, saveData, setRefresh, tabActiveKey, setTabActiveKey, logoList, billingList }) => {
     const tabItems = [
@@ -20,6 +21,7 @@ const Setting = ({ companyList, saveData, setRefresh, tabActiveKey, setTabActive
         getTabItems('3', 'Notifications', <NotificationOutlined />, <Notification />),
         getTabItems('4', 'Security', <LockOutlined />, <Security companyList={companyList} saveData={saveData} />),
         getTabItems('5', 'Social links', <ShareAltOutlined />, <SocialLink companyList={companyList} saveData={saveData} />),
+        getTabItems('6', 'QR Code', <QrcodeOutlined />, <QRcode companyList={companyList} />),
     ];
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');
