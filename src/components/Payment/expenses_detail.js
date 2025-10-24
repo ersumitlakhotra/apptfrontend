@@ -1,6 +1,6 @@
 
 import { useEffect, useImperativeHandle, useState } from "react";
-import { DatePicker,  Input } from "antd";
+import { DatePicker,  Input, Select } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { TextboxFlex } from "../../common/textbox";
 import { LocalDate } from "../../common/localDate";
@@ -14,13 +14,13 @@ const ExpensesDetail = ({ id, refresh, ref, expensesList, saveData, setOpen }) =
     const [name, setName] = useState('');
     const [quantity, setQuantity] = useState('1');
     const [netamount, setNetAmount] = useState('0.00');
-    const [taxamount, setTaxAmount] = useState('0.00');
+    const [taxamount, setTaxAmount] = useState('0');
     const [grossamount, setGrossAmount] = useState('0.00');
     const [notes, setNotes] = useState('');
 
     useEffect(() => {
         if (id === 0) {
-            setEtype('Expense'); setName(''); setQuantity('1'); setTrnDate(LocalDate()); setNetAmount('0.00'); setTaxAmount('0.00'); setGrossAmount('0.00'); setNotes('');
+            setEtype('Expense'); setName(''); setQuantity('1'); setTrnDate(LocalDate()); setNetAmount('0.00'); setTaxAmount('0'); setGrossAmount('0.00'); setNotes('');
         }
         else {
             const editList = expensesList.find(item => item.id === id)
@@ -73,15 +73,35 @@ const ExpensesDetail = ({ id, refresh, ref, expensesList, saveData, setOpen }) =
 
     };
     useEffect(() => {
-        let net = 0; let tax = 0; let total=0
-        net =parseFloat(netamount);
-        tax = parseFloat(taxamount);
-        total =net + tax;
-        if (isNaN(total))
-            setGrossAmount(0);
-        else
-            setGrossAmount(total.toFixed(2));
-    }, [netamount,taxamount])
+        let net = 0; let product_quantity = 1; 
+
+        if(quantity !== '')
+            product_quantity =parseFloat(quantity);
+
+        if(netamount !== '')
+            net =parseFloat(netamount * product_quantity);
+
+        
+
+        if (taxamount === 0) {
+            setGrossAmount(net)
+        }
+        else {
+            if (taxamount === 5) {
+                setGrossAmount(parseFloat(net * 1.05).toFixed(2))
+            }
+
+            if (taxamount === 13) {
+                setGrossAmount(parseFloat(net * 1.13).toFixed(2))
+            }
+
+            if (taxamount === 15) {
+                
+                setGrossAmount(parseFloat(net * 1.15).toFixed(2))
+            }
+
+        }
+    }, [netamount,taxamount,quantity])
     
     return (
         <div class='flex flex-col font-normal gap-2 mt-2'>
@@ -102,8 +122,19 @@ const ExpensesDetail = ({ id, refresh, ref, expensesList, saveData, setOpen }) =
             <TextboxFlex label={'Price ($)'} mandatory={true} input={
                 <Input placeholder="Price" status={(netamount === '' || netamount === '.') ? 'error' : ''} value={netamount} onChange={(e) => setPriceNumberOnly(e, setNetAmount)} />
             } />
-            <TextboxFlex label={'Tax ($)'} mandatory={true} input={
-                <Input placeholder="Tax" status={(taxamount === '' || taxamount === '.') ? 'error' : ''} value={taxamount} onChange={(e) => setPriceNumberOnly(e, setTaxAmount)} />
+            
+            <TextboxFlex label={'Tax (%)'} mandatory={true} input={
+                <Select
+                    value={taxamount}
+                    style={{ width: '100%' }}
+                    onChange={(value) => setTaxAmount(value)}
+                    options={[
+                        { value: 0, label: '0%' },
+                        { value: 5, label: '5%' },
+                        { value: 13, label: '13%' },
+                        { value: 15, label: '15%' }
+                    ]}
+                />
             } />
             <TextboxFlex label={'Total ($)'} mandatory={true} input={
                 <Input placeholder="Total" status={(grossamount === '' || grossamount === '.') ? 'error' : ''} value={grossamount} onChange={(e) => setPriceNumberOnly(e, setGrossAmount)} />

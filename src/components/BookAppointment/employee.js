@@ -4,7 +4,7 @@ import { Avatar, Image, Input, Tag } from "antd";
 import { IoSearchOutline } from "react-icons/io5";
 import { UserOutlined } from '@ant-design/icons';
 
-const Employee = ({ userList,next , user , setUser }) => {
+const Employee = ({ userList,next , user , setUser, setEmployeeName}) => {
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(userList);
 
@@ -25,7 +25,7 @@ const Employee = ({ userList,next , user , setUser }) => {
                 <Input size="large" placeholder="Search" prefix={<IoSearchOutline />} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
             </div>
             {filteredList.map(a => (
-                <div key={a.id} class={`w-full bg-white rounded-lg p-4 shadow cursor-pointer mb-4 ${a.id === user && 'border-green-500 bg-green-200 border'}`} onClick={() => { setUser(a.id); next(); }}>
+                <div key={a.id} class={`w-full bg-white rounded-lg p-4 shadow cursor-pointer mb-4 ${a.id === user && 'border-green-500 bg-green-200 border'}`} onClick={() => { setUser(a.id);setEmployeeName(a.fullname); next(); }}>
                     <div class='flex flex-col gap-3 text-gray-800 text-lg font-medium font-sans '>
                         <div class='flex flex-row gap-2 items-center'>
                             {a.profilepic !== null ?

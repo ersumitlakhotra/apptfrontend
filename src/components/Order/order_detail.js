@@ -150,7 +150,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
     }
 
     const save = async () => {
-        if (customerName !== '' && customerPhone !== '' && servicesItem.length !== 0 && price !== '' && price !== '.' && trndate !== '' && isOpen) {
+        if (customerName !== '' && customerPhone !== '' && customerPhone.length ===12  && servicesItem.length !== 0 && price !== '' && price !== '.' && trndate !== '' && isOpen) {
             const Body = JSON.stringify({
                 customerinfo: [{
                     name: customerName,

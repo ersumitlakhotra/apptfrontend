@@ -103,7 +103,7 @@ const Expenses = ({ key, expensesData, btn_Click, btn_LogsClick, fromDate, setFr
                             <td class="p-3 ">{item.quantity}</td>
 
                             <td class="p-3 ">$ {item.netamount}</td>
-                            <td class="p-3 ">$ {item.taxamount}</td>
+                            <td class="p-3 ">{item.taxamount}%</td>
                             <td class="p-3 ">$ {item.grossamount}</td>
                             <td class="p-3 ">{item.notes}</td>
                             <td class="p-3">{UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A')}</td>

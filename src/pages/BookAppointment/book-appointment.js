@@ -10,14 +10,15 @@ import Employee from '../../components/BookAppointment/employee.js';
 import Slot from '../../components/BookAppointment/slot.js';
 import Details from '../../components/BookAppointment/detail.js';
 import { apiCallsViaBooking, getCompanyViaStore } from '../../hook/apiCall';
-import { LocalDate } from '../../common/localDate.js';
+import { get_Date, LocalDate } from '../../common/localDate.js';
 import dayjs from 'dayjs';
 import useAlert from '../../common/alert.js';
 
 function BookAppointment() {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const { contextHolder, success, error } = useAlert();
+    const { contextHolder, success, error,warning } = useAlert();
+    const [modal, contextHolderModal] = Modal.useModal();
     const [isLoading, setIsLoading] = useState(false);
     const [isLocationValid, setIsLocationValid] = useState(true);
     const [companyList, setCompanyList] = useState([]);
@@ -28,11 +29,19 @@ function BookAppointment() {
     const [trndate, setTrnDate] = useState(LocalDate());
 
     const [cid, setCid] = useState(0);
+    const [storeName, setStoreName] = useState('');
+    const [storeCell, setStoreCell] = useState('');
     const [service, setService] = useState(0);
     const [user, setUser] = useState(0);
+    const [employeeName, setEmployeeName] = useState('');
     const [slot, setSlot] = useState('');
     const [customerName, setCustomerName] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
+
+    const [price, setPrice] = useState('0');
+    const [total, setTotal] = useState('0');
+    const [coupon, setCoupon] = useState('');
+    const [discount, setDiscount] = useState('0');
 
     const storeId = searchParams.get('store') || 'All';
 
@@ -67,21 +76,7 @@ function BookAppointment() {
         }
         setIsLoading(false);
     }
-    const saveData = async ( endPoint,body) => {
-        setIsLoading(true);
-        try {
-            const result = await apiCallsViaBooking("POST", endPoint, cid, body, null, null);
-            if (result.status === 201)
-                success(`The  has been  successfully.`);
-            else
-                error()
-            let status = result.status === 201 ? 'Created' : result.status === 200 ? 'Modified' : 'Deleted';
-        }
-        catch (e) {
-            //error(error.message)
-        }
-        setIsLoading(false);
-    }
+   
 
     const getLocations = async (setList, endPoint, store) => {
         setIsLoading(true);
@@ -114,15 +109,20 @@ function BookAppointment() {
     const steps = [
         {
             title: 'Location',
-            content: <Location companyList={companyList} next={next} cid={cid} setCid={setCid} />,
+            content: <Location companyList={companyList} next={next} cid={cid} setCid={setCid} setStoreName={setStoreName} setStoreCell={setStoreCell} />,
         },
         {
             title: 'Services',
-            content: <Services servicesList={servicesList} eventList={eventList} next={next} service={service} setService={setService}  />,
+            content: <Services 
+            servicesList={servicesList} 
+            eventList={eventList} 
+            next={next} 
+            service={service}  setService={setService} 
+            setPrice={setPrice} setDiscount={setDiscount} setTotal={setTotal} setCoupon={setCoupon}  />,
         },
         {
             title: 'Employee',
-            content: <Employee userList={userList} next={next} user={user} setUser={setUser} />,
+            content: <Employee userList={userList} next={next} user={user} setUser={setUser} setEmployeeName={setEmployeeName} />,
         },
         {
             title: 'Slot',
@@ -145,7 +145,37 @@ function BookAppointment() {
         whiteSpace: 'nowrap',
         overflowX: 'auto'
     };
-    const save = async () => {       
+
+    
+    const successModal = () => {
+        modal.success({
+            title:(<span class='font-semibold'>{storeName}</span>),
+            content: (
+                <div class='flex flex-col gap-4 p-4'>
+                    <p class='font-bold'>Hi {customerName}</p>
+                    <p>Your booking at <span class='font-semibold'>{storeName}</span> has been <span class='text-green-700'>Confirmed!</span></p>
+                    <div class='w-full flex flex-col gap-2 p-2 bg-white rounded-lg shadow border border-green-700 border-s-green-700 border-s-8'>
+                         <p class='font-bold'>Appointment Details</p>
+                         <p>Booked with: <span class='font-semibold'>{employeeName}</span></p>
+                         <p>Date: <span class='font-semibold'>{`${get_Date(trndate,'DD MMM YYYY')} at ${slot}`}</span></p>
+                    </div>
+                </div>
+            ),
+             onOk() {window.location.reload()},
+        });
+    };
+    const errorModal = () => {
+        modal.error({
+            title: (<span class='font-semibold'>{storeName}</span>),
+            content: ( <div class='flex flex-col gap-4 p-4'>
+                <p class='font-bold'>We sincerely apologize, but something went wrong with your booking!</p>
+                <p class='text-xs'>We invite you to try again, or to contact the store at {`( ${storeCell} ) `} to get help</p>
+            </div>),         
+             onOk() {window.location.reload()},
+        });
+    };
+    const save = async () => {     
+         if (customerName !== '' && customerPhone !== '' && customerPhone.length === 12 ) {  
             const Body = JSON.stringify({
                 customerinfo: [{
                     name: customerName,
@@ -153,18 +183,42 @@ function BookAppointment() {
                     email: '',
                 }],
                 serviceinfo: service.split(),
-                //price: price,
-                //discount: discount,
-                //tax: tax,
-                //taxamount: taxamount,
-                //total: total,
-                //coupon: coupon,
-                status: 'In progress',
+                price: price,
+                discount: discount,
+                tax: '0',
+                taxamount: '0',
+                total: total,
+                coupon: coupon,
+                status: 'Pending',
                 trndate: trndate,
                 assignedto: user ,
                 slot: slot
             });
-           // saveData("Order", id !== 0 ? 'PUT' : 'POST', "order", id !== 0 ? id : null, Body); 
+          saveData( Body);                  
+        }
+        else {        
+                warning('Please, fill out the required fields !');
+        }
+    }
+     const saveData = async ( body) => {
+        setIsLoading(true);
+        try {
+            const result = await apiCallsViaBooking("POST", "order", cid, body, null, null);
+            if (result.status === 201)
+            {
+                 const message='Hi '+customerName + ', this is a confirmation of your '+storeName+ ' booking for '+
+                get_Date(trndate,'DD MMM YYYY')+' at ' + slot +', If you have any questions, please contact the business at ( '+storeCell+' ) \n\n'+
+                'Book again: '+'https://appointstack.com/book-appointment?store='+storeId;
+                const res = await apiCallsViaBooking("POST", "twiliosms", cid, JSON.stringify({to: customerPhone.replaceAll('-','') ,message: message}), null, null);        
+                successModal();
+            }
+            else
+                errorModal();
+        }
+        catch (e) {
+            errorModal();
+        }
+        setIsLoading(false);
     }
     return (
         <div class='w-full'>
@@ -205,7 +259,7 @@ function BookAppointment() {
                                 </Button>
                             )*/}
                             {current === steps.length - 1 && (
-                                <Button variant='solid' color="cyan" onClick={() => message.success('Processing complete!')}>
+                                <Button variant='solid' color="cyan" onClick={() => save()}>
                                     Complete
                                 </Button>
                             )}
@@ -223,6 +277,7 @@ invalid location
                 }
             </div>
             {contextHolder}
+            {contextHolderModal}
         </div>
     );
 }
