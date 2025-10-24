@@ -54,7 +54,7 @@ const Setting = ({ companyList, saveData, setRefresh, tabActiveKey, setTabActive
     }, [logoList])
 
     const openExtendedLink = (address) => {
-        window.open(address);
+       // window.open(address);
         window.open(address, '_blank', 'noopener noreferrer');
     };
 

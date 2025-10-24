@@ -13,11 +13,12 @@ import { apiCallsViaBooking, getCompanyViaStore } from '../../hook/apiCall';
 import { get_Date, LocalDate } from '../../common/localDate.js';
 import dayjs from 'dayjs';
 import useAlert from '../../common/alert.js';
+import barber from '../../Images/barber.jpeg';
 
-function BookAppointment({barber}) {
+const BookAppointment =()=> {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const { contextHolder, success, error,warning } = useAlert();
+    const { contextHolder,warning } = useAlert();
     const [modal, contextHolderModal] = Modal.useModal();
     const [isLoading, setIsLoading] = useState(false);
     const [isLocationValid, setIsLocationValid] = useState(true);
