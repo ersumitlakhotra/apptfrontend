@@ -14,9 +14,10 @@ import { useEffect, useState } from "react";
 import Security from "../../components/Setting/Security/security.js";
 import QRcode from "../../components/Setting/QRcode/qrcode.js";
 
-const Setting = ({ companyList, saveData, setRefresh, tabActiveKey, setTabActiveKey, logoList, billingList }) => {
+const Setting = ({ companyList, saveData, setRefresh, tabActiveKey, setTabActiveKey, logoList, billingList,onSetSignout }) => {
+    
     const tabItems = [
-        getTabItems('1', 'Account', <IdcardOutlined />, <Account companyList={companyList} saveData={saveData} logoList={logoList} setRefresh={setRefresh} />),
+        getTabItems('1', 'Account', <IdcardOutlined />, <Account companyList={companyList} saveData={saveData} logoList={logoList} setRefresh={setRefresh} onSetSignout={onSetSignout} />),
         getTabItems('2', 'Billing & plans', <ContainerOutlined />, <Billing companyList={companyList} billingList={billingList} saveData={saveData} setRefresh={setRefresh} />),
         getTabItems('3', 'Notifications', <NotificationOutlined />, <Notification />),
         getTabItems('4', 'Security', <LockOutlined />, <Security companyList={companyList} saveData={saveData} />),

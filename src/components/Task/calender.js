@@ -22,7 +22,7 @@ const Calender = ({ orderList, servicesList, userList, companyList, trndate, btn
 
     useEffect(() => {
         let i = 0;
-        setHeaderItems(userList.map(a => ({ key: i = i + 1, label: a.fullname, id: a.id, profilepic: a.profilepic })))
+        setHeaderItems(userList.filter(item =>  !item.status.toLowerCase().includes('inactive')).map(a => ({ key: i = i + 1, label: a.fullname, id: a.id, profilepic: a.profilepic })))
     }, [userList])
 
     useEffect(() => {

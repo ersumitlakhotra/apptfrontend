@@ -10,11 +10,9 @@ const Services = ({ servicesList, eventList, next, service, setService, setServi
 
     useEffect(() => {
         const searchedList = servicesList.filter(item =>
-        (item.name.toLowerCase().includes(searchInput.toLowerCase()) && item.status.toLowerCase().includes('active')));
+        (item.name.toLowerCase().includes(searchInput.toLowerCase()) && !item.status.toLowerCase().includes('inactive')));
        
-        if (searchInput === '')
-            setFilteredList(servicesList);
-        else
+       
             setFilteredList(searchedList);
 
         const liveList = eventList.filter(a => a.case.toUpperCase() === 'LIVE');

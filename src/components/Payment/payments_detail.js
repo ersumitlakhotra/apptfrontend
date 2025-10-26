@@ -119,7 +119,7 @@ const PaymentsDetail = ({ id, refresh, ref, expensesList, userList, saveData, se
                     style={{ width: '100%' }}
                     status={assigned_to === '' ? 'error' : ''}
                     onChange={(value) => setAssignedTo(value)}
-                    options={userList.map(item => ({
+                    options={userList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
                         value: item.id,
                         label:
                             <div class='flex flex-row gap-2 items-center'>

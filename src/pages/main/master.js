@@ -380,6 +380,7 @@ const onSubmit = async(email,password) => {
         logoList={logoList}
         tabActiveKey={settingActiveTab}
         setTabActiveKey={setSettingActiveTab}
+        onSetSignout={onSetSignout}
       />;    
   }
 

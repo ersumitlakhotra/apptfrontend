@@ -39,7 +39,7 @@ export const Signup = ({logo}) => {
         const cid = res.data.data.id;
         try {
           const userBody = JSON.stringify({
-            fullname: business_name,
+            fullname: 'Admin',
             cell: cell,
             email: email,
             gender: 'Male',

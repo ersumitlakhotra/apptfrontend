@@ -67,7 +67,7 @@ const Payments = ({ key, expensesData, userList, btn_LogsClick, btn_Click, fromD
                             style={{ width: 300 }}
                             size="middle"
                             onChange={(value) => setAssignedTo(value)}
-                            options={[{ value: '', label: 'All Users' }, ...userList.map(item => ({
+                            options={[{ value: '', label: 'All Users' }, ...userList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
                                 value: item.id,
                                 label:<AssignedTo key={item.id} userId={item.id} userList={userList} />                                 
                             }))]}

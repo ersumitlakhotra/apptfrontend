@@ -295,7 +295,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     value={servicesItem}
                     style={{ width: '100%' }}
                     onChange={(value) => setServicesItem(value)}
-                    options={servicesList.map(item => ({
+                    options={servicesList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
                         value: item.id,
                         label: item.name
                     }))}
@@ -372,7 +372,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     value={assigned_to}
                     style={{ width: '100%' }}
                     onChange={(value) => setAssignedTo(value)}
-                    options={[{value:'0',label:'None'},...userList.map(item => ({
+                    options={[{value:'0',label:'None'},...userList.filter(a =>!a.status.toLowerCase().includes('inactive')).map(item => ({
                         value: item.id,
                         label:
                             <div class='flex flex-row gap-2 items-center'>

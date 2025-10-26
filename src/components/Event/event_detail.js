@@ -112,7 +112,7 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
                     value={servicesItem}
                     style={{ width: '100%' }}
                     onChange={(value) => onChangeServicesItem(value)}
-                    options={servicesList.map(item => ({
+                    options={servicesList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
                         value: item.id,
                         label: item.name
                     }))}

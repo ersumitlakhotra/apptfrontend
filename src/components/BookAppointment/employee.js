@@ -10,13 +10,9 @@ const Employee = ({ userList,next , user , setUser, setEmployeeName}) => {
 
     useEffect(() => {
         const searchedList = userList.filter(item =>
-            (item.fullname.toLowerCase().includes(searchInput.toLowerCase()) && item.status.toLowerCase().includes('active')));
+            (item.fullname.toLowerCase().includes(searchInput.toLowerCase()) && !item.status.toLowerCase().includes('inactive')));
 
-        if (searchInput === '')
-            setFilteredList(userList);
-        else
-            setFilteredList(searchedList);
-
+        setFilteredList(searchedList);
     }, [searchInput, userList])
 
     return (
