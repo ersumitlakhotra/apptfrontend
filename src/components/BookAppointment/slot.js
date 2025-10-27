@@ -97,6 +97,7 @@ const Slot = ({ allCompany, cid, trndate, setTrnDate, orderList, assigned_to, us
                 }
 
         }
+        
         let orderListSlot = [];
         orderListSlot = (orderList.filter(a => (a.trndate.includes(trndate) && a.assignedto === assigned_to)));
         setIsOpen(isOpen);
