@@ -100,6 +100,22 @@ export const apiCallsViaBooking = async (method, endPoint, companyId, body = [],
     }
     // api calls
 };
+export const apiCallWithoutCid = async (method, endPoint, body = [] ) => {
+    const options = {
+        method: method,
+        url: API_ENDPOINT + `${endPoint}`,
+        headers: {
+            'content-Type': 'application/json'
+        },
+        data: body
+    };
+    try {
+        return await axios.request(options);
+    } catch (error) {
+        return error;
+    }
+    // api calls
+};
 
 
 
