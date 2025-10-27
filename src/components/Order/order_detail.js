@@ -167,7 +167,8 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 status: status,
                 trndate: trndate,
                 assignedto: assigned_to === '' ? 0 : assigned_to,
-                slot: slot
+                slot: slot, 
+                bookedvia:'Walk-In',
             });
             saveData("Order", id !== 0 ? 'PUT' : 'POST', "order", id !== 0 ? id : null, Body);
             setOpen(false);

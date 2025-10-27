@@ -10,11 +10,13 @@ const Slot = ({ allCompany, cid, trndate, setTrnDate, orderList, assigned_to, us
     const [availableSlot, setAvailableSlot] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const [isUserWorking, setUserWorking] = useState(false);
+    const [bookingDays, setBookingDays] = useState(0);
     const weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
     useEffect(() => {
         if (cid !== 0) {
             let selectedCompany = allCompany.filter(a => a.id === cid);
+            setBookingDays(selectedCompany[0].bookingdays);
             let userSchedule = userList.filter(a => a.id === assigned_to);
             if (selectedCompany[0].timinginfo !== null && userSchedule[0].scheduleinfo !== null) {
                 if (trndate !== '') {
@@ -110,8 +112,9 @@ const Slot = ({ allCompany, cid, trndate, setTrnDate, orderList, assigned_to, us
         }
     }
     const disabledDate = (current) => {
-        // Can not select dates before today
-        return current && current < dayjs().startOf('day');
+        const isBeforeToday = current && current < dayjs().startOf('day');
+        const isAfter = current && current > dayjs().add(bookingDays, 'days').endOf('day');
+        return isBeforeToday || isAfter;
     };
     return (
         <div>
