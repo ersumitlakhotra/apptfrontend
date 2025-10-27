@@ -2,10 +2,11 @@
 
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Avatar,  Button,  Image,  Rate, Tabs } from "antd";
-import { CloudUploadOutlined, EyeOutlined, UserOutlined } from '@ant-design/icons';
+import { CloudUploadOutlined, EyeOutlined, UserOutlined,ClockCircleOutlined } from '@ant-design/icons';
 import UserAbout from "./about.js";
 import useAlert from "../../common/alert.js";
 import UserLoginPermissions from "./permissions.js";
+import UserSchedule from "./schedule.js";
 import {  isValidEmail } from "../../common/cellformat.js";
 
 function getTabItems(key, label, icon, children) {
@@ -37,19 +38,39 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
     const [sales, setSales] = useState(false);
     const [setting, setSetting] = useState(false);
 
+    
+    const weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+
+    const [monday, setMonday] = useState(['09:00:00', '21:00:00', true]);
+    const [tuesday, setTuesday] = useState(['09:00:00', '21:00:00', true]);
+    const [wednesday, setWednesday] = useState(['09:00:00', '21:00:00', true]);
+    const [thursday, setThursday] = useState(['09:00:00', '21:00:00', true]);
+    const [friday, setFriday] = useState(['09:00:00', '21:00:00', true]);
+    const [saturday, setSaturday] = useState(['09:00:00', '21:00:00', true]);
+    const [sunday, setSunday] = useState(['09:00:00', '21:00:00', true]);
+
+
     const { contextHolder, error, warning } = useAlert();
     let refimage=useRef();
 
     useEffect(() => {
-        setTabActiveKey("1"); 
+        setTabActiveKey("1");
         if (id === 0) {
             setFullname('');
             setCell(''); setEmail(''); setAddress('');
-            setUsername(''); setPassword(''); setRole('Employee'); setRating(0); 
-           setAccountType('Basic'); setProfile(null);
+            setUsername(''); setPassword(''); setRole('Employee'); setRating(0);
+            setAccountType('Basic'); setProfile(null);
             setGender('Male'); setStatus('Active');
             setDashboard(true); setTasks(false); setOrder(false); setEvent(false); setPayment(false);
-            setServices(false); setUsers(false); setSales(false); setSetting(false); 
+            setServices(false); setUsers(false); setSales(false); setSetting(false);
+
+            setMonday(['09:00:00', '21:00:00', true]);
+            setTuesday(['09:00:00', '21:00:00', true]);
+            setWednesday(['09:00:00', '21:00:00', true]);
+            setThursday(['09:00:00', '21:00:00', true]);
+            setFriday(['09:00:00', '21:00:00', true]);
+            setSaturday(['09:00:00', '21:00:00', true]);
+            setSunday(['09:00:00', '21:00:00', true]);
         }
         else {
             const editList = userList.find(item => item.id === id)
@@ -77,8 +98,29 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
                 setSetting(editList.permissioninfo[0].setting);
             }
             else {
-                setDashboard(true); setTasks(false); setOrder(false); setEvent(false); setPayment(false); 
-                setServices(false); setUsers(false); setSales(false); setSetting(false); }
+                setDashboard(true); setTasks(false); setOrder(false); setEvent(false); setPayment(false);
+                setServices(false); setUsers(false); setSales(false); setSetting(false);
+            }
+
+            if (editList.scheduleinfo !== null) {
+                setSunday(editList.scheduleinfo[0].sunday);
+                setMonday(editList.scheduleinfo[0].monday);
+                setTuesday(editList.scheduleinfo[0].tuesday);
+                setWednesday(editList.scheduleinfo[0].wednesday);
+                setThursday(editList.scheduleinfo[0].thursday);
+                setFriday(editList.scheduleinfo[0].friday);
+                setSaturday(editList.scheduleinfo[0].saturday);
+                
+            }
+            else {
+            setMonday(['09:00:00', '21:00:00', true]);
+            setTuesday(['09:00:00', '21:00:00', true]);
+            setWednesday(['09:00:00', '21:00:00', true]);
+            setThursday(['09:00:00', '21:00:00', true]);
+            setFriday(['09:00:00', '21:00:00', true]);
+            setSaturday(['09:00:00', '21:00:00', true]);
+            setSunday(['09:00:00', '21:00:00', true]);  }
+
         }
     }, [refresh])
 
@@ -109,7 +151,20 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
             }]
         }     
     }
+    
+    function getUserSchedule() {
+        return [{
+            sunday: sunday,
+            monday: monday,
+            tuesday: tuesday,
+            wednesday: wednesday,
+            thursday: thursday,
+            friday: friday,
+            saturday: saturday,
+        }]
+    }
 
+    
     const save = async () => {
         if (fullname !== '' && (role === "User" ? password !== '':true) && isValidEmail(email) ) {
             const Body = JSON.stringify({
@@ -122,6 +177,7 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
                 role: role,
                 rating: rating,
                 permissioninfo:getUserPermission(),
+                scheduleinfo:getUserSchedule(),
                 status: status,
                 accounttype: accounttype,
                 profilepic: profilepic
@@ -180,7 +236,23 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
             setSales={setSales}
             setting={setting}
             setSetting={setSetting}
-        />))
+        />)),
+        getTabItems('3', 'Schedule', <ClockCircleOutlined/>, <UserSchedule 
+            sunday={sunday}
+            setSunday={setSunday}
+            monday={monday}
+            setMonday={setMonday}
+            tuesday={tuesday}
+            setTuesday={setTuesday}
+            wednesday={wednesday}
+            setWednesday={setWednesday}
+            thursday={thursday}
+            setThursday={setThursday}
+            friday={friday}
+            setFriday={setFriday}
+            saturday={saturday}
+            setSaturday={setSaturday}
+            />)
     ];
     const handleFileChange = (event) => {
         const file = event.target.files[0]; // Access the first selected file

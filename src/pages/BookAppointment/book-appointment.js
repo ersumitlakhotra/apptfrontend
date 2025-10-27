@@ -128,7 +128,7 @@ const BookAppointment =()=> {
         },
         {
             title: slot === '' ? 'Select Slot':get_Date(trndate,'DD MMM YYYY')+' '+ slot,
-            content: <Slot allCompany={companyList} cid={cid} trndate={trndate} setTrnDate={setTrnDate} orderList={orderList} assigned_to={user} next={next} slot={slot} setSlot={setSlot} />,
+            content: <Slot allCompany={companyList} cid={cid} trndate={trndate} setTrnDate={setTrnDate} orderList={orderList} assigned_to={user} userList={userList} employeeName={employeeName} next={next} slot={slot} setSlot={setSlot} />,
         },
         {
             title: customerName === '' ? 'Enter Details' : customerName,
