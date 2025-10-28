@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import { Button, Spin, Steps, theme, Modal, Radio, Input, Select, Space } from 'antd';
+import { Button, Spin, Steps, theme, Modal, Radio, Input, Select, Space,Popconfirm } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -222,10 +222,27 @@ const BookAppointment = () => {
             onOk() { window.location.reload() },
         });
     };
+    const cancelModal = (order_no) => {
+        modal.success({
+            title: (<span class='font-semibold'>{storeName}</span>),
+            content: (
+                <div class='flex flex-col gap-4 p-4'>
+                    <p class='font-bold'>Hi {customerName}</p>
+                    <p>Your booking at <span class='font-semibold'>{storeName}</span> has been  <span class='text-red-700'>Cancelled!</span></p>
+                    <div class='w-full flex flex-col gap-2 p-2 bg-white rounded-lg shadow border border-red-700 border-s-red-700 border-s-8'>
+                        <p class='font-bold'>Appointment Details</p>
+                        <p>Booking #: <span class='font-semibold'>{order_no}</span></p>
+                        <p>Booked with: <span class='font-semibold'>{employeeName}</span></p>
+                        <p>Date: <span class='font-semibold'>{`${get_Date(trndate, 'DD MMM YYYY')} at ${slot}`}</span></p>
+                    </div>
+                </div>
+            ),
+            onOk() { window.location.reload() },
+        });
+    };
 
 
-
-    const save = async () => {
+    const save = async (isCancelled = false) => {
         if (customerName !== '' && customerPhone !== '' && customerPhone.length === 12 && customerEmail !== '' && isValidEmail(customerEmail)) {
             const Body = JSON.stringify({
                 customerinfo: [{
@@ -246,10 +263,15 @@ const BookAppointment = () => {
                 slot: slot,
                 bookedvia: 'Appointment',
             });
-            if (isRescheduled)
-                saveData("PUT", "order", Body, orderId);
-            else
-                saveData("POST", "order", Body, null);
+            if (isCancelled) {
+                saveData("POST", "order/cancel", [], orderId);
+            }
+            else {
+                if (isRescheduled)
+                    saveData("PUT", "order", Body, orderId);
+                else
+                    saveData("POST", "order", Body, null);
+            }
         }
         else {
             warning('Please, fill out the required fields !');
@@ -266,6 +288,14 @@ const BookAppointment = () => {
                     'Book again: ' + 'https://appointstack.com/book-appointment?store=' + storeId;
                 //const res = await apiCallsViaBooking("POST", "twiliosms", cid, JSON.stringify({to: customerPhone.replaceAll('-','') ,message: message}), null, null);        
                 successModal(order_no);
+            }
+            else if (result.status === 203) {
+                const order_no = result.data.data.order_no;
+                const message = 'Hi ' + customerName + '\n,This is a confirmation of your ' + storeName + ' booking for ' +
+                    get_Date(trndate, 'DD MMM YYYY') + ' at ' + slot + '.\n\nBooking# : ' + order_no + ' \nBooked with: ' + employeeName + '\nIf you have any questions, please contact the business at ( ' + storeCell + ' ) \n\n' +
+                    'Book again: ' + 'https://appointstack.com/book-appointment?store=' + storeId;
+                //const res = await apiCallsViaBooking("POST", "twiliosms", cid, JSON.stringify({to: customerPhone.replaceAll('-','') ,message: message}), null, null);        
+                cancelModal(order_no);
             }
             else
                 errorModal();
@@ -425,9 +455,18 @@ const BookAppointment = () => {
                                                 {isRescheduled ? 'Rescheduled' : 'Book Appointment'}
                                             </Button>
                                             {isRescheduled &&
-                                                <Button variant='solid' color="danger" onClick={() => save()}>
-                                                    Cancel Appointment
-                                                </Button>}
+                                                <Popconfirm
+                                                    title="Cancel"
+                                                    description="Are you sure to cancel the appointment? "
+                                                    onConfirm={() => save(true)}
+                                                    okText="Yes"
+                                                    cancelText="No"
+                                                >
+                                                    <Button variant='solid' color="danger">
+                                                        Cancel Appointment
+                                                    </Button>
+                                                </Popconfirm>
+                                            }
                                         </Space>
                                     )}
                                 </div>
