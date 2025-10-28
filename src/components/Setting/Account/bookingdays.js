@@ -17,7 +17,7 @@ const BookingDays = ({ companyList, saveData }) => {
         const Body = JSON.stringify({
             bookingdays: bookingdays,
         });
-        saveData("Booking Horizons", "PUT", "company/bookingdays", null, Body);
+        saveData("Booking Horizons", "PUT", "company/bookingdays", null, Body,true,false);
     }
     return (
         <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>

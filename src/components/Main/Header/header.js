@@ -108,7 +108,7 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermi
         message: item.message,
         read: 0,
       });
-      saveData("Notification", 'PUT', "notification", item.id, Body, false);
+      saveData("Notification", 'PUT', "notification", item.id, Body, false,false);
     })
   }
 

@@ -127,34 +127,35 @@ const MasterPage = () => {
     setIsLoading(false);
   } 
   
-  const saveData = async (label, method, endPoint, id = null, body = null,notify=true) => {
+  const saveData = async (label, method, endPoint, id = null, body = null, notify = true, logs = true) => {
     setIsLoading(true);
     try {
       const result = await apiCalls(method, endPoint, id, body);
 
-      if (result.status === 500 || result.status === 404)
-      {
+      if (result.status === 500 || result.status === 404) {
         notify && error(result.message);
       }
       else {
         let status = result.status === 201 ? 'Created' : result.status === 200 ? 'Modified' : 'Deleted';
-        const Log = JSON.stringify({
-          ltype: label,
-          lid: result.data.data.id,
-          lname: '',
-          userid: localStorage.getItem('uid'),
-          status: status,
-          datainfo: [body] 
-        });
+        if (logs) {
+          const Log = JSON.stringify({
+            ltype: label,
+            lid: result.data.data.id,
+            lname: '',
+            userid: localStorage.getItem('uid'),
+            status: status,
+            datainfo: [body]
+          });
 
-        await apiCalls('POST', 'logs', null, Log);
+          await apiCalls('POST', 'logs', null, Log);
+        }
         notify && success(`The ${label} has been ${status} successfully.`);
         setRefresh(refresh + 1)
       }
     }
     catch (e) {
       notify && error(e.message)
-    }  
+    }
     setIsLoading(false);
   }
 

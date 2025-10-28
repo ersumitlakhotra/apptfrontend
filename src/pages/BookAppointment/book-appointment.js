@@ -16,6 +16,7 @@ import useAlert from '../../common/alert.js';
 import { TextboxFlex } from '../../common/textbox.js';
 import logo from '../../Images/logo.png'
 import { isValidEmail } from '../../common/cellformat.js';
+import { Tags } from '../../common/tags.js';
 
 const BookAppointment = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -54,6 +55,8 @@ const BookAppointment = () => {
     const [isRescheduled, setIsRescheduled] = useState(false);
     const [bookedSlot, setBookedSlot] = useState('');
     const [bookedTrndate, setBookedTrndate] = useState('');
+    
+    const [orderStatus, setOrderStatus] = useState('Pending');
     const storeId = searchParams.get('store') || 'All';
 
     useEffect(() => {
@@ -82,6 +85,7 @@ const BookAppointment = () => {
         setTrnDate(LocalDate());
         setBookedSlot('');
         setBookedTrndate('');
+        setOrderStatus('Pending');
         setIsRescheduled(false);
     }, [btype]);
 
@@ -348,6 +352,7 @@ const BookAppointment = () => {
                         setTotal(editList.total);
                         setCoupon(editList.coupon);
                         setDiscount(editList.discount);
+                        setOrderStatus(editList.status);
                         setCurrent(4);
                         setIsRescheduled(true);
                         isRecordFound = true;
@@ -438,6 +443,11 @@ const BookAppointment = () => {
                             <>
                                 <Steps current={current} items={items} />
                                 <div style={contentStyle}>{steps[current].content}</div>
+                                {orderStatus !== 'Pending' ? 
+                                <div class='w-full mt-2'>
+                                    Order status is marked as {Tags(orderStatus)}. You can't reschedule or cancel the appointment.
+                                </div>
+                                :
                                 <div style={{ marginTop: 24 }}>
                                     {/*current < steps.length - 1 && (
                                 <Button type="primary" onClick={() => next()}>
@@ -469,7 +479,7 @@ const BookAppointment = () => {
                                             }
                                         </Space>
                                     )}
-                                </div>
+                                </div>}
                             </> : <></>
                         :
                         <div class='flex flex-row justify-center items-center'>

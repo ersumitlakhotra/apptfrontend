@@ -60,7 +60,7 @@ const BasicInfo = ({ companyList, saveData, logoList }) => {
                 postal: postal
             }]
         });
-        saveData("Basic Information", "PUT", "company/address", null, Body);
+        saveData("Basic Information", "PUT", "company/address", null, Body,true,false);
     }
 
     const { contextHolder, error } = useAlert();
