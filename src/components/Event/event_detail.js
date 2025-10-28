@@ -75,9 +75,7 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
     const onChangeServicesItem = (value) => {
         let rate = 0;
         setServicesItem(value);
-        servicesList.filter(a =>
-            value.some(b => b === a.id)
-        ).map(item => (rate = rate + parseFloat(item.price)));
+        servicesList.filter(a => a.id === value).map(item => (rate = rate + parseFloat(item.price)));
         setPrice(parseFloat(rate).toFixed(2))
     } 
 
