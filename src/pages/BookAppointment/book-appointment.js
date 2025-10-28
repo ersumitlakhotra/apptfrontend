@@ -55,8 +55,10 @@ const BookAppointment = () => {
     const [isRescheduled, setIsRescheduled] = useState(false);
     const [bookedSlot, setBookedSlot] = useState('');
     const [bookedTrndate, setBookedTrndate] = useState('');
-    
+
     const [orderStatus, setOrderStatus] = useState('Pending');
+    const [emailUser, setEmailUser] = useState('');
+    const [emailPass, setEmailPass] = useState('');
     const storeId = searchParams.get('store') || 'All';
 
     useEffect(() => {
@@ -85,11 +87,17 @@ const BookAppointment = () => {
         setTrnDate(LocalDate());
         setBookedSlot('');
         setBookedTrndate('');
+        setEmailUser('');
+        setEmailPass('');
         setOrderStatus('Pending');
         setIsRescheduled(false);
     }, [btype]);
 
     useEffect(() => {
+        companyList.filter(a=> a.id === cid).map(item => {
+            setEmailUser(item.emailuser);
+            setEmailPass(item.emailpass);
+        })
         getData(setServicesList, "GET", "services");
         getData(setEventList, "GET", "event", [], null, null, true);
         getData(setUserList, "GET", "user");
@@ -281,24 +289,18 @@ const BookAppointment = () => {
             warning('Please, fill out the required fields !');
         }
     }
-    const saveData = async (method, endPoint, body, id) => {
+    const saveData = async (method, endPoint, body, id ) => {
         setIsLoading(true);
         try {
             const result = await apiCallsViaBooking(method, endPoint, cid, body, id, null);
             if (result.status === 201 || result.status === 200) {
                 const order_no = result.data.data.order_no;
-                const message = 'Hi ' + customerName + '\n,This is a confirmation of your ' + storeName + ' booking for ' +
-                    get_Date(trndate, 'DD MMM YYYY') + ' at ' + slot + '.\n\nBooking# : ' + order_no + ' \nBooked with: ' + employeeName + '\nIf you have any questions, please contact the business at ( ' + storeCell + ' ) \n\n' +
-                    'Book again: ' + 'https://appointstack.com/book-appointment?store=' + storeId;
-                //const res = await apiCallsViaBooking("POST", "twiliosms", cid, JSON.stringify({to: customerPhone.replaceAll('-','') ,message: message}), null, null);        
+                sendEmail(id, order_no, false);
                 successModal(order_no);
             }
             else if (result.status === 203) {
                 const order_no = result.data.data.order_no;
-                const message = 'Hi ' + customerName + '\n,This is a confirmation of your ' + storeName + ' booking for ' +
-                    get_Date(trndate, 'DD MMM YYYY') + ' at ' + slot + '.\n\nBooking# : ' + order_no + ' \nBooked with: ' + employeeName + '\nIf you have any questions, please contact the business at ( ' + storeCell + ' ) \n\n' +
-                    'Book again: ' + 'https://appointstack.com/book-appointment?store=' + storeId;
-                //const res = await apiCallsViaBooking("POST", "twiliosms", cid, JSON.stringify({to: customerPhone.replaceAll('-','') ,message: message}), null, null);        
+                sendEmail(id, order_no, true);
                 cancelModal(order_no);
             }
             else
@@ -306,6 +308,34 @@ const BookAppointment = () => {
         }
         catch (e) {
             errorModal();
+        }
+        setIsLoading(false);
+    }
+
+    const sendEmail = async (id, order_no, isCancelled) =>{
+        const Subject = isCancelled ? 'Booking Cancellation' : id === null ? "Booking Confirmation" : "Re-Schedule Confirmation";
+        const link = 'https://appointstack.com/book-appointment?store=' + storeId;
+        let message = '<p>Hi ' + customerName + '</p>';
+        message += `<p>This is a ${isCancelled ? 'cancellation' :'confirmation'} of your <b>` + serviceName + ' </b> booking on ' + get_Date(trndate, 'DD MMM YYYY') + ' at ' + slot + '.</p>';
+        message += '<p>Your <b>Booking# :</b> ' + order_no + ' and <b>Booked With : </b>' + employeeName + '</p>';
+        message += '<p>If you have any questions, please contact the business at ( ' + storeCell + ' )</p>';
+        message += '<p>In case for New booking/Rescheduling/Cancellation, please click on this link:</p><a href="' + link +'">' + link + '</a>';
+
+        const Body = JSON.stringify({
+            emailUser: emailUser,
+            emailPass: emailPass,
+            storeName: storeName,
+            to: customerEmail,
+            subject: Subject,
+            message: message,
+        });
+        setIsLoading(true);
+        try {
+        await apiCallsViaBooking("POST", "sendmail", cid, Body);
+        }
+        catch(e)
+        {
+
         }
         setIsLoading(false);
     }
