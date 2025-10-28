@@ -51,7 +51,7 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
                 description: description,
                 startdate: startDate,
                 enddate: endDate,
-                serviceinfo: servicesItem,
+                serviceinfo: servicesItem.split(),
                 price: price,
                 discount: discount,
                 total: total,

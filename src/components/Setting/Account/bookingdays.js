@@ -22,9 +22,10 @@ const BookingDays = ({ companyList, saveData }) => {
     return (
         <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
             <Heading label={"Booking Horizons"} icon={<CarryOutFilled />} desc={`Appointment can be booked up to ${bookingdays} days in advance`} />
-            <div class='ml-8 md:w-1/12'>
+            <div class='ml-8 md:w-1/6'>
                 <Select
                     value={bookingdays}
+                    size="large"
                     style={{ width: '100%' }}
                     onChange={(value) => setBookingdays(value)}
                     options={[
