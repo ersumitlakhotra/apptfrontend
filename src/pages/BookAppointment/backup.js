@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import { Button, Spin, Steps, Modal, Radio, Input, Select, Space,Popconfirm, Drawer } from 'antd';
-import { LoadingOutlined, LeftSquareOutlined, CloseSquareOutlined, LeftOutlined, ArrowLeftOutlined, CloseOutlined, UpCircleOutlined } from '@ant-design/icons';   
+import { Button, Spin, Steps, theme, Modal, Radio, Input, Select, Space,Popconfirm } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Location from '../../components/BookAppointment/locations.js';
@@ -10,90 +10,69 @@ import Employee from '../../components/BookAppointment/employee.js';
 import Slot from '../../components/BookAppointment/slot.js';
 import Details from '../../components/BookAppointment/detail.js';
 import { apiCallsViaBooking, getCompanyViaStore } from '../../hook/apiCall';
-import { get_Date, LocalDate, LocalTime } from '../../common/localDate.js';
+import { get_Date, LocalDate } from '../../common/localDate.js';
 import dayjs from 'dayjs';
 import useAlert from '../../common/alert.js';
 import { TextboxFlex } from '../../common/textbox.js';
+import logo from '../../Images/logo.png'
 import { isValidEmail } from '../../common/cellformat.js';
 import { Tags } from '../../common/tags.js';
-import FirstPage from '../../components/BookAppointment/first_page.js';
-import BookingOption from '../../components/BookAppointment/book_reschedule.js';
-import { generateTimeSlots } from '../../common/intervals.js';
 
-const BookAppointment = () => {
+const BookAppointmentBackup = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const {contextHolder, warning, error } = useAlert();
+
+    const { contextHolder, warning, error } = useAlert();
     const [modal, contextHolderModal] = Modal.useModal();
     const [isLoading, setIsLoading] = useState(false);
-
-    const [content, setContent] = useState(0);
-
-    const [cid, setCid] = useState(0);
-    const [storeName, setStoreName] = useState('');
-    const [storeCell, setStoreCell] = useState(''); 
-    const [emailUser, setEmailUser] = useState('');
-    const [emailPass, setEmailPass] = useState('');
-    const [daysAdvance, setDaysAdvance] = useState(0);
-    const [slotGap, setSlotGap] = useState(60);
-    const [storeSchedule, setStoreSchedule] = useState(null); 
-
-    const [bookingType, setBookingType] = useState(0);
-
-    const [user, setUser] = useState(0);
-    const [employeeName, setEmployeeName] = useState('');
-    const [employeeSchedule, setEmployeeSchedule] = useState(null);
-
-    const [servicesItem, setServicesItem] = useState([]); 
-    const [price, setPrice] = useState('0');
-    const [total, setTotal] = useState('0');
-    const [coupon, setCoupon] = useState('');
-    const [discount, setDiscount] = useState('0');
-
-    const [trndate, setTrnDate] = useState(LocalDate());
-    const [slot, setSlot] = useState(''); 
-    const [availableSlot, setAvailableSlot] = useState([]);
-    const [isOpen, setIsOpen] = useState(false);
-    const [isUserWorking, setUserWorking] = useState(false);
-  
-    const [customerName, setCustomerName] = useState('');
-    const [customerPhone, setCustomerPhone] = useState('');
-    const [customerEmail, setCustomerEmail] = useState('');
-
     const [isLocationValid, setIsLocationValid] = useState(true);
     const [companyList, setCompanyList] = useState([]);
     const [servicesList, setServicesList] = useState([]);
     const [userList, setUserList] = useState([]);
     const [orderList, setOrderList] = useState([]);
     const [eventList, setEventList] = useState([]);
-   
+    const [trndate, setTrnDate] = useState(LocalDate());
 
-
+    const [cid, setCid] = useState(0);
     const [bookingNo, setBookingNo] = useState('');
     const [orderId, setOrderId] = useState(0);
+    const [storeName, setStoreName] = useState('');
+    const [storeCell, setStoreCell] = useState('');
+    const [service, setService] = useState(0);
+    const [serviceName, setServiceName] = useState('');
+    const [user, setUser] = useState(0);
+    const [employeeName, setEmployeeName] = useState('');
+    const [slot, setSlot] = useState('');
+    const [customerName, setCustomerName] = useState('');
+    const [customerPhone, setCustomerPhone] = useState('');
+    const [customerEmail, setCustomerEmail] = useState('');
+
+    const [price, setPrice] = useState('0');
+    const [total, setTotal] = useState('0');
+    const [coupon, setCoupon] = useState('');
+    const [discount, setDiscount] = useState('0');
+
+    const [btype, setBtype] = useState('New Appointment');
     const [isRescheduled, setIsRescheduled] = useState(false);
     const [bookedSlot, setBookedSlot] = useState('');
     const [bookedTrndate, setBookedTrndate] = useState('');
 
     const [orderStatus, setOrderStatus] = useState('Pending');
-    
-
-    const [openExit,setOpenExit]=useState(false);
-
+    const [emailUser, setEmailUser] = useState('');
+    const [emailPass, setEmailPass] = useState('');
     const storeId = searchParams.get('store') || 'All';
-    const weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+
     useEffect(() => {
         getLocations(setCompanyList, "company/booking", storeId);
     }, []);
 
     useEffect(() => {
-        if(bookingType === 0)
-        {
         setCid(0);
-            setServicesItem([]);
+        setService(0);
         setUser(0);
         setCurrent(0);
         setStoreName('');
-        setStoreCell([]);
+        setStoreCell('');
+        setServiceName('');
         setEmployeeName('');
         setSlot('');
         setCustomerName('');
@@ -112,18 +91,12 @@ const BookAppointment = () => {
         setEmailPass('');
         setOrderStatus('Pending');
         setIsRescheduled(false);
-        }
-    }, [bookingType]);
+    }, [btype]);
 
     useEffect(() => {
-        companyList.filter(a => a.id === cid).map(item => {
-            setStoreName(item.name);
-            setStoreCell(item.cell);
+        companyList.filter(a=> a.id === cid).map(item => {
             setEmailUser(item.emailuser);
             setEmailPass(item.emailpass);
-            setDaysAdvance(item.bookingdays);
-            setSlotGap(item.slot); 
-            setStoreSchedule(item.timinginfo[0]);
         })
         getData(setServicesList, "GET", "services");
         getData(setEventList, "GET", "event", [], null, null, true);
@@ -132,121 +105,19 @@ const BookAppointment = () => {
     }, [cid]);
 
     useEffect(() => {
-        userList.filter(a => a.id === user).map(item => 
-        { setEmployeeName(item.fullname); setEmployeeSchedule(item.scheduleinfo[0]);}
-        )
-    }, [user]); 
-    
-    useEffect(() => {
-        let price=0
-        servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item => (price = price + parseFloat(item.price)));
-        setPrice(price);
-        setTotal(price);
-        setDiscount(discount);
-        setCoupon(coupon);  
-    }, [servicesItem]);
-
-    useEffect(() => {
-
         if (trndate === '')
             setTrnDate(LocalDate());
-
         if (cid !== 0) {
             getData(setOrderList, "GET", "order/booking", [], null, dayjs.utc(trndate, 'YYYY-MM-DD'), false);
-            if (employeeSchedule !== null) {
-                const dayNum = dayjs(trndate).get('day');
-                const weekday = weekdays[dayNum];
-
-                let inTime = '00:00:00';
-                let outTime = '00:00:00';
-                let isOpen = false;
-                let isWorking = false;
-                switch (weekday.toLowerCase()) {
-                    case 'sunday':
-                        {
-                            inTime = employeeSchedule.sunday[0];
-                            outTime = employeeSchedule.sunday[1];
-                            isWorking = employeeSchedule.sunday[2];
-                            isOpen = storeSchedule.sunday[2];
-                            break;
-                        }
-                    case 'monday':
-                        {
-                            inTime = employeeSchedule.monday[0];
-                            outTime = employeeSchedule.monday[1];
-                            isWorking = employeeSchedule.monday[2];
-                            isOpen = storeSchedule.monday[2];
-                            break;
-                        }
-                    case 'tuesday':
-                        {
-                            inTime = employeeSchedule.tuesday[0];
-                            outTime = employeeSchedule.tuesday[1];
-                            isWorking = employeeSchedule.tuesday[2];
-                            isOpen = storeSchedule.tuesday[2];
-                            break;
-                        }
-                    case 'wednesday':
-                        {
-                            inTime = employeeSchedule.wednesday[0];
-                            outTime = employeeSchedule.wednesday[1];
-                            isWorking = employeeSchedule.wednesday[2];
-                            isOpen = storeSchedule.wednesday[2];
-                            break;
-                        }
-                    case 'thursday':
-                        {
-                            inTime = employeeSchedule.thursday[0];
-                            outTime = employeeSchedule.thursday[1];
-                            isWorking = employeeSchedule.thursday[2];
-                            isOpen = storeSchedule.thursday[2];
-                            break;
-                        }
-                    case 'friday':
-                        {
-                            inTime = employeeSchedule.friday[0];
-                            outTime = employeeSchedule.friday[1];
-                            isWorking = employeeSchedule.friday[2];
-                            isOpen = storeSchedule.friday[2];
-                            break;
-                        }
-                    case 'saturday':
-                        {
-                            inTime = employeeSchedule.saturday[0];
-                            outTime = employeeSchedule.saturday[1];
-                            isWorking = employeeSchedule.saturday[2];
-                            isOpen = storeSchedule.saturday[2];
-                            break;
-                        }
-                    default:
-                        {
-                            inTime = '00:00:00'; outTime = '00:00:00'; isOpen = false;
-                            isWorking = false;
-                            break;
-                        }
-
-                }
-
-                let orderListSlot = [];
-                orderListSlot = (orderList.filter(a => (a.trndate.includes(trndate) && a.assignedto === user)));
-                setIsOpen(isOpen);
-                setUserWorking(isWorking);
-                setAvailableSlot([]);
-                if (isOpen && isWorking) {
-                    if (trndate === LocalDate())
-                        inTime = LocalTime();
-                    setAvailableSlot(generateTimeSlots(inTime, outTime, slotGap, orderListSlot, slot));
-                }
-            }
         }
 
-       // if (btype === 'New Appointment')
-            //setSlot('');
-        //else {
-          //  if (isRescheduled && trndate !== bookedTrndate)
-               // setSlot('');
+        if (btype === 'New Appointment')
+            setSlot('');
+        else {
+            if (isRescheduled && trndate !== bookedTrndate)
+                setSlot('');
 
-      //  }
+        }
 
     }, [trndate]);
 
@@ -283,14 +154,55 @@ const BookAppointment = () => {
     }
 
 
+    const { token } = theme.useToken();
     const [current, setCurrent] = useState(0);
     const next = () => {
         setCurrent(current + 1);
-        setContent(content + 1);
     };
     const prev = () => {
         setCurrent(current - 1);
-        setContent(content - 1);
+    };
+
+    const steps = [
+        {
+            title: storeName === '' ? 'Select Location' : storeName,
+            content: <Location companyList={companyList} next={next} cid={cid} setCid={setCid} setStoreName={setStoreName} setStoreCell={setStoreCell} />,
+        },
+        {
+            title: serviceName === '' ? 'Select Services' : serviceName,
+            content: <Services
+                servicesList={servicesList}
+                eventList={eventList}
+                next={next}
+                service={service}
+                setService={setService}
+                setServiceName={setServiceName}
+                setPrice={setPrice} setDiscount={setDiscount} setTotal={setTotal} setCoupon={setCoupon} />,
+        },
+        {
+            title: employeeName === '' ? 'Select Employee' : employeeName,
+            content: <Employee userList={userList} next={next} user={user} setUser={setUser} setEmployeeName={setEmployeeName} />,
+        },
+        {
+            title: slot === '' ? 'Select Slot' : get_Date(trndate, 'DD MMM YYYY') + ' ' + slot,
+            content: <Slot allCompany={companyList} cid={cid} trndate={trndate} setTrnDate={setTrnDate} orderList={orderList} assigned_to={user} userList={userList} employeeName={employeeName} next={next} slot={slot} setSlot={setSlot} />,
+        },
+        {
+            title: customerName === '' ? 'Enter Details' : customerName,
+            content: <Details customerName={customerName} setCustomerName={setCustomerName} customerPhone={customerPhone} setCustomerPhone={setCustomerPhone} customerEmail={customerEmail} setCustomerEmail={setCustomerEmail} />,
+        },
+    ];
+    const items = steps.map(item => ({ key: item.title, title: item.title }));
+    const contentStyle = {
+        height: '400px',
+        color: token.colorTextTertiary,
+        backgroundColor: token.colorFillAlter,
+        borderRadius: token.borderRadiusLG,
+        border: `1px dashed ${token.colorBorder}`,
+        marginTop: 16,
+        padding: 16,
+        whiteSpace: 'nowrap',
+        overflowX: 'auto'
     };
 
 
@@ -350,7 +262,7 @@ const BookAppointment = () => {
                     cell: customerPhone,
                     email: customerEmail,
                 }],
-                serviceinfo: servicesItem,
+                serviceinfo: service.split(),
                 price: price,
                 discount: discount,
                 tax: '0',
@@ -404,7 +316,7 @@ const BookAppointment = () => {
         const Subject = isCancelled ? 'Booking Cancellation' : id === null ? "Booking Confirmation" : "Re-Schedule Confirmation";
         const link = 'https://appointstack.com/book-appointment?store=' + storeId;
         let message = '<p>Hi ' + customerName + '</p>';
-        message += `<p>This is a ${isCancelled ? 'cancellation' :'confirmation'} of your <b>` + 'serviceName' + ' </b> booking on ' + get_Date(trndate, 'DD MMM YYYY') + ' at ' + slot + '.</p>';
+        message += `<p>This is a ${isCancelled ? 'cancellation' :'confirmation'} of your <b>` + serviceName + ' </b> booking on ' + get_Date(trndate, 'DD MMM YYYY') + ' at ' + slot + '.</p>';
         message += '<p>Your <b>Booking# :</b> ' + order_no + ' and <b>Booked With : </b>' + employeeName + '</p>';
         message += '<p>If you have any questions, please contact the business at ( ' + storeCell + ' )</p>';
         message += '<p>In case for New booking/Rescheduling/Cancellation, please click on this link:</p><a href="' + link +'">' + link + '</a>';
@@ -448,9 +360,9 @@ const BookAppointment = () => {
                         })
 
                         setOrderId(editList.id)
-                        setServicesItem(editList.serviceinfo[0]);
+                        setService(editList.serviceinfo[0]);
                         let service = servicesList.filter(a => a.id === editList.serviceinfo[0])
-                       // setServiceName(service[0].name);
+                        setServiceName(service[0].name);
 
                         setUser(editList.assignedto);
                         let employee = userList.filter(a => a.id === editList.assignedto);
@@ -490,99 +402,26 @@ const BookAppointment = () => {
             warning('Please, fill out the required fields !');
     }
 
-    let displayedContent;
-    if (content === 0) {
-        displayedContent =<FirstPage companyList={companyList} setCid={setCid} next={next}/>
-    } else if (content === 1) {
-        displayedContent = <BookingOption bookingType={bookingType} setBookingType={setBookingType} />
-    } else if (content === 2) {
-        displayedContent = <Employee userList={userList} next={next} user={user} setUser={setUser} setEmployeeName={setEmployeeName} />
-    } else if (content === 3) {
-        displayedContent = <Services
-            servicesList={servicesList}
-            eventList={eventList}
-            next={next}
-            servicesItem={servicesItem}
-            setServicesItem={setServicesItem}
-            setPrice={setPrice} setDiscount={setDiscount} setTotal={setTotal} setCoupon={setCoupon} />
-    } else if (content === 4) {
-        displayedContent = <Slot
-            daysAdvance={daysAdvance}
-            trndate={trndate}
-            setTrnDate={setTrnDate}
-            slot={slot}
-            setSlot={setSlot}
-            isOpen={isOpen}
-            isUserWorking={isUserWorking}
-            availableSlot={availableSlot}
-            employeeName={employeeName}/>
-    }
-    
     return (
-        <div class='w-full p-8'>
-                {isLoading ? (
-                    <div
-                        style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            height: '100%',
-                            backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            zIndex: 9999, // Ensure it's on top
-                        }}
-                    >
-                        <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
-                    </div>
-                ) :
-                    <>
-                    {cid > 0 &&
-                        <div class='w-full flex flex-row justify-between items-center mb-2'>
-                            {content > 1 ? <ArrowLeftOutlined style={{ fontSize: 20 }} onClick={() => prev()}  /> : <p></p>}
-                            <CloseOutlined style={{ fontSize: 20 }} onClick={() => setOpenExit(true)} />
-                        </div>
-                    }
-                    <div class='overflow-x-auto'>
-                    {displayedContent}
-                    </div>
-
-                    {
-                        bookingType > 0 &&
-                        <div class="fixed bottom-2 left-6 right-6 z-20 p-2 border rounded-md bg-black text-white border-gray-200 shadow-md ">
-                            <div class='flex flex-row justify-between items-center  p-2'>
-                                <div class='flex flex-row items-center gap-4'>
-                                    <UpCircleOutlined style={{ fontSize: 20, color: 'white' }} />
-                                    <p class='font-medium'>{storeName}</p>
-                                </div>
-                                <Button color="default" variant="outlined" style={{ width: '12%', fontWeight: 'bold' }} onClick={() =>next()}> Next </Button>
-
-                            </div>
-                        </div>
-
-                    }
-                    </>
-                    
-                }
-
-            {/* Exit Drawer*/}
-            <Drawer title={"Are you sure you want to exit ?"} placement='bottom' height={'20%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenExit(false)} open={openExit}>
-                <div class='w-full flex flex-row gap-2 items-center'>
-                    <div class='w-1/2'>
-                        <Button color="default" variant="outlined" style={{ width: '100%', borderRadius: 24 }} onClick={() => setOpenExit(false)}> No </Button>
-                    </div> 
-                    <div class='w-1/2'>
-                        <Button color="danger" variant="solid" style={{ width: '100%', borderRadius: 24 }} onClick={() => window.location.reload()}> Yes, Exit </Button>
-                    </div>
+        <div class='w-full p-4'>
+            {/*<div class="relative max-w-xl mx-auto mt-8">
+                <img class="h-64 w-full object-cover rounded-md"  alt="Random image" />
+                <div class="absolute inset-0 bg-gray-700 opacity-60 rounded-md"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <h2 class="text-white text-3xl font-bold">Book an Appointment</h2>
                 </div>
-            </Drawer>
-
+            </div>*/}
             <div class='flex flex-col border-b w-full object-cover rounded-md gap-2 pb-4 '>
+                <div class='w-full flex justify-center items-center mt-4 '>
+                    <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white" >
+                        <img class="w-10 h-8 mr-2" src={logo} alt="logo" />
+                        {process.env.REACT_APP_PROJECT_NAME}
+                    </a>
+                </div>
+                <Radio.Group options={['New Appointment', 'Reschedule/Cancel Appointment']} value={btype} onChange={(e) => setBtype(e.target.value)} />
             </div>
 
-            {bookingType > 1 &&
+            {btype !== 'New Appointment' &&
                 <div class='w-full p-8 flex flex-col gap-2 border rounded-md bg-gray-200 '>
                     <TextboxFlex mandatory={true} label={'Location'} input={
                         <Select
@@ -630,10 +469,10 @@ const BookAppointment = () => {
                     </div>
                 ) :
                     isLocationValid ?
-                        (bookingType === 1 || isRescheduled) ?
+                        (btype === 'New Appointment' || isRescheduled) ?
                             <>
-                               
-                             
+                                <Steps current={current} items={items} />
+                                <div style={contentStyle}>{steps[current].content}</div>
                                 {orderStatus !== 'Pending' ? 
                                 <div class='w-full mt-2'>
                                     Order status is marked as {Tags(orderStatus)}. You can't reschedule or cancel the appointment.
@@ -650,7 +489,7 @@ const BookAppointment = () => {
                                             Previous
                                         </Button>
                                     )}
-                                    {current === 5 - 1 && (
+                                    {current === steps.length - 1 && (
                                         <Space>
                                             <Button variant='solid' color="cyan" onClick={() => save()}>
                                                 {isRescheduled ? 'Rescheduled' : 'Book Appointment'}
@@ -689,4 +528,4 @@ const BookAppointment = () => {
     );
 }
 
-export default BookAppointment;
+export default BookAppointmentBackup;

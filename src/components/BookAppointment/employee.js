@@ -1,37 +1,28 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react";
-import { Avatar, Image, Input, Tag } from "antd";
-import { IoSearchOutline } from "react-icons/io5";
-import { UserOutlined } from '@ant-design/icons';
+import { Avatar, Button, Image } from "antd";
+import { UserOutlined, CheckSquareFilled } from '@ant-design/icons';
 
-const Employee = ({ userList,next , user , setUser, setEmployeeName}) => {
-    const [searchInput, setSearchInput] = useState('');
-    const [filteredList, setFilteredList] = useState(userList);
-
-    useEffect(() => {
-        const searchedList = userList.filter(item =>
-            (item.fullname.toLowerCase().includes(searchInput.toLowerCase()) && !item.status.toLowerCase().includes('inactive')));
-
-        setFilteredList(searchedList);
-    }, [searchInput, userList])
-
+const Employee = ({ userList, user, setUser }) => {
     return (
-        <div>
-            <div class='mb-4'>
-                <Input size="large" placeholder="Search" prefix={<IoSearchOutline />} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
-            </div>
-            {filteredList.map(a => (
-                <div key={a.id} class={`w-full bg-white rounded-lg p-4 shadow cursor-pointer mb-4 ${a.id === user && 'border-green-500 bg-green-200 border'}`} onClick={() => { setUser(a.id);setEmployeeName(a.fullname); next(); }}>
-                    <div class='flex flex-col gap-3 text-gray-800 text-lg font-medium font-sans '>
-                        <div class='flex flex-row gap-2 items-center'>
-                            {a.profilepic !== null ?
-                                <Image width={40} height={40} src={a.profilepic} style={{ borderRadius: 20 }} /> :
-                                <Avatar size={40} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
-                            }
-                            <p class="text-sm font-semibold">{a.fullname}</p>
-                        </div>
-                    </div>
+        <div class='flex flex-col font-normal mt-2 w-full' >
+            <p class='text-2xl font-sans font-bold mb-4'> Choose professional</p>
 
+            {userList.filter(f => !f.status.toLowerCase().includes('inactive')).map(item => (
+                <div key={item.id} class={`w-full border-b p-4 flex flex-row justify-between items-center`}>
+                    <div class='flex flex-row gap-4 items-center'>
+                        {item.profilepic !== null ?
+                            <Image width={40} height={40} src={item.profilepic} style={{ borderRadius: 20 }} /> :
+                            <Avatar size={40} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
+                        }
+                        <p class="text-sm font-semibold">{item.fullname}</p>
+                    </div>
+                    <div class='flex flex-row justify-center items-center w-20'>
+                        {
+                            item.id === user ?
+                                <CheckSquareFilled style={{ color: 'green', fontSize: 24 }} /> :
+                                <Button color="default" variant="outlined" onClick={() => setUser(item.id)}> Select </Button>
+                        }
+                    </div>
                 </div>
             ))}
         </div>

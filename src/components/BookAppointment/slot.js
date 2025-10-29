@@ -1,161 +1,85 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Col, DatePicker, Popover, Row, Tag } from 'antd';
-import dayjs from 'dayjs';
+import { Button, Tag } from 'antd';
 import { useEffect, useState } from 'react';
-import { generateTimeSlots } from '../../common/intervals';
-import { LocalDate, LocalTime } from '../../common/localDate';
+import { get_Date, LocalDate, UTC_LocalDateTime } from '../../common/localDate';
 
-const Slot = ({ allCompany, cid, trndate, setTrnDate, orderList, assigned_to, userList,employeeName, next, slot, setSlot }) => {
+function getFutureDates(numberOfDays) {
+    const dates = [];
+    const weekdays = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+    for (let i = 1; i < numberOfDays; i++) {
+        let today = new Date(LocalDate());
+        const futureDate = new Date(today); // Create a new Date object to avoid modifying 'today'
+        futureDate.setDate(today.getDate() + i);
+        const dayName = weekdays[futureDate.getDay()];
+        dates.push({ key: futureDate, label: futureDate.getDate(), weekday: dayName });
+    }
+    return dates;
+}
+const Slot = ({ daysAdvance, trndate, setTrnDate, slot, setSlot, isOpen, isUserWorking, availableSlot, employeeName }) => {
 
-    const [availableSlot, setAvailableSlot] = useState([]);
-    const [isOpen, setIsOpen] = useState(false);
-    const [isUserWorking, setUserWorking] = useState(false);
-    const [bookingDays, setBookingDays] = useState(0);
-    const weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+    const [dateAvailable, setDateAvailable] = useState([]);
+    const [morningSlot, setMorningSlot] = useState([]);
+    const [afternoonSlot, setAfternoonSlot] = useState([]);
+    const [eveningSlot, setEveningSlot] = useState([]); 
+
+    const options = [
+        { key: 1, label: 'Morning', slotList: morningSlot },
+        { key: 2, label: 'Afternoon', slotList: afternoonSlot },
+        { key: 3, label: 'Evening', slotList: eveningSlot },
+    ];
 
     useEffect(() => {
-        if (cid !== 0) {
-            let selectedCompany = allCompany.filter(a => a.id === cid);
-            setBookingDays(selectedCompany[0].bookingdays);
-            let userSchedule = userList.filter(a => a.id === assigned_to);
-            if (selectedCompany[0].timinginfo !== null && userSchedule[0].scheduleinfo !== null) {
-                if (trndate !== '') {
-                    const dayOfWeekNumber = dayjs(trndate).get('day');
-                    const dayName = weekdays[dayOfWeekNumber];
-                    console.log(userSchedule[0])
-                    setOpeningHours(dayName, selectedCompany[0], selectedCompany[0].slot, userSchedule[0]);
-                }
-            }
-        }
-    }, [cid, trndate, userList])
+        setDateAvailable(getFutureDates(daysAdvance));
+    }, [daysAdvance])
 
-    const setOpeningHours = (weekday, companyList, slotGap, userSchedule) => {
-        let inTime = '00:00:00';
-        let outTime = '00:00:00';
-        let isOpen = false;
-        let isWorking = false;
-        switch (weekday.toLowerCase()) {
-            case 'sunday':
-                {
-                    inTime = userSchedule.scheduleinfo[0].sunday[0]; 
-                    outTime = userSchedule.scheduleinfo[0].sunday[1];                  
-                    isOpen = companyList.timinginfo[0].sunday[2];
-                    isWorking = userSchedule.scheduleinfo[0].sunday[2];
-                    break;
-                }
-            case 'monday':
-                {
-                    inTime = userSchedule.scheduleinfo[0].monday[0];
-                     outTime = userSchedule.scheduleinfo[0].monday[1]; 
-                     isOpen = companyList.timinginfo[0].monday[2];
-                    isWorking = userSchedule.scheduleinfo[0].monday[2];
-                    break;
-                }
-            case 'tuesday':
-                {
-                    inTime = userSchedule.scheduleinfo[0].tuesday[0]; 
-                    outTime = userSchedule.scheduleinfo[0].tuesday[1]; 
-                    isOpen = companyList.timinginfo[0].tuesday[2];
-                    isWorking = userSchedule.scheduleinfo[0].tuesday[2];
-                    break;
-                }
-            case 'wednesday':
-                {
-                    inTime = userSchedule.scheduleinfo[0].wednesday[0]; 
-                    outTime = userSchedule.scheduleinfo[0].wednesday[1]; 
-                    isOpen = companyList.timinginfo[0].wednesday[2];
-                    isWorking = userSchedule.scheduleinfo[0].wednesday[2];
-                    break;
-                }
-            case 'thursday':
-                {
-                    inTime = userSchedule.scheduleinfo[0].thursday[0]; 
-                    outTime = userSchedule.scheduleinfo[0].thursday[1]; 
-                    isOpen = companyList.timinginfo[0].thursday[2];
-                    isWorking = userSchedule.scheduleinfo[0].thursday[2];
-                    break;
-                }
-            case 'friday':
-                {
-                    inTime = userSchedule.scheduleinfo[0].friday[0]; 
-                    outTime = userSchedule.scheduleinfo[0].friday[1]; 
-                    isOpen = companyList.timinginfo[0].friday[2];
-                    isWorking = userSchedule.scheduleinfo[0].friday[2];
-                    break;
-                }
-            case 'saturday':
-                {
-                    inTime = userSchedule.scheduleinfo[0].saturday[0]; 
-                    outTime = userSchedule.scheduleinfo[0].saturday[1];
-                     isOpen = companyList.timinginfo[0].saturday[2];
-                    isWorking = userSchedule.scheduleinfo[0].saturday[2];
-                    break;
-                }
-            default:
-                {
-                    inTime = '00:00:00'; outTime = '00:00:00'; isOpen = false;
-                    isWorking = false;
-                    break;
-                }
+    useEffect(() => {
+        const morning = availableSlot.filter(item => item.id.includes('AM'));
+        const evening = availableSlot.filter(item => item.id.includes('PM') && item.id.split(':')[0] > 3 && item.id.split(':')[0] < 12);
+        const afternoon = availableSlot.filter(item => !item.id.includes('AM') && !evening.some(b => b.id === item.id));
+        setMorningSlot(morning)
+        setAfternoonSlot(afternoon)
+        setEveningSlot(evening)
+    }, [availableSlot])
 
-        }
-        
-        let orderListSlot = [];
-        orderListSlot = (orderList.filter(a => (a.trndate.includes(trndate) && a.assignedto === assigned_to)));
-        setIsOpen(isOpen);
-        setUserWorking(isWorking);
-        setAvailableSlot([]);
-        if (isOpen && isWorking) {
-            if (trndate === LocalDate())
-                inTime = LocalTime();
-            setAvailableSlot(generateTimeSlots(inTime, outTime, slotGap, orderListSlot, slot));
-        }
-    }
-    const disabledDate = (current) => {
-        const isBeforeToday = current && current < dayjs().startOf('day');
-        const isAfter = current && current > dayjs().add(bookingDays, 'days').endOf('day');
-        return isBeforeToday || isAfter;
-    };
+   
     return (
-        <div>
-            <Popover placement="bottom" title={"Select Booking Date"} content={
-                <div>
-                    <DatePicker
-                        style={{ width: '100%' }}
-                        disabledDate={disabledDate}
-                        value={trndate === '' ? trndate : dayjs(trndate, 'YYYY-MM-DD')}
-                        onChange={(date, dateString) => setTrnDate(dateString)} />
-                </div>
-            }>
-                <Button className="text-xs"><span class='font-medium'>Booking Date :  </span><span class='text-blue-500'> {trndate}  </span></Button>
-            </Popover>
-
-            <div class='w-full md:w-1/4 mt-2 py-4 px-2'>
-                {(isOpen && isUserWorking) ?
-                    <>
-                        <p class='mb-4'> Available Slots</p>
-                        <Row key={new Date()} gutter={[0, 16]} >
-                            {availableSlot.map(item => (
-                                <Col className="gutter-row" span={8}>
-                                    <Button color={slot === item.id ? 'primary' : 'default'}
-                                        variant="outlined"
-                                        disabled={item.disabled}
-                                        onClick={() => { setSlot(item.id); next(); }}>
-
-                                        {item.id}
-                                    </Button>
-                                </Col>
-                            ))}
-
-                        </Row>
-                    </>
-                    :
-                    !isUserWorking ? 
-                    <Tag color='red'>The {employeeName} has the DAY OFF.</Tag>
-                    :
-                    <Tag color='red'>Business is closed . Please book an appointment for another day!</Tag>
-                }
+        <div class='flex flex-col font-normal mt-2 w-full' >
+            <p class='text-2xl font-sans font-bold mb-4'> Select a date</p>
+            
+            <div class='overflow-x-auto mb-2 flex flex-row gap-3 pb-4'>
+                {dateAvailable.map(item =>
+                    <div key={item.key} class='flex-col w-10 gap-2' onClick={() => setTrnDate(UTC_LocalDateTime(item.key, 'YYYY-MM-DD'))} >
+                        <div class={`border w-10 h-12 rounded-xl flex justify-center items-center p-2 ${UTC_LocalDateTime(item.key, 'YYYY-MM-DD') === trndate ? 'bg-cyan-400 text-white font-bold' : 'bg-gray-50'} shadow-sm cursor-pointer`} >{item.label}</div>
+                        <p class='text-xs text-gray-400 flex justify-center items-center'>{item.weekday}</p>
+                    </div>
+                )}
             </div>
+            <p class='text-sm font-sans font-semibold mb-4'>Slots Availability : {get_Date(trndate, 'DD MMM YYYY') }</p>
+
+            <div class='w-full flex flex-row gap-12 text-xs'>
+                {(isOpen && isUserWorking) ?                 
+                        options.map(opt =>
+                            <div key={opt.key} class='flex flex-col gap-2'>
+                                <p class='flex-row flex justify-center items-center'>{opt.label}</p>
+                                {opt.slotList.length === 0 ? <p class='text-xs text-gray-500'>Empty</p> :
+                                    opt.slotList.map(item => (
+                                        <Button color={slot === item.id ? 'cyan' : 'default'}
+                                            variant="outlined"
+                                            disabled={item.disabled}
+                                            onClick={() => { setSlot(item.id) }}>
+
+                                            {item.id}
+                                        </Button>
+                                    ))}
+                            </div>
+                        )              
+                    :
+                    !isUserWorking ?
+                        <Tag color='red'>The {employeeName} has the DAY OFF.</Tag>
+                        :
+                        <Tag color='red'>Business is closed . Please book an appointment for another day!</Tag>
+                }
+            </div>                   
         </div>
     )
 }
