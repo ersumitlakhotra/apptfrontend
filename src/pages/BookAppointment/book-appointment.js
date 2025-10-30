@@ -1,10 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import { Button, Spin, Steps, Modal, Radio, Input, Select, Space,Popconfirm, Drawer } from 'antd';
-import { LoadingOutlined, LeftSquareOutlined, CloseSquareOutlined, LeftOutlined, ArrowLeftOutlined, CloseOutlined, UpCircleOutlined } from '@ant-design/icons';   
+import { Button, Spin, Modal, Drawer, Image, Avatar, Input } from 'antd';
+import { LoadingOutlined, ArrowLeftOutlined, CloseOutlined, UpCircleOutlined, UserOutlined, CalendarOutlined, ContactsOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Location from '../../components/BookAppointment/locations.js';
 import Services from '../../components/BookAppointment/services.js';
 import Employee from '../../components/BookAppointment/employee.js';
 import Slot from '../../components/BookAppointment/slot.js';
@@ -13,16 +12,16 @@ import { apiCallsViaBooking, getCompanyViaStore } from '../../hook/apiCall';
 import { get_Date, LocalDate, LocalTime } from '../../common/localDate.js';
 import dayjs from 'dayjs';
 import useAlert from '../../common/alert.js';
-import { TextboxFlex } from '../../common/textbox.js';
 import { isValidEmail } from '../../common/cellformat.js';
-import { Tags } from '../../common/tags.js';
 import FirstPage from '../../components/BookAppointment/first_page.js';
 import BookingOption from '../../components/BookAppointment/book_reschedule.js';
 import { generateTimeSlots } from '../../common/intervals.js';
+import ViewBooking from '../../components/BookAppointment/view_booking.js';
+import { TextboxFlexCol } from '../../common/textbox.js';
 
 const BookAppointment = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const {contextHolder, warning, error } = useAlert();
+    const { contextHolder, warning, error } = useAlert();
     const [modal, contextHolderModal] = Modal.useModal();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -30,12 +29,13 @@ const BookAppointment = () => {
 
     const [cid, setCid] = useState(0);
     const [storeName, setStoreName] = useState('');
-    const [storeCell, setStoreCell] = useState(''); 
+    const [storeCell, setStoreCell] = useState('');
+    const [storeAddress, setStoreAddress] = useState('');
     const [emailUser, setEmailUser] = useState('');
     const [emailPass, setEmailPass] = useState('');
     const [daysAdvance, setDaysAdvance] = useState(0);
     const [slotGap, setSlotGap] = useState(60);
-    const [storeSchedule, setStoreSchedule] = useState(null); 
+    const [storeSchedule, setStoreSchedule] = useState(null);
 
     const [bookingType, setBookingType] = useState(0);
 
@@ -43,77 +43,44 @@ const BookAppointment = () => {
     const [employeeName, setEmployeeName] = useState('');
     const [employeeSchedule, setEmployeeSchedule] = useState(null);
 
-    const [servicesItem, setServicesItem] = useState([]); 
+    const [servicesItem, setServicesItem] = useState([]);
     const [price, setPrice] = useState('0');
     const [total, setTotal] = useState('0');
     const [coupon, setCoupon] = useState('');
     const [discount, setDiscount] = useState('0');
 
     const [trndate, setTrnDate] = useState(LocalDate());
-    const [slot, setSlot] = useState(''); 
+    const [slot, setSlot] = useState('');
     const [availableSlot, setAvailableSlot] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const [isUserWorking, setUserWorking] = useState(false);
-  
+
     const [customerName, setCustomerName] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
 
-    const [isLocationValid, setIsLocationValid] = useState(true);
+    const [isURL, setIsURL] = useState(false);
     const [companyList, setCompanyList] = useState([]);
     const [servicesList, setServicesList] = useState([]);
     const [userList, setUserList] = useState([]);
     const [orderList, setOrderList] = useState([]);
     const [eventList, setEventList] = useState([]);
-   
 
 
-    const [bookingNo, setBookingNo] = useState('');
-    const [orderId, setOrderId] = useState(0);
-    const [isRescheduled, setIsRescheduled] = useState(false);
-    const [bookedSlot, setBookedSlot] = useState('');
-    const [bookedTrndate, setBookedTrndate] = useState('');
-
+    const [order_no, setOrder_no] = useState('');
+    const [order_id, setOrder_Id] = useState(0);
     const [orderStatus, setOrderStatus] = useState('Pending');
-    
 
-    const [openExit,setOpenExit]=useState(false);
+    const [openExit, setOpenExit] = useState(false);
+    const [openOrder, setOpenOrder] = useState(false);
+    const [openSearch, setOpenSearch] = useState(false);
 
     const storeId = searchParams.get('store') || 'All';
     const weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+
     useEffect(() => {
         getLocations(setCompanyList, "company/booking", storeId);
     }, []);
-
-    useEffect(() => {
-        if(bookingType === 0)
-        {
-        setCid(0);
-            setServicesItem([]);
-        setUser(0);
-        setCurrent(0);
-        setStoreName('');
-        setStoreCell([]);
-        setEmployeeName('');
-        setSlot('');
-        setCustomerName('');
-        setCustomerPhone('');
-        setCustomerEmail('');
-        setPrice('0');
-        setTotal('0');
-        setCoupon('');
-        setDiscount('0');
-        setBookingNo('');
-        setOrderId(0);
-        setTrnDate(LocalDate());
-        setBookedSlot('');
-        setBookedTrndate('');
-        setEmailUser('');
-        setEmailPass('');
-        setOrderStatus('Pending');
-        setIsRescheduled(false);
-        }
-    }, [bookingType]);
 
     useEffect(() => {
         companyList.filter(a => a.id === cid).map(item => {
@@ -122,8 +89,12 @@ const BookAppointment = () => {
             setEmailUser(item.emailuser);
             setEmailPass(item.emailpass);
             setDaysAdvance(item.bookingdays);
-            setSlotGap(item.slot); 
+            setSlotGap(item.slot);
             setStoreSchedule(item.timinginfo[0]);
+            if (item.addressinfo !== null) {
+                let address = `${item.addressinfo[0].street}, ${item.addressinfo[0].city}, ${item.addressinfo[0].province} ${item.addressinfo[0].postal} `;
+                setStoreAddress(address);
+            }
         })
         getData(setServicesList, "GET", "services");
         getData(setEventList, "GET", "event", [], null, null, true);
@@ -132,18 +103,17 @@ const BookAppointment = () => {
     }, [cid]);
 
     useEffect(() => {
-        userList.filter(a => a.id === user).map(item => 
-        { setEmployeeName(item.fullname); setEmployeeSchedule(item.scheduleinfo[0]);}
+        userList.filter(a => a.id === user).map(item => { setEmployeeName(item.fullname); setEmployeeSchedule(item.scheduleinfo[0]); }
         )
-    }, [user]); 
-    
+    }, [user]);
+
     useEffect(() => {
-        let price=0
+        let price = 0
         servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item => (price = price + parseFloat(item.price)));
         setPrice(price);
         setTotal(price);
         setDiscount(discount);
-        setCoupon(coupon);  
+        setCoupon(coupon);
     }, [servicesItem]);
 
     useEffect(() => {
@@ -151,9 +121,9 @@ const BookAppointment = () => {
         if (trndate === '')
             setTrnDate(LocalDate());
 
-        if (cid !== 0) {
+        if (cid !== 0 && employeeSchedule !== null) {
             getData(setOrderList, "GET", "order/booking", [], null, dayjs.utc(trndate, 'YYYY-MM-DD'), false);
-            if (employeeSchedule !== null) {
+            {bookingType > 1 && setSlot('')}
                 const dayNum = dayjs(trndate).get('day');
                 const weekday = weekdays[dayNum];
 
@@ -235,20 +205,11 @@ const BookAppointment = () => {
                 if (isOpen && isWorking) {
                     if (trndate === LocalDate())
                         inTime = LocalTime();
-                    setAvailableSlot(generateTimeSlots(inTime, outTime, slotGap, orderListSlot, slot));
-                }
+                    setAvailableSlot(generateTimeSlots(inTime, outTime, slotGap, orderListSlot, slot));              
             }
         }
 
-       // if (btype === 'New Appointment')
-            //setSlot('');
-        //else {
-          //  if (isRescheduled && trndate !== bookedTrndate)
-               // setSlot('');
-
-      //  }
-
-    }, [trndate]);
+    }, [trndate,employeeSchedule]);
 
     const getData = async (setList, method, endPoint, body = [], id = null, date = null, eventDate = false) => {
         setIsLoading(true);
@@ -269,27 +230,74 @@ const BookAppointment = () => {
         try {
             const res = await getCompanyViaStore("GET", endPoint, store);
             setList(res.data.data);
-            if (res.data.data.length === 0)
-                setIsLocationValid(false)
-            else
-                setIsLocationValid(true);
+            if (res.data.data.length > 0)
+                setIsURL(true)
         }
         catch (e) {
             setList([])
-            setIsLocationValid(false)
-            //error(error.message)
+            setIsURL(false)
         }
         setIsLoading(false);
     }
 
 
-    const [current, setCurrent] = useState(0);
     const next = () => {
-        setCurrent(current + 1);
-        setContent(content + 1);
+        let isNext = true;
+        let message = '';
+        switch (content) {
+            case 1:
+                {
+                    if (bookingType > 1 && order_id === 0) {
+                        isNext = false;
+                        setOpenSearch(true);
+                    }
+                    break;
+                }
+            case 2:
+                {
+                    if (user === 0) {
+                        isNext = false;
+                        message = "Please select a professional from list. "
+                    }
+                    break;
+                }
+            case 3:
+                {
+                    if (servicesItem.length === 0) {
+                        isNext = false;
+                        message = "Minimum one service is required to book an appointment. "
+                    }
+                    break;
+                }
+            case 4:
+                {
+                    if (slot === '') {
+                        isNext = false;
+                        message = "Please select a slot as per professional availability. "
+                    }
+                    break;
+                }
+            case 5:
+                {
+                    if (customerName === '' || customerPhone === '' || customerPhone.length !== 12 || customerEmail === '' || !isValidEmail(customerEmail)) {
+                        isNext = false;
+                        message = "Please fill the contact details. "
+                    }
+                    else {
+                        save();
+                    }
+                    break;
+                }
+            default: { break }
+        }
+        if (isNext)
+            setContent(content + 1);
+        else if (message !== '')
+            warning(message);
+
     };
+
     const prev = () => {
-        setCurrent(current - 1);
         setContent(content - 1);
     };
 
@@ -300,7 +308,7 @@ const BookAppointment = () => {
             content: (
                 <div class='flex flex-col gap-4 p-4'>
                     <p class='font-bold'>Hi {customerName}</p>
-                    <p>Your booking at <span class='font-semibold'>{storeName}</span> has been {isRescheduled && 'rescheduled and'} <span class='text-green-700'>Confirmed!</span></p>
+                    <p>Your booking at <span class='font-semibold'>{storeName}</span> has been {bookingType === 2 && 'rescheduled and'} <span class='text-green-700'>Confirmed!</span></p>
                     <div class='w-full flex flex-col gap-2 p-2 bg-white rounded-lg shadow border border-green-700 border-s-green-700 border-s-8'>
                         <p class='font-bold'>Appointment Details</p>
                         <p>Booking #: <span class='font-semibold'>{order_no}</span></p>
@@ -342,7 +350,7 @@ const BookAppointment = () => {
     };
 
 
-    const save = async (isCancelled = false) => {
+    const save = async () => {
         if (customerName !== '' && customerPhone !== '' && customerPhone.length === 12 && customerEmail !== '' && isValidEmail(customerEmail)) {
             const Body = JSON.stringify({
                 customerinfo: [{
@@ -363,21 +371,22 @@ const BookAppointment = () => {
                 slot: slot,
                 bookedvia: 'Appointment',
             });
-            if (isCancelled) {
-                saveData("POST", "order/cancel", [], orderId);
+
+            if (bookingType === 1) {
+                saveData("POST", "order", Body, null);
             }
-            else {
-                if (isRescheduled)
-                    saveData("PUT", "order", Body, orderId);
-                else
-                    saveData("POST", "order", Body, null);
+            if (bookingType === 2) {
+                saveData("PUT", "order", Body, order_id);
+            }
+            if (bookingType === 1) {
+                saveData("POST", "order/cancel", [], order_id);
             }
         }
         else {
             warning('Please, fill out the required fields !');
         }
     }
-    const saveData = async (method, endPoint, body, id ) => {
+    const saveData = async (method, endPoint, body, id) => {
         setIsLoading(true);
         try {
             const result = await apiCallsViaBooking(method, endPoint, cid, body, id, null);
@@ -400,14 +409,14 @@ const BookAppointment = () => {
         setIsLoading(false);
     }
 
-    const sendEmail = async (id, order_no, isCancelled) =>{
+    const sendEmail = async (id, order_no, isCancelled) => {
         const Subject = isCancelled ? 'Booking Cancellation' : id === null ? "Booking Confirmation" : "Re-Schedule Confirmation";
         const link = 'https://appointstack.com/book-appointment?store=' + storeId;
         let message = '<p>Hi ' + customerName + '</p>';
-        message += `<p>This is a ${isCancelled ? 'cancellation' :'confirmation'} of your <b>` + 'serviceName' + ' </b> booking on ' + get_Date(trndate, 'DD MMM YYYY') + ' at ' + slot + '.</p>';
+        message += `<p>This is a ${isCancelled ? 'cancellation' : 'confirmation'} of your <b>` + 'serviceName' + ' </b> booking on ' + get_Date(trndate, 'DD MMM YYYY') + ' at ' + slot + '.</p>';
         message += '<p>Your <b>Booking# :</b> ' + order_no + ' and <b>Booked With : </b>' + employeeName + '</p>';
         message += '<p>If you have any questions, please contact the business at ( ' + storeCell + ' )</p>';
-        message += '<p>In case for New booking/Rescheduling/Cancellation, please click on this link:</p><a href="' + link +'">' + link + '</a>';
+        message += '<p>In case for New booking/Rescheduling/Cancellation, please click on this link:</p><a href="' + link + '">' + link + '</a>';
 
         const Body = JSON.stringify({
             emailUser: emailUser,
@@ -419,66 +428,75 @@ const BookAppointment = () => {
         });
         setIsLoading(true);
         try {
-        await apiCallsViaBooking("POST", "sendmail", cid, Body);
+            await apiCallsViaBooking("POST", "sendmail", cid, Body);
         }
-        catch(e)
-        {
+        catch (e) {
 
         }
         setIsLoading(false);
     }
 
     const searchOrder = async () => {
-        setIsRescheduled(false);
-        if (cid !== 0 && bookingNo !== '' && customerEmail !== '') {
+        if (order_no !== '' && customerEmail !== '') {
             setIsLoading(true);
-            let isRecordFound = false;
+            let result = false;
+            let message = 'No record found.';
+            let bookedSlot = '';
             try {
-                // getData(setOrderList, "GET", "order/booking", [], null, dayjs.utc(trndate, 'YYYY-MM-DD'), false);
                 const Body = JSON.stringify({
-                    order_no: bookingNo
+                    order_no: order_no
                 });
                 const res = await apiCallsViaBooking("POST", "order/reschedule", cid, Body);
                 if (res.data.data.length > 0) {
                     const editList = res.data.data[0];
-                    if (editList.customerinfo !== null && editList.customerinfo[0].email === customerEmail) {
-                        companyList.filter(a => a.id === cid).map(item => {
-                            setStoreName(item.name);
-                            setStoreCell(item.cell);
-                        })
-
-                        setOrderId(editList.id)
-                        setServicesItem(editList.serviceinfo[0]);
-                        let service = servicesList.filter(a => a.id === editList.serviceinfo[0])
-                       // setServiceName(service[0].name);
-
-                        setUser(editList.assignedto);
-                        let employee = userList.filter(a => a.id === editList.assignedto);
-                        setEmployeeName(employee[0].fullname);
-                        setTrnDate(get_Date(editList.trndate, 'YYYY-MM-DD'))
-                        setBookedTrndate(get_Date(editList.trndate, 'YYYY-MM-DD'))
-
-                        setSlot(editList.slot);
-                        setBookedSlot(editList.slot);
-                        if (editList.customerinfo !== null) {
-
-                            setCustomerName(editList.customerinfo[0].name);
-                            setCustomerPhone(editList.customerinfo[0].cell);
+                    if (editList.customerinfo !== null && editList.customerinfo[0].email.toLowerCase() === customerEmail.toLowerCase()) {
+                        
+                        const bookDate = dayjs(`${get_Date(editList.trndate, 'YYYY-MM-DD')} ${dayjs(editList.slot, 'hh:mm A').format('HH:mm:ss')}`, `YYYY-MM-DDTHH:mm:ss`);
+                            const localDate = dayjs(`${LocalDate()} ${LocalTime()}`, `YYYY-MM-DDTHH:mm:ss`);
+                            const date1 = new Date(bookDate);
+                            const date2 = new Date(localDate);
+                        if (date1 < date2) {
+                            result = false;
+                            message = `Past order can't be rescheduled or cancel.`;
                         }
+                        else if (editList.status !== 'Pending') {
+                            result = false;
+                            message = `Order is already marked as ${editList.status}.`;
+                        }
+                        else {
+                            result = true;
+                            message = ''; 
+                            setOrder_Id(editList.id)
+                            setUser(editList.assignedto);
+                            setServicesItem(editList.serviceinfo);
+                            setSlot(editList.slot);
+                            setTrnDate(get_Date(editList.trndate, 'YYYY-MM-DD'))
+                            
+                            if (editList.customerinfo !== null) {
 
-                        setPrice(editList.price);
-                        setTotal(editList.total);
-                        setCoupon(editList.coupon);
-                        setDiscount(editList.discount);
-                        setOrderStatus(editList.status);
-                        setCurrent(4);
-                        setIsRescheduled(true);
-                        isRecordFound = true;
+                                setCustomerName(editList.customerinfo[0].name);
+                                setCustomerPhone(editList.customerinfo[0].cell);
+                            }
+
+                            setPrice(editList.price);
+                            setTotal(editList.total);
+                            setCoupon(editList.coupon);
+                            setDiscount(editList.discount);
+                            setOrderStatus(editList.status);                          
+                        }
                     }
-                }
-                if (!isRecordFound)
-                    error('No record found!');
 
+                    if (result) {
+                        setContent(5);
+                        { bookingType === 2 && setOpenOrder(true) };
+                        setOpenSearch(false);
+                        
+                    }
+                    else
+                        error(message);
+                }
+                else
+                   error(message);
             }
             catch (e) {
                 // setList([])
@@ -492,7 +510,7 @@ const BookAppointment = () => {
 
     let displayedContent;
     if (content === 0) {
-        displayedContent =<FirstPage companyList={companyList} setCid={setCid} next={next}/>
+        displayedContent = <FirstPage companyList={companyList} setCid={setCid} next={next} />
     } else if (content === 1) {
         displayedContent = <BookingOption bookingType={bookingType} setBookingType={setBookingType} />
     } else if (content === 2) {
@@ -515,174 +533,176 @@ const BookAppointment = () => {
             isOpen={isOpen}
             isUserWorking={isUserWorking}
             availableSlot={availableSlot}
-            employeeName={employeeName}/>
+            employeeName={employeeName} />
+    } else if (content === 5) {
+        displayedContent = <Details
+            customerName={customerName}
+            setCustomerName={setCustomerName}
+            customerPhone={customerPhone}
+            setCustomerPhone={setCustomerPhone}
+            customerEmail={customerEmail}
+            setCustomerEmail={setCustomerEmail} />
     }
-    
+
     return (
         <div class='w-full p-8'>
-                {isLoading ? (
-                    <div
-                        style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            height: '100%',
-                            backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            zIndex: 9999, // Ensure it's on top
-                        }}
-                    >
-                        <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
-                    </div>
-                ) :
+            {isLoading ? (
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 9999, // Ensure it's on top
+                    }}
+                >
+                    <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
+                </div>
+            ) :
+                isURL ?
                     <>
-                    {cid > 0 &&
-                        <div class='w-full flex flex-row justify-between items-center mb-2'>
-                            {content > 1 ? <ArrowLeftOutlined style={{ fontSize: 20 }} onClick={() => prev()}  /> : <p></p>}
-                            <CloseOutlined style={{ fontSize: 20 }} onClick={() => setOpenExit(true)} />
+                        {cid > 0 &&
+                            <div class='w-full flex flex-row justify-between items-center mb-2'>
+                                {content > 2 ? <ArrowLeftOutlined style={{ fontSize: 20 }} onClick={() => prev()} /> : <p></p>}
+                                <CloseOutlined style={{ fontSize: 20 }} onClick={() => setOpenExit(true)} />
+                            </div>
+                        }
+                        <div class='overflow-x-auto'>
+                            {displayedContent}
                         </div>
-                    }
-                    <div class='overflow-x-auto'>
-                    {displayedContent}
+
+                        {
+                            bookingType > 0 &&
+                            <div class="fixed bottom-2 left-6 right-6 z-20 p-2 border rounded-md bg-black text-white border-gray-200 shadow-md ">
+                                <div class='flex flex-row justify-between items-center  p-2'>
+                                    <div class='flex flex-row items-center gap-4'>
+                                        <UpCircleOutlined style={{ fontSize: 20, color: 'white' }} onClick={() => setOpenOrder(true)} />
+                                        <div class='flex flex-col text-xs'>
+                                            <p class='font-medium text-gray-300'>Price : ${total}</p>
+                                            <p class='text-gray-600'>Services : {servicesItem.length} </p>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        color={bookingType === 3 && content === 5 ? "danger" : "default"}
+                                        variant="outlined"
+                                        style={{ fontWeight: 'bold' }}
+                                        onClick={() => next()}>
+                                        {content === 5 ? (bookingType === 3 ? "Cancel Booking" : "Complete") : 'Next'}
+                                    </Button>
+
+                                </div>
+                            </div>
+
+                        }
+                    </> :
+                    <div class='flex flex-row justify-center items-center'>
+                        <div class='flex flex-col gap-3 items-start'>
+                            <p class='text-4xl font-sans font-semibold'> Page not found</p>
+                            <p >Uh oh, we can't seem to find the page you're looking for.</p>
+                            <p >Are you sure the website URL is correct ?</p>
+                            <p >Get in touch with the site owner.</p>
+                        </div>
                     </div>
 
-                    {
-                        bookingType > 0 &&
-                        <div class="fixed bottom-2 left-6 right-6 z-20 p-2 border rounded-md bg-black text-white border-gray-200 shadow-md ">
-                            <div class='flex flex-row justify-between items-center  p-2'>
-                                <div class='flex flex-row items-center gap-4'>
-                                    <UpCircleOutlined style={{ fontSize: 20, color: 'white' }} />
-                                    <p class='font-medium'>{storeName}</p>
-                                </div>
-                                <Button color="default" variant="outlined" style={{ width: '12%', fontWeight: 'bold' }} onClick={() =>next()}> Next </Button>
-
-                            </div>
-                        </div>
-
-                    }
-                    </>
-                    
-                }
+            }
 
             {/* Exit Drawer*/}
             <Drawer title={"Are you sure you want to exit ?"} placement='bottom' height={'20%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenExit(false)} open={openExit}>
                 <div class='w-full flex flex-row gap-2 items-center'>
                     <div class='w-1/2'>
                         <Button color="default" variant="outlined" style={{ width: '100%', borderRadius: 24 }} onClick={() => setOpenExit(false)}> No </Button>
-                    </div> 
+                    </div>
                     <div class='w-1/2'>
                         <Button color="danger" variant="solid" style={{ width: '100%', borderRadius: 24 }} onClick={() => window.location.reload()}> Yes, Exit </Button>
                     </div>
                 </div>
             </Drawer>
 
-            <div class='flex flex-col border-b w-full object-cover rounded-md gap-2 pb-4 '>
-            </div>
-
-            {bookingType > 1 &&
-                <div class='w-full p-8 flex flex-col gap-2 border rounded-md bg-gray-200 '>
-                    <TextboxFlex mandatory={true} label={'Location'} input={
-                        <Select
-                            value={cid}
-                            style={{ width: '100%' }}
-                            status={cid === 0 ? 'error' : ''}
-                            onChange={(value) => setCid(value)}
-                            options={[{ value: 0, label: ' ' },
-                            ...companyList.map(item => ({
-                                value: item.id,
-                                label: item.name
-                            }))]}
-                        />
-                    } />
-                    <TextboxFlex label={'Booking #'} mandatory={true} input={
-                        <Input placeholder="1001" status={bookingNo === '' ? 'error' : ''} value={bookingNo} onChange={(e) => setBookingNo(e.target.value)} />
+            {/* Search Drawer*/}
+            <Drawer title={""} placement='bottom' height={'70%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenSearch(false)} open={openSearch}>
+                <div class='flex flex-col font-normal gap-4 w-full' >
+                    <TextboxFlexCol label={'Booking#'} mandatory={true} input={
+                        <Input placeholder="Enter your booking #" size="large" status={order_no === '' ? 'error' : ''} value={order_no} onChange={(e) => setOrder_no(e.target.value)} />
                     } />
 
-                    <TextboxFlex label={'E-mail'} mandatory={true} input={
-                        <Input placeholder="abcd@company.com" status={customerEmail === '' ? 'error' : ''} value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} />
+                    <TextboxFlexCol label={'E-mail'} mandatory={true} input={
+                        <Input placeholder="Enter your e-mail address . ." size="large" status={customerEmail === '' || !isValidEmail(customerEmail) ? 'error' : ''} value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} />
                     } />
                     <div class='my-4 flex justify-end items-center'>
-                        <Button size='large' color="primary" variant="solid" onClick={searchOrder} >Search</Button>
+                        <Button size='large' color='default' variant="solid" onClick={() => searchOrder()}  >Submit</Button>
                     </div>
                 </div>
-            }
+            </Drawer>
 
-            <div class='w-full mt-4 '>
-                {isLoading ? (
-                    <div
-                        style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            height: '100%',
-                            backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            zIndex: 9999, // Ensure it's on top
-                        }}
-                    >
-                        <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
-                    </div>
-                ) :
-                    isLocationValid ?
-                        (bookingType === 1 || isRescheduled) ?
-                            <>
-                               
-                             
-                                {orderStatus !== 'Pending' ? 
-                                <div class='w-full mt-2'>
-                                    Order status is marked as {Tags(orderStatus)}. You can't reschedule or cancel the appointment.
+            {/* View Order*/}
+            <Drawer title={
+                <div class='flex flex-col'>
+                    <p class='font-medium text-sm text-gray-600'>{storeName} </p>
+                    <p class='text-gray-400 text-xs'>{storeAddress}</p>
+                </div>}
+                placement='bottom' height={'90%'} style={{ backgroundColor: '#f9fafb' }} onClose={() => setOpenOrder(false)} open={openOrder}>
+                <div class='w-full flex flex-col  gap-6 items-center p-3'>
+
+                    {user !== 0 && <ViewBooking title={'Professional'} content={2} setContent={setContent} setOpenOrder={setOpenOrder}
+                        value={<div class='flex flex-row gap-4  items-center'>
+                            {userList.filter(f => f.id === user).map(item =>
+                                <>
+                                    {item.profilepic !== null ?
+                                        <Image width={24} height={24} src={item.profilepic} style={{ borderRadius: 10 }} /> :
+                                        <Avatar size={24} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
+                                    }
+                                    <p class="text-xs font-medium">{item.fullname}</p>
+                                </>)}
+                        </div>
+                        } />
+                    }
+
+                    {servicesItem.length !== 0 && <ViewBooking title={'Services'} content={3} setContent={setContent} setOpenOrder={setOpenOrder}
+                        value={<div class='flex flex-col gap-2 items-center'>
+                            {servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item =>
+                                <div key={item.id} class='flex flex-row items-center  text-gray-700'>
+                                    <p class='bg-gray-50 w-10 p-1 text-xs text-gray-600 font-medium font-sans border-r shadow-md rounded-r-md'>
+                                        $ {item.price}
+                                    </p>
+                                    <p style={{ fontSize: 11, fontWeight: 500, marginLeft: 8 }}>{item.name}</p>
                                 </div>
-                                :
-                                <div style={{ marginTop: 24 }}>
-                                    {/*current < steps.length - 1 && (
-                                <Button type="primary" onClick={() => next()}>
-                                    Next
-                                </Button>
-                            )*/}
-                                    {current > 0 && (
-                                        <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
-                                            Previous
-                                        </Button>
-                                    )}
-                                    {current === 5 - 1 && (
-                                        <Space>
-                                            <Button variant='solid' color="cyan" onClick={() => save()}>
-                                                {isRescheduled ? 'Rescheduled' : 'Book Appointment'}
-                                            </Button>
-                                            {isRescheduled &&
-                                                <Popconfirm
-                                                    title="Cancel"
-                                                    description="Are you sure to cancel the appointment? "
-                                                    onConfirm={() => save(true)}
-                                                    okText="Yes"
-                                                    cancelText="No"
-                                                >
-                                                    <Button variant='solid' color="danger">
-                                                        Cancel Appointment
-                                                    </Button>
-                                                </Popconfirm>
-                                            }
-                                        </Space>
-                                    )}
-                                </div>}
-                            </> : <></>
-                        :
-                        <div class='flex flex-row justify-center items-center'>
-                            <div class='flex flex-col gap-3 items-start'>
-                                <p class='text-4xl font-sans font-semibold'> Page not found</p>
-                                <p >Uh oh, we can't seem to find the page you're looking for.</p>
-                                <p >Are you sure the website URL is correct ?</p>
-                                <p >Get in touch with the site owner.</p>
+                            )}
+                        </div>
+                        } />
+                    }
+
+                    {slot !== '' && <ViewBooking title={'Date/Time'} content={4} setContent={setContent} setOpenOrder={setOpenOrder}
+                        value={<div class='flex flex-row gap-4 items-center'>
+                            <CalendarOutlined style={{ fontSize: 16, color: 'gray', marginLeft: 2 }} />
+                            <div class='flex flex-col text-xs'>
+                                <p class='font-sans font-semibold'>{get_Date(trndate, 'DD MMM YYYY')}</p>
+                                <p class='text-gray-400'>{slot}</p>
                             </div>
                         </div>
-                }
-            </div>
+                        } />
+                    }
+
+                    {customerName !== '' && <ViewBooking title={'Contact details'} content={5} setContent={setContent} setOpenOrder={setOpenOrder}
+                        value={<div class='flex flex-row gap-4 items-center'>
+                            <ContactsOutlined style={{ fontSize: 20, color: 'gray', marginLeft: 2 }} />
+                            <div class='flex flex-col text-xs'>
+                                <p class='font-sans font-semibold'>{customerName}</p>
+                                <p class='text-gray-400'>{customerPhone}</p>
+                                <p class='text-gray-400'>{customerEmail}</p>
+                            </div>
+                        </div>
+                        } />
+                    }
+
+                </div>
+            </Drawer>
+
+
             {contextHolder}
             {contextHolderModal}
         </div>
