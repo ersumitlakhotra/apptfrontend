@@ -4,7 +4,7 @@ import { useEffect, useImperativeHandle, useState } from "react";
 import { Avatar, Badge, DatePicker, Divider, Image, Input, Select } from "antd";
 import dayjs from 'dayjs';
 import { TextboxFlex } from "../../common/textbox";
-import { setCellFormat, setPriceNumberOnly } from "../../common/cellformat";
+import { isValidEmail, setCellFormat, setPriceNumberOnly } from "../../common/cellformat";
 
 import { UserOutlined } from '@ant-design/icons';
 import { generateTimeSlots } from "../../common/intervals";
@@ -150,7 +150,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
     }
 
     const save = async () => {
-        if (customerName !== '' && customerPhone !== '' && customerPhone.length ===12  && servicesItem.length !== 0 && price !== '' && price !== '.' && trndate !== '' && isOpen) {
+        if (customerName !== '' && customerPhone !== '' && customerPhone.length === 12 && servicesItem.length !== 0 && price !== '' && price !== '.' && trndate !== '' && customerEmail !== '' && isValidEmail(customerEmail)&& isOpen) {
             const Body = JSON.stringify({
                 customerinfo: [{
                     name: customerName,
@@ -267,8 +267,8 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 <Input placeholder="111-222-3333" status={customerPhone === '' ? 'error' : ''} value={customerPhone} onChange={(e) => setCustomerPhone(setCellFormat(e.target.value))} />
             } />
 
-            <TextboxFlex label={'E-mail'} input={
-                <Input placeholder="abcd@company.com" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} />
+            <TextboxFlex label={'E-mail'} mandatory={true} input={
+                <Input placeholder="abcd@company.com" status={customerEmail === '' || !isValidEmail(customerEmail) ? 'error' : ''} value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} />
             } />
 
             <Divider />

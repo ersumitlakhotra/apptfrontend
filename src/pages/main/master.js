@@ -61,7 +61,10 @@ const MasterPage = () => {
     };
 
     window.addEventListener('resize', handleResize);
-    setRefresh(refresh + 1);
+    if (!isUserValid()) {
+      setRefresh(refresh + 1);
+    }
+   
     // Clean up the event listener on component unmount
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -86,7 +89,8 @@ const MasterPage = () => {
 
   useEffect(() => {
     const companyId = localStorage.getItem('cid');
-    if (!companyId) {
+    if (!isUserValid() || !companyId )
+    {
       navigate("/");
     }
   }, [navigate, signout]);
@@ -114,19 +118,19 @@ const MasterPage = () => {
     setIsLoading(false);
   }
 
-  const getData = async (setList, endPoint, eventDate=false) => {
-    setIsLoading(true);
+  const getData = async (setList, endPoint, eventDate = false,isLoadingShow=true) => {
+    isLoadingShow && setIsLoading(true);
     try {
-      const res = await apiCalls("GET", endPoint,null,null,eventDate);
+      const res = await apiCalls("GET", endPoint, null, null, eventDate);
       setList(res.data.data);
     }
     catch (e) {
       setList([])
       //error(error.message)
     }
-    setIsLoading(false);
-  } 
-  
+    isLoadingShow && setIsLoading(false);
+  }   
+   
   const saveData = async (label, method, endPoint, id = null, body = null, notify = true, logs = true) => {
     setIsLoading(true);
     try {
@@ -162,9 +166,11 @@ const MasterPage = () => {
   const isUserValid = () => {
     let result = true;
     const now = new Date();
-    const itemString = localStorage.getItem('uid');
+    const itemString = localStorage.getItem('email');
     if (itemString) {
       const item = JSON.parse(itemString);
+
+      console.log(item)
       if (now.getTime() > item.expiry) {
         const email = JSON.parse(localStorage.getItem('email')).value;
         const password = JSON.parse(localStorage.getItem('password')).value;

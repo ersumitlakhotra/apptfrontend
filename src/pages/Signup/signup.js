@@ -1,20 +1,63 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { useState } from "react";
 import { LoadingOutlined } from '@ant-design/icons';
-import { Spin } from 'antd';
+import { Drawer, Spin } from 'antd';
 import { createCompany, createAdminUser } from "../../hook/apiCall.js";
 import useAlert from "../../common/alert.js";
-import { getAdminPermission, setCellFormat } from "../../common/cellformat.js";
+import { getAdminPermission, isValidEmail, setCellFormat } from "../../common/cellformat.js";
 
-export const Signup = ({logo}) => {
+export const Signup = ({ logo }) => {
   const [business_name, setBusinessName] = useState('');
   const [cell, setCell] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { contextHolder, success, error, warning } = useAlert();
+  const [code, setCode] = useState('');
+  const [openVerification, setOpenVerification] = useState(false);
+
+  const generateCode = () => {
+    const newCode = Math.floor(100000 + Math.random() * 900000);
+    setCode(newCode.toString());
+  };
 
   const onSubmit = async () => {
+    if (business_name !== '' && cell !== '' && cell.length === 12 && email !== '' && isValidEmail(email) && password !== '') {
+      setLoading(true);
+      try {
+        const body = JSON.stringify({email: email});
+        const res = await createCompany('POST', 'company/isExist', body);
+        if (res.status === 200 && res.data === null) {
+
+          const Subject = "Appoint Stack Verification Code";
+          const newCode = Math.floor(100000 + Math.random() * 900000);
+          setCode(newCode.toString());
+
+          let message = '<p>Hi ' + business_name + '</p>';
+          message += '<p>Please enter the following verification code to create you account.</p><br/>';
+          message += '<p><big><b>' + newCode + ' </b></big></p>';
+          message += '<p>In case you were not trying to create your account & are seeing this email, please contact us at info@appointstack.com</p>';
+
+          const emailMessage = JSON.stringify({
+            to: email,
+            subject: Subject,
+            message: message,
+          });
+          //await createCompany('POST', 'sendverification', emailMessage);
+            setOpenVerification(true);
+        }
+        else {
+          warning('An account with that information is already exists. Try again or create a new account with different details. ');
+        }
+      } catch (e) { }
+      setLoading(false);
+    }
+    else {
+      warning('Please, fill out the required fields !');
+    }
+
+  }
+  const RegisterNewCompany = async () => {
     setLoading(true);
     try {
       const body = JSON.stringify({
@@ -22,7 +65,7 @@ export const Signup = ({logo}) => {
         email: email,
         cell: cell,
         password: password,
-        slot:60,
+        slot: 60,
         timinginfo: [{
           monday: ['09:00:00', '21:00:00', true],
           tuesday: ['09:00:00', '21:00:00', true],
@@ -52,8 +95,7 @@ export const Signup = ({logo}) => {
             accounttype: 'Basic'
           });
           const resUser = await createAdminUser('POST', 'user', userBody, cid);
-          if (resUser.status === 201)
-          {
+          if (resUser.status === 201) {
             reset();
             success('Congratulation, your account has been successfully created.');
           }
@@ -79,12 +121,13 @@ export const Signup = ({logo}) => {
     }
   }
 
-  const reset =() => {
+  const reset = () => {
     setBusinessName('');
     setCell('');
     setEmail('');
     setPassword('');
   }
+
   return (
     <section class="bg-gray-50 ">
       <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0 ">
@@ -100,43 +143,41 @@ export const Signup = ({logo}) => {
             <p class="block mb-2 text-sm font-small text-gray-700 dark:text-white">
               Create an account to start managing your appointments and build your remote team.
             </p>
-            <form class="space-y-4 md:space-y-6" action={onSubmit}>
-              <div>
-                <label for="company" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Business name <span class='text-red-500'>*</span></label>
-                <input type="text" name="company" id="company" value={business_name}
-                  class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="Business Name" required onChange={(e) => setBusinessName(e.target.value)} />
-              </div>
-              <div>
-                <label for="cell" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cell number <span class='text-red-500'>*</span></label>
-                <input type="tel" name="cell" id="cell" value={cell}
-                  class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="(111)-222-3333" required onChange={(e) => setCell(setCellFormat(e.target.value))} />
-              </div>
-              <div>
-                <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email <span class='text-red-500'>*</span></label>
-                <input type="email" name="email" id="email" value={email}
-                  class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="name@company.com" required onChange={(e) => setEmail(e.target.value)} />
-              </div>
-              <div>
-                <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password <span class='text-red-500'>*</span></label>
-                <input type="password" name="password" id="password" placeholder="••••••••" value={password}
-                  class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  required onChange={(e) => setPassword(e.target.value)} />
-              </div>
-              <div class="flex items-center justify-between">
-                <div class="flex items-start">
-                  <div class="flex items-center h-5">
-                    <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-                      Already have an account? <a href="/" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign in</a>
-                    </p>
-                  </div>
+            <div>
+              <label for="company" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Business name <span class='text-red-500'>*</span></label>
+              <input type="text" name="company" id="company" value={business_name}
+                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Business Name" required onChange={(e) => setBusinessName(e.target.value)} />
+            </div>
+            <div>
+              <label for="cell" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cell number <span class='text-red-500'>*</span></label>
+              <input type="tel" name="cell" id="cell" value={cell}
+                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="(111)-222-3333" required onChange={(e) => setCell(setCellFormat(e.target.value))} />
+            </div>
+            <div>
+              <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email <span class='text-red-500'>*</span></label>
+              <input type="email" name="email" id="email" value={email}
+                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="name@company.com" required onChange={(e) => setEmail(e.target.value)} />
+            </div>
+            <div>
+              <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password <span class='text-red-500'>*</span></label>
+              <input type="password" name="password" id="password" placeholder="••••••••" value={password}
+                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                required onChange={(e) => setPassword(e.target.value)} />
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-start">
+                <div class="flex items-center h-5">
+                  <p class="text-sm font-light text-gray-500 dark:text-gray-400">
+                    Already have an account? <a href="/" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign in</a>
+                  </p>
                 </div>
               </div>
-              <button type="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Sign up</button>
+            </div>
+            <button onClick={() => onSubmit()} type="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Sign up</button>
 
-            </form>
             <p class="block mb-2 text-center text-xs font-small text-gray-500 dark:text-white">
               By signing up to create an account, you are accepting our terms of service and privacy policy
             </p>
@@ -162,6 +203,13 @@ export const Signup = ({logo}) => {
           <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
         </div>
       )}
+
+      <Drawer title={"Are you sure you want to exit ?"} placement='bottom' height={'20%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenVerification(false)} open={openVerification}>
+        <div class='w-full flex flex-row gap-2 items-center'>
+         
+        </div>
+      </Drawer>
+
       {contextHolder}
     </section>
   );

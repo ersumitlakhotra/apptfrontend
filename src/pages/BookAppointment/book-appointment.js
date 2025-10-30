@@ -18,6 +18,7 @@ import BookingOption from '../../components/BookAppointment/book_reschedule.js';
 import { generateTimeSlots } from '../../common/intervals.js';
 import ViewBooking from '../../components/BookAppointment/view_booking.js';
 import { TextboxFlexCol } from '../../common/textbox.js';
+import { useIdleTimer } from 'react-idle-timer';
 
 const BookAppointment = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -51,6 +52,8 @@ const BookAppointment = () => {
 
     const [trndate, setTrnDate] = useState(LocalDate());
     const [slot, setSlot] = useState('');
+    const [prevTrnDate, setPrevTrnDate] = useState('');
+    const [prevSlot, setPrevSlot] = useState('');
     const [availableSlot, setAvailableSlot] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const [isUserWorking, setUserWorking] = useState(false);
@@ -69,7 +72,6 @@ const BookAppointment = () => {
 
     const [order_no, setOrder_no] = useState('');
     const [order_id, setOrder_Id] = useState(0);
-    const [orderStatus, setOrderStatus] = useState('Pending');
 
     const [openExit, setOpenExit] = useState(false);
     const [openOrder, setOpenOrder] = useState(false);
@@ -77,6 +79,17 @@ const BookAppointment = () => {
 
     const storeId = searchParams.get('store') || 'All';
     const weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+
+    const onIdle = () => {
+        window.location.reload();
+    };
+
+    useIdleTimer({
+        onIdle,
+        timeout: 1000 * 60 * 5, // 10 minutes in milliseconds
+        promptTimeout: 0, // No warning prompt
+        crossTab: true, // Optional: Sync state across browser tabs
+    });
 
     useEffect(() => {
         getLocations(setCompanyList, "company/booking", storeId);
@@ -123,7 +136,11 @@ const BookAppointment = () => {
 
         if (cid !== 0 && employeeSchedule !== null) {
             getData(setOrderList, "GET", "order/booking", [], null, dayjs.utc(trndate, 'YYYY-MM-DD'), false);
-            {bookingType > 1 && setSlot('')}
+            
+            if (prevTrnDate === trndate && bookingType > 1) {
+                setSlot(prevSlot);
+            } else
+                setSlot('')
                 const dayNum = dayjs(trndate).get('day');
                 const weekday = weekdays[dayNum];
 
@@ -315,6 +332,8 @@ const BookAppointment = () => {
                         <p>Booked with: <span class='font-semibold'>{employeeName}</span></p>
                         <p>Date: <span class='font-semibold'>{`${get_Date(trndate, 'DD MMM YYYY')} at ${slot}`}</span></p>
                     </div>
+
+                    <p>You will shortly receive an email regarding booking confirmation.</p>
                 </div>
             ),
             onOk() { window.location.reload() },
@@ -343,6 +362,7 @@ const BookAppointment = () => {
                         <p>Booked with: <span class='font-semibold'>{employeeName}</span></p>
                         <p>Date: <span class='font-semibold'>{`${get_Date(trndate, 'DD MMM YYYY')} at ${slot}`}</span></p>
                     </div>
+                    <p>You will shortly receive an email regarding booking cancellation.</p>
                 </div>
             ),
             onOk() { window.location.reload() },
@@ -378,7 +398,7 @@ const BookAppointment = () => {
             if (bookingType === 2) {
                 saveData("PUT", "order", Body, order_id);
             }
-            if (bookingType === 1) {
+            if (bookingType === 3) {//message, read, cancelled             
                 saveData("POST", "order/cancel", [], order_id);
             }
         }
@@ -398,6 +418,11 @@ const BookAppointment = () => {
             else if (result.status === 203) {
                 const order_no = result.data.data.order_no;
                 sendEmail(id, order_no, true);
+                const notifyBody = JSON.stringify({                 
+                    message: '# '+order_no + ' is cancelled by '+customerName + ' : '+customerPhone,
+                    cancelled: '1',
+                });
+               await apiCallsViaBooking("POST", "notification", cid, notifyBody, null, null);
                 cancelModal(order_no);
             }
             else
@@ -412,8 +437,13 @@ const BookAppointment = () => {
     const sendEmail = async (id, order_no, isCancelled) => {
         const Subject = isCancelled ? 'Booking Cancellation' : id === null ? "Booking Confirmation" : "Re-Schedule Confirmation";
         const link = 'https://appointstack.com/book-appointment?store=' + storeId;
+        let serviceNames ='';
+        servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item =>
+            serviceNames += item.name + ', '
+        )
+       
         let message = '<p>Hi ' + customerName + '</p>';
-        message += `<p>This is a ${isCancelled ? 'cancellation' : 'confirmation'} of your <b>` + 'serviceName' + ' </b> booking on ' + get_Date(trndate, 'DD MMM YYYY') + ' at ' + slot + '.</p>';
+        message += `<p>This is a ${isCancelled ? 'cancellation' : 'confirmation'} of your <b>` + serviceNames + ' </b> booking on ' + get_Date(trndate, 'DD MMM YYYY') + ' at ' + slot + '.</p>';
         message += '<p>Your <b>Booking# :</b> ' + order_no + ' and <b>Booked With : </b>' + employeeName + '</p>';
         message += '<p>If you have any questions, please contact the business at ( ' + storeCell + ' )</p>';
         message += '<p>In case for New booking/Rescheduling/Cancellation, please click on this link:</p><a href="' + link + '">' + link + '</a>';
@@ -441,7 +471,6 @@ const BookAppointment = () => {
             setIsLoading(true);
             let result = false;
             let message = 'No record found.';
-            let bookedSlot = '';
             try {
                 const Body = JSON.stringify({
                     order_no: order_no
@@ -470,7 +499,9 @@ const BookAppointment = () => {
                             setUser(editList.assignedto);
                             setServicesItem(editList.serviceinfo);
                             setSlot(editList.slot);
-                            setTrnDate(get_Date(editList.trndate, 'YYYY-MM-DD'))
+                            setPrevSlot(editList.slot);
+                            setPrevTrnDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
+                            setTrnDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
                             
                             if (editList.customerinfo !== null) {
 
@@ -482,13 +513,13 @@ const BookAppointment = () => {
                             setTotal(editList.total);
                             setCoupon(editList.coupon);
                             setDiscount(editList.discount);
-                            setOrderStatus(editList.status);                          
+
                         }
                     }
 
                     if (result) {
                         setContent(5);
-                        { bookingType === 2 && setOpenOrder(true) };
+                        bookingType === 2 && setOpenOrder(true)
                         setOpenSearch(false);
                         
                     }
@@ -663,9 +694,9 @@ const BookAppointment = () => {
                     }
 
                     {servicesItem.length !== 0 && <ViewBooking title={'Services'} content={3} setContent={setContent} setOpenOrder={setOpenOrder}
-                        value={<div class='flex flex-col gap-2 items-center'>
+                        value={<div class='flex flex-col gap-2'>
                             {servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item =>
-                                <div key={item.id} class='flex flex-row items-center  text-gray-700'>
+                                <div key={item.id} class='flex flex-row items-center text-gray-700'>
                                     <p class='bg-gray-50 w-10 p-1 text-xs text-gray-600 font-medium font-sans border-r shadow-md rounded-r-md'>
                                         $ {item.price}
                                     </p>

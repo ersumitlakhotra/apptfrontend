@@ -38,7 +38,7 @@ const RecentActivities = ({ orderList, expensesList, servicesList, userList, eve
         else
             setLogsData(editList);
 
-    }, [currentOption,orderList])
+    }, [currentOption, logsList])
 
     return (
         <div class='flex flex-col gap-4 w-full'>

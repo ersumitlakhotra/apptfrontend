@@ -1,7 +1,7 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Space, Dropdown, Drawer,  Badge } from 'antd';
-import { MenuUnfoldOutlined, LogoutOutlined,  BellFilled } from '@ant-design/icons';
+import { Space, Dropdown, Drawer,  Badge, Button } from 'antd';
+import { MenuUnfoldOutlined, LogoutOutlined, BellFilled, DownOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import AssignedTo from '../../../common/assigned_to.js';
 import NotificationDetail from '../Notification/notification_detail.js';
@@ -31,11 +31,16 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermi
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-      setId(localStorage.getItem('uid'));
-      getData(setUserList, "users");
-      getData(setNotificationList, "notification");
-  }, [refresh]);
+    setId(localStorage.getItem('uid'));
+    getData(setUserList, "users");
+    getData(setNotificationList, "notification");
 
+    const intervalId = setInterval(() => {
+      getData(setNotificationList, "notification",false,false);
+    }, 120000); // 120000 milliseconds = 2 minutes
+    return () => clearInterval(intervalId);
+
+  }, []);
 
   useEffect(() => {
     const unread = notificationList.filter(a => a.read === '1');
@@ -92,6 +97,7 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermi
       default: { break; }
     }
   };
+
   const menuProps = {
     items,
     onClick: handleMenuClick
@@ -110,7 +116,19 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermi
       });
       saveData("Notification", 'PUT', "notification", item.id, Body, false,false);
     })
+    getData(setNotificationList, "notification", false, false);
   }
+ 
+
+  const [currentOption, setCurrentOption] = useState('Today');
+  const itemsNotification = [
+    { key: 'Today', label: 'Today' },
+    { key: 'Last 7 Days', label: 'Last 7 Days' },
+    { key: 'This Month', label: 'This Month' },
+    { key: 'This Year', label: 'This Year' },
+  ];
+  const onItemChanged = e => { setCurrentOption(e.key) };
+  const menuPropsNotification = { items:itemsNotification, onClick: onItemChanged };
 
   return (
     <div class='flex items-center justify-between p-3 pe-8 overflow-x-hidden '>
@@ -127,9 +145,20 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermi
 
       </div>
 
-      <Drawer title={"Notification"} placement='right' width={400} onClose={() => updateOnClose()} open={openNotification}>
-        <NotificationDetail refresh={refresh} notificationList={notificationList} setUnreadUpdate={setUnreadUpdate} tabActiveKey={tabActiveKey} setTabActiveKey={setTabActiveKey} />
+      <Drawer title={"Notification"} placement='right' width={500} onClose={() => updateOnClose()} open={openNotification}
+        extra={<Dropdown menu={menuPropsNotification}>
+          <Button>
+            <Space>
+              {currentOption}
+              <DownOutlined />
+            </Space>
+          </Button>
+        </Dropdown>}>
+
+        <NotificationDetail refresh={refresh} currentOption={currentOption} notificationList={notificationList} setUnreadUpdate={setUnreadUpdate} tabActiveKey={tabActiveKey} setTabActiveKey={setTabActiveKey} />
       </Drawer>
+
+      
     </div>
   )
 }

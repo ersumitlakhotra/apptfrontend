@@ -3,8 +3,7 @@ import { useIdleTimer } from 'react-idle-timer';
 //npm install react-idle-timer
 
 const Idlerr = () => {
-    const onIdle = () => {
-        console.log('User is idle. Refreshing page...');
+    const onIdle = () => {      
         window.location.reload();
     };
 
