@@ -96,32 +96,21 @@ const MasterPage = () => {
   }, [navigate, signout]);
 
   const onSetSignout = () => {
+    clearLocalStorage();
+    setSignout(true);
+  }
+  const clearLocalStorage = () => {
     localStorage.removeItem('cid');
     localStorage.removeItem('uid');
     localStorage.removeItem('email');
     localStorage.removeItem('password');
-    setSignout(true);
-  }
-
-  const getLogo = async ( method, endPoint, id = null, body = null) => {
-    setIsLoading(true);
-    try {
-      const res = await apiCalls(method, endPoint, id, body);
-      if (res.data.status === 200)
-        setLogoList(res.data.data);
-    else
-        setLogoList([]);
-    }
-    catch (e) {
-      setLogoList([]);
-    }
-    setIsLoading(false);
   }
 
   const getData = async (setList, endPoint, eventDate = false,isLoadingShow=true) => {
     isLoadingShow && setIsLoading(true);
-    try {
-      const res = await apiCalls("GET", endPoint, null, null, eventDate);
+    try {   
+    const companyId = localStorage.getItem('cid');  
+      const res = await apiCalls("GET", endPoint,companyId, null, null, eventDate);
       setList(res.data.data);
     }
     catch (e) {
@@ -134,7 +123,9 @@ const MasterPage = () => {
   const saveData = async (label, method, endPoint, id = null, body = null, notify = true, logs = true) => {
     setIsLoading(true);
     try {
-      const result = await apiCalls(method, endPoint, id, body);
+      
+    const companyId = localStorage.getItem('cid');  
+      const result = await apiCalls(method, endPoint,companyId, id, body);
 
       if (result.status === 500 || result.status === 404) {
         notify && error(result.message);
@@ -151,7 +142,7 @@ const MasterPage = () => {
             datainfo: [body]
           });
 
-          await apiCalls('POST', 'logs', null, Log);
+          await apiCalls('POST', 'logs', companyId,null, Log);
         }
         notify && success(`The ${label} has been ${status} successfully.`);
         setRefresh(refresh + 1)
@@ -169,15 +160,10 @@ const MasterPage = () => {
     const itemString = localStorage.getItem('email');
     if (itemString) {
       const item = JSON.parse(itemString);
-
-      console.log(item)
       if (now.getTime() > item.expiry) {
         const email = JSON.parse(localStorage.getItem('email')).value;
         const password = JSON.parse(localStorage.getItem('password')).value;
-        localStorage.removeItem('cid');
-        localStorage.removeItem('uid');
-        localStorage.removeItem('email');
-        localStorage.removeItem('password');// Remove expired item
+        clearLocalStorage();
         result = onSubmit(email, password);
       }
 
@@ -288,7 +274,7 @@ const onSubmit = async(email,password) => {
       case 'Setting':
         {
           getData(setCompanyList,"company");
-          getLogo("GET", "logo");
+          getData(setLogoList,"logo");
           getData(setBillingList, "billing");
           break;
         }

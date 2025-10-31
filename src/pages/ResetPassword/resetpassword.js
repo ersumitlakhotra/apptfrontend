@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState } from "react";
 import useAlert from "../../common/alert";
-import { apiCallWithoutCid } from "../../hook/apiCall";
+import { apiCalls } from "../../hook/apiCall";
 
 export const ResetPassword = ({logo}) => {
 const { contextHolder, success, error, warning } = useAlert();
@@ -20,7 +20,7 @@ const onSubmit = async () => {
         code: newCode.toString(),
       });
 
-      const res = await apiCallWithoutCid('POST', 'verification', body);
+      const res = await apiCalls('POST', 'verification',null,null, body);
       if (res.status === 201) 
       {
          console.log(newCode.toString())     

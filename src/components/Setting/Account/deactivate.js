@@ -31,7 +31,8 @@ const Deactivate = ({onSetSignout}) => {
     const onDeactivate = async () => {
        // setIsLoading(true);
         try {
-            const result = await apiCalls('PUT', 'company/deactivate', null, []);
+            const companyId = localStorage.getItem('cid');  
+            const result = await apiCalls('PUT', 'company/deactivate',companyId, null, []);
             if (result.status === 203)
                 successModal();
             else

@@ -8,7 +8,7 @@ import Services from '../../components/BookAppointment/services.js';
 import Employee from '../../components/BookAppointment/employee.js';
 import Slot from '../../components/BookAppointment/slot.js';
 import Details from '../../components/BookAppointment/detail.js';
-import { apiCallsViaBooking, getCompanyViaStore } from '../../hook/apiCall';
+import { apiCalls } from '../../hook/apiCall';
 import { get_Date, LocalDate, LocalTime } from '../../common/localDate.js';
 import dayjs from 'dayjs';
 import useAlert from '../../common/alert.js';
@@ -110,9 +110,9 @@ const BookAppointment = () => {
             }
         })
         getData(setServicesList, "GET", "services");
-        getData(setEventList, "GET", "event", [], null, null, true);
+        getData(setEventList, "GET", "event", null,[], null, true);
         getData(setUserList, "GET", "user");
-        getData(setOrderList, "GET", "order/booking", [], null, dayjs.utc(trndate, 'YYYY-MM-DD'), false);
+        getData(setOrderList, "GET", "order/booking",dayjs.utc(trndate, 'YYYY-MM-DD'), [] , false);
     }, [cid]);
 
     useEffect(() => {
@@ -135,7 +135,7 @@ const BookAppointment = () => {
             setTrnDate(LocalDate());
 
         if (cid !== 0 && employeeSchedule !== null) {
-            getData(setOrderList, "GET", "order/booking", [], null, dayjs.utc(trndate, 'YYYY-MM-DD'), false);
+            getData(setOrderList, "GET", "order/booking",dayjs.utc(trndate, 'YYYY-MM-DD'), [] , false);
             
             if (prevTrnDate === trndate && bookingType > 1) {
                 setSlot(prevSlot);
@@ -228,10 +228,10 @@ const BookAppointment = () => {
 
     }, [trndate,employeeSchedule]);
 
-    const getData = async (setList, method, endPoint, body = [], id = null, date = null, eventDate = false) => {
+    const getData = async (setList, method, endPoint, id = null, body = [], eventDate = false) => {
         setIsLoading(true);
         try {
-            const res = await apiCallsViaBooking(method, endPoint, cid, body, id, date, eventDate);
+            const res = await apiCalls(method, endPoint, cid, id,body, eventDate);
             setList(res.data.data);
         }
         catch (e) {
@@ -245,7 +245,7 @@ const BookAppointment = () => {
     const getLocations = async (setList, endPoint, store) => {
         setIsLoading(true);
         try {
-            const res = await getCompanyViaStore("GET", endPoint, store);
+            const res = await apiCalls("GET", endPoint, store);
             setList(res.data.data);
             if (res.data.data.length > 0)
                 setIsURL(true)
@@ -409,7 +409,7 @@ const BookAppointment = () => {
     const saveData = async (method, endPoint, body, id) => {
         setIsLoading(true);
         try {
-            const result = await apiCallsViaBooking(method, endPoint, cid, body, id, null);
+            const result = await apiCalls(method, endPoint, cid, id, body, null);
             if (result.status === 201 || result.status === 200) {
                 const order_no = result.data.data.order_no;
                 sendEmail(id, order_no, false);
@@ -422,7 +422,7 @@ const BookAppointment = () => {
                     message: '# '+order_no + ' is cancelled by '+customerName + ' : '+customerPhone,
                     cancelled: '1',
                 });
-               await apiCallsViaBooking("POST", "notification", cid, notifyBody, null, null);
+               await apiCalls("POST", "notification", cid,null, notifyBody,  null);
                 cancelModal(order_no);
             }
             else
@@ -458,7 +458,7 @@ const BookAppointment = () => {
         });
         setIsLoading(true);
         try {
-            await apiCallsViaBooking("POST", "sendmail", cid, Body);
+            await apiCalls("POST", "sendmail", cid,null, Body);
         }
         catch (e) {
 
@@ -475,7 +475,7 @@ const BookAppointment = () => {
                 const Body = JSON.stringify({
                     order_no: order_no
                 });
-                const res = await apiCallsViaBooking("POST", "order/reschedule", cid, Body);
+                const res = await apiCalls("POST", "order/reschedule", cid,null, Body);
                 if (res.data.data.length > 0) {
                     const editList = res.data.data[0];
                     if (editList.customerinfo !== null && editList.customerinfo[0].email.toLowerCase() === customerEmail.toLowerCase()) {
