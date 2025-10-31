@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { useState } from "react";
 import { LoadingOutlined, MailFilled } from '@ant-design/icons';
-import { Drawer, Spin,Input, Button } from 'antd';
+import { Drawer, Spin, Input, Button } from 'antd';
 import { apiCalls } from "../../hook/apiCall.js";
 import useAlert from "../../common/alert.js";
 import { getAdminPermission, isValidEmail, setCellFormat } from "../../common/cellformat.js";
@@ -13,31 +13,27 @@ export const Signup = ({ logo }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { contextHolder, success, error, warning } = useAlert();
+  const {contextHolder, success, error, warning } = useAlert();
   const [code, setCode] = useState('');
   const [codeEnter, setCodeEnter] = useState('');
   const [openVerification, setOpenVerification] = useState(false);
-
-  const generateCode = () => {
-    const newCode = Math.floor(100000 + Math.random() * 900000);
-    setCode(newCode.toString());
-  }
 
   const onSubmit = async () => {
     if (business_name !== '' && cell !== '' && cell.length === 12 && email !== '' && isValidEmail(email) && password !== '') {
       setLoading(true);
       try {
-        const body = JSON.stringify({email: email});
-        const res = await apiCalls('POST', 'company/isExist',null,null, body);
+        const body = JSON.stringify({ email: email });
+        const res = await apiCalls('POST', 'company/isExist', null, null, body);
         if (res.status === 200 && res.data.data === null) {
-            sendEmail();
-            // generateCode();
-            setOpenVerification(true);            
+          sendEmail();
+          setOpenVerification(true);
         }
         else {
           warning('An account with that information is already exists. Try again or create a new account with different details. ');
         }
-      } catch (e) { }
+      } catch (err) {
+        error(String(err.message))
+       }
       setLoading(false);
     }
     else {
@@ -45,106 +41,110 @@ export const Signup = ({ logo }) => {
     }
 
   }
-  const sendEmail = async() => {
-     generateCode();
-          const Subject = "Appoint Stack Verification Code";
+  const sendEmail = async () => {
+    const newCode = Math.floor(100000 + Math.random() * 900000); 
+    const Subject = "Appoint Stack Verification Code";
 
-          let message = '<p>Hi ' + business_name + '</p>';
-          message += '<p>Please enter the following verification code to create you account.</p><br/>';
-          message += '<p><big><b>' + code + ' </b></big></p>';
-          message += '<p>In case you were not trying to create your account & are seeing this email, please contact us at info@appointstack.com</p>';
+    let message = '<p>Hi ' + business_name + '</p>';
+    message += '<p>Please enter the following verification code to create you account.</p><br/>';
+    message += '<p><big><b>' + newCode + ' </b></big></p>';
+    message += '<p>In case you were not trying to create your account & are seeing this email, please contact us at info@appointstack.com</p>';
 
-          const emailMessage = JSON.stringify({
-            to: email,
-            subject: Subject,
-            message: message,
-          });
-          await apiCalls('POST', 'sendverification',null,null, emailMessage);
-  }
-  const RegisterNewCompany = async () => {
-    if(code === codeEnter)
-    {
-    setLoading(true);
-    try {
-      const body = JSON.stringify({
-        name: business_name,
-        email: email,
-        cell: cell,
-        password: password,
-        slot: 45,
-        timinginfo: [{
-          monday: ['09:00:00', '21:00:00', true],
-          tuesday: ['09:00:00', '21:00:00', true],
-          wednesday: ['09:00:00', '21:00:00', true],
-          thursday: ['09:00:00', '21:00:00', true],
-          friday: ['09:00:00', '21:00:00', true],
-          saturday: ['09:00:00', '21:00:00', true],
-          sunday: ['09:00:00', '21:00:00', true],
-        }]
-      });
-
-      const res = await apiCalls('POST', 'company',null,null, body);
-      if (res.status === 201) {
-        const cid = res.data.data.id;
-        try {
-          const userBody = JSON.stringify({
-            fullname: 'Admin',
-            cell: cell,
-            email: email,
-            gender: 'Male',
-            username: email,
-            password: password,
-            role: 'Administrator',
-            rating: '5',
-            permissioninfo: getAdminPermission(),
-            status: 'Active',
-            accounttype: 'Basic'
-          });
-          const resUser = await apiCalls('POST', 'user',cid,null, userBody);
-          if (resUser.status === 201) {
-            reset();
-            success('Congratulation, your account has been successfully created.');
-          }
-          else
-            error(resUser.response.data.error)
-        } catch (error) {
-          error(error.message)
-        }
-
-      }
-      else {
-        if (String(res.response.data.error).toLocaleLowerCase().includes("duplicate key"))
-          warning('An account with that information is already exists. Try again or create a new account with different details. ');
-        else
-          error(String(res.response.data.error))
-      }
-    }
-    catch (err) {
-      error(String(err.message))
-    }
-    finally {
-      setLoading(false);
-    }
-  }
+    const emailMessage = JSON.stringify({
+      to: email,
+      subject: Subject,
+      message: message,
+    });
+    await apiCalls('POST', 'sendverification', null, null, emailMessage);
+    saveCode(newCode);
   }
 
+  const saveCode = (newCode) => {
+    setCode(newCode.toString());
+    setCodeEnter('');
+  }
   const reset = () => {
     setBusinessName('');
     setCell('');
     setEmail('');
     setPassword('');
     setCode('');
+    setCodeEnter('');
+    setOpenVerification(false);
+  }
+
+  const RegisterNewCompany = async () => {
+    if (code === codeEnter) {
+      setLoading(true);
+      try {
+        const body = JSON.stringify({
+          name: business_name,
+          email: email,
+          cell: cell,
+          password: password,
+          slot: 45,
+          timinginfo: [{
+            monday: ['09:00:00', '21:00:00', true],
+            tuesday: ['09:00:00', '21:00:00', true],
+            wednesday: ['09:00:00', '21:00:00', true],
+            thursday: ['09:00:00', '21:00:00', true],
+            friday: ['09:00:00', '21:00:00', true],
+            saturday: ['09:00:00', '21:00:00', true],
+            sunday: ['09:00:00', '21:00:00', true],
+          }]
+        });
+
+        const res = await apiCalls('POST', 'company', null, null, body);
+        if (res.status === 201) {
+          const cid = res.data.data.id;
+          try {
+            const userBody = JSON.stringify({
+              fullname: 'Admin',
+              cell: cell,
+              email: email,
+              gender: 'Male',
+              username: email,
+              password: password,
+              role: 'Administrator',
+              rating: '5',
+              permissioninfo: getAdminPermission(),
+              status: 'Active',
+              accounttype: 'Basic'
+            });
+            const resUser = await apiCalls('POST', 'user', cid, null, userBody);
+            if (resUser.status === 201) {
+              reset();
+              success('Congratulation, your account has been successfully created.');
+            }
+            else
+              error(resUser.response.data.error)
+          } catch (error) {
+            error(error.message)
+          }
+
+        }
+        else {
+            error(String(res.response.data.error))
+        }
+      }
+      catch (err) {
+        error(String(err.message))
+      }
+      finally {
+        setLoading(false);
+      }
+    }
+    else
+      error(`Hmm, that's not a valid verification code. Please double-check your email and try again!`)
   }
 
   const onChange = text => {
     setCodeEnter(text.toString());
   };
- const onInput = value => {
-    setCodeEnter('');
-  };
+ 
+
   const sharedProps = {
-    onChange,
-    onInput
+    onChange
   };
 
   return (
@@ -223,18 +223,18 @@ export const Signup = ({ logo }) => {
         </div>
       )}
 
-      <Drawer title={""} placement='bottom' height={'80%'} style={{ backgroundColor: '#F9FAFB' }} open={openVerification} 
-      onClose={() => setOpenVerification(false)} >
+      <Drawer title={""} placement='bottom' height={'80%'} style={{ backgroundColor: '#F9FAFB' }} open={openVerification}
+        onClose={() => {setOpenVerification(false); reset();}} >
         <div class='w-full flex flex-col justify-center gap-4 items-center '>
           <MailFilled style={{ fontSize: 32, color: 'green' }} />
           <p class='text-2xl  font-sans text-gray-600 border-b border-gray-400 pb-6 px-12 '>VERIFY YOUR EMAIL ADDRESS</p>
           <p class='font-medium'>A verification code has been sent to : {email}</p>
           <p>Please check your inbox and enter the verification code below to verify your email address.</p>
           <div class='flex flex-row gap-1 text-sm font-bold mb-3'><p>The code will expire in : </p><CountdownTimer code={code} setCode={setCode} /></div>
-         
-          <Input.OTP size='large' status={ code !== codeEnter && codeEnter.length === 6 ? "error" : ""} formatter={str => str.toUpperCase()} {...sharedProps} />
-         
-          <Button color="cyan" variant="solid" size='large' style={{width:'400px'}} onClick={() => RegisterNewCompany()}>
+
+          <Input.OTP size='large' status={code !== codeEnter && codeEnter.length === 6 ? "error" : ""} formatter={str => str.toUpperCase()} {...sharedProps} />
+
+          <Button color="cyan" variant="solid" size='large' style={{ width: '400px' }} onClick={() => RegisterNewCompany()}>
             Verify
           </Button>
           <Button color="cyan" variant="link" onClick={() => sendEmail()}>

@@ -35,7 +35,7 @@ const CountdownTimer = ({ code,  setCode }) => {
 
   return (
     <p>
-      {seconds <= 0 ? `Time's up!`: formatTime(seconds)+ ' minutes'}
+      {seconds <= 0 ? `Time's up!`: formatTime(seconds)+ ' minutes' }
     </p>
   );
 };
