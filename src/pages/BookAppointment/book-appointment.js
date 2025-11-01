@@ -66,8 +66,6 @@ const BookAppointment = () => {
     const [companyList, setCompanyList] = useState([]);
     const [servicesList, setServicesList] = useState([]);
     const [userList, setUserList] = useState([]);
-    const [orderList, setOrderList] = useState([]);
-    const [eventList, setEventList] = useState([]);
 
 
     const [order_no, setOrder_no] = useState('');
@@ -110,9 +108,7 @@ const BookAppointment = () => {
             }
         })
         getData(setServicesList, "GET", "services");
-        getData(setEventList, "GET", "event", null,[], null, true);
         getData(setUserList, "GET", "user");
-        getData(setOrderList, "GET", "order/booking",dayjs.utc(trndate, 'YYYY-MM-DD'), [] , false);
     }, [cid]);
 
     useEffect(() => {
@@ -130,108 +126,116 @@ const BookAppointment = () => {
     }, [servicesItem]);
 
     useEffect(() => {
-
-        if (trndate === '')
-            setTrnDate(LocalDate());
-
-        if (cid !== 0 && employeeSchedule !== null) {
-            getData(setOrderList, "GET", "order/booking",dayjs.utc(trndate, 'YYYY-MM-DD'), [] , false);
-            
-            if (prevTrnDate === trndate && bookingType > 1) {
-                setSlot(prevSlot);
-            } else
-                setSlot('')
-                const dayNum = dayjs(trndate).get('day');
-                const weekday = weekdays[dayNum];
-
-                let inTime = '00:00:00';
-                let outTime = '00:00:00';
-                let isOpen = false;
-                let isWorking = false;
-                switch (weekday.toLowerCase()) {
-                    case 'sunday':
-                        {
-                            inTime = employeeSchedule.sunday[0];
-                            outTime = employeeSchedule.sunday[1];
-                            isWorking = employeeSchedule.sunday[2];
-                            isOpen = storeSchedule.sunday[2];
-                            break;
-                        }
-                    case 'monday':
-                        {
-                            inTime = employeeSchedule.monday[0];
-                            outTime = employeeSchedule.monday[1];
-                            isWorking = employeeSchedule.monday[2];
-                            isOpen = storeSchedule.monday[2];
-                            break;
-                        }
-                    case 'tuesday':
-                        {
-                            inTime = employeeSchedule.tuesday[0];
-                            outTime = employeeSchedule.tuesday[1];
-                            isWorking = employeeSchedule.tuesday[2];
-                            isOpen = storeSchedule.tuesday[2];
-                            break;
-                        }
-                    case 'wednesday':
-                        {
-                            inTime = employeeSchedule.wednesday[0];
-                            outTime = employeeSchedule.wednesday[1];
-                            isWorking = employeeSchedule.wednesday[2];
-                            isOpen = storeSchedule.wednesday[2];
-                            break;
-                        }
-                    case 'thursday':
-                        {
-                            inTime = employeeSchedule.thursday[0];
-                            outTime = employeeSchedule.thursday[1];
-                            isWorking = employeeSchedule.thursday[2];
-                            isOpen = storeSchedule.thursday[2];
-                            break;
-                        }
-                    case 'friday':
-                        {
-                            inTime = employeeSchedule.friday[0];
-                            outTime = employeeSchedule.friday[1];
-                            isWorking = employeeSchedule.friday[2];
-                            isOpen = storeSchedule.friday[2];
-                            break;
-                        }
-                    case 'saturday':
-                        {
-                            inTime = employeeSchedule.saturday[0];
-                            outTime = employeeSchedule.saturday[1];
-                            isWorking = employeeSchedule.saturday[2];
-                            isOpen = storeSchedule.saturday[2];
-                            break;
-                        }
-                    default:
-                        {
-                            inTime = '00:00:00'; outTime = '00:00:00'; isOpen = false;
-                            isWorking = false;
-                            break;
-                        }
-
-                }
-
-                let orderListSlot = [];
-                orderListSlot = (orderList.filter(a => (a.trndate.includes(trndate) && a.assignedto === user)));
-                setIsOpen(isOpen);
-                setUserWorking(isWorking);
-                setAvailableSlot([]);
-                if (isOpen && isWorking) {
-                    if (trndate === LocalDate())
-                        inTime = LocalTime();
-                    setAvailableSlot(generateTimeSlots(inTime, outTime, slotGap, orderListSlot, slot));              
-            }
+        if (employeeSchedule !== null && cid !== 0) {
+            onTrnDateChange();          
         }
+        }, [trndate, employeeSchedule]);
 
-    }, [trndate,employeeSchedule]);
-
-    const getData = async (setList, method, endPoint, id = null, body = [], eventDate = false) => {
+    const onTrnDateChange = async () => {
+        const body = JSON.stringify({ date: get_Date(trndate, 'YYYY-MM-DD').toString(), uid: parseInt(user) });
+        let orderList=[];
         setIsLoading(true);
         try {
-            const res = await apiCalls(method, endPoint, cid, id,body, eventDate);
+            const res = await apiCalls("POST", "order/booking", cid, null, body, false);
+            orderList=res.data.data;
+        }
+        catch (e) {
+            orderList=[];
+            //error(error.message)
+        }
+        setIsLoading(false);
+        if (prevTrnDate === trndate && bookingType > 1) {
+            setSlot(prevSlot);
+        } else
+            setSlot('')
+
+        const dayNum = dayjs(trndate).get('day');
+        const weekday = weekdays[dayNum];
+
+        let inTime = '00:00:00';
+        let outTime = '00:00:00';
+        let isOpen = false;
+        let isWorking = false;
+
+        switch (weekday.toLowerCase()) {
+            case 'sunday':
+                {
+                    inTime = employeeSchedule.sunday[0];
+                    outTime = employeeSchedule.sunday[1];
+                    isWorking = employeeSchedule.sunday[2];
+                    isOpen = storeSchedule.sunday[2];
+                    break;
+                }
+            case 'monday':
+                {
+                    inTime = employeeSchedule.monday[0];
+                    outTime = employeeSchedule.monday[1];
+                    isWorking = employeeSchedule.monday[2];
+                    isOpen = storeSchedule.monday[2];
+                    break;
+                }
+            case 'tuesday':
+                {
+                    inTime = employeeSchedule.tuesday[0];
+                    outTime = employeeSchedule.tuesday[1];
+                    isWorking = employeeSchedule.tuesday[2];
+                    isOpen = storeSchedule.tuesday[2];
+                    break;
+                }
+            case 'wednesday':
+                {
+                    inTime = employeeSchedule.wednesday[0];
+                    outTime = employeeSchedule.wednesday[1];
+                    isWorking = employeeSchedule.wednesday[2];
+                    isOpen = storeSchedule.wednesday[2];
+                    break;
+                }
+            case 'thursday':
+                {
+                    inTime = employeeSchedule.thursday[0];
+                    outTime = employeeSchedule.thursday[1];
+                    isWorking = employeeSchedule.thursday[2];
+                    isOpen = storeSchedule.thursday[2];
+                    break;
+                }
+            case 'friday':
+                {
+                    inTime = employeeSchedule.friday[0];
+                    outTime = employeeSchedule.friday[1];
+                    isWorking = employeeSchedule.friday[2];
+                    isOpen = storeSchedule.friday[2];
+                    break;
+                }
+            case 'saturday':
+                {
+                    inTime = employeeSchedule.saturday[0];
+                    outTime = employeeSchedule.saturday[1];
+                    isWorking = employeeSchedule.saturday[2];
+                    isOpen = storeSchedule.saturday[2];
+                    break;
+                }
+            default:
+                {
+                    inTime = '00:00:00'; outTime = '00:00:00'; isOpen = false;
+                    isWorking = false;
+                    break;
+                }
+        }
+        setIsOpen(isOpen);
+        setUserWorking(isWorking);
+        setAvailableSlot([]);
+        if (isOpen && isWorking) {
+            if (trndate === LocalDate())
+                inTime = LocalTime();
+            setAvailableSlot(generateTimeSlots(inTime, outTime, slotGap, orderList, slot));
+        }
+    }
+
+    const getData = async (setList, method, endPoint, id = null, body = [], eventDate = false) => {
+       
+        setIsLoading(true);
+        try {
+            const res = await apiCalls(method, endPoint, cid, id, body, eventDate);
             setList(res.data.data);
         }
         catch (e) {
@@ -239,16 +243,15 @@ const BookAppointment = () => {
             //error(error.message)
         }
         setIsLoading(false);
-    }
-
-
+    }    
+    
     const getLocations = async (setList, endPoint, store) => {
         setIsLoading(true);
         try {
             const res = await apiCalls("GET", endPoint, store);
-            setList(res.data.data);
             if (res.data.data.length > 0)
-                setIsURL(true)
+                setIsURL(true);
+            setList(res.data.data);
         }
         catch (e) {
             setList([])
@@ -418,11 +421,11 @@ const BookAppointment = () => {
             else if (result.status === 203) {
                 const order_no = result.data.data.order_no;
                 sendEmail(id, order_no, true);
-                const notifyBody = JSON.stringify({                 
-                    message: '# '+order_no + ' is cancelled by '+customerName + ' : '+customerPhone,
+                const notifyBody = JSON.stringify({
+                    message: '# ' + order_no + ' is cancelled by ' + customerName + ' : ' + customerPhone,
                     cancelled: '1',
                 });
-               await apiCalls("POST", "notification", cid,null, notifyBody,  null);
+                await apiCalls("POST", "notification", cid, null, notifyBody, null);
                 cancelModal(order_no);
             }
             else
@@ -437,11 +440,11 @@ const BookAppointment = () => {
     const sendEmail = async (id, order_no, isCancelled) => {
         const Subject = isCancelled ? 'Booking Cancellation' : id === null ? "Booking Confirmation" : "Re-Schedule Confirmation";
         const link = 'https://appointstack.com/book-appointment?store=' + storeId;
-        let serviceNames ='';
+        let serviceNames = '';
         servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item =>
             serviceNames += item.name + ', '
         )
-       
+
         let message = '<p>Hi ' + customerName + '</p>';
         message += `<p>This is a ${isCancelled ? 'cancellation' : 'confirmation'} of your <b>` + serviceNames + ' </b> booking on ' + get_Date(trndate, 'DD MMM YYYY') + ' at ' + slot + '.</p>';
         message += '<p>Your <b>Booking# :</b> ' + order_no + ' and <b>Booked With : </b>' + employeeName + '</p>';
@@ -458,7 +461,7 @@ const BookAppointment = () => {
         });
         setIsLoading(true);
         try {
-            await apiCalls("POST", "sendmail", cid,null, Body);
+            await apiCalls("POST", "sendmail", cid, null, Body);
         }
         catch (e) {
 
@@ -475,15 +478,15 @@ const BookAppointment = () => {
                 const Body = JSON.stringify({
                     order_no: order_no
                 });
-                const res = await apiCalls("POST", "order/reschedule", cid,null, Body);
+                const res = await apiCalls("POST", "order/reschedule", cid, null, Body);
                 if (res.data.data.length > 0) {
                     const editList = res.data.data[0];
                     if (editList.customerinfo !== null && editList.customerinfo[0].email.toLowerCase() === customerEmail.toLowerCase()) {
-                        
+
                         const bookDate = dayjs(`${get_Date(editList.trndate, 'YYYY-MM-DD')} ${dayjs(editList.slot, 'hh:mm A').format('HH:mm:ss')}`, `YYYY-MM-DDTHH:mm:ss`);
-                            const localDate = dayjs(`${LocalDate()} ${LocalTime()}`, `YYYY-MM-DDTHH:mm:ss`);
-                            const date1 = new Date(bookDate);
-                            const date2 = new Date(localDate);
+                        const localDate = dayjs(`${LocalDate()} ${LocalTime()}`, `YYYY-MM-DDTHH:mm:ss`);
+                        const date1 = new Date(bookDate);
+                        const date2 = new Date(localDate);
                         if (date1 < date2) {
                             result = false;
                             message = `Past order can't be rescheduled or cancel.`;
@@ -494,7 +497,7 @@ const BookAppointment = () => {
                         }
                         else {
                             result = true;
-                            message = ''; 
+                            message = '';
                             setOrder_Id(editList.id)
                             setUser(editList.assignedto);
                             setServicesItem(editList.serviceinfo);
@@ -502,7 +505,7 @@ const BookAppointment = () => {
                             setPrevSlot(editList.slot);
                             setPrevTrnDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
                             setTrnDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
-                            
+
                             if (editList.customerinfo !== null) {
 
                                 setCustomerName(editList.customerinfo[0].name);
@@ -521,13 +524,13 @@ const BookAppointment = () => {
                         setContent(5);
                         bookingType === 2 && setOpenOrder(true)
                         setOpenSearch(false);
-                        
+
                     }
                     else
                         error(message);
                 }
                 else
-                   error(message);
+                    error(message);
             }
             catch (e) {
                 // setList([])
@@ -549,7 +552,6 @@ const BookAppointment = () => {
     } else if (content === 3) {
         displayedContent = <Services
             servicesList={servicesList}
-            eventList={eventList}
             next={next}
             servicesItem={servicesItem}
             setServicesItem={setServicesItem}
@@ -680,15 +682,16 @@ const BookAppointment = () => {
                 <div class='w-full flex flex-col  gap-6 items-center p-3'>
 
                     {user !== 0 && <ViewBooking title={'Professional'} content={2} setContent={setContent} setOpenOrder={setOpenOrder}
-                        value={<div class='flex flex-row gap-4  items-center'>
+                        value={
+                        <div class='flex flex-row gap-4  items-center'>
                             {userList.filter(f => f.id === user).map(item =>
-                                <>
+                                <div key={item.id}>
                                     {item.profilepic !== null ?
                                         <Image width={24} height={24} src={item.profilepic} style={{ borderRadius: 10 }} /> :
                                         <Avatar size={24} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
                                     }
                                     <p class="text-xs font-medium">{item.fullname}</p>
-                                </>)}
+                                </div>)}
                         </div>
                         } />
                     }

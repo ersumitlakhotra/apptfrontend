@@ -91,12 +91,12 @@ const Sidebar = ({ onSelected, content, open, permissioninfo }) => {
 
   return (
     <div class={` h-full  duration-300 ${open ? 'w-72' : 'w-14'}`}>
-      <sidebar class='w-full flex flex-col ' >
+      <div class='w-full flex flex-col ' >
 
-        <header class='h-16  p-3 flex items-center gap-1 cursor-pointer '>
+        <div  class='h-16  p-3 flex items-center gap-1 cursor-pointer '>
           <img class="w-10 h-8 rounded-full bg-white" src={logo} alt="Rounded avatar" />
           <span class={`font-semibold whitespace-nowrap duration-150 ${!open && ' scale-0'}`}>{process.env.REACT_APP_PROJECT_NAME}</span>
-        </header>
+        </div>
 
         <span class={` text-sm  px-5 mt-6 duration-150 ${!open && 'scale-0'}  ${overview.filter(item => item.isVisible === true).length === 0 && 'hidden'} whitespace-nowrap`}>Overview</span>
         {overview.map(item => item.isVisible && <SideBarButton key={item.key} isOpen={open} icon={item.icon} label={item.label} badge={item.badge} content={content} onSelected={(e) => onSelected(e)} />)}
@@ -110,7 +110,7 @@ const Sidebar = ({ onSelected, content, open, permissioninfo }) => {
         <span class={` text-sm  px-5 mt-6 duration-150 ${!open && 'scale-0'} ${misc.filter(item => item.isVisible === true).length === 0 && 'hidden'} whitespace-nowrap`}>Misc</span>
         {misc.map(item => item.isVisible && <SideBarButton key={item.key} isOpen={open} icon={item.icon} label={item.label} badge={item.badge} content={content} onSelected={(e) => onSelected(e)} />)}
        
-      </sidebar>
+      </div>
     </div>
   );
 };

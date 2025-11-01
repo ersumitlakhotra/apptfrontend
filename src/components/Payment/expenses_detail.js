@@ -14,13 +14,13 @@ const ExpensesDetail = ({ id, refresh, ref, expensesList, saveData, setOpen }) =
     const [name, setName] = useState('');
     const [quantity, setQuantity] = useState('1');
     const [netamount, setNetAmount] = useState('0.00');
-    const [taxamount, setTaxAmount] = useState('0');
+    const [taxamount, setTaxAmount] = useState(0);
     const [grossamount, setGrossAmount] = useState('0.00');
     const [notes, setNotes] = useState('');
 
     useEffect(() => {
         if (id === 0) {
-            setEtype('Expense'); setName(''); setQuantity('1'); setTrnDate(LocalDate()); setNetAmount('0.00'); setTaxAmount('0'); setGrossAmount('0.00'); setNotes('');
+            setEtype('Expense'); setName(''); setQuantity('1'); setTrnDate(LocalDate()); setNetAmount('0.00'); setTaxAmount(0); setGrossAmount('0.00'); setNotes('');
         }
         else {
             const editList = expensesList.find(item => item.id === id)
@@ -29,7 +29,7 @@ const ExpensesDetail = ({ id, refresh, ref, expensesList, saveData, setOpen }) =
             setName(editList.name);
             setQuantity(editList.quantity);
             setNetAmount(editList.netamount);
-            setTaxAmount(editList.taxamount);
+            setTaxAmount( parseInt(editList.taxamount));
             setGrossAmount(editList.grossamount);
             setNotes(editList.notes);
         }
@@ -81,10 +81,10 @@ const ExpensesDetail = ({ id, refresh, ref, expensesList, saveData, setOpen }) =
         if(netamount !== '')
             net =parseFloat(netamount * product_quantity);
 
-        
+       
 
         if (taxamount === 0) {
-            setGrossAmount(net)
+            setGrossAmount(parseFloat(net).toFixed(2))
         }
         else {
             if (taxamount === 5) {

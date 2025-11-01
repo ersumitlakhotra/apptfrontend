@@ -63,7 +63,7 @@ const Slot = ({ daysAdvance, trndate, setTrnDate, slot, setSlot, isOpen, isUserW
                                 <p class='flex-row flex justify-center items-center'>{opt.label}</p>
                                 {opt.slotList.length === 0 ? <p class='text-xs text-gray-500'>Empty</p> :
                                     opt.slotList.map(item => (
-                                        <Button color={slot === item.id ? 'cyan' : 'default'}
+                                        <Button key={item.id} color={slot === item.id ? 'cyan' : 'default'}
                                             variant="outlined"
                                             disabled={item.disabled}
                                             onClick={() => { setSlot(item.id) }}>

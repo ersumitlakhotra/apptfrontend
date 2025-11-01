@@ -1,13 +1,20 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Avatar, Button, Image } from "antd";
 import { UserOutlined, CheckSquareFilled } from '@ant-design/icons';
+import { useState ,useEffect} from "react";
 
 const Employee = ({ userList, user, setUser }) => {
+    const [filteredList, setFilteredList] = useState(userList);
+
+    useEffect(() => {
+        setFilteredList(userList);
+    }, [userList])
+
     return (
-        <div class='flex flex-col font-normal mt-2 w-full' >
+        <div class='flex flex-col font-normal mt-2 mb-10 w-full' >
             <p class='text-2xl font-sans font-bold mb-4'> Choose professional</p>
 
-            {userList.filter(f => !f.status.toLowerCase().includes('inactive')).map(item => (
+            {filteredList.filter(f => !f.status.toLowerCase().includes('inactive')).map(item => (
                 <div key={item.id} class={`w-full border-b p-4 flex flex-row justify-between items-center`}>
                     <div class='flex flex-row gap-4 items-center'>
                         {item.profilepic !== null ?

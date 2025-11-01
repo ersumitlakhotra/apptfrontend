@@ -1,15 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable array-callback-return */
 import { useEffect, useImperativeHandle, useState } from "react";
-import { Avatar, Badge, DatePicker, Divider, Image, Input, Select } from "antd";
+import { Avatar, Badge, Button, DatePicker, Divider, Image, Input, Select, Tag } from "antd";
 import dayjs from 'dayjs';
 import { TextboxFlex } from "../../common/textbox";
 import { isValidEmail, setCellFormat, setPriceNumberOnly } from "../../common/cellformat";
-
 import { UserOutlined } from '@ant-design/icons';
 import { generateTimeSlots } from "../../common/intervals";
 import useAlert from "../../common/alert";
-import { LocalDate } from "../../common/localDate";
+import { get_Date, LocalDate } from "../../common/localDate";
 
 const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, userList, companyList, eventList, saveData, setOpen }) => {
 
@@ -26,26 +25,45 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
     const [discount, setDiscount] = useState('0');
     const [discountEdit, setDiscountEdit] = useState('0');
     const [trndate, setTrnDate] = useState(LocalDate());
-    const [assigned_to, setAssignedTo] = useState('0');
+    const [assigned_to, setAssignedTo] = useState('');
+    const [employeeName, setEmployeeName] = useState('0');
     const [slot, setSlot] = useState('');
     const [servicesItem, setServicesItem] = useState([]);
     const [availableSlot, setAvailableSlot] = useState([]);
     //const filteredOptionsServices = servicesList.filter(o => !selectedItems.includes(o));
     const [liveList, setLiveList] = useState([]);
 
-    const [slotGap, setSlotGap] = useState(30);
-    const [inTime, setInTime] = useState('00:00:00');
-    const [outTime, setOutTime] = useState('00:00:00');
+    const [prevTrnDate, setPrevTrnDate] = useState('');
+    const [prevSlot, setPrevSlot] = useState('');
+    const [prevAssigned_To, setPrevAssigned_To] = useState('');
+
+    const [slotGap, setSlotGap] = useState(null);
+    const [timingInfo, setTimingInfo] = useState(null);
+
     const [isOpen, setIsOpen] = useState(false);
+    const [isUserWorking, setUserWorking] = useState(false);
 
     const { contextHolder, warning } = useAlert();
     const weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+    const [morningSlot, setMorningSlot] = useState([]);
+    const [afternoonSlot, setAfternoonSlot] = useState([]);
+    const [eveningSlot, setEveningSlot] = useState([]); 
+      const options = [
+        { key: 1, label: 'Morning', slotList: morningSlot },
+        { key: 2, label: 'Afternoon', slotList: afternoonSlot },
+        { key: 3, label: 'Evening', slotList: eveningSlot },
+    ];
+
+    const getDay = () => {
+        const dayNum = dayjs(trndate).get('day');
+        return weekdays[dayNum];
+    }
 
     useEffect(() => {
         if (id === 0) {
             setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');
             setStatus('Pending'); setPrice('0'); setTax('0'); setTotal('0'); setDiscount('0'); setCoupon(''); setTaxAmount('0'); setTrnDate(LocalDate());
-            setAssignedTo('0'); setOrderNo(''); setServicesItem([]); setSlot('');
+            setAssignedTo('0'); setOrderNo(''); setServicesItem([]); setSlot(''); setPrevSlot(''); setPrevTrnDate('');
         }
         else {
             const editList = orderList.find(item => item.id === id)
@@ -59,8 +77,10 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setOrderNo(editList.order_no);
             setStatus(editList.status);
             setTrnDate(editList.trndate);
+            setPrevTrnDate(editList.trndate);
             setServicesItem(editList.serviceinfo);
             setAssignedTo(editList.assignedto);
+            setPrevAssigned_To(editList.assignedto);
             setPrice(editList.price);
             setTax(editList.tax);
             setTaxAmount(editList.taxamount);
@@ -69,88 +89,149 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setDiscount(editList.discount);
             setDiscountEdit(editList.discount)
             setSlot(editList.slot);
+            setPrevSlot(editList.slot);
         }
         const liveList = eventList.filter(a => a.case.toUpperCase() === 'LIVE');
         setLiveList(liveList.length > 0 ? liveList : [])
     }, [refresh])
 
-
-    useEffect(() => {
-        let orderListSlot = [];
-        if (trndate !== '' && assigned_to !== '') {
-            orderListSlot = (orderList.filter(a => (a.trndate.includes(trndate) && a.assignedto === assigned_to)));
-        }
-        if (isOpen)
-            setAvailableSlot(generateTimeSlots(inTime, outTime, slotGap, orderListSlot, slot));
-        else
-        {
-            setAvailableSlot([{ id: 'Business Closed' }]);
-        }
-    }, [refresh,isOpen, trndate, assigned_to])
-
-
     useEffect(() => {
         if (companyList.length !== 0) {
-            if (companyList.timinginfo !== null) {
-                if (trndate !== '') {
-                    const dayOfWeekNumber = dayjs(trndate).get('day');
-                    const dayName = weekdays[dayOfWeekNumber];
-                    setOpeningHours(dayName);
-                }
-            }          
-            setSlotGap(companyList.slot)
+            setSlotGap(companyList.slot);
+            setTimingInfo(companyList.timinginfo[0]);
         }
 
-    }, [companyList, trndate])
+    }, [companyList])
 
-    const setOpeningHours = (weekday) => {
-        switch (weekday.toLowerCase()) {
-            case 'sunday':
-                {
-                    setInTime(companyList.timinginfo[0].sunday[0]); setOutTime(companyList.timinginfo[0].sunday[1]); setIsOpen(companyList.timinginfo[0].sunday[2]);
-                    break;
+    useEffect(() => {
+
+        if (trndate === '')
+            setTrnDate(LocalDate());
+
+        if (userList.length !== 0 && slotGap !== null && timingInfo !== null) {
+            let employeeSchedule = [];
+            let orderListSlot = [];
+            let inTime = '00:00:00';
+            let outTime = '00:00:00';
+            let isOpen = false;
+            let isWorking = false;
+            let employeeName='';
+            switch (getDay().toLowerCase()) {
+                case 'sunday':
+                    { isOpen = timingInfo.sunday[2]; break; }
+                case 'monday':
+                    { isOpen = timingInfo.monday[2]; break; }
+                case 'tuesday':
+                    { isOpen = timingInfo.tuesday[2]; break; }
+                case 'wednesday':
+                    { isOpen = timingInfo.wednesday[2]; break; }
+                case 'thursday':
+                    { isOpen = timingInfo.thursday[2]; break; }
+                case 'friday':
+                    { isOpen = timingInfo.friday[2]; break; }
+                case 'saturday':
+                    { isOpen = timingInfo.saturday[2]; break; }
+                default:
+                    { isOpen = false; break; }
+            }
+
+            if (assigned_to === "0") {
+                isWorking = true;
+                setAvailableSlot([]);
+            }
+            else {
+                userList.filter(a => a.id === assigned_to).map(b =>
+                    { employeeSchedule = b.scheduleinfo[0]; employeeName = b.fullname});
+                orderListSlot = orderList.filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === assigned_to));
+
+                switch (getDay().toLowerCase()) {
+                    case 'sunday':
+                        {
+                            inTime = employeeSchedule.sunday[0];
+                            outTime = employeeSchedule.sunday[1];
+                            isWorking = employeeSchedule.sunday[2];
+                            break;
+                        }
+                    case 'monday':
+                        {
+                            inTime = employeeSchedule.monday[0];
+                            outTime = employeeSchedule.monday[1];
+                            isWorking = employeeSchedule.monday[2];
+                            break;
+                        }
+                    case 'tuesday':
+                        {
+                            inTime = employeeSchedule.tuesday[0];
+                            outTime = employeeSchedule.tuesday[1];
+                            isWorking = employeeSchedule.tuesday[2];
+                            break;
+                        }
+                    case 'wednesday':
+                        {
+                            inTime = employeeSchedule.wednesday[0];
+                            outTime = employeeSchedule.wednesday[1];
+                            isWorking = employeeSchedule.wednesday[2];
+                            break;
+                        }
+                    case 'thursday':
+                        {
+                            inTime = employeeSchedule.thursday[0];
+                            outTime = employeeSchedule.thursday[1];
+                            isWorking = employeeSchedule.thursday[2];
+                            break;
+                        }
+                    case 'friday':
+                        {
+                            inTime = employeeSchedule.friday[0];
+                            outTime = employeeSchedule.friday[1];
+                            isWorking = employeeSchedule.friday[2];
+                            break;
+                        }
+                    case 'saturday':
+                        {
+                            inTime = employeeSchedule.saturday[0];
+                            outTime = employeeSchedule.saturday[1];
+                            isWorking = employeeSchedule.saturday[2];
+                            break;
+                        }
+                    default:
+                        {
+                            inTime = '00:00:00'; outTime = '00:00:00'; isWorking = false;
+                            break;
+                        }
                 }
-            case 'monday':
-                {
-                    setInTime(companyList.timinginfo[0].monday[0]); setOutTime(companyList.timinginfo[0].monday[1]); setIsOpen(companyList.timinginfo[0].monday[2]);
-                    break;
-                }
-            case 'tuesday':
-                {
-                    setInTime(companyList.timinginfo[0].tuesday[0]); setOutTime(companyList.timinginfo[0].tuesday[1]); setIsOpen(companyList.timinginfo[0].tuesday[2]);
-                    break;
-                }
-            case 'wednesday':
-                {
-                    setInTime(companyList.timinginfo[0].wednesday[0]); setOutTime(companyList.timinginfo[0].wednesday[1]); setIsOpen(companyList.timinginfo[0].wednesday[2]);
-                    break;
-                }
-            case 'thursday':
-                {
-                    setInTime(companyList.timinginfo[0].thursday[0]); setOutTime(companyList.timinginfo[0].thursday[1]); setIsOpen(companyList.timinginfo[0].thursday[2]);
-                    break;
-                }
-            case 'friday':
-                {
-                    setInTime(companyList.timinginfo[0].friday[0]); setOutTime(companyList.timinginfo[0].friday[1]); setIsOpen(companyList.timinginfo[0].friday[2]);
-                    break;
-                }
-            case 'saturday':
-                {
-                    setInTime(companyList.timinginfo[0].saturday[0]); setOutTime(companyList.timinginfo[0].saturday[1]); setIsOpen(companyList.timinginfo[0].saturday[2]);
-                    break;
-                }
-            default:
-                {
-                    setInTime('00:00:00'); setOutTime('00:00:00'); setIsOpen(false);
-                    break;
-                }
+            }
+            setIsOpen(isOpen);
+            setUserWorking(isWorking);
+            setEmployeeName(employeeName);
+
+            let _slot = ''
+            if (prevTrnDate === trndate && id !== 0 && prevAssigned_To === assigned_to) {
+                _slot = prevSlot;
+            }
+            setSlot(_slot);
+
+            if (isOpen && isWorking)
+                setAvailableSlot(generateTimeSlots(inTime, outTime, slotGap, orderListSlot, _slot));
+            else
+                setAvailableSlot([]);
 
         }
-    }
+    }, [trndate, assigned_to])
+
+  useEffect(() => {
+        const morning = availableSlot.filter(item => item.id.includes('AM'));
+        const evening = availableSlot.filter(item => item.id.includes('PM') && item.id.split(':')[0] > 3 && item.id.split(':')[0] < 12);
+        const afternoon = availableSlot.filter(item => !item.id.includes('AM') && !evening.some(b => b.id === item.id));
+        setMorningSlot(morning)
+        setAfternoonSlot(afternoon)
+        setEveningSlot(evening)
+    }, [availableSlot])
 
     const save = async () => {
-        if (customerName !== '' && customerPhone !== '' && customerPhone.length === 12 && servicesItem.length !== 0 && price !== '' && price !== '.' && trndate !== '' && customerEmail !== '' && isValidEmail(customerEmail)&& isOpen) {
+        if (customerName !== '' && customerPhone !== '' && customerPhone.length === 12 && servicesItem.length !== 0 && 
+            price !== '' && price !== '.' && trndate !== '' && customerEmail !== '' && isValidEmail(customerEmail) && 
+            isOpen && isUserWorking && (assigned_to === '0' ? true : slot ==='' ? false:true)) {
             const Body = JSON.stringify({
                 customerinfo: [{
                     name: customerName,
@@ -166,16 +247,21 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 coupon: coupon,
                 status: status,
                 trndate: trndate,
-                assignedto: assigned_to === '' ? 0 : assigned_to,
-                slot: slot, 
-                bookedvia:'Walk-In',
+                assignedto: assigned_to === '0' ? 0 : assigned_to,
+                slot: slot,
+                bookedvia: 'Walk-In',
             });
+            
             saveData("Order", id !== 0 ? 'PUT' : 'POST', "order", id !== 0 ? id : null, Body);
             setOpen(false);
         }
         else {
-            if (!isOpen && trndate !== '')
+            if (!isOpen)
                 warning('Business is marked as closed . Please book an appointment for another day!');
+            else if (!isUserWorking)
+                warning(`The ${employeeName} has the DAY OFF.`);
+            else if (slot === '' && assigned_to !=='0')
+                warning(`Please select a valid slot !`);
             else
                 warning('Please, fill out the required fields !');
         }
@@ -365,7 +451,10 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             <p class="text-gray-400 mb-4">Booking Details</p>
 
             <TextboxFlex label={'Date'} mandatory={true} input={
-                <DatePicker status={trndate === '' ? 'error' : ''} style={{ width: '100%' }} value={trndate === '' ? trndate : dayjs(trndate, 'YYYY-MM-DD')} onChange={(date, dateString) => setTrnDate(date)} />
+                <DatePicker status={trndate === '' ? 'error' : ''}
+                    style={{ width: '100%' }}
+                    value={trndate === '' ? trndate : dayjs(trndate, 'YYYY-MM-DD')}
+                    onChange={(date, dateString) => setTrnDate(dateString)} />
             } />
 
             <TextboxFlex label={'Employee'} input={
@@ -373,7 +462,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     value={assigned_to}
                     style={{ width: '100%' }}
                     onChange={(value) => setAssignedTo(value)}
-                    options={[{value:'0',label:'None'},...userList.filter(a =>!a.status.toLowerCase().includes('inactive')).map(item => ({
+                    options={[{ value: '0', label: 'None' }, ...userList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
                         value: item.id,
                         label:
                             <div class='flex flex-row gap-2 items-center'>
@@ -386,15 +475,34 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     }))]}
                 />
             } />
-            <TextboxFlex label={'Slot'} mandatory={true} input={
-                <Select
-                    value={slot}
-                    style={{ width: '100%' }}
-                    onChange={(value) => setSlot(value)}
-                    options={availableSlot.map(item => ({ value: item.id, label: item.id }))}
-                />
+            <TextboxFlex label={''} input={
+                <div class='w-full flex flex-row gap-6 text-xs'>
+                    {(isOpen && isUserWorking && assigned_to !== '0') ?
+                        options.map(opt =>
+                            <div key={opt.key} class='flex flex-col gap-2'>
+                                <p class='flex-row flex justify-center items-center'>{opt.label}</p>
+                                {opt.slotList.length === 0 ? <p class='text-xs text-gray-500'>Empty</p> :
+                                    opt.slotList.map(item => (
+                                        <Button key={item.id} color={slot === item.id ? 'cyan' : 'default'}
+                                            variant="outlined"
+                                            disabled={item.disabled}
+                                            onClick={() => { setSlot(item.id) }}>
+
+                                            {item.id}
+                                        </Button>
+                                    ))}
+                            </div>
+                        )
+                        :
+                        (!isUserWorking && assigned_to !== '0')  ?
+                            <Tag color='red'>The {employeeName} has the DAY OFF.</Tag>                          
+                            :
+                            !isOpen &&
+                            <Tag color='red'>Business is closed . Please book an appointment for another day!</Tag>
+                    }
+                </div>
             } />
-            {contextHolder}      
+            {contextHolder}
         </div>
     )
 

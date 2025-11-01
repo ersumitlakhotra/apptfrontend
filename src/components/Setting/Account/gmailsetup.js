@@ -5,12 +5,15 @@ import { useEffect, useState } from "react";
 import { Textbox } from "../../../common/textbox";
 
 const GmailSetup = ({ companyList, saveData }) => {
-    const [emailUser, setEmailUser] = useState(0);
-    const [emailPass, setEmailPass] = useState(0);
+    const [emailUser, setEmailUser] = useState('');
+    const [emailPass, setEmailPass] = useState('');
 
     useEffect(() => {
         if (companyList.length !== 0) {
+            if(companyList.emailuser !== null)
             setEmailUser(companyList.emailuser);
+        
+            if(companyList.emailpass !== null)
             setEmailPass(companyList.emailpass);
         }
     }, [companyList])

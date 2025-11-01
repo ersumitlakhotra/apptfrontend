@@ -4,10 +4,9 @@ import { Button, Input } from "antd";
 import { IoSearchOutline } from "react-icons/io5";
 import { CheckSquareFilled } from '@ant-design/icons';
 
-const Services = ({ servicesList, eventList, servicesItem, setServicesItem, setPrice,setDiscount,setTotal,setCoupon}) => {
+const Services = ({ servicesList, servicesItem, setServicesItem}) => {
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(servicesList);
-    const [liveList, setLiveList] = useState([]);
 
     useEffect(() => {
         const searchedList = servicesList.filter(item =>
@@ -15,10 +14,8 @@ const Services = ({ servicesList, eventList, servicesItem, setServicesItem, setP
            
             setFilteredList(searchedList);
 
-        const liveList = eventList.filter(a => a.case.toUpperCase() === 'LIVE');
-        setLiveList(liveList.length > 0 ? liveList : [])
 
-    }, [searchInput, servicesList, eventList])
+    }, [searchInput, servicesList])
 
     const addService = (id) => {
         setServicesItem([...servicesItem, id]);
@@ -29,7 +26,7 @@ const Services = ({ servicesList, eventList, servicesItem, setServicesItem, setP
 
     // setItems(prevItems => prevItems.filter(item => item !== itemToRemove));
     return (
-        <div class='flex flex-col font-normal mt-2 w-full' >
+        <div class='flex flex-col font-normal mt-2 mb-10 w-full' >
             <p class='text-2xl font-sans font-bold mb-4'> Add services to your appointment</p>
             <div class='mb-4'>
             <Input size="middle" placeholder="Search" prefix={<IoSearchOutline />} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />

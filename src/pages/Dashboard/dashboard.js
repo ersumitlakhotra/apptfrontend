@@ -39,10 +39,9 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList,
         let totalSales = 0;
         let totalExpenses = 0;
         let totalRevenue = 0;
-        let date = new Date(LocalDate());
-        const lastDayOfMonth = lastDateOfMonth(date);
-        const year = new Date(date).getFullYear();
-        const month = new Date(date).getMonth();
+        const lastDayOfMonth = lastDateOfMonth(new Date());
+        const year = dayjs().year();
+        const month = dayjs().month();
         for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
             categoryArray.push(dayjs(new Date(year, month, day)).format("MMM DD"));
             let sales = 0;
@@ -85,10 +84,10 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList,
             {/* cards*/}
             <span class="text-lg font-semibold text-gray-800">Dashboard</span>         
             <div class='flex flex-col gap-6 md:flex-row '>
-                <Card key={1} title={'Orders'} value={totalOrders} sign={'#'} chart={orderChart} />
-                <Card key={2} title={'Sales'} value={totalSales} sign={'$'} chart={salesChart} />
-                <Card key={3} title={'Expenses'} value={totalExpenses} sign={'$'} chart={expenseChart} />
-                <Card key={4} title={'Profit/Loss'} value={totalRevenue} sign={'$'} chart={revenueChart} />              
+                <Card srno={1} title={'Orders'} value={totalOrders} sign={'#'} chart={orderChart} />
+                <Card srno={2} title={'Sales'} value={totalSales} sign={'$'} chart={salesChart} />
+                <Card srno={3} title={'Expenses'} value={totalExpenses} sign={'$'} chart={expenseChart} />
+                <Card srno={4} title={'Profit/Loss'} value={totalRevenue} sign={'$'} chart={revenueChart} />              
             </div>
 
             <div class='flex flex-col gap-4 mt-4  w-full md:flex-row'>

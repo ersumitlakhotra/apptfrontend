@@ -76,7 +76,7 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_View
                         style={{ width: '100%' }}
                         size="large"
                         onChange={(value) => setAssignedTo(value)}
-                        options={[{ value: '', label: 'All Users' }, ...userList.map(item => ({
+                        options={[{ value: '', label: 'All Users' },{ value: '0', label: 'None' }, ...userList.map(item => ({
                             value: item.id,
                             label: <AssignedTo key={item.id} userId={item.id} userList={userList} />                                                                     
                         }))]}
