@@ -525,7 +525,7 @@ const BookAppointment = () => {
 
                     }
                     else
-                        error(message);
+                        warning(message);
                 }
                 else
                     error(message);
