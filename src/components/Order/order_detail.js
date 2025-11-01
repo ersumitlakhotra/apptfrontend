@@ -23,7 +23,6 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
     const [total, setTotal] = useState('0');
     const [coupon, setCoupon] = useState('');
     const [discount, setDiscount] = useState('0');
-    const [discountEdit, setDiscountEdit] = useState('0');
     const [trndate, setTrnDate] = useState(LocalDate());
     const [assigned_to, setAssignedTo] = useState('');
     const [employeeName, setEmployeeName] = useState('0');
@@ -87,7 +86,6 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setTotal(editList.total);
             setCoupon(editList.coupon);
             setDiscount(editList.discount);
-            setDiscountEdit(editList.discount)
             setSlot(editList.slot);
             setPrevSlot(editList.slot);
         }
