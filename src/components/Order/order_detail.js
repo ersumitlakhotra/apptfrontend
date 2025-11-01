@@ -217,10 +217,10 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
         }
     }, [trndate, assigned_to])
 
-  useEffect(() => {
-        const morning = availableSlot.filter(item => item.id.includes('AM'));
-        const evening = availableSlot.filter(item => item.id.includes('PM') && item.id.split(':')[0] > 3 && item.id.split(':')[0] < 12);
-        const afternoon = availableSlot.filter(item => !item.id.includes('AM') && !evening.some(b => b.id === item.id));
+    useEffect(() => {
+        const morning = availableSlot.filter(item => dayjs(item.id, 'hh:mm A').format('HH:mm:ss').split(':')[0] < 12);
+        const afternoon = availableSlot.filter(item => dayjs(item.id, 'hh:mm A').format('HH:mm:ss').split(':')[0] >= 12 && dayjs(item.id, 'hh:mm A').format('HH:mm:ss').split(':')[0] < 16);
+        const evening = availableSlot.filter(item => dayjs(item.id, 'hh:mm A').format('HH:mm:ss').split(':')[0] >= 16);
         setMorningSlot(morning)
         setAfternoonSlot(afternoon)
         setEveningSlot(evening)

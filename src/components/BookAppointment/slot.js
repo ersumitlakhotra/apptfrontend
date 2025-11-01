@@ -1,7 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Button, Tag } from 'antd';
 import { useEffect, useState } from 'react';
-import { get_Date, LocalDate, UTC_LocalDateTime } from '../../common/localDate';
+import { get_Date, LocalDate, LocalTime, UTC_LocalDateTime } from '../../common/localDate';
+import dayjs from 'dayjs';
 
 function getFutureDates(numberOfDays) {
     const dates = [];
@@ -33,9 +34,17 @@ const Slot = ({ daysAdvance, trndate, setTrnDate, slot, setSlot, isOpen, isUserW
     }, [daysAdvance])
 
     useEffect(() => {
-        const morning = availableSlot.filter(item => item.id.includes('AM'));
-        const evening = availableSlot.filter(item => item.id.includes('PM') && item.id.split(':')[0] > 3 && item.id.split(':')[0] < 12);
-        const afternoon = availableSlot.filter(item => !item.id.includes('AM') && !evening.some(b => b.id === item.id));
+        let available=availableSlot;
+        let localTime = LocalTime('HH:mm:ss');
+        if (trndate === LocalDate()) {
+            available = availableSlot.filter(item =>
+                dayjs(item.id, 'hh:mm A').format('HH:mm:ss').split(':')[0] > localTime.split(':')[0] ||
+                (dayjs(item.id, 'hh:mm A').format('HH:mm:ss').split(':')[0] === localTime.split(':')[0] &&
+                dayjs(item.id, 'hh:mm A').format('HH:mm:ss').split(':')[1] > localTime.split(':')[1] ));
+        }
+        const morning = available.filter(item => dayjs(item.id, 'hh:mm A').format('HH:mm:ss').split(':')[0] < 12);
+        const afternoon = available.filter(item => dayjs(item.id, 'hh:mm A').format('HH:mm:ss').split(':')[0] >= 12 && dayjs(item.id, 'hh:mm A').format('HH:mm:ss').split(':')[0] < 16 );
+        const evening = available.filter(item => dayjs(item.id, 'hh:mm A').format('HH:mm:ss').split(':')[0] >=16 );
         setMorningSlot(morning)
         setAfternoonSlot(afternoon)
         setEveningSlot(evening)
@@ -74,10 +83,9 @@ const Slot = ({ daysAdvance, trndate, setTrnDate, slot, setSlot, isOpen, isUserW
                             </div>
                         )              
                     :
-                    !isUserWorking ?
-                        <Tag color='red'>The {employeeName} has the DAY OFF.</Tag>
-                        :
-                        <Tag color='red'>Business is closed . Please book an appointment for another day!</Tag>
+                        !isOpen ? <Tag color='red'>Business is closed . Please book an appointment for another day!</Tag>
+                        :!isUserWorking ? <Tag color='red'>The {employeeName} has the DAY OFF.</Tag>
+                        :<></>
                 }
             </div>                   
         </div>

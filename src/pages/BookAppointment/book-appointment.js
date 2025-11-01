@@ -225,8 +225,6 @@ const BookAppointment = () => {
         setUserWorking(isWorking);
         setAvailableSlot([]);
         if (isOpen && isWorking) {
-            if (trndate === LocalDate())
-                inTime = LocalTime();
             setAvailableSlot(generateTimeSlots(inTime, outTime, slotGap, orderList, slot));
         }
     }
