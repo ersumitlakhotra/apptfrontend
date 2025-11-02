@@ -60,9 +60,9 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList,setOpenView,
 
     const updateStatus = (isCancel = false) => {
         if(isCancel)
-            saveData("Order","POST", "order/cancel",id, []);
+            saveData("Order","POST", "order/cancel",id, [],true,false);
         else
-            saveData("Order","POST", "order/complete",id, []);
+            saveData("Order","POST", "order/complete",id, [],true,false);
 
         setOpenView(false);
     }
