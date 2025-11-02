@@ -22,7 +22,7 @@ const Tasks = ({ orderList, servicesList, userList, companyList, saveData, reloa
 
     useEffect(() => {
         filterData();
-    }, [date])
+    }, [date,orderList])
 
     const onReload = () => {
         setReload(reload + 1);
