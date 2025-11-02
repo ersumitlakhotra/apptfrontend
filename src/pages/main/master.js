@@ -131,7 +131,7 @@ const MasterPage = () => {
         notify && error(result.message);
       }
       else {
-        let status = result.status === 201 ? 'Created' : result.status === 200 ? 'Modified' : 'Deleted';
+        let status = result.status === 201 ? 'Created' : result.status === 200 ? 'Modified' : 'Deleted/Cancelled';
         if (logs) {
           const Log = JSON.stringify({
             ltype: label,
@@ -224,7 +224,6 @@ const onSubmit = async(email,password) => {
           getData(setEventList,"event", true);
           getData(setLogsList,"logs");
           getData(setOrderList,"order");
-          //getData(setServicesList, "services");
           break;
         }
       case 'Tasks':
@@ -303,7 +302,9 @@ const onSubmit = async(email,password) => {
         userList={userList}
         servicesList={servicesList}
         companyList={companyList}
-        screenWidth={500}
+        saveData={saveData}
+        reload={refresh}
+        setReload={setRefresh}
       />;
   } else if (content === 'Order') {
     displayedContent =

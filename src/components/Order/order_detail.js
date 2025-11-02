@@ -54,7 +54,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
     ];
 
     const getDay = () => {
-        const dayNum = dayjs(trndate).get('day');
+        const dayNum = dayjs(get_Date(trndate,'YYYY-MM-DD')).get('day');
         return weekdays[dayNum];
     }
 
@@ -107,6 +107,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setTrnDate(LocalDate());
 
         if (userList.length !== 0 && slotGap !== null && timingInfo !== null) {
+            
             let employeeSchedule = [];
             let orderListSlot = [];
             let inTime = '00:00:00';
@@ -130,7 +131,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 case 'saturday':
                     { isOpen = timingInfo.saturday[2]; break; }
                 default:
-                    { isOpen = false; break; }
+                    { isOpen = false;  break; }
             }
 
             if (assigned_to === "0") {
@@ -140,7 +141,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             else {
                 userList.filter(a => a.id === assigned_to).map(b =>
                     { employeeSchedule = b.scheduleinfo[0]; employeeName = b.fullname});
-                orderListSlot = orderList.filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === assigned_to));
+                orderListSlot = orderList.filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === assigned_to && a.status != 'Cancelled'));
 
                 switch (getDay().toLowerCase()) {
                     case 'sunday':

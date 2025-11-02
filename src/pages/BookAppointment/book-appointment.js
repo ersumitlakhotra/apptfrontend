@@ -106,14 +106,13 @@ const BookAppointment = () => {
                 let address = `${item.addressinfo[0].street}, ${item.addressinfo[0].city}, ${item.addressinfo[0].province} ${item.addressinfo[0].postal} `;
                 setStoreAddress(address);
             }
-        })
+        });
         getData(setServicesList, "GET", "services");
         getData(setUserList, "GET", "user");
     }, [cid]);
 
     useEffect(() => {
-        userList.filter(a => a.id === user).map(item => { setEmployeeName(item.fullname); setEmployeeSchedule(item.scheduleinfo[0]); }
-        )
+        userList.filter(a => a.id === user).map(item => { setEmployeeName(item.fullname); setEmployeeSchedule(item.scheduleinfo[0]); })
     }, [user]);
 
     useEffect(() => {
@@ -137,7 +136,7 @@ const BookAppointment = () => {
         setIsLoading(true);
         try {
             const res = await apiCalls("POST", "order/booking", cid, null, body, false);
-            orderList=res.data.data;
+            orderList=res.data.data.filter(a => a.status !== "Cancelled");
         }
         catch (e) {
             orderList=[];
@@ -297,13 +296,11 @@ const BookAppointment = () => {
                 }
             case 5:
                 {
-                    if (customerName === '' || customerPhone === '' || customerPhone.length !== 12 || customerEmail === '' || !isValidEmail(customerEmail)) {
-                        isNext = false;
+                    isNext = false;
+                    if (customerName === '' || customerPhone === '' || customerPhone.length !== 12 || customerEmail === '' || !isValidEmail(customerEmail))
                         message = "Please fill the contact details. "
-                    }
-                    else {
+                    else
                         save();
-                    }
                     break;
                 }
             default: { break }
@@ -393,12 +390,34 @@ const BookAppointment = () => {
                 bookedvia: 'Appointment',
             });
 
-            if (bookingType === 1) {
-                saveData("POST", "order", Body, null);
+            if (bookingType === 1 || bookingType === 2) {
+                const bodyOrderCheck = JSON.stringify({ date: get_Date(trndate, 'YYYY-MM-DD').toString(), uid: parseInt(user) });
+                 let orderList=[];
+                setIsLoading(true);
+                try {
+                    const res = await apiCalls("POST", "order/booking", cid, null, bodyOrderCheck, false);
+                    orderList = res.data.data.filter(a => a.status !== "Cancelled" && a.slot === slot);
+                    if(orderList.length === 0)
+                    {
+                        if (bookingType === 1) {
+                            saveData("POST", "order", Body, null);
+                        }
+                        if (bookingType === 2) {
+                            saveData("PUT", "order", Body, order_id);
+                        }
+                    }
+                    else
+                    {
+                        warning(`The time slot (${slot}) on ${trndate} has been reserved by another party and is no longer available`);
+                    }
+                }
+                catch (e) {
+                    orderList = [];
+                    //error(error.message)
+                }
+             setIsLoading(false);
             }
-            if (bookingType === 2) {
-                saveData("PUT", "order", Body, order_id);
-            }
+           
             if (bookingType === 3) {//message, read, cancelled             
                 saveData("POST", "order/cancel", [], order_id);
             }

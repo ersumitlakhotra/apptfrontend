@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Avatar, Button, Divider, Image,  Rate, Steps } from "antd";
-import { DownloadOutlined, MailOutlined, PrinterOutlined, CalendarOutlined, ClockCircleOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
+import { CheckOutlined, CloseOutlined, PrinterOutlined, CalendarOutlined, ClockCircleOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import { UTC_LocalDateTime } from "../../common/localDate";
 import Services from "../../common/services";
-const OrderView = ({ id, refresh, orderList, servicesList, userList }) => {
+const OrderView = ({ id, refresh, orderList, servicesList, userList,setOpenView, saveData }) => {
 
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
@@ -58,15 +58,27 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList }) => {
         }
     }, [refresh])
 
+    const updateStatus = (isCancel = false) => {
+        if(isCancel)
+            saveData("Order","POST", "order/cancel",id, []);
+        else
+            saveData("Order","POST", "order/complete",id, []);
+
+        setOpenView(false);
+    }
+
     return (
         <div class="flex flex-col gap-2 mb-12  w-full">
             <div class='flex items-center justify-between'>
                 <span class="text-2xl font-bold text-gray-800">Order #{order_no}</span>
-                {/*<div class="flex gap-2">
-                    <Button type='default' icon={<PrinterOutlined />} size="middle">Print</Button>
-                    <Button type='default' icon={<MailOutlined />} size="middle">Email</Button>
-                    <Button type='default' icon={<DownloadOutlined />} size="middle">Export</Button>
-                </div>*/}
+                {(status === 'Pending' || status === 'In progress') &&
+                    <div class="flex gap-2">
+                        <Button color="cyan" variant="solid" icon={<CheckOutlined />} size="large" onClick={() => updateStatus()}>Completed</Button>
+                        <Button color="danger" variant="solid" icon={<CloseOutlined />} size="large" onClick={() => updateStatus(true)}>Cancelled</Button>
+
+                        {/*<Button type='default' icon={<PrinterOutlined />} size="middle">Print</Button>*/}
+                    </div>
+                }
             </div>
             <div class='flex text-xs text-gray-500'>
                 <p>Order History / Via {bookedvia} / #{order_no} - {UTC_LocalDateTime(createdat, 'MMMM, DD YYYY - hh:mm A ')}</p>
