@@ -15,7 +15,7 @@ import Tasks from "../Tasks/tasks.js";
 import Setting from "../Setting/setting.js";
 import { apiCalls, loginAuth } from "../../hook/apiCall.js";
 import useAlert from "../../common/alert.js";
-import { LocalDate } from "../../common/localDate.js";
+import { get_Date, LocalDate } from "../../common/localDate.js";
 import Sales from "../Sales/sales.js";
 import Payment from "../Payment/payment.js";
 import { setLocalStorageWithExpiry } from "../../common/localStorage.js";
@@ -48,6 +48,12 @@ const MasterPage = () => {
   const [logsList, setLogsList] = useState([]);
   const [billingList, setBillingList] = useState([]);
 
+    const [storeName, setStoreName] = useState('');
+    const [storeCell, setStoreCell] = useState('');
+    const [storeId, setStoreId] = useState('');
+    const [emailUser, setEmailUser] = useState('');
+    const [emailPass, setEmailPass] = useState('');
+
   const onSelected = (newContent) => {
     setIsLoading(true);
     setContent(newContent);
@@ -71,7 +77,16 @@ const MasterPage = () => {
     };
   }, []);
   
- 
+  useEffect(() => {
+    if (companyList.length !== 0) {
+      setStoreName(companyList.name);
+      setStoreCell(companyList.cell);
+      setStoreId(companyList.store);
+      setEmailUser(companyList.emailuser);
+      setEmailPass(companyList.emailpass);
+    }
+
+  }, [companyList])
 
   useEffect(
     () => {
@@ -144,6 +159,28 @@ const MasterPage = () => {
 
           await apiCalls('POST', 'logs', companyId,null, Log);
         }
+        if(label === 'Order' && result.data.data.status !== 'Completed')
+          {
+            let order_no=result.data.data.order_no;
+            let serviceinfo=result.data.data.serviceinfo;
+            let customerinfo=result.data.data.customerinfo[0];
+            let customerName='';let customerEmail='';let employeeName='';
+            if (customerinfo !== null) {
+                customerName=customerinfo.name;
+                customerEmail=customerinfo.email;
+            }
+            userList.filter(a => a.id === result.data.data.assignedto).map(b => 
+              employeeName = b.fullname
+            )
+
+            let trndate=result.data.data.trndate;
+            let slot=result.data.data.slot;
+            let isCancelled=result.data.data.status === 'Cancelled' ? true:false;
+            let isEmailSend=sendEmail(companyId,id,order_no,serviceinfo,customerName,customerEmail,employeeName,trndate,slot,isCancelled);
+           if(!isEmailSend)
+            error('There is some issue while send the email. Please try again later.')
+          }
+        
         notify && success(`The ${label} has been ${status} successfully.`);
         setRefresh(refresh + 1)
       }
@@ -153,7 +190,41 @@ const MasterPage = () => {
     }
     setIsLoading(false);
   }
+  const sendEmail = async (cid, id, order_no,servicesItem,customerName,customerEmail,employeeName,trndate,slot, isCancelled) => {
+        let isEmailSend = false;
+        const Subject = isCancelled ? 'Booking Cancellation' : id === null ? "Booking Confirmation" : "Re-Schedule Confirmation";
+        const link = 'https://appointstack.com/book-appointment?store=' + storeId;
+        let serviceNames = '';
+        servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item =>
+            serviceNames += item.name + ', '
+        )
 
+        let message = '<p>Hi ' + customerName + '</p>';
+        message += `<p>This is a ${isCancelled ? 'cancellation' : 'confirmation'} of your <b>` + serviceNames + ' </b> booking on ' + get_Date(trndate, 'DD MMM YYYY') + ' at ' + slot + '.</p>';
+        message += '<p>Your <b>Booking# :</b> ' + order_no + ' and <b>Booked With : </b>' + employeeName + '</p>';
+        message += '<p>If you have any questions, please contact the business at ( ' + storeCell + ' )</p>';
+        message += '<p>In case for New booking/Rescheduling/Cancellation, please click on this link:</p><a href="' + link + '">' + link + '</a>';
+
+        const Body = JSON.stringify({
+            emailUser: emailUser,
+            emailPass: emailPass,
+            storeName: storeName,
+            to: customerEmail,
+            subject: Subject,
+            message: message,
+        });
+        try {
+            const result = await apiCalls("POST", "sendmail", cid, null, Body);
+            if (result.status === 200)
+                isEmailSend = true;
+        }
+        catch (e) {
+            isEmailSend = false;
+        }
+
+        return isEmailSend;
+    }
+  
   const isUserValid = () => {
     let result = true;
     const now = new Date();

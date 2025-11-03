@@ -19,7 +19,7 @@ const customLabelTab = (label, tagColor, tagValue) => {
     )
 }
 
-const Order = ({ orderList, servicesList, userList, companyList, eventList, logsList, saveData, fromDate, setFromDate, toDate, setToDate }) => {
+const Order = ({ orderList, servicesList, userList, companyList, eventList, logsList, saveData,fromDate, setFromDate, toDate, setToDate }) => {
     const ref = useRef();
 
     const [open, setOpen] = useState(false);

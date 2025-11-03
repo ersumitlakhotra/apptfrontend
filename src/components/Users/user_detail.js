@@ -38,9 +38,6 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
     const [sales, setSales] = useState(false);
     const [setting, setSetting] = useState(false);
 
-    
-    const weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-
     const [monday, setMonday] = useState(['09:00:00', '21:00:00', true]);
     const [tuesday, setTuesday] = useState(['09:00:00', '21:00:00', true]);
     const [wednesday, setWednesday] = useState(['09:00:00', '21:00:00', true]);
@@ -139,7 +136,7 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
         }
         if (role === 'Employee') {
             return [{
-                dashboard: false,
+                dashboard: true,
                 tasks: false,
                 order: false,
                 event: false,

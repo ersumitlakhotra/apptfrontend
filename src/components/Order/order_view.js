@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Avatar, Button, Divider, Image,  Rate, Steps } from "antd";
-import { CheckOutlined, CloseOutlined, PrinterOutlined, CalendarOutlined, ClockCircleOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
+import { CheckOutlined, CloseOutlined, CalendarOutlined, ClockCircleOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import { UTC_LocalDateTime } from "../../common/localDate";
 import Services from "../../common/services";

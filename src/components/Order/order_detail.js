@@ -98,7 +98,6 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setSlotGap(companyList.slot);
             setTimingInfo(companyList.timinginfo[0]);
         }
-
     }, [companyList])
 
     useEffect(() => {
@@ -140,8 +139,8 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             }
             else {
                 userList.filter(a => a.id === assigned_to).map(b =>
-                    { employeeSchedule = b.scheduleinfo[0]; employeeName = b.fullname});
-                orderListSlot = orderList.filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === assigned_to && a.status != 'Cancelled'));
+                    { employeeSchedule = b.scheduleinfo[0]; employeeName = b.fullname;});
+                orderListSlot = orderList.filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === assigned_to && a.status !== 'Cancelled'));
 
                 switch (getDay().toLowerCase()) {
                     case 'sunday':
@@ -252,6 +251,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             });
             
             saveData("Order", id !== 0 ? 'PUT' : 'POST', "order", id !== 0 ? id : null, Body);
+
             setOpen(false);
         }
         else {
@@ -270,7 +270,6 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             save,
         };
     })
-
     useEffect(() => {
         let rate = 0;
         let discount = 0;
@@ -352,6 +351,23 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 <Input placeholder="111-222-3333" status={customerPhone === '' ? 'error' : ''} value={customerPhone} onChange={(e) => setCustomerPhone(setCellFormat(e.target.value))} />
             } />
 
+         {/*  <TextboxFlex label={'Cell #'} mandatory={true} input={
+                <Select
+                    showSearch
+                    style={{ width: '100%' }}
+                    status={customerPhone === '' || customerPhone.length !== 12 ? 'error' : ''}
+                    placeholder="Search to Select"
+                    value={customerPhone}
+                    onChange={(value) => setCustomerPhone(setCellFormat(value))}
+                    options={servicesList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
+                        value: item.id,
+                        label: item.name
+                    }))}
+                    optionFilterProp="label"
+                    filterSort={(optionA, optionB) =>
+                        (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                    } />
+            } />*/} 
             <TextboxFlex label={'E-mail'} mandatory={true} input={
                 <Input placeholder="abcd@company.com" status={customerEmail === '' || !isValidEmail(customerEmail) ? 'error' : ''} value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} />
             } />
