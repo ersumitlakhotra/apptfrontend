@@ -10,7 +10,7 @@ import { generateTimeSlots } from "../../common/intervals";
 import useAlert from "../../common/alert";
 import { get_Date, LocalDate } from "../../common/localDate";
 
-const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, userList, companyList, eventList, saveData, setOpen }) => {
+const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, userList, companyList, eventList, customerList, saveData, setOpen }) => {
 
 
     const [customerName, setCustomerName] = useState('');
@@ -236,6 +236,9 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     cell: customerPhone,
                     email: customerEmail,
                 }],
+                customerName: customerName,
+                customerPhone: customerPhone,
+                customerEmail: customerEmail,
                 serviceinfo: servicesItem,
                 price: price,
                 discount: discount,
@@ -341,6 +344,24 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
 
     return (
         <div class='flex flex-col font-normal gap-3 mt-2'>
+            <TextboxFlex label={'Search'}  input={
+                <Select
+                    showSearch
+                    style={{ width: '100%' }}
+                    placeholder="Search to Select"
+                    //value={customerPhone}
+                    onChange={(value) => console.log(value)}
+                    options={customerList.map(item => ({
+                        value: item.cell,
+                        label: item.cell + ' : ' + item.name
+                        //label: item.customerinfo[0].cell + ' : ' + item.customerinfo[0].name
+                    }))}
+                    optionFilterProp="label"
+                    filterSort={(optionA, optionB) =>
+                        (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                    } />
+            } />
+
             <p class="text-gray-400 mb-4">Customer Detail</p>
 
             <TextboxFlex label={'Name'} mandatory={true} input={
@@ -351,23 +372,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 <Input placeholder="111-222-3333" status={customerPhone === '' ? 'error' : ''} value={customerPhone} onChange={(e) => setCustomerPhone(setCellFormat(e.target.value))} />
             } />
 
-         {/*  <TextboxFlex label={'Cell #'} mandatory={true} input={
-                <Select
-                    showSearch
-                    style={{ width: '100%' }}
-                    status={customerPhone === '' || customerPhone.length !== 12 ? 'error' : ''}
-                    placeholder="Search to Select"
-                    value={customerPhone}
-                    onChange={(value) => setCustomerPhone(setCellFormat(value))}
-                    options={servicesList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
-                        value: item.id,
-                        label: item.name
-                    }))}
-                    optionFilterProp="label"
-                    filterSort={(optionA, optionB) =>
-                        (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-                    } />
-            } />*/} 
+          
             <TextboxFlex label={'E-mail'} mandatory={true} input={
                 <Input placeholder="abcd@company.com" status={customerEmail === '' || !isValidEmail(customerEmail) ? 'error' : ''} value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} />
             } />

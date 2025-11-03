@@ -47,6 +47,7 @@ const MasterPage = () => {
   const [expenseList, setExpenseList] = useState([]);
   const [logsList, setLogsList] = useState([]);
   const [billingList, setBillingList] = useState([]);
+  const [customerList, setCustomerList] = useState([]);
 
     const [storeName, setStoreName] = useState('');
     const [storeCell, setStoreCell] = useState('');
@@ -291,8 +292,9 @@ const onSubmit = async(email,password) => {
         {
           getData(setServicesList,"services");
           getData(setUserList,"user");
-          getData(setCompanyList,"company");
-          getData(setEventList,"event", true);
+          getData(setCompanyList, "company");
+          getData(setEventList, "event", true);
+          getData(setCustomerList, "customer");
           getData(setLogsList,"logs");
           getData(setOrderList,"order");
           break;
@@ -384,8 +386,9 @@ const onSubmit = async(email,password) => {
         servicesList={servicesList}
         userList={userList}
         companyList={companyList}
-        eventList={eventList}
-        logsList={logsList}
+      eventList={eventList}
+      logsList={logsList}
+      customerList={customerList}
         saveData={saveData}
         fromDate={fromDate}
         setFromDate={setFromDate}
