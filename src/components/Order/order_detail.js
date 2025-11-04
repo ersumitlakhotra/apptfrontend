@@ -342,6 +342,15 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
         }
     }
 
+    const onSearch = (value) => {
+        const customer = customerList.find(a => a.cell === value)
+        if (customer !== undefined && customer !== null ) {
+            setCustomerName(customer.name);
+            setCustomerEmail(customer.email);
+            setCustomerPhone(customer.cell);
+         }
+    }
+
     return (
         <div class='flex flex-col font-normal gap-3 mt-2'>
             <TextboxFlex label={'Search'}  input={
@@ -349,12 +358,11 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     showSearch
                     style={{ width: '100%' }}
                     placeholder="Search to Select"
-                    //value={customerPhone}
-                    onChange={(value) => console.log(value)}
+                    value={''}
+                    onChange={(value) => onSearch(value)}
                     options={customerList.map(item => ({
                         value: item.cell,
-                        label: item.cell + ' : ' + item.name
-                        //label: item.customerinfo[0].cell + ' : ' + item.customerinfo[0].name
+                        label: item.cell + ' ( ' + item.name + ' )'
                     }))}
                     optionFilterProp="label"
                     filterSort={(optionA, optionB) =>
