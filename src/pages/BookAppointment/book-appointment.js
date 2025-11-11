@@ -153,8 +153,10 @@ const BookAppointment = () => {
 
         let inTime = '00:00:00';
         let outTime = '00:00:00';
-        let isOpen = false;
         let isWorking = false;
+        let inTimeStore = '00:00:00';
+        let outTimeStore = '00:00:00';
+        let isOpen = false;
 
         switch (weekday.toLowerCase()) {
             case 'sunday':
@@ -162,6 +164,9 @@ const BookAppointment = () => {
                     inTime = employeeSchedule.sunday[0];
                     outTime = employeeSchedule.sunday[1];
                     isWorking = employeeSchedule.sunday[2];
+
+                    inTimeStore = storeSchedule.sunday[0];
+                    outTimeStore = storeSchedule.sunday[1];
                     isOpen = storeSchedule.sunday[2];
                     break;
                 }
@@ -170,6 +175,9 @@ const BookAppointment = () => {
                     inTime = employeeSchedule.monday[0];
                     outTime = employeeSchedule.monday[1];
                     isWorking = employeeSchedule.monday[2];
+
+                    inTimeStore = storeSchedule.monday[0];
+                    outTimeStore = storeSchedule.monday[1];
                     isOpen = storeSchedule.monday[2];
                     break;
                 }
@@ -178,6 +186,9 @@ const BookAppointment = () => {
                     inTime = employeeSchedule.tuesday[0];
                     outTime = employeeSchedule.tuesday[1];
                     isWorking = employeeSchedule.tuesday[2];
+
+                    inTimeStore = storeSchedule.tuesday[0];
+                    outTimeStore = storeSchedule.tuesday[1];
                     isOpen = storeSchedule.tuesday[2];
                     break;
                 }
@@ -186,6 +197,9 @@ const BookAppointment = () => {
                     inTime = employeeSchedule.wednesday[0];
                     outTime = employeeSchedule.wednesday[1];
                     isWorking = employeeSchedule.wednesday[2];
+
+                    inTimeStore = storeSchedule.wednesday[0];
+                    outTimeStore = storeSchedule.wednesday[1];
                     isOpen = storeSchedule.wednesday[2];
                     break;
                 }
@@ -194,6 +208,9 @@ const BookAppointment = () => {
                     inTime = employeeSchedule.thursday[0];
                     outTime = employeeSchedule.thursday[1];
                     isWorking = employeeSchedule.thursday[2];
+
+                    inTimeStore = storeSchedule.thursday[0];
+                    outTimeStore = storeSchedule.thursday[1];
                     isOpen = storeSchedule.thursday[2];
                     break;
                 }
@@ -202,6 +219,9 @@ const BookAppointment = () => {
                     inTime = employeeSchedule.friday[0];
                     outTime = employeeSchedule.friday[1];
                     isWorking = employeeSchedule.friday[2];
+
+                    inTimeStore = storeSchedule.friday[0];
+                    outTimeStore = storeSchedule.friday[1];
                     isOpen = storeSchedule.friday[2];
                     break;
                 }
@@ -210,21 +230,45 @@ const BookAppointment = () => {
                     inTime = employeeSchedule.saturday[0];
                     outTime = employeeSchedule.saturday[1];
                     isWorking = employeeSchedule.saturday[2];
+
+                    inTimeStore = storeSchedule.saturday[0];
+                    outTimeStore = storeSchedule.saturday[1];
                     isOpen = storeSchedule.saturday[2];
                     break;
                 }
             default:
                 {
                     inTime = '00:00:00'; outTime = '00:00:00'; isOpen = false;
-                    isWorking = false;
+                    inTimeStore = '00:00:00'; outTimeStore = '00:00:00';isWorking = false;
                     break;
                 }
         }
         setIsOpen(isOpen);
         setUserWorking(isWorking);
         setAvailableSlot([]);
+        let open = '00:00:00';
+        let close = '00:00:00';
+        if (dayjs(inTime).format('HH:mm:ss').split(':')[0] >= dayjs(inTimeStore).format('HH:mm:ss').split(':')[0] &&
+            dayjs(inTime).format('HH:mm:ss').split(':')[1] >= dayjs(inTimeStore).format('HH:mm:ss').split(':')[1]) {
+            open = inTime;
+
+        }
+        else {
+            open = inTimeStore;
+        } 
+        
+        if (dayjs(outTime).format('HH:mm:ss').split(':')[0] <= dayjs(outTimeStore).format('HH:mm:ss').split(':')[0] &&
+            dayjs(outTime).format('HH:mm:ss').split(':')[1] <= dayjs(outTimeStore).format('HH:mm:ss').split(':')[1]) {
+            close = outTime;
+
+        }
+        else {
+            close = outTimeStore;
+        }
+
+
         if (isOpen && isWorking) {
-            setAvailableSlot(generateTimeSlots(inTime, outTime, slotGap, orderList, slot));
+            setAvailableSlot(generateTimeSlots(open, close, slotGap, orderList, slot));
         }
     }
 

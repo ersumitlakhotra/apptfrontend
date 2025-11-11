@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 function getFutureDates(numberOfDays) {
     const dates = [];
     const weekdays = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
-    for (let i = 1; i < numberOfDays; i++) {
+    for (let i = 1; i <= numberOfDays; i++) {
         let today = new Date(LocalDate());
         const futureDate = new Date(today); // Create a new Date object to avoid modifying 'today'
         futureDate.setDate(today.getDate() + i);
