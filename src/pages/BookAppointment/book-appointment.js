@@ -540,7 +540,7 @@ const BookAppointment = () => {
                 const res = await apiCalls("POST", "order/reschedule", cid, null, Body);
                 if (res.data.data.length > 0) {
                     const editList = res.data.data[0];
-                    if (editList.customerinfo !== null && editList.customerinfo[0].email.toLowerCase() === customerEmail.toLowerCase()) {
+                    if (editList.email.toLowerCase() === customerEmail.toLowerCase()) {
 
                         const bookDate = dayjs(`${get_Date(editList.trndate, 'YYYY-MM-DD')} ${dayjs(editList.slot, 'hh:mm A').format('HH:mm:ss')}`, `YYYY-MM-DDTHH:mm:ss`);
                         const localDate = dayjs(`${LocalDate()} ${LocalTime()}`, `YYYY-MM-DDTHH:mm:ss`);
@@ -564,13 +564,8 @@ const BookAppointment = () => {
                             setPrevSlot(editList.slot);
                             setPrevTrnDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
                             setTrnDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
-
-                            if (editList.customerinfo !== null) {
-
-                                setCustomerName(editList.customerinfo[0].name);
-                                setCustomerPhone(editList.customerinfo[0].cell);
-                            }
-
+                            setCustomerName(editList.name);
+                            setCustomerPhone(editList.cell);
                             setPrice(editList.price);
                             setTotal(editList.total);
                             setCoupon(editList.coupon);

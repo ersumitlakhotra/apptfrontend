@@ -1,6 +1,6 @@
 
-import { Avatar, Button, Image } from "antd";
-import { EditOutlined, UserOutlined } from '@ant-design/icons';
+import {  Button } from "antd";
+import { EditOutlined } from '@ant-design/icons';
 
 const ViewBooking = ({ title, value,content,setContent,setOpenOrder}) => {
     return (
