@@ -4,7 +4,7 @@ import { LoadingOutlined, MailFilled } from '@ant-design/icons';
 import { Drawer, Spin, Input, Button } from 'antd';
 import { apiCalls } from "../../hook/apiCall.js";
 import useAlert from "../../common/alert.js";
-import { getAdminPermission, isValidEmail, setCellFormat } from "../../common/cellformat.js";
+import { isValidEmail, setCellFormat } from "../../common/cellformat.js";
 import CountdownTimer from "../../common/countTimer.js";
 
 export const Signup = ({ logo }) => {
@@ -107,7 +107,6 @@ export const Signup = ({ logo }) => {
               password: password,
               role: 'Administrator',
               rating: '5',
-              permissioninfo: getAdminPermission(),
               status: 'Active',
               accounttype: 'Basic'
             });

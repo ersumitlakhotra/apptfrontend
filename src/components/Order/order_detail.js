@@ -65,15 +65,11 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setAssignedTo('0'); setOrderNo(''); setServicesItem([]); setSlot(''); setPrevSlot(''); setPrevTrnDate('');
         }
         else {
-            const editList = orderList.find(item => item.id === id)
-            if (editList.customerinfo !== null) {
-                setCustomerName(editList.customerinfo[0].name);
-                setCustomerPhone(editList.customerinfo[0].cell);
-                setCustomerEmail(editList.customerinfo[0].email);
-            }
-            else { setCustomerName(''); setCustomerEmail(''); setCustomerPhone(''); }
-
-            setOrderNo(editList.order_no);
+            const editList = orderList.find(item => item.id === id);
+            setOrderNo(editList.order_no);    
+            setCustomerName(editList.name);
+            setCustomerPhone(editList.cell);
+            setCustomerEmail(editList.email); 
             setStatus(editList.status);
             setTrnDate(editList.trndate);
             setPrevTrnDate(editList.trndate);
@@ -231,11 +227,6 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             price !== '' && price !== '.' && trndate !== '' && customerEmail !== '' && isValidEmail(customerEmail) && 
             isOpen && isUserWorking && (assigned_to === '0' ? true : slot ==='' ? false:true)) {
             const Body = JSON.stringify({
-                customerinfo: [{
-                    name: customerName,
-                    cell: customerPhone,
-                    email: customerEmail,
-                }],
                 customerName: customerName,
                 customerPhone: customerPhone,
                 customerEmail: customerEmail,

@@ -19,6 +19,7 @@ import { get_Date, LocalDate } from "../../common/localDate.js";
 import Sales from "../Sales/sales.js";
 import Payment from "../Payment/payment.js";
 import { setLocalStorageWithExpiry } from "../../common/localStorage.js";
+import Customer from "../Customer/customer.js";
 
 const MasterPage = () => {
   const navigate = useNavigate();
@@ -28,9 +29,8 @@ const MasterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [refresh, setRefresh] = useState(0);
   const [open, setOpen] = useState(true);
-  const {contextHolder, success, error } = useAlert();
-
-  const [permissioninfo, setPermissionInfo] = useState(null);
+  const { contextHolder, success, error } = useAlert();
+  const [uid, setUid] = useState('0');
 
   const [settingActiveTab, setSettingActiveTab] = useState('1');
   const [paymentActiveTab, setPaymentActiveTab] = useState('1');
@@ -48,17 +48,18 @@ const MasterPage = () => {
   const [logsList, setLogsList] = useState([]);
   const [billingList, setBillingList] = useState([]);
   const [customerList, setCustomerList] = useState([]);
+  const [userPermissionList, setUserPermissionList] = useState([]);
 
-    const [storeName, setStoreName] = useState('');
-    const [storeCell, setStoreCell] = useState('');
-    const [storeId, setStoreId] = useState('');
-    const [emailUser, setEmailUser] = useState('');
-    const [emailPass, setEmailPass] = useState('');
+  const [storeName, setStoreName] = useState('');
+  const [storeCell, setStoreCell] = useState('');
+  const [storeId, setStoreId] = useState('');
+  const [emailUser, setEmailUser] = useState('');
+  const [emailPass, setEmailPass] = useState('');
 
   const onSelected = (newContent) => {
     setIsLoading(true);
     setContent(newContent);
-    setRefresh(refresh+1)
+    setRefresh(refresh + 1)
     setIsLoading(false);
   };
 
@@ -71,13 +72,13 @@ const MasterPage = () => {
     if (!isUserValid()) {
       setRefresh(refresh + 1);
     }
-   
+
     // Clean up the event listener on component unmount
     return () => {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
-  
+
   useEffect(() => {
     if (companyList.length !== 0) {
       setStoreName(companyList.name);
@@ -105,8 +106,7 @@ const MasterPage = () => {
 
   useEffect(() => {
     const companyId = localStorage.getItem('cid');
-    if (!isUserValid() || !companyId )
-    {
+    if (!isUserValid() || !companyId) {
       navigate("/");
     }
   }, [navigate, signout]);
@@ -122,11 +122,11 @@ const MasterPage = () => {
     localStorage.removeItem('password');
   }
 
-  const getData = async (setList, endPoint, eventDate = false,isLoadingShow=true) => {
+  const getData = async (setList, endPoint, eventDate = false, isLoadingShow = true) => {
     isLoadingShow && setIsLoading(true);
-    try {   
-    const companyId = localStorage.getItem('cid');  
-      const res = await apiCalls("GET", endPoint,companyId, null, null, eventDate);
+    try {
+      const companyId = localStorage.getItem('cid');
+      const res = await apiCalls("GET", endPoint, companyId, null, null, eventDate);   
       setList(res.data.data);
     }
     catch (e) {
@@ -134,14 +134,14 @@ const MasterPage = () => {
       //error(error.message)
     }
     isLoadingShow && setIsLoading(false);
-  }   
-   
+  }
+
   const saveData = async (label, method, endPoint, id = null, body = null, notify = true, logs = true) => {
     setIsLoading(true);
     try {
-      
-    const companyId = localStorage.getItem('cid');  
-      const result = await apiCalls(method, endPoint,companyId, id, body);
+
+      const companyId = localStorage.getItem('cid');
+      const result = await apiCalls(method, endPoint, companyId, id, body);
 
       if (result.status === 500 || result.status === 404) {
         notify && error(result.message);
@@ -158,30 +158,26 @@ const MasterPage = () => {
             datainfo: [body]
           });
 
-          await apiCalls('POST', 'logs', companyId,null, Log);
+          await apiCalls('POST', 'logs', companyId, null, Log);
         }
-        if(label === 'Order' && result.data.data.status !== 'Completed')
-          {
-            let order_no=result.data.data.order_no;
-            let serviceinfo=result.data.data.serviceinfo;
-            let customerinfo=result.data.data.customerinfo[0];
-            let customerName='';let customerEmail='';let employeeName='';
-            if (customerinfo !== null) {
-                customerName=customerinfo.name;
-                customerEmail=customerinfo.email;
-            }
-            userList.filter(a => a.id === result.data.data.assignedto).map(b => 
-              employeeName = b.fullname
-            )
+        if (label === 'Order' && result.data.data.status !== 'Completed') {
+          let order_no = result.data.data.order_no;
+          let customerName = result.data.data.name; 
+          let customerEmail = result.data.data.email;
+          let serviceinfo = result.data.data.serviceinfo;
+         let employeeName = '';
+          userList.filter(a => a.id === result.data.data.assignedto).map(b =>
+            employeeName = b.fullname
+          )
 
-            let trndate=result.data.data.trndate;
-            let slot=result.data.data.slot;
-            let isCancelled=result.data.data.status === 'Cancelled' ? true:false;
-            let isEmailSend=sendEmail(companyId,id,order_no,serviceinfo,customerName,customerEmail,employeeName,trndate,slot,isCancelled);
-           if(!isEmailSend)
+          let trndate = result.data.data.trndate;
+          let slot = result.data.data.slot;
+          let isCancelled = result.data.data.status === 'Cancelled' ? true : false;
+          let isEmailSend = sendEmail(companyId, id, order_no, serviceinfo, customerName, customerEmail, employeeName, trndate, slot, isCancelled);
+          if (!isEmailSend)
             error('There is some issue while send the email. Please try again later.')
-          }
-        
+        }
+
         notify && success(`The ${label} has been ${status} successfully.`);
         setRefresh(refresh + 1)
       }
@@ -191,44 +187,46 @@ const MasterPage = () => {
     }
     setIsLoading(false);
   }
-  const sendEmail = async (cid, id, order_no,servicesItem,customerName,customerEmail,employeeName,trndate,slot, isCancelled) => {
-        let isEmailSend = false;
-        const Subject = isCancelled ? 'Booking Cancellation' : id === null ? "Booking Confirmation" : "Re-Schedule Confirmation";
-        const link = 'https://appointstack.com/book-appointment?store=' + storeId;
-        let serviceNames = '';
-        servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item =>
-            serviceNames += item.name + ', '
-        )
 
-        let message = '<p>Hi ' + customerName + '</p>';
-        message += `<p>This is a ${isCancelled ? 'cancellation' : 'confirmation'} of your <b>` + serviceNames + ' </b> booking on ' + get_Date(trndate, 'DD MMM YYYY') + ' at ' + slot + '.</p>';
-        message += '<p>Your <b>Booking# :</b> ' + order_no + ' and <b>Booked With : </b>' + employeeName + '</p>';
-        message += '<p>If you have any questions, please contact the business at ( ' + storeCell + ' )</p>';
-        message += '<p>In case for New booking/Rescheduling/Cancellation, please click on this link:</p><a href="' + link + '">' + link + '</a>';
+  const sendEmail = async (cid, id, order_no, servicesItem, customerName, customerEmail, employeeName, trndate, slot, isCancelled) => {
+    let isEmailSend = false;
+    const Subject = isCancelled ? 'Booking Cancellation' : id === null ? "Booking Confirmation" : "Re-Schedule Confirmation";
+    const link = 'https://appointstack.com/book-appointment?store=' + storeId;
+    let serviceNames = '';
+    servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item =>
+      serviceNames += item.name + ', '
+    )
 
-        const Body = JSON.stringify({
-            emailUser: emailUser,
-            emailPass: emailPass,
-            storeName: storeName,
-            to: customerEmail,
-            subject: Subject,
-            message: message,
-        });
-        try {
-            const result = await apiCalls("POST", "sendmail", cid, null, Body);
-            if (result.status === 200)
-                isEmailSend = true;
-        }
-        catch (e) {
-            isEmailSend = false;
-        }
+    let message = '<p>Hi ' + customerName + '</p>';
+    message += `<p>This is a ${isCancelled ? 'cancellation' : 'confirmation'} of your <b>` + serviceNames + ' </b> booking on ' + get_Date(trndate, 'DD MMM YYYY') + ' at ' + slot + '.</p>';
+    message += '<p>Your <b>Booking# :</b> ' + order_no + ' and <b>Booked With : </b>' + employeeName + '</p>';
+    message += '<p>If you have any questions, please contact the business at ( ' + storeCell + ' )</p>';
+    message += '<p>In case for New booking/Rescheduling/Cancellation, please click on this link:</p><a href="' + link + '">' + link + '</a>';
 
-        return isEmailSend;
+    const Body = JSON.stringify({
+      emailUser: emailUser,
+      emailPass: emailPass,
+      storeName: storeName,
+      to: customerEmail,
+      subject: Subject,
+      message: message,
+    });
+    try {
+      const result = await apiCalls("POST", "sendmail", cid, null, Body);
+      if (result.status === 200)
+        isEmailSend = true;
     }
-  
+    catch (e) {
+      isEmailSend = false;
+    }
+
+    return isEmailSend;
+  }
+
   const isUserValid = () => {
     let result = true;
     const now = new Date();
+    setUid(localStorage.getItem('uid'));
     const itemString = localStorage.getItem('email');
     if (itemString) {
       const item = JSON.parse(itemString);
@@ -243,119 +241,124 @@ const MasterPage = () => {
         onSetSignout();
       }
     }
-    else
-    {
+    else {
       onSetSignout();
     }
 
     return result;
   };
 
-const onSubmit = async(email,password) => {
-  setIsLoading(true);
-  try{
-    const res= await loginAuth(email,password);
-    if(res.status === 200)
-    {
-      setLocalStorageWithExpiry('cid', res.data.data.cid);
-      setLocalStorageWithExpiry('uid', res.data.data.id);
-      setLocalStorageWithExpiry('email', email, 720);
-      setLocalStorageWithExpiry('password', password, 720);   
-      return true;
+  const onSubmit = async (email, password) => {
+    setIsLoading(true);
+    try {
+      const res = await loginAuth(email, password);
+      if (res.status === 200) {
+        setLocalStorageWithExpiry('cid', res.data.data.cid);
+        setLocalStorageWithExpiry('uid', res.data.data.id);
+        setLocalStorageWithExpiry('email', email, 720);
+        setLocalStorageWithExpiry('password', password, 720);
+        return true;
+      }
+      else
+        return false;
     }
-    else         
+    catch (err) {
       return false;
+    }
+    finally {
+      setIsLoading(false);
+    }
   }
-  catch(err){
-    return false;
-  }
-  finally{
-    setIsLoading(false);
-  }
-}
 
 
-  useEffect(() => {  
+  useEffect(() => {
     switch (content) {
       case "Dashboard":
         {
           getData(setCompanyList, "company");
-          getData(setServicesList,"services");
-          getData(setUserList,"user");
-          getData(setExpenseList,"payment");
-          getData(setEventList,"event",true);
+          getData(setServicesList, "services");
+          getData(setUserList, "user");
+          getData(setExpenseList, "payment");
+          getData(setEventList, "event", true);
           getData(setLogsList, "logs");
-          getData(setOrderList,"order");
+          getData(setOrderList, "order");
           break;
-        } 
-        case "Order":
+        }
+      case "Order":
         {
-          getData(setServicesList,"services");
-          getData(setUserList,"user");
+          getData(setServicesList, "services");
+          getData(setUserList, "user");
           getData(setCompanyList, "company");
           getData(setEventList, "event", true);
           getData(setCustomerList, "customer");
-          getData(setLogsList,"logs");
-          getData(setOrderList,"order");
+          getData(setLogsList, "logs");
+          getData(setOrderList, "order");
           break;
         }
       case 'Tasks':
         {
-          getData(setUserList,"user");
-          getData(setServicesList,"services");
-          getData(setOrderList,"order");
-          getData(setCompanyList,"company");
+          getData(setCustomerList, "customer");
+          getData(setUserList, "user");
+          getData(setServicesList, "services");
+          getData(setOrderList, "order");
+          getData(setCompanyList, "company");
           break;
         }
       case 'Event':
         {
           getData(setUserList, "user");
           getData(setLogsList, "logs");
-          getData(setEventList,"event", true);
+          getData(setEventList, "event", true);
           getData(setServicesList, "services");
           break;
         }
       case 'Payment':
         {
           getData(setLogsList, "logs");
-          getData(setUserList,"user");
-          getData(setExpenseList,"payment");
+          getData(setUserList, "user");
+          getData(setExpenseList, "payment");
+          break;
+        }
+      case 'Customers':
+        {
+          getData(setCustomerList, "customer");
           break;
         }
       case 'Services':
         {
           getData(setUserList, "user");
           getData(setLogsList, "logs");
-          getData(setServicesList,"services");
+          getData(setServicesList, "services");
           break;
         }
       case 'Sales':
         {
           getData(setCompanyList, "company");
-          getData(setUserList,"user");  
-          getData(setExpenseList,"payment");
-          getData(setOrderList,"order");
+          getData(setUserList, "user");
+          getData(setExpenseList, "payment");
+          getData(setOrderList, "order");
           break;
         }
       case 'Users':
         {
           getData(setLogsList, "logs");
-          getData(setUserList,"user");
+          getData(setUserPermissionList, "userpermission");
+          getData(setUserList, "user");
           break;
         }
       case 'Setting':
         {
-          getData(setCompanyList,"company");
-          getData(setLogoList,"logo");
+          getData(setCompanyList, "company");
+          getData(setLogoList, "logo");
           getData(setBillingList, "billing");
           break;
         }
       default: { break }
     }
-  },[refresh]);
+  }, [refresh]);
 
   let displayedContent;
-  if (content === 'Dashboard' ) {
+  if (content === 'Dashboard') {
     displayedContent =
       <Dashboard
         orderList={orderList}
@@ -363,7 +366,7 @@ const onSubmit = async(email,password) => {
         userList={userList}
         expensesList={expenseList}
         eventList={eventList}
-        logsList={logsList} 
+        logsList={logsList}
         companyList={companyList}
         onSelected={onSelected}
         refresh={refresh}
@@ -375,6 +378,7 @@ const onSubmit = async(email,password) => {
         userList={userList}
         servicesList={servicesList}
         companyList={companyList}
+        customerList={customerList}
         saveData={saveData}
         reload={refresh}
         setReload={setRefresh}
@@ -386,9 +390,9 @@ const onSubmit = async(email,password) => {
         servicesList={servicesList}
         userList={userList}
         companyList={companyList}
-      eventList={eventList}
-      logsList={logsList}
-      customerList={customerList}
+        eventList={eventList}
+        logsList={logsList}
+        customerList={customerList}
         saveData={saveData}
         fromDate={fromDate}
         setFromDate={setFromDate}
@@ -414,6 +418,13 @@ const onSubmit = async(email,password) => {
         tabActiveKey={paymentActiveTab}
         setTabActiveKey={setPaymentActiveTab}
       />;
+  } else if (content === 'Customers') {
+    displayedContent =
+      <Customer
+        customerList={customerList}
+        setCustomerList={setCustomerList}
+        saveData={saveData}
+      />;
   } else if (content === 'Services') {
     displayedContent =
       <Services
@@ -427,6 +438,7 @@ const onSubmit = async(email,password) => {
     displayedContent =
       <Users
         userList={userList}
+        userPermissionList={userPermissionList}
         logsList={logsList}
         saveData={saveData}
       />;
@@ -449,15 +461,15 @@ const onSubmit = async(email,password) => {
         tabActiveKey={settingActiveTab}
         setTabActiveKey={setSettingActiveTab}
         onSetSignout={onSetSignout}
-      />;    
+      />;
   }
 
   return (
     <div class='h-screen w-full flex flex-row '>
-      <Sidebar onSelected={onSelected} content={content} open={open} permissioninfo={permissioninfo} />
+      <Sidebar onSelected={onSelected} content={content} open={open} uid={uid} getData={getData} />
       <div class='flex flex-col w-full bg-gray-50 '>
         <header class='h-16 border-b bg-white '>
-          <Header onSignout={onSetSignout} open={open} setOpen={setOpen} getData={getData} saveData={saveData} refresh={refresh} setPermissionInfo={setPermissionInfo}  />
+          <Header onSignout={onSetSignout} open={open} setOpen={setOpen} getData={getData} saveData={saveData} refresh={refresh} uid={uid}  />
         </header>
         <section class='overflow-y-scroll p-8 w-full'>
           {isLoading ? (

@@ -16,10 +16,10 @@ function getItem(key, label, icon, extra, disabled, danger) {
     danger,
   };
 }
-const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermissionInfo }) => {
+const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, uid }) => {
   const [userList, setUserList] = useState([]);
   const [notificationList, setNotificationList] = useState([]);
-  const [id, setId] = useState('0');
+ 
   const [fullname, setFullname] = useState('');
   const [profilepic, setProfile] = useState(null);
   const [openNotification, setOpenNotification] = useState(false);
@@ -31,7 +31,6 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermi
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    setId(localStorage.getItem('uid'));
     getData(setUserList, "users");
     getData(setNotificationList, "notification");
 
@@ -51,14 +50,13 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermi
 
   useEffect(() => {
     if (userList.length > 0) {
-      userList.filter(a => a.id === id).map(b => {
+      userList.filter(a => a.id === uid).map(b => {
         setFullname(b.fullname);
-        setPermissionInfo(b.permissioninfo);
         setProfile(b.profilepic);
         setItems([
           getItem('1',
             <div class='flex flex-row gap-4'>
-              <AssignedTo userId={id} userList={userList} imageWidth={40} imageHeight={40} AvatarSize={40} allowText={false} preview={false} />
+              <AssignedTo userId={uid} userList={userList} imageWidth={40} imageHeight={40} AvatarSize={40} allowText={false} preview={false} />
               <div class='flex flex-col'>
                 <p>{b.fullname} </p>
                 <p>{b.cell} </p>
@@ -139,7 +137,7 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, setPermi
         </Badge>
         <Dropdown menu={menuProps} overlayStyle={{ width: '250px', gap: 5 }}>
           <Space>
-            <AssignedTo userId={id} userList={userList} imageWidth={30} imageHeight={30} AvatarSize={30} allowText={false} preview={false} />
+            <AssignedTo userId={uid} userList={userList} imageWidth={30} imageHeight={30} AvatarSize={30} allowText={false} preview={false} />
           </Space>
         </Dropdown>
 

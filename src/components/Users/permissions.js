@@ -2,7 +2,7 @@
 import { Switch } from "antd"; 
 import { TextboxFlex } from "../../common/textbox";
 
-const UserLoginPermissions = ({ dashboard ,setDashboard ,tasks ,setTasks ,order ,setOrder ,event ,setEvent ,payment ,setPayment ,services ,setServices ,  
+const UserLoginPermissions = ({ dashboard, setDashboard, tasks, setTasks, order, setOrder, event, setEvent, payment, setPayment, customer, setCustomer ,services ,setServices ,  
             users ,setUsers ,sales ,setSales ,setting ,setSetting  }) => {
     const Checked = 'Allowed'; const Unchecked = 'Blocked';
     return (
@@ -30,6 +30,9 @@ const UserLoginPermissions = ({ dashboard ,setDashboard ,tasks ,setTasks ,order 
             } />
 
             <p class="text-gray-400 mt-4">Management</p>
+            <TextboxFlex label={'Customer'} input={
+                <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={customer} onChange={(e) => setCustomer(e)} />
+            } />
             <TextboxFlex label={'Services'} input={
                 <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={services} onChange={(e) => setServices(e)} />
             } />

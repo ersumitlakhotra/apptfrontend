@@ -20,11 +20,8 @@ const OrderLogs = ({ dataList, id, orderList, servicesList, userList }) => {
 
     useEffect(() => {
         const editList = dataList[0];
-        if (editList.customerinfo !== null) {
-            setCustomerName(editList.customerinfo[0].name);
-            setCustomerPhone(editList.customerinfo[0].cell);
-        }
-        else { setCustomerName(''); setCustomerPhone(''); }
+        setCustomerName(editList.customerName);
+        setCustomerPhone(editList.customerPhone);
         setStatus(editList.status);
         setTrnDate(editList.trndate);
         setTotal(editList.total);

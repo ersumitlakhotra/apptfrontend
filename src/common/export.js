@@ -18,6 +18,7 @@ const ExportToExcel = ({ data, fileName, servicesList, userList }) => {
           getExcelItem('Order', 10),
           getExcelItem('Customer_Name', 30),
           getExcelItem('Customer_Cell', 30),
+          getExcelItem('Customer_Email', 30),
           getExcelItem('Date', 20),
           getExcelItem('Services', 50),
           getExcelItem('Rate', 20),
@@ -28,8 +29,9 @@ const ExportToExcel = ({ data, fileName, servicesList, userList }) => {
         data.forEach(item => {
           worksheet.addRow({
             Order: item.order_no,
-            Customer_Name: item.customerinfo !== null && item.customerinfo[0].name,
-            Customer_Cell: item.customerinfo !== null && item.customerinfo[0].cell,
+            Customer_Name: item.name,
+            Customer_Cell: item.cell,
+            Customer_Email: item.email,
             Date: dayjs(item.trndate).format('DD MMM YYYY'),
             Services: item.serviceinfo !== null && (servicesList.filter(a => item.serviceinfo.some(b => b === a.id)).map(c => c.name)).toString(),
             Rate: `$ ${item.total}`,
@@ -110,6 +112,24 @@ const ExportToExcel = ({ data, fileName, servicesList, userList }) => {
             Tax: `$ ${item.taxamount}`,
             Gross_Pay: `$ ${item.grossamount}`,
             Notes: item.notes,
+            Last_Modified: UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A'),
+          });
+        });
+        break;
+      }
+
+      case 'CUSTOMERS': {
+        worksheet.columns = [
+          getExcelItem('Name', 30),
+          getExcelItem('Email', 30),
+          getExcelItem('Cell', 10),
+          getExcelItem('Last_Modified', 30)
+        ];
+        data.forEach(item => {
+          worksheet.addRow({
+            Name: item.name,
+            Email: item.email,
+            Cell: item.cell,
             Last_Modified: UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A'),
           });
         });

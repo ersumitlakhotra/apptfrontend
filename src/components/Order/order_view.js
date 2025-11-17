@@ -4,7 +4,7 @@ import { CheckOutlined, CloseOutlined, CalendarOutlined, ClockCircleOutlined, Un
 import { useEffect, useState } from "react";
 import { UTC_LocalDateTime } from "../../common/localDate";
 import Services from "../../common/services";
-const OrderView = ({ id, refresh, orderList, servicesList, userList,setOpenView, saveData }) => {
+const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView, saveData }) => {
 
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
@@ -34,13 +34,9 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList,setOpenView,
         }
         else {
             const editList = orderList.find(item => item.id === id)
-            if (editList.customerinfo !== null) {
-                setCustomerName(editList.customerinfo[0].name);
-                setCustomerPhone(editList.customerinfo[0].cell);
-                setCustomerEmail(editList.customerinfo[0].email);
-            }
-            else { setCustomerName(''); setCustomerEmail(''); setCustomerPhone(''); }
-
+            setCustomerName(editList.name);
+            setCustomerPhone(editList.cell);
+            setCustomerEmail(editList.email);
             setOrderNo(editList.order_no);
             setStatus(editList.status);
             setTrnDate(editList.trndate);

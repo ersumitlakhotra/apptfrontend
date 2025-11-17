@@ -415,11 +415,6 @@ const BookAppointment = () => {
     const save = async () => {
         if (customerName !== '' && customerPhone !== '' && customerPhone.length === 12 && customerEmail !== '' && isValidEmail(customerEmail)) {
             const Body = JSON.stringify({
-                customerinfo: [{
-                    name: customerName,
-                    cell: customerPhone,
-                    email: customerEmail,
-                }], 
                 customerName: customerName,
                 customerPhone: customerPhone,
                 customerEmail: customerEmail,

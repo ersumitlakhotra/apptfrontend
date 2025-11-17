@@ -12,7 +12,7 @@ import ExportToExcel from "../../common/export.js";
 import { UTC_LocalDateTime } from "../../common/localDate.js";
 
 
-const Users = ({ userList, logsList, saveData }) => {
+const Users = ({ userList, userPermissionList, logsList, saveData }) => {
     const ref= useRef();
 
 
@@ -161,7 +161,7 @@ const Users = ({ userList, logsList, saveData }) => {
             <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
-                <UserDetail id={id} refresh={refresh} ref={ref} userList={userList} saveData={saveData} setOpen={setOpen} />
+                <UserDetail id={id} refresh={refresh} ref={ref} userList={userList} userPermissionList={userPermissionList} saveData={saveData} setOpen={setOpen} />
             </Drawer>
             {/* Drawer on logs */}
             <Drawer title={"Logs Detail"} placement='right' width={500} onClose={() => setOpenLogs(false)} open={openLogs}>

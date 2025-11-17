@@ -31,8 +31,8 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_View
     }, [refresh, orderList])
 
     useEffect(() => {
-        let searchedList = orderList.filter(item =>
-            item.customerinfo[0].name.toLowerCase().includes(searchInput.toLowerCase()) ||
+        let searchedList = orderList.filter(item => 
+            item.name.toLowerCase().includes(searchInput.toLowerCase()) ||
             item.order_no.toString().includes(searchInput.toLowerCase()));
         if (assigned_to !== '')
             searchedList = searchedList.filter(item => item.assignedto === assigned_to)
@@ -120,12 +120,10 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_View
                             <td class="p-3 text-blue-500 italic hover:underline cursor-pointer" onClick={() => btn_ViewClick(item.id)} ># {item.order_no}</td>
 
                             <td class="p-3">
-                                {item.customerinfo !== null &&
-                                    <>
-                                        <p class="font-semibold">{item.customerinfo[0].name}</p>
-                                        <p class="text-xs font-medium text-gray-400">{item.customerinfo[0].cell}</p>
-                                    </>
-                                }
+                                <>
+                                    <p class="font-semibold">{item.name}</p>
+                                    <p class="text-xs font-medium text-gray-400">{item.cell}</p>
+                                </>
                             </td>
 
                             <td class="p-3">

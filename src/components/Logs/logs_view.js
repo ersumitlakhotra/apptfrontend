@@ -9,7 +9,7 @@ import UsersLogs from "./users.log";
 import ExpenseLogs from "./expense_log";
 import PaymentLogs from "./payment_log";
 import AssignedTo from "../../common/assigned_to";
-const LogsView = ({ id, ltype, logsList,orderList, userList, servicesList }) => {
+const LogsView = ({ id, ltype, logsList, orderList, userList, servicesList }) => {
     const [logsData, setLogsData] = useState([]);
 
     useEffect(() => {

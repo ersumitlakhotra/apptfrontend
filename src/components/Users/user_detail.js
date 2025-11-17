@@ -12,7 +12,7 @@ import {  isValidEmail } from "../../common/cellformat.js";
 function getTabItems(key, label, icon, children) {
     return {key,label,children,icon,};
 }
-const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
+const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData ,setOpen}) => {
     const [tabActiveKey, setTabActiveKey] = useState("1");
     const [fullname, setFullname] = useState('');
     const [cell, setCell] = useState('');
@@ -33,6 +33,7 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
     const [order, setOrder] = useState(false);
     const [event, setEvent] = useState(false);
     const [payment, setPayment] = useState(false);
+    const [customer, setCustomer] = useState(false);
     const [services, setServices] = useState(false);
     const [users, setUsers] = useState(false);
     const [sales, setSales] = useState(false);
@@ -59,7 +60,7 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
             setAccountType('Basic'); setProfile(null);
             setGender('Male'); setStatus('Active');
             setDashboard(true); setTasks(false); setOrder(false); setEvent(false); setPayment(false);
-            setServices(false); setUsers(false); setSales(false); setSetting(false);
+            setCustomer(false); setServices(false); setUsers(false); setSales(false); setSetting(false);
 
             setMonday(['09:00:00', '21:00:00', true]);
             setTuesday(['09:00:00', '21:00:00', true]);
@@ -81,23 +82,22 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
             setRole(editList.role);
             setRating(editList.rating);
             setAccountType(editList.accounttype);
-            setProfile(editList.profilepic)
+            setProfile(editList.profilepic);
             setStatus(editList.status);
-            if (editList.permissioninfo !== null) {
-                setDashboard(editList.permissioninfo[0].dashboard);
-                setTasks(editList.permissioninfo[0].tasks);
-                setOrder(editList.permissioninfo[0].order);
-                setEvent(editList.permissioninfo[0].event);
-                setPayment(editList.permissioninfo[0].payment);
-                setServices(editList.permissioninfo[0].services);
-                setUsers(editList.permissioninfo[0].users);
-                setSales(editList.permissioninfo[0].sales);
-                setSetting(editList.permissioninfo[0].setting);
-            }
-            else {
-                setDashboard(true); setTasks(false); setOrder(false); setEvent(false); setPayment(false);
-                setServices(false); setUsers(false); setSales(false); setSetting(false);
-            }
+            userPermissionList.filter(a => a.uid === id).map(b => {
+                setDashboard(b.dashboard);
+                setTasks(b.tasks);
+                setOrder(b.order);
+                setEvent(b.event);
+                setPayment(b.payment);
+
+                setCustomer(b.customer);
+                setServices(b.services);
+                setUsers(b.users);
+
+                setSales(b.sales);
+                setSetting(b.setting);
+            })
 
             if (editList.scheduleinfo !== null) {
                 setSunday(editList.scheduleinfo[0].sunday);
@@ -120,35 +120,7 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
 
         }
     }, [refresh])
-
-    function getUserPermission (){     
-        if (role === 'User') { return [{
-                dashboard: dashboard,
-                tasks: tasks,
-                order: order,
-                event: event,
-                payment: payment,
-                services: services,
-                users: users,
-                sales: sales,
-                setting: setting,
-            }]   
-        }
-        if (role === 'Employee') {
-            return [{
-                dashboard: true,
-                tasks: false,
-                order: false,
-                event: false,
-                payment: false,
-                services: false,
-                users: false,
-                sales: false,
-                setting: false,
-            }]
-        }     
-    }
-    
+  
     function getUserSchedule() {
         return [{
             sunday: sunday,
@@ -173,11 +145,20 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
                 password: password,
                 role: role,
                 rating: rating,
-                permissioninfo:getUserPermission(),
                 scheduleinfo:getUserSchedule(),
                 status: status,
                 accounttype: accounttype,
-                profilepic: profilepic
+                profilepic: profilepic,
+                dashboard: dashboard,
+                tasks: tasks,
+                order: order,
+                event: event,
+                payment: payment,
+                customer: customer,
+                services: services,
+                users: users,
+                sales: sales,
+                setting: setting,
             }); 
             saveData("Users", id !== 0 ? 'PUT' : 'POST', "user", id !== 0 ? id : null, Body);
             setOpen(false);
@@ -225,6 +206,8 @@ const UserDetail = ({ id, refresh, ref, userList,  saveData ,setOpen}) => {
             setEvent={setEvent}
             payment={payment}
             setPayment={setPayment}
+            customer={customer}
+            setCustomer={setCustomer}
             services={services}
             setServices={setServices}
             users={users}

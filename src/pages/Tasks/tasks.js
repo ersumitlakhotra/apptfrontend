@@ -8,7 +8,7 @@ import Calender from "../../components/Task/calender";
 import OrderView from "../../components/Order/order_view";
 import { get_Date } from "../../common/localDate";
 
-const Tasks = ({ orderList, servicesList, userList, companyList, saveData, reload, setReload }) => {
+const Tasks = ({ orderList, servicesList, userList, companyList, customerList, saveData, reload, setReload }) => {
     const [date, setDate] = useState(null);
     const [orders, setOrders] = useState([]);
     const [refresh, setRefresh] = useState(0);
