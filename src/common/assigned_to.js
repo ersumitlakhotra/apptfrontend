@@ -13,7 +13,7 @@ const AssignedTo = ({ userId, userList, style = '', imageWidth = 31, imageHeight
                         <Image width={imageWidth} height={imageHeight} src={a.profilepic} style={{ borderRadius: 15 }} preview={preview} /> :
                         <Avatar size={AvatarSize} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
                     }
-                    {allowText && <span class={style}>{a.fullname}</span>}
+                    {allowText && <span class='text-sm font-bold text-nowrap whitespace-nowrap '>{a.fullname}</span>}
                 </div>
             ))
     }

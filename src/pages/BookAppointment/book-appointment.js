@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
 import { Button, Spin, Modal, Drawer, Image, Avatar, Input } from 'antd';
@@ -10,15 +11,15 @@ import Slot from '../../components/BookAppointment/slot.js';
 import Details from '../../components/BookAppointment/detail.js';
 import { apiCalls } from '../../hook/apiCall';
 import { get_Date, LocalDate, LocalTime } from '../../common/localDate.js';
-import dayjs from 'dayjs';
 import useAlert from '../../common/alert.js';
 import { isValidEmail } from '../../common/cellformat.js';
 import FirstPage from '../../components/BookAppointment/first_page.js';
 import BookingOption from '../../components/BookAppointment/book_reschedule.js';
-import { generateTimeSlots } from '../../common/intervals.js';
 import ViewBooking from '../../components/BookAppointment/view_booking.js';
 import { TextboxFlexCol } from '../../common/textbox.js';
 import { useIdleTimer } from 'react-idle-timer';
+import { compareTimes, isOpenForWork } from '../../common/general.js';
+import { generateTimeSlotsWithDate, toMinutes } from '../../common/generateTimeSlots.js';
 
 const BookAppointment = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -35,16 +36,17 @@ const BookAppointment = () => {
     const [emailUser, setEmailUser] = useState('');
     const [emailPass, setEmailPass] = useState('');
     const [daysAdvance, setDaysAdvance] = useState(0);
-    const [slotGap, setSlotGap] = useState(60);
     const [storeSchedule, setStoreSchedule] = useState(null);
 
     const [bookingType, setBookingType] = useState(0);
-
-    const [user, setUser] = useState(0);
+    const [assigned_to, setAssignedTo] = useState(0);
+    const [prevAssigned_To, setPrevAssigned_To] = useState(0);
+    
     const [employeeName, setEmployeeName] = useState('');
     const [employeeSchedule, setEmployeeSchedule] = useState(null);
 
     const [servicesItem, setServicesItem] = useState([]);
+    const [prevServicesItem, setPrevServicesItem] = useState([]);
     const [price, setPrice] = useState('0');
     const [total, setTotal] = useState('0');
     const [coupon, setCoupon] = useState('');
@@ -52,6 +54,8 @@ const BookAppointment = () => {
 
     const [trndate, setTrnDate] = useState(LocalDate());
     const [slot, setSlot] = useState('');
+    const [start, setStart] = useState('');
+    const [end, setEnd] = useState('');
     const [prevTrnDate, setPrevTrnDate] = useState('');
     const [prevSlot, setPrevSlot] = useState('');
     const [availableSlot, setAvailableSlot] = useState([]);
@@ -76,7 +80,6 @@ const BookAppointment = () => {
     const [openSearch, setOpenSearch] = useState(false);
 
     const storeId = searchParams.get('store') || 'All';
-    const weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
     const onIdle = () => {
         window.location.reload();
@@ -100,7 +103,6 @@ const BookAppointment = () => {
             setEmailUser(item.emailuser);
             setEmailPass(item.emailpass);
             setDaysAdvance(item.bookingdays);
-            setSlotGap(item.slot);
             setStoreSchedule(item.timinginfo[0]);
             if (item.addressinfo !== null) {
                 let address = `${item.addressinfo[0].street}, ${item.addressinfo[0].city}, ${item.addressinfo[0].province} ${item.addressinfo[0].postal} `;
@@ -112,8 +114,8 @@ const BookAppointment = () => {
     }, [cid]);
 
     useEffect(() => {
-        userList.filter(a => a.id === user).map(item => { setEmployeeName(item.fullname); setEmployeeSchedule(item.scheduleinfo[0]); })
-    }, [user]);
+        userList.filter(a => a.id === assigned_to).map(item => { setEmployeeName(item.fullname); setEmployeeSchedule(item.scheduleinfo[0]); })
+    }, [assigned_to]);
 
     useEffect(() => {
         let price = 0
@@ -131,145 +133,61 @@ const BookAppointment = () => {
         }, [trndate, employeeSchedule]);
 
     const onTrnDateChange = async () => {
-        const body = JSON.stringify({ date: get_Date(trndate, 'YYYY-MM-DD').toString(), uid: parseInt(user) });
-        let orderList=[];
+        const body = JSON.stringify({ date: get_Date(trndate, 'YYYY-MM-DD').toString(), uid: parseInt(assigned_to) });
+        let orderList = [];
+
         setIsLoading(true);
         try {
             const res = await apiCalls("POST", "order/booking", cid, null, body, false);
-            orderList=res.data.data.filter(a => a.status !== "Cancelled");
+            orderList = res.data.data;
         }
         catch (e) {
-            orderList=[];
+            orderList = [];
             //error(error.message)
         }
         setIsLoading(false);
-        if (prevTrnDate === trndate && bookingType > 1) {
-            setSlot(prevSlot);
-        } else
-            setSlot('')
 
-        const dayNum = dayjs(trndate).get('day');
-        const weekday = weekdays[dayNum];
+        //setSlot(prevTrnDate === trndate && bookingType > 1 ? prevSlot :'' );
+        setSlot('');
+        const business = isOpenForWork(trndate, storeSchedule);
+        let appointments = [];
+         if (business[0].isOpen) {
+                setIsOpen(true);
+                if (assigned_to !== 0) {
+                    const user = userList.find(item => item.id === assigned_to);
+                    const employee = isOpenForWork(trndate, user.scheduleinfo[0]);
+                    setEmployeeName(user.fullname);
 
-        let inTime = '00:00:00';
-        let outTime = '00:00:00';
-        let isWorking = false;
-        let inTimeStore = '00:00:00';
-        let outTimeStore = '00:00:00';
-        let isOpen = false;
+                    if (employee[0].isOpen) {
+                        setUserWorking(true);
+                        appointments = orderList.filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === assigned_to && a.status !== 'Cancelled' && a.id !== order_id));
 
-        switch (weekday.toLowerCase()) {
-            case 'sunday':
-                {
-                    inTime = employeeSchedule.sunday[0];
-                    outTime = employeeSchedule.sunday[1];
-                    isWorking = employeeSchedule.sunday[2];
+                        let minutes = 0;
+                        servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item => { minutes += item.minutes; });
 
-                    inTimeStore = storeSchedule.sunday[0];
-                    outTimeStore = storeSchedule.sunday[1];
-                    isOpen = storeSchedule.sunday[2];
-                    break;
+                        let loginTime = compareTimes(business[0].inTime, employee[0].inTime);
+                        let logoutTime = compareTimes(business[0].outTime, employee[0].outTime);
+                        let inTime = loginTime === -1 ? employee[0].inTime : (loginTime === 1 || loginTime === 0) && business[0].inTime;
+                        let outTime = logoutTime === -1 ? business[0].outTime : (logoutTime === 1 || logoutTime === 0) && employee[0].outTime;
+                        setAvailableSlot(generateTimeSlotsWithDate(trndate, inTime, outTime, minutes === 0 ? 30 : minutes, appointments));
+                       
+                        if (prevTrnDate === trndate && order_id !== 0 && prevAssigned_To === assigned_to && prevServicesItem === servicesItem) {
+                            setSlot(prevSlot);
+                        }
+
+                    }
+                    else
+                        setUserWorking(false);
+
                 }
-            case 'monday':
-                {
-                    inTime = employeeSchedule.monday[0];
-                    outTime = employeeSchedule.monday[1];
-                    isWorking = employeeSchedule.monday[2];
-
-                    inTimeStore = storeSchedule.monday[0];
-                    outTimeStore = storeSchedule.monday[1];
-                    isOpen = storeSchedule.monday[2];
-                    break;
+                else {
+                    setUserWorking(true);
+                    setEmployeeName('');
                 }
-            case 'tuesday':
-                {
-                    inTime = employeeSchedule.tuesday[0];
-                    outTime = employeeSchedule.tuesday[1];
-                    isWorking = employeeSchedule.tuesday[2];
+            }
+            else
+                setIsOpen(false);
 
-                    inTimeStore = storeSchedule.tuesday[0];
-                    outTimeStore = storeSchedule.tuesday[1];
-                    isOpen = storeSchedule.tuesday[2];
-                    break;
-                }
-            case 'wednesday':
-                {
-                    inTime = employeeSchedule.wednesday[0];
-                    outTime = employeeSchedule.wednesday[1];
-                    isWorking = employeeSchedule.wednesday[2];
-
-                    inTimeStore = storeSchedule.wednesday[0];
-                    outTimeStore = storeSchedule.wednesday[1];
-                    isOpen = storeSchedule.wednesday[2];
-                    break;
-                }
-            case 'thursday':
-                {
-                    inTime = employeeSchedule.thursday[0];
-                    outTime = employeeSchedule.thursday[1];
-                    isWorking = employeeSchedule.thursday[2];
-
-                    inTimeStore = storeSchedule.thursday[0];
-                    outTimeStore = storeSchedule.thursday[1];
-                    isOpen = storeSchedule.thursday[2];
-                    break;
-                }
-            case 'friday':
-                {
-                    inTime = employeeSchedule.friday[0];
-                    outTime = employeeSchedule.friday[1];
-                    isWorking = employeeSchedule.friday[2];
-
-                    inTimeStore = storeSchedule.friday[0];
-                    outTimeStore = storeSchedule.friday[1];
-                    isOpen = storeSchedule.friday[2];
-                    break;
-                }
-            case 'saturday':
-                {
-                    inTime = employeeSchedule.saturday[0];
-                    outTime = employeeSchedule.saturday[1];
-                    isWorking = employeeSchedule.saturday[2];
-
-                    inTimeStore = storeSchedule.saturday[0];
-                    outTimeStore = storeSchedule.saturday[1];
-                    isOpen = storeSchedule.saturday[2];
-                    break;
-                }
-            default:
-                {
-                    inTime = '00:00:00'; outTime = '00:00:00'; isOpen = false;
-                    inTimeStore = '00:00:00'; outTimeStore = '00:00:00';isWorking = false;
-                    break;
-                }
-        }
-        setIsOpen(isOpen);
-        setUserWorking(isWorking);
-        setAvailableSlot([]);
-        let open = '00:00:00';
-        let close = '00:00:00';
-        if (dayjs(inTime).format('HH:mm:ss').split(':')[0] >= dayjs(inTimeStore).format('HH:mm:ss').split(':')[0] &&
-            dayjs(inTime).format('HH:mm:ss').split(':')[1] >= dayjs(inTimeStore).format('HH:mm:ss').split(':')[1]) {
-            open = inTime;
-
-        }
-        else {
-            open = inTimeStore;
-        } 
-        
-        if (dayjs(outTime).format('HH:mm:ss').split(':')[0] <= dayjs(outTimeStore).format('HH:mm:ss').split(':')[0] &&
-            dayjs(outTime).format('HH:mm:ss').split(':')[1] <= dayjs(outTimeStore).format('HH:mm:ss').split(':')[1]) {
-            close = outTime;
-
-        }
-        else {
-            close = outTimeStore;
-        }
-
-
-        if (isOpen && isWorking) {
-            setAvailableSlot(generateTimeSlots(open, close, slotGap, orderList, slot));
-        }
     }
 
     const getData = async (setList, method, endPoint, id = null, body = [], eventDate = false) => {
@@ -316,7 +234,7 @@ const BookAppointment = () => {
                 }
             case 2:
                 {
-                    if (user === 0) {
+                    if (assigned_to === 0) {
                         isNext = false;
                         message = "Please select a professional from list. "
                     }
@@ -324,14 +242,17 @@ const BookAppointment = () => {
                 }
             case 3:
                 {
+
                     if (servicesItem.length === 0) {
                         isNext = false;
                         message = "Minimum one service is required to book an appointment. "
                     }
+                    onTrnDateChange();
                     break;
                 }
             case 4:
                 {
+                    
                     if (slot === '') {
                         isNext = false;
                         message = "Please select a slot as per professional availability. "
@@ -427,13 +348,15 @@ const BookAppointment = () => {
                 coupon: coupon,
                 status: 'Pending',
                 trndate: trndate,
-                assignedto: user,
+                assignedto: assigned_to,
                 slot: slot,
+                start: start,
+                end: end,
                 bookedvia: 'Appointment',
             });
 
             if (bookingType === 1 || bookingType === 2) {
-                const bodyOrderCheck = JSON.stringify({ date: get_Date(trndate, 'YYYY-MM-DD').toString(), uid: parseInt(user) });
+                const bodyOrderCheck = JSON.stringify({ date: get_Date(trndate, 'YYYY-MM-DD').toString(), uid: parseInt(assigned_to) });
                  let orderList=[];
                 setIsLoading(true);
                 try {
@@ -532,7 +455,7 @@ const BookAppointment = () => {
         if (order_no !== '' && customerEmail !== '') {
             setIsLoading(true);
             let result = false;
-            let message = 'No record found.';
+            let message = 'Either Booking# or E-mail id is incorrect!';
             try {
                 const Body = JSON.stringify({
                     order_no: order_no
@@ -542,11 +465,10 @@ const BookAppointment = () => {
                     const editList = res.data.data[0];
                     if (editList.email.toLowerCase() === customerEmail.toLowerCase()) {
 
-                        const bookDate = dayjs(`${get_Date(editList.trndate, 'YYYY-MM-DD')} ${dayjs(editList.slot, 'hh:mm A').format('HH:mm:ss')}`, `YYYY-MM-DDTHH:mm:ss`);
-                        const localDate = dayjs(`${LocalDate()} ${LocalTime()}`, `YYYY-MM-DDTHH:mm:ss`);
-                        const date1 = new Date(bookDate);
-                        const date2 = new Date(localDate);
-                        if (date1 < date2) {
+                        const date1 = new Date(editList.trndate);
+                        const date2 = new Date(LocalDate());
+
+                        if (date1 < date2 || (date1 === date2 && toMinutes(editList.start) < toMinutes(LocalTime('HH:mm')))) {
                             result = false;
                             message = `Past order can't be rescheduled or cancel.`;
                         }
@@ -558,9 +480,13 @@ const BookAppointment = () => {
                             result = true;
                             message = '';
                             setOrder_Id(editList.id)
-                            setUser(editList.assignedto);
+                            setAssignedTo(editList.assignedto);
+                            setPrevAssigned_To(editList.assignedto);
                             setServicesItem(editList.serviceinfo);
+                            setPrevServicesItem(editList.serviceinfo);
                             setSlot(editList.slot);
+                            setStart(editList.start);
+                            setEnd(editList.end);
                             setPrevSlot(editList.slot);
                             setPrevTrnDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
                             setTrnDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
@@ -584,7 +510,7 @@ const BookAppointment = () => {
                         warning(message);
                 }
                 else
-                    error(message);
+                    warning(message);
             }
             catch (e) {
                 // setList([])
@@ -602,7 +528,7 @@ const BookAppointment = () => {
     } else if (content === 1) {
         displayedContent = <BookingOption bookingType={bookingType} setBookingType={setBookingType} />
     } else if (content === 2) {
-        displayedContent = <Employee userList={userList} next={next} user={user} setUser={setUser} setEmployeeName={setEmployeeName} />
+        displayedContent = <Employee userList={userList} next={next} user={assigned_to} setUser={setAssignedTo} setEmployeeName={setEmployeeName} />
     } else if (content === 3) {
         displayedContent = <Services
             servicesList={servicesList}
@@ -617,9 +543,11 @@ const BookAppointment = () => {
             setTrnDate={setTrnDate}
             slot={slot}
             setSlot={setSlot}
+            setStart={setStart}
+            setEnd={setEnd}
             isOpen={isOpen}
             isUserWorking={isUserWorking}
-            availableSlot={availableSlot}
+            availableSlots={availableSlot}
             employeeName={employeeName} />
     } else if (content === 5) {
         displayedContent = <Details
@@ -735,10 +663,10 @@ const BookAppointment = () => {
                 placement='bottom' height={'90%'} style={{ backgroundColor: '#f9fafb' }} onClose={() => setOpenOrder(false)} open={openOrder}>
                 <div class='w-full flex flex-col  gap-6 items-center p-3'>
 
-                    {user !== 0 && <ViewBooking title={'Professional'} content={2} setContent={setContent} setOpenOrder={setOpenOrder}
+                    {assigned_to !== 0 && <ViewBooking title={'Professional'} content={2} setContent={setContent} setOpenOrder={setOpenOrder}
                         value={
                         <div class='flex flex-row gap-4  items-center'>
-                            {userList.filter(f => f.id === user).map(item =>
+                            {userList.filter(f => f.id === assigned_to).map(item =>
                                 <div key={item.id}>
                                     {item.profilepic !== null ?
                                         <Image width={24} height={24} src={item.profilepic} style={{ borderRadius: 10 }} /> :

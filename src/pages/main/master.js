@@ -144,7 +144,7 @@ const MasterPage = () => {
       const result = await apiCalls(method, endPoint, companyId, id, body);
 
       if (result.status === 500 || result.status === 404) {
-        notify && error(result.message);
+        notify && error(result.message);      
       }
       else {
         let status = result.status === 201 ? 'Created' : result.status === 200 ? 'Modified' : 'Deleted/Cancelled';

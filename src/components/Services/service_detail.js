@@ -12,19 +12,21 @@ const ServiceDetail = ({ id, refresh, ref, servicesList, saveData, setOpen }) =>
     const [price, setPrice] = useState('');
 
     const [timing, setTiming] = useState('30 Minute');
+    const [minutes, setMinutes] = useState(30);
     const [description, setDescription] = useState('');
     const [status, setStatus] = useState('Active');
 
 
     useEffect(() => {
         if (id === 0) {
-            setName('');  setPrice('');setDescription(''); setTiming('30 Minute'); setStatus('Active');
+            setName(''); setPrice(''); setDescription(''); setTiming('30 Minute'); setMinutes(30); setStatus('Active');
         }
         else {
             const editList = servicesList.find(item => item.id === id)
             setName(editList.name);
             setPrice(editList.price);
             setTiming(editList.timing);
+            setMinutes(editList.minutes);
             setStatus(editList.status);
             setDescription(editList.description);
         }
@@ -37,6 +39,7 @@ const ServiceDetail = ({ id, refresh, ref, servicesList, saveData, setOpen }) =>
                 name: name.charAt(0).toUpperCase() + name.slice(1),
                 price: price,
                 timing: timing,
+                minutes: minutes,
                 status: status,
                 description: description,
             });
@@ -78,15 +81,17 @@ const ServiceDetail = ({ id, refresh, ref, servicesList, saveData, setOpen }) =>
 
             <TextboxFlex label={'Time'} input={
                 <Select
-                    value={timing}
+                    value={minutes}
                     style={{ width: '100%' }}
-                    onChange={(e) => setTiming(e)}
+                    onChange={(value, l) => { setTiming(l.label); setMinutes(value); }}
                     options={[
-                        { value: '15 Minute', label: '15 Minute' },
-                        { value: '30 Minute', label: '30 Minute' },
-                        { value: '45 Minute', label: '45 Minute' },
-                        { value: '1 Hour', label: '1 Hour' },
-                        { value: '2 Hour', label: '2 Hour' },
+                        { value: 15, label: '15 Minutes' },
+                        { value: 30, label: '30 Minutes' },
+                        { value: 45, label: '45 Minutes' },
+                        { value: 60, label: '1 Hour' },
+                        { value: 120, label: '2 Hour' },
+                        { value: 180, label: '3 Hour' },
+                        { value: 240, label: '4 Hour' },
                     ]}
                 />
             } />

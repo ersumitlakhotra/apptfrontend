@@ -114,7 +114,7 @@ const Order = ({ orderList, servicesList, userList, companyList, eventList, logs
             <Tabs items={tabItems} defaultActiveKey={tabActiveKey} activeKey={tabActiveKey} onChange={(e) => { setTabActiveKey(e) }} />
         
             {/* Drawer on Add/ Edit*/}
-            <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
+            <Drawer title={title} placement='right' width={600} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
                 <OrderDetail id={id} refresh={refresh} ref={ref} setOrderNo={setOrderNo} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} eventList={eventList} customerList={customerList} saveData={saveData} setOpen={setOpen} />

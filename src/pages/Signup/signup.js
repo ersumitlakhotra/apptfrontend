@@ -13,7 +13,7 @@ export const Signup = ({ logo }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const {contextHolder, success, error, warning } = useAlert();
+  const { contextHolder, success, error, warning } = useAlert();
   const [code, setCode] = useState('');
   const [codeEnter, setCodeEnter] = useState('');
   const [openVerification, setOpenVerification] = useState(false);
@@ -33,7 +33,7 @@ export const Signup = ({ logo }) => {
         }
       } catch (err) {
         error(String(err.message))
-       }
+      }
       setLoading(false);
     }
     else {
@@ -41,8 +41,9 @@ export const Signup = ({ logo }) => {
     }
 
   }
+
   const sendEmail = async () => {
-    const newCode = Math.floor(100000 + Math.random() * 900000); 
+    const newCode = Math.floor(100000 + Math.random() * 900000);
     const Subject = "Appoint Stack Verification Code";
 
     let message = '<p>Hi ' + business_name + '</p>';
@@ -123,7 +124,7 @@ export const Signup = ({ logo }) => {
 
         }
         else {
-            error(String(res.response.data.error))
+          error(String(res.response.data.error))
         }
       }
       catch (err) {
@@ -140,7 +141,7 @@ export const Signup = ({ logo }) => {
   const onChange = text => {
     setCodeEnter(text.toString());
   };
- 
+
 
   const sharedProps = {
     onChange
@@ -223,7 +224,7 @@ export const Signup = ({ logo }) => {
       )}
 
       <Drawer title={""} placement='bottom' height={'80%'} style={{ backgroundColor: '#F9FAFB' }} open={openVerification}
-        onClose={() => {setOpenVerification(false); reset();}} >
+        onClose={() => { setOpenVerification(false); reset(); }} >
         <div class='w-full flex flex-col justify-center gap-4 items-center '>
           <MailFilled style={{ fontSize: 32, color: 'green' }} />
           <p class='text-2xl  font-sans text-gray-600 border-b border-gray-400 pb-6 px-12 '>VERIFY YOUR EMAIL ADDRESS</p>

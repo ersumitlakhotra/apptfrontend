@@ -6,10 +6,11 @@ import { RightOutlined, LeftOutlined, ReloadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import Calender from "../../components/Task/calender";
 import OrderView from "../../components/Order/order_view";
-import { get_Date } from "../../common/localDate";
+import { get_Date, LocalDate } from "../../common/localDate";
+import TaskCalender from "../../components/Task/taskcalender";
 
 const Tasks = ({ orderList, servicesList, userList, companyList, customerList, saveData, reload, setReload }) => {
-    const [date, setDate] = useState(null);
+    const [date, setDate] = useState(LocalDate());
     const [orders, setOrders] = useState([]);
     const [refresh, setRefresh] = useState(0);
     const [openView, setOpenView] = useState(false);
@@ -41,7 +42,7 @@ const Tasks = ({ orderList, servicesList, userList, companyList, customerList, s
     }
 
     return (
-        <div class="flex flex-col gap-4 mb-12  w-full">
+        <div class="flex flex-col gap-4 mb-12  w-full h-full">
             
             <div class='flex  items-center justify-between'>
                 <span class="text-lg font-semibold text-gray-800">Task</span>
@@ -56,8 +57,8 @@ const Tasks = ({ orderList, servicesList, userList, companyList, customerList, s
                 </div>
             </div>
 
-            <div class={`w-full bg-white border rounded-lg py-2 max-h-[700px] overflow-auto`}>
-                <Calender orderList={orders} servicesList={servicesList} userList={userList} companyList={companyList} trndate={date} btn_ViewClick={btn_ViewClick} />            
+            <div class={`w-full bg-white border rounded-lg overflow-auto`}>
+                <TaskCalender orderList={orders} servicesList={servicesList} userList={userList} companyList={companyList} trndate={date} btn_ViewClick={btn_ViewClick} />            
             </div>
 
             {/* Drawer on View*/}

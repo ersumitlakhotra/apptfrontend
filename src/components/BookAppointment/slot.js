@@ -2,7 +2,7 @@
 import { Button, Tag } from 'antd';
 import { useEffect, useState } from 'react';
 import { get_Date, LocalDate, LocalTime, UTC_LocalDateTime } from '../../common/localDate';
-import dayjs from 'dayjs';
+import { toMinutes } from '../../common/generateTimeSlots';
 
 function getFutureDates(numberOfDays) {
     const dates = [];
@@ -16,7 +16,7 @@ function getFutureDates(numberOfDays) {
     }
     return dates;
 }
-const Slot = ({ daysAdvance, trndate, setTrnDate, slot, setSlot, isOpen, isUserWorking, availableSlot, employeeName }) => {
+const Slot = ({ daysAdvance, trndate, setTrnDate, slot, setSlot, setStart, setEnd, isOpen, isUserWorking, availableSlots, employeeName }) => {
 
     const [dateAvailable, setDateAvailable] = useState([]);
     const [morningSlot, setMorningSlot] = useState([]);
@@ -29,30 +29,25 @@ const Slot = ({ daysAdvance, trndate, setTrnDate, slot, setSlot, isOpen, isUserW
         { key: 3, label: 'Evening', slotList: eveningSlot },
     ];
 
+ 
     useEffect(() => {
         setDateAvailable(getFutureDates(daysAdvance));
     }, [daysAdvance])
 
     useEffect(() => {
-        let available=availableSlot;
-        let localTime = LocalTime('HH:mm:ss');
+        let localTime = toMinutes(LocalTime('HH:mm'));
         if (trndate === LocalDate()) {
-            available = availableSlot.filter(item =>
-                dayjs(item.id, 'hh:mm A').format('HH:mm:ss').split(':')[0] > localTime.split(':')[0] ||
-                (dayjs(item.id, 'hh:mm A').format('HH:mm:ss').split(':')[0] === localTime.split(':')[0] &&
-                dayjs(item.id, 'hh:mm A').format('HH:mm:ss').split(':')[1] > localTime.split(':')[1] ));
+            availableSlots = availableSlots.filter(item => toMinutes(item.start) >= localTime);
         }
-        const morning = available.filter(item => dayjs(item.id, 'hh:mm A').format('HH:mm:ss').split(':')[0] < 12);
-        const afternoon = available.filter(item => dayjs(item.id, 'hh:mm A').format('HH:mm:ss').split(':')[0] >= 12 && dayjs(item.id, 'hh:mm A').format('HH:mm:ss').split(':')[0] < 16 );
-        const evening = available.filter(item => dayjs(item.id, 'hh:mm A').format('HH:mm:ss').split(':')[0] >=16 );
-        setMorningSlot(morning)
-        setAfternoonSlot(afternoon)
-        setEveningSlot(evening)
-    }, [availableSlot])
+
+        setMorningSlot(availableSlots.filter(item => item.category === 'Morning'));
+        setAfternoonSlot(availableSlots.filter(item => item.category === 'Afternoon'));
+        setEveningSlot(availableSlots.filter(item => item.category === 'Evening'));
+    }, [availableSlots])
 
    
     return (
-        <div class='flex flex-col font-normal mt-2 w-full' >
+        <div class='flex flex-col font-normal mt-2 mb-20 w-full' >
             <p class='text-2xl font-sans font-bold mb-4'> Select a date</p>
             
             <div class='overflow-x-auto mb-2 flex flex-row gap-3 pb-4'>
@@ -65,27 +60,30 @@ const Slot = ({ daysAdvance, trndate, setTrnDate, slot, setSlot, isOpen, isUserW
             </div>
             <p class='text-sm font-sans font-semibold mb-4'>Slots Availability : {get_Date(trndate, 'DD MMM YYYY') }</p>
 
-            <div class='w-full flex flex-row gap-12 text-xs'>
-                {(isOpen && isUserWorking) ?                 
+            <div class='w-full overflow-auto flex flex-row gap-2 text-xs'>
+                {
+                    isOpen ? isUserWorking ?
                         options.map(opt =>
                             <div key={opt.key} class='flex flex-col gap-2'>
-                                <p class='flex-row flex justify-center items-center'>{opt.label}</p>
+                                <p class='flex-row flex justify-center items-center '>{opt.label}</p>
                                 {opt.slotList.length === 0 ? <p class='text-xs text-gray-500'>Empty</p> :
                                     opt.slotList.map(item => (
-                                        <Button key={item.id} color={slot === item.id ? 'cyan' : 'default'}
+                                        <Button key={item.slot} color={slot === item.slot ? 'cyan' : 'default'}
                                             variant="outlined"
-                                            disabled={item.disabled}
-                                            onClick={() => { setSlot(item.id) }}>
+                                            // disabled={item.disabled}
+                                            onClick={() => {
+                                                setSlot(item.slot);
+                                                setStart(item.start);
+                                                setEnd(item.end);
+                                            }}>
 
-                                            {item.id}
+                                            {item.slot}
                                         </Button>
                                     ))}
                             </div>
-                        )              
-                    :
-                        !isOpen ? <Tag color='red'>Business is closed . Please book an appointment for another day!</Tag>
-                        :!isUserWorking ? <Tag color='red'>The {employeeName} has the DAY OFF.</Tag>
-                        :<></>
+                        )
+                        : <Tag color='red'>The {employeeName} has the DAY OFF.</Tag>
+                        : <Tag color='red'>Business is closed . Please book an appointment for another day!</Tag>
                 }
             </div>                   
         </div>
