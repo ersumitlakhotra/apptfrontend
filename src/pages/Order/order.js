@@ -61,12 +61,6 @@ const Order = ({ orderList, servicesList, userList, companyList, eventList, logs
     const [exportList, setExportList] = useState([]);
    
     useEffect(() => {
-        if (fromDate === '')
-            setFromDate(LocalDate());
-
-        if (toDate === '')
-            setToDate(LocalDate());
-
         load();
     }, [orderList, fromDate, toDate])
 

@@ -79,6 +79,7 @@ const Payments = ({ key, expensesData, userList, btn_LogsClick, btn_Click, fromD
                             <div>
                                 <DatePicker
                                     style={{ width: '100%' }}
+                                    allowClear={false}
                                     value={fromDate === '' ? fromDate : dayjs(fromDate, 'YYYY-MM-DD')}
                                     onChange={(date, dateString) => setFromDate(dateString)} />
                             </div>
@@ -89,6 +90,7 @@ const Payments = ({ key, expensesData, userList, btn_LogsClick, btn_Click, fromD
                             <div>
                                 <DatePicker
                                     style={{ width: '100%' }}
+                                    allowClear={false}
                                     value={toDate === '' ? toDate : dayjs(toDate, 'YYYY-MM-DD')}
                                     onChange={(date, dateString) => setToDate(dateString)} />
                             </div>

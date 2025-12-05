@@ -1,6 +1,6 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Dropdown, Space, Spin } from "antd";
+import { Button, Dropdown, Skeleton, Space, Spin } from "antd";
 import { useEffect, useState } from "react";
 import { DownOutlined, LoadingOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -20,6 +20,8 @@ const Task = ({ orderList, userList }) => {
     const menuProps = { items, onClick: onItemChanged, };
 
     useEffect(() => {
+        setChart(null);
+        setStackedChart(null);
         let frmMonth = dayjs(firstDateOfMonth(new Date())).format("YYYY-MM-DD");
         let toMonth = dayjs(lastDateOfMonth(new Date())).format("YYYY-MM-DD");
         let year = new Date().getFullYear();
@@ -47,6 +49,11 @@ const Task = ({ orderList, userList }) => {
         setStackedChart(<StackedBarChart categories={categories} pending={pendingStacked} inprogress={inprocessStacked} completed={completedStacked} cancelled={cancelledStacked} />)
     }, [orderList, currentOption]) 
 
+    useEffect(() => {
+        setChart(chart);
+        setStackedChart(stackedchart);
+    }, [chart, stackedchart])
+
     return (
         <div class='flex flex-col gap-4 w-full'>
             <div class='flex justify-between items-center'>
@@ -62,11 +69,13 @@ const Task = ({ orderList, userList }) => {
             </div>
             <div class='w-full bg-white border rounded p-5 text-gray-500 flex flex-col gap-2 md:flex-row'>
                 <div class='w-full md:w-1/2'>
-                    {stackedchart === null ? <div class='h-[420px] flex items-center justify-center'><Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} /></div>
+                    {stackedchart === null ? <div class='h-[420px] flex items-center justify-center'>
+                    <Skeleton active style={{ padding: '16px' }} paragraph={{ rows: 10 }} /></div>
                         : stackedchart}
                 </div>  
                 <div class='w-full md:w-1/2'>
-                    {chart === null ? <div class='h-[420px] flex items-center justify-center'><Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} /></div>
+                    {chart === null ? <div class='h-[420px] flex items-center justify-center'>
+                        <Skeleton active style={{ padding: '16px' }} paragraph={{ rows: 10 }} /></div>
                         : chart}
                 </div>
                 

@@ -51,7 +51,7 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
                 description: description,
                 startdate: startDate,
                 enddate: endDate,
-                serviceinfo: servicesItem.split(),
+                serviceinfo: servicesItem,
                 price: price,
                 discount: discount,
                 total: total,
@@ -74,10 +74,11 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
 
     const onChangeServicesItem = (value) => {
         let rate = 0;
-        setServicesItem(value);
+        setServicesItem([String(value)]);
         servicesList.filter(a => a.id === value).map(item => (rate = rate + parseFloat(item.price)));
-        setPrice(parseFloat(rate).toFixed(2))
+        setPrice(parseFloat(rate).toFixed(2))    
     } 
+
 
     useEffect(() => {
         setTotal(parseFloat(parseFloat(price) - parseFloat(discount)).toFixed(2) )
@@ -96,11 +97,11 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
             } />
 
             <TextboxFlex label={'Start Date'} mandatory={true} input={
-                <DatePicker status={startDate === '' ? 'error' : ''} style={{ width: '100%' }} value={startDate === '' ? startDate : dayjs(startDate, 'YYYY-MM-DD')} onChange={(date, dateString) => setStartDate(dateString)} />
+                <DatePicker status={startDate === '' ? 'error' : ''} style={{ width: '100%' }} allowClear={false} value={startDate === '' ? startDate : dayjs(startDate, 'YYYY-MM-DD')} onChange={(date, dateString) => setStartDate(dateString)} />
             } />
 
             <TextboxFlex label={'End Date'} mandatory={true} input={
-                <DatePicker status={endDate === '' ? 'error' : ''} style={{ width: '100%' }} value={endDate === '' ? endDate : dayjs(endDate, 'YYYY-MM-DD')} onChange={(date, dateString) => setEndDate(dateString)} />
+                <DatePicker status={endDate === '' ? 'error' : ''} style={{ width: '100%' }} allowClear={false}  value={endDate === '' ? endDate : dayjs(endDate, 'YYYY-MM-DD')} onChange={(date, dateString) => setEndDate(dateString)} />
             } />
 
             <TextboxFlex label={'Services'} mandatory={true} input={

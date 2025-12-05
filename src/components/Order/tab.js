@@ -88,6 +88,7 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_View
                             <div>
                                 <DatePicker
                                     style={{ width: '100%' }}
+                                    allowClear={false}
                                     value={fromDate === '' ? fromDate : dayjs(fromDate, 'YYYY-MM-DD')}
                                     onChange={(date, dateString) => setFromDate(dateString)} />
                             </div>
@@ -98,6 +99,7 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_View
                             <div>
                                 <DatePicker
                                     style={{ width: '100%' }}
+                                    allowClear={false}
                                     value={toDate === '' ? toDate : dayjs(toDate, 'YYYY-MM-DD')}
                                     onChange={(date, dateString) => setToDate(dateString)} />
                             </div>

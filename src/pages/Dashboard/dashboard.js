@@ -9,7 +9,7 @@ import Task from "../../components/Dashboard/Task/task.js";
 import LiveEvent from "../../components/Dashboard/LiveEvent/live_event.js";
 import RecentActivities from "../../components/Dashboard/RecentActivities/recent_activities.js";
 import { useEffect, useState } from "react";
-import { get_Date, lastDateOfMonth, LocalDate } from "../../common/localDate.js";
+import { get_Date, lastDateOfMonth } from "../../common/localDate.js";
 import dayjs from 'dayjs';
 import { AreaChartCard } from "../../components/Dashboard/Charts/charts.js";
 
@@ -30,6 +30,10 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList,
     }, [companyList])
 
     useEffect(() => {
+        setOrderChart(null);
+        setSalesChart(null);
+        setExpenseChart(null);
+        setRevenueChart(null);
         let categoryArray = [];
         let orderSeries = [];
         let salesSeries = [];
@@ -78,16 +82,23 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList,
         setTotalRevenue(totalRevenue);
     }, [orderList])
 
+    useEffect(() => {       
+        setOrderChart(orderChart)
+        setSalesChart(salesChart)
+        setExpenseChart(expenseChart)
+        setRevenueChart(revenueChart)
+    }, [orderChart, salesChart, expenseChart, revenueChart])
+
     return (
         <div class="flex flex-col gap-4 mb-12">
 
             {/* cards*/}
             <span class="text-lg font-semibold text-gray-800">Dashboard</span>         
             <div class='flex flex-col gap-6 md:flex-row '>
-                <Card srno={1} title={'Orders'} value={totalOrders} sign={'#'} chart={orderChart} />
-                <Card srno={2} title={'Sales'} value={totalSales} sign={'$'} chart={salesChart} />
-                <Card srno={3} title={'Expenses'} value={totalExpenses} sign={'$'} chart={expenseChart} />
-                <Card srno={4} title={'Profit/Loss'} value={totalRevenue} sign={'$'} chart={revenueChart} />              
+                <Card key={1} title={'Orders'} value={totalOrders} sign={'#'} chart={orderChart} />
+                <Card key={2} title={'Sales'} value={totalSales} sign={'$'} chart={salesChart} />
+                <Card key={3} title={'Expenses'} value={totalExpenses} sign={'$'} chart={expenseChart} />
+                <Card key={4} title={'Profit/Loss'} value={totalRevenue} sign={'$'} chart={revenueChart} />              
             </div>
 
             <div class='flex flex-col gap-4 mt-4  w-full md:flex-row'>

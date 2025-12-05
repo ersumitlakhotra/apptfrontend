@@ -108,7 +108,7 @@ const ExpensesDetail = ({ id, refresh, ref, expensesList, saveData, setOpen }) =
             <p class="text-gray-400 mb-4">Expense Information</p>
 
             <TextboxFlex label={'Date'} mandatory={true} input={
-                <DatePicker status={trndate === '' ? 'error' : ''} style={{ width: '100%' }} value={trndate === '' ? trndate : dayjs(trndate, 'YYYY-MM-DD')} onChange={(date, dateString) => setTrnDate(dateString)} />
+                <DatePicker status={trndate === '' ? 'error' : ''} style={{ width: '100%' }} allowClear={false} value={trndate === '' ? trndate : dayjs(trndate, 'YYYY-MM-DD')} onChange={(date, dateString) => setTrnDate(dateString)} />
             } />
 
             <TextboxFlex label={'Name'} mandatory={true} input={

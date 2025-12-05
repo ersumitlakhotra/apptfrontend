@@ -63,6 +63,7 @@ const Events = ({ eventList, servicesList, btn_Click, btn_LogsClick, fromDate, s
                             <div>
                                 <DatePicker
                                     style={{ width: '100%' }}
+                                    allowClear={false}
                                     value={fromDate === '' ? fromDate : dayjs(fromDate, 'YYYY-MM-DD')}
                                     onChange={(date, dateString) => setFromDate(dateString)} />
                             </div>
@@ -73,6 +74,7 @@ const Events = ({ eventList, servicesList, btn_Click, btn_LogsClick, fromDate, s
                             <div>
                                 <DatePicker
                                     style={{ width: '100%' }}
+                                    allowClear={false}
                                     value={toDate === '' ? toDate : dayjs(toDate, 'YYYY-MM-DD')}
                                     onChange={(date, dateString) => setToDate(dateString)} />
                             </div>

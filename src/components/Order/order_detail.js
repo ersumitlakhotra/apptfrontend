@@ -7,8 +7,8 @@ import { TextboxFlex } from "../../common/textbox";
 import { isValidEmail, setCellFormat, setPriceNumberOnly } from "../../common/cellformat";
 import { UserOutlined } from '@ant-design/icons';
 import useAlert from "../../common/alert";
-import { get_Date, LocalDate, LocalTime } from "../../common/localDate";
-import { generateTimeSlotsWithDate, toMinutes } from "../../common/generateTimeSlots";
+import { get_Date, LocalDate } from "../../common/localDate";
+import { generateTimeSlotsWithDate } from "../../common/generateTimeSlots";
 import { compareTimes, isOpenForWork } from "../../common/general";
 
 const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, userList, companyList, eventList, customerList, saveData, setOpen }) => {
@@ -17,7 +17,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
-    const [status, setStatus] = useState('Pending');
+    const [status, setStatus] = useState('');
     const [price, setPrice] = useState('0');
     const [tax, setTax] = useState('0');
     const [taxamount, setTaxAmount] = useState('0');
@@ -53,7 +53,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
         { key: 2, label: 'Afternoon', slotList: afternoonSlot },
         { key: 3, label: 'Evening', slotList: eveningSlot },
     ];
-  
+
     const onSearch = (value) => {
         const customer = customerList.find(a => a.cell === value)
         if (customer !== undefined && customer !== null) {
@@ -68,7 +68,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');
             setStatus('Pending'); setPrice('0'); setTax('0'); setTotal('0'); setDiscount('0'); setCoupon(''); setTaxAmount('0'); setTrnDate(LocalDate());
             setAssignedTo('0'); setOrderNo(''); setServicesItem([]); setSlot(''); setPrevSlot(''); setPrevTrnDate(''); setPrevServicesItem([]);
-            setStart(''); setEnd('');
+            setStart(''); setEnd(''); 
         }
         else {
             const editList = orderList.find(item => item.id === id);
@@ -76,7 +76,6 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setCustomerName(editList.name);
             setCustomerPhone(editList.cell);
             setCustomerEmail(editList.email);
-            setStatus(editList.status);
             setTrnDate(editList.trndate);
             setPrevTrnDate(editList.trndate);
             setServicesItem(editList.serviceinfo);
@@ -93,6 +92,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setPrevSlot(editList.slot);
             setStart(editList.start);
             setEnd(editList.end);
+            setStatus(editList.status);
         }
         const liveList = eventList.filter(a => a.case.toUpperCase() === 'LIVE');
         setLiveList(liveList.length > 0 ? liveList : [])
@@ -149,11 +149,12 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
         };
     })
 
-    useEffect(() => {
+    const CalculatePrice = (items) => {
         let rate = 0;
-        servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item => (rate = rate + parseFloat(item.price)));
+        servicesList.filter(a => items.some(b => b === a.id)).map(item => (rate = rate + parseFloat(item.price)));
         setPrice(parseFloat(rate).toFixed(2));
-    }, [servicesItem])
+    }
+
 
     useEffect(() => {
         if (status === 'Cancelled') {
@@ -165,6 +166,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setTotal(0.00);
         }
         else {
+           
             let _price = price;
             let _discount = discount;
             let _tax = tax;
@@ -173,7 +175,8 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 const couponServices = eventList.filter(a => a.coupon === coupon);
                 for (let i = 0; i < couponServices[0].serviceinfo.length; i++) {
                     if (servicesItem.includes(couponServices[0].serviceinfo[i])) {
-                        _discount = parseFloat(couponServices[0].discount).toFixed(2)
+                        _discount = parseFloat(couponServices[0].discount).toFixed(2);
+                        setDiscount(_discount);
                     }
                 }
             }
@@ -181,10 +184,8 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             let _subTotal = _price - _discount;
             let _total = _tax > 0 ? parseFloat((_subTotal * _tax) + _subTotal).toFixed(2) : _subTotal;
             let _taxAmount = _tax > 0 ? parseFloat(_subTotal * _tax).toFixed(2) : 0.00;
-
-            setPrice(_price);
-            setDiscount(_discount);
-            setTax(_tax);
+            
+           
             setTaxAmount(_taxAmount);
             setTotal(_total);
 
@@ -297,7 +298,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     mode="multiple"
                     value={servicesItem}
                     style={{ width: '100%' }}
-                    onChange={(value) => setServicesItem(value)}
+                    onChange={(value) => {setServicesItem(value); CalculatePrice(value)}}
                     options={servicesList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
                         value: item.id,
                         label: item.name
@@ -328,7 +329,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             } />
 
             <TextboxFlex label={'Discount'} input={
-                <Input placeholder="Discount" value={discount} onChange={(e) => setDiscount(setPriceNumberOnly(e.target.value))} />
+                <Input placeholder="Discount" value={discount} readOnly={coupon !==''} onChange={(e) => setDiscount(setPriceNumberOnly(e.target.value))} />
             } />
             <TextboxFlex label={'Tax (%)'} mandatory={true} input={
                 <Select
@@ -352,7 +353,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 <Select
                     value={coupon}
                     style={{ width: '100%' }}
-                    onChange={(value) => setCoupon(value)}
+                    onChange={(value) => { setCoupon(value); value === '' && setDiscount(0.00)}}
                     options={[{ value: '', label: '' },
                     ...liveList.map(item => ({
                         value: item.coupon,

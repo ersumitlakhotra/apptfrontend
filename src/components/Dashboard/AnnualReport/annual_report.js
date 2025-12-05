@@ -1,8 +1,8 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Dropdown, Space, Spin } from "antd";
+import { Button, Dropdown, Skeleton, Space } from "antd";
 import { useEffect, useState } from "react";
-import { DownOutlined, LoadingOutlined } from '@ant-design/icons';
+import { DownOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { firstDateOfMonth, get_Date, lastDateOfMonth } from "../../../common/localDate";
 import { AreaChart } from "../Charts/charts";
@@ -15,6 +15,7 @@ const AnnualReport = ({ orderList, expensesList, yearList, months }) => {
     const menuProps = { items: yearList, onClick: onYearChanged, };
 
     useEffect(() => {
+        setChart(null);
         let salesArray = [];
         let expenseArray = [];
         // eslint-disable-next-line array-callback-return
@@ -34,6 +35,10 @@ const AnnualReport = ({ orderList, expensesList, yearList, months }) => {
         })
         setChart(<AreaChart sales={salesArray} expense={expenseArray} categoriesArray={months} />);
     }, [orderList,currentYear])
+   
+    useEffect(() => {
+        setChart(chart);
+    }, [chart])
 
     return (
         <div class='flex flex-col gap-4 w-full'>
@@ -49,7 +54,8 @@ const AnnualReport = ({ orderList, expensesList, yearList, months }) => {
                 </Dropdown>
             </div>
             <div class='w-full bg-white border rounded p-5 text-gray-500 flex flex-col gap-2'>
-                {chart === null ? <div class='h-[420px] flex items-center justify-center'><Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} /></div>
+                {chart === null ? <div class='h-[420px] flex items-center justify-center'>
+                    <Skeleton active style={{ padding: '16px' }} paragraph={{ rows: 10 }} /></div>
                     : chart}
             </div>
         </div>

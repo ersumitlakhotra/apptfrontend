@@ -135,10 +135,10 @@ const PaymentsDetail = ({ id, refresh, ref, expensesList, userList, saveData, se
 
 
             <TextboxFlex label={'From'} mandatory={true} input={
-                <DatePicker status={fromdate === '' ? 'error' : ''} style={{ width: '100%' }} value={fromdate === '' ? fromdate : dayjs(fromdate, 'YYYY-MM-DD')} onChange={(date, dateString) => setFromDate(dateString)} />
+                <DatePicker status={fromdate === '' ? 'error' : ''} style={{ width: '100%' }} allowClear={false} value={fromdate === '' ? fromdate : dayjs(fromdate, 'YYYY-MM-DD')} onChange={(date, dateString) => setFromDate(dateString)} />
             } />
             <TextboxFlex label={'To'} mandatory={true} input={
-                <DatePicker status={todate === '' ? 'error' : ''} style={{ width: '100%' }} value={todate === '' ? todate : dayjs(todate, 'YYYY-MM-DD')} onChange={(date, dateString) => setToDate(dateString)} />
+                <DatePicker status={todate === '' ? 'error' : ''} style={{ width: '100%' }} allowClear={false} value={todate === '' ? todate : dayjs(todate, 'YYYY-MM-DD')} onChange={(date, dateString) => setToDate(dateString)} />
             } />
             <TextboxFlex label={'Price ($)'} mandatory={true} input={
                 <Input placeholder="Price" status={(netamount === '' || netamount === '.') ? 'error' : ''} value={netamount} onChange={(e) => setPriceNumberOnly(e, setNetAmount)} />
