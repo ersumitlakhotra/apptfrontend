@@ -431,20 +431,3 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
 }
 
 export default OrderDetail;
-
-
-{/*availableSlot.map(opt =>
-                                <div key={opt.key} class='flex flex-col gap-2'>
-                                    <p class='flex-row flex justify-center items-center'>{opt.label}</p>
-                                    {opt.slotList.length === 0 ? <p class='text-xs text-gray-500'>Empty</p> :
-                                        opt.slotList.map(item => (
-                                            <Button key={item.id} color={slot === item.id ? 'cyan' : 'default'}
-                                                variant="outlined"
-                                                disabled={item.disabled}
-                                                onClick={() => { setSlot(item.id) }}>
-
-                                                {item.id}
-                                            </Button>
-                                        ))}
-                                </div>
-                            )*/}

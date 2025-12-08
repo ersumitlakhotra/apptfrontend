@@ -21,10 +21,26 @@ export const apiCalls = async (method, endPoint,companyId = null, id = null, bod
     // api calls
 };
 
-export const loginAuth = async (username,password) => {
+export const loginAuth = async (username, password) => {
     const options = {
         method: "GET",
         url: API_ENDPOINT + `user/auth/${username}/${password}`,
+        headers: {
+            'content-Type': 'application/json'
+        },
+    };
+    try {
+        return await axios.request(options);
+    } catch (error) {
+        return error;
+    }
+    // api calls
+};
+
+export const userLoginAuth = async ( username, password) => {
+    const options = {
+        method: "GET",
+        url: API_ENDPOINT + `userLogin/auth/${username}/${password}`,
         headers: {
             'content-Type': 'application/json'
         },

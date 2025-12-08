@@ -16,10 +16,14 @@ export const Login = ({ logo }) => {
   const { contextHolder, error } = useAlert();
 
   useEffect(() => {
-    const companyId = localStorage.getItem('cid');
-    if (companyId) {
-      navigate("/main");
-    }
+    //localStorage.removeItem('cid');
+    //localStorage.removeItem('uid');
+    //localStorage.removeItem('email');
+    //localStorage.removeItem('password');
+    //const companyId = localStorage.getItem('cid');
+    //if (companyId) {
+    //  navigate("/main");
+    //}
   });
 
   const onSubmit = async () => {
