@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { get_Date } from './localDate';
+import { get_Date, LocalDate } from './localDate';
 
 const getDay = (date) => {
     const weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
@@ -84,4 +84,26 @@ export const compareTimes=(time1, time2)=> {
     if (h1 > h2 || (h1 === h2 && m1 > m2)) return 1;   // time1 is later
     if (h1 < h2 || (h1 === h2 && m1 < m2)) return -1;  // time1 is earlier
     return 0;                                          // times are equal
+}
+
+export const getFutureDates=(numberOfDays)=> {
+    const dates = [];
+    const weekdays = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+    for (let i = 1; i <= numberOfDays; i++) {
+        let today = new Date(LocalDate());
+        const futureDate = new Date(today); // Create a new Date object to avoid modifying 'today'
+        futureDate.setDate(today.getDate() + i);
+        const dayName = weekdays[futureDate.getDay()];
+        
+        
+        const date = new Date(futureDate);
+
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, "0");
+        const dd = String(date.getDate()).padStart(2, "0");
+
+
+        dates.push({ key: `${yyyy}-${mm}-${dd}`, label: futureDate.getDate(), weekday: dayName });
+    }
+    return dates;
 }

@@ -27,10 +27,6 @@ const Appointment = ({ orderList, yearList, months }) => {
         })
         setChart(<BarChart dataArray={dataArray} />)
     }, [orderList, currentYear])
-
-    useEffect(() => {
-        setChart(chart);
-    }, [chart])
     
     return (
         <div class='flex flex-col gap-4 w-full'>

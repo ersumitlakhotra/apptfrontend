@@ -49,11 +49,6 @@ const Task = ({ orderList, userList }) => {
         setStackedChart(<StackedBarChart categories={categories} pending={pendingStacked} inprogress={inprocessStacked} completed={completedStacked} cancelled={cancelledStacked} />)
     }, [orderList, currentOption]) 
 
-    useEffect(() => {
-        setChart(chart);
-        setStackedChart(stackedchart);
-    }, [chart, stackedchart])
-
     return (
         <div class='flex flex-col gap-4 w-full'>
             <div class='flex justify-between items-center'>

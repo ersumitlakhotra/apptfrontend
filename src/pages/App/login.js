@@ -17,8 +17,6 @@ export const AppLogin = ({ logo }) => {
     const { contextHolder, error } = useAlert();
 
     useEffect(() => {
-        localStorage.removeItem('compid');
-        localStorage.removeItem('userid');
     }, []);
 
     const onSubmit = async () => {
@@ -27,9 +25,9 @@ export const AppLogin = ({ logo }) => {
             const res = await userLoginAuth(cell, password);
             if (res.status === 200) {
                 if (res.data.data.length === 1)
-                {                         
-                    setLocalStorageWithExpiry('compid', res.data.data.cid);
-                    setLocalStorageWithExpiry('userid', res.data.data.id);
+                {                    
+                    setLocalStorageWithExpiry('companyId', res.data.data[0].cid);
+                    setLocalStorageWithExpiry('userId', res.data.data[0].id);
                     // setLocalStorageWithExpiry('password', password, 720);
                     navigate("/home"); //success('Login Successfully');   
                 }

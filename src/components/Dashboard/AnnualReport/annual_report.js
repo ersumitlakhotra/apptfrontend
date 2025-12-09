@@ -35,10 +35,7 @@ const AnnualReport = ({ orderList, expensesList, yearList, months }) => {
         })
         setChart(<AreaChart sales={salesArray} expense={expenseArray} categoriesArray={months} />);
     }, [orderList,currentYear])
-   
-    useEffect(() => {
-        setChart(chart);
-    }, [chart])
+
 
     return (
         <div class='flex flex-col gap-4 w-full'>
