@@ -7,6 +7,13 @@ import {  getBorder, getTag } from "../../common/items";
 import { isOpenForWork } from "../../common/general";
 import { convertTo12Hour, generateTimeSlotsWithDate, toHHMM, toMinutes } from "../../common/generateTimeSlots";
 
+function getHeight (start, end)  {
+    let startMinutes = toMinutes(start);
+    let endMinutes = toMinutes(end);
+    let heightInt = (endMinutes - startMinutes) / 15;
+    let setHeight = `${(heightInt * 48) - 4}px`
+    return setHeight;
+};
 const TaskCalender = ({ orderList, servicesList, userList, companyList, trndate, btn_ViewClick }) => {
     const [slots, setSlots] = useState([]);
 
@@ -17,23 +24,6 @@ const TaskCalender = ({ orderList, servicesList, userList, companyList, trndate,
             setSlots(generateTimeSlotsWithDate(trndate, business[0].inTime, toHHMM(outTime), 15, []));
         }
     }, [companyList, trndate])
-
-    const getHeight=(start, end) =>{
-        let startMinutes = toMinutes(start);
-        let endMinutes = toMinutes(end);
-        let heightInt = (endMinutes - startMinutes) / 15;
-        switch (heightInt)
-        {
-            case 1: return 'h-[44px]'
-            case 2: return 'h-[92px]'
-            case 3: return 'h-[140px]'
-            case 4: return 'h-[188px]'
-            case 8: return 'h-[380px]'
-            case 16: return 'h-[764px]'
-            case 32: return 'h-[1532px]'
-            default: return 'h-[44px]'
-        }
-    };
     return (
         <div className='relative h-full w-max min-w-full overflow-auto px-2'>
 
@@ -59,7 +49,7 @@ const TaskCalender = ({ orderList, servicesList, userList, companyList, trndate,
                         {userList.map(a => (
                             <div class=' w-44'>
                                 {orderList.filter(b => b.assignedto === a.id && b.start === item.start).map(c => (
-                                    <div key={c.id} class={`flex flex-col gap-2 px-2 mt-4 border rounded-md text-xs border-s-4 ${getHeight(c.start, c.end)} ${getBorder(c.status)}`}>
+                                    <div key={c.id} style={{ height: getHeight(c.start, c.end)}} class={`flex flex-col gap-2 px-2 mt-4 border rounded-md text-xs border-s-4 ${getBorder(c.status)}`}>
                                         <div class='flex items-center justify-between  font-medium'>
                                             <p class='underline cursor-pointer' onClick={() => btn_ViewClick(c.id)} ># {c.order_no}</p>
                                             <p>$ {c.price}</p>

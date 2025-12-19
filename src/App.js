@@ -12,8 +12,6 @@ import {
 } from "react-router-dom";
 
 import logo from './Images/logo.png'
-import AppLogin  from './pages/App/login.js';
-import Home from './pages/App/home.js';
 
 function App() {
   return (
@@ -24,8 +22,6 @@ function App() {
         <Route path="resetpassword" element={<ResetPassword logo={logo} />} />
         <Route path="main" element={<MasterPage />} />
         <Route path="book-appointment" element={<BookAppointment />} />
-        <Route path="app" element={<AppLogin logo={logo} />} />
-        <Route path="home" element={<Home />} />
       </Routes>
     </Router>
   );

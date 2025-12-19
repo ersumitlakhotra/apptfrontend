@@ -7,9 +7,10 @@ import { TextboxFlex } from "../../common/textbox";
 import { isValidEmail, setCellFormat, setPriceNumberOnly } from "../../common/cellformat";
 import { UserOutlined } from '@ant-design/icons';
 import useAlert from "../../common/alert";
-import { get_Date, LocalDate } from "../../common/localDate";
-import { generateTimeSlotsWithDate } from "../../common/generateTimeSlots";
+import { get_Date, LocalDate, LocalTime } from "../../common/localDate";
+import { generateTimeSlotsWithDate, toMinutes } from "../../common/generateTimeSlots";
 import { compareTimes, isOpenForWork } from "../../common/general";
+import { apiCalls } from "../../hook/apiCall";
 
 const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, userList, companyList, eventList, customerList, saveData, setOpen }) => {
 
@@ -193,29 +194,61 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
     }, [status, price, discount, tax, coupon])
 
     useEffect(() => {
-        if (userList.length !== 0 && timingInfo !== null) {          
-            const business = isOpenForWork(trndate, timingInfo);  
+        onTrnDateChange();
+    }, [trndate, assigned_to,servicesItem])
+
+    const onTrnDateChange = async () => {
+        if (userList.length !== 0 && timingInfo !== null) {
+            const business = isOpenForWork(trndate, timingInfo);
             let appointments = [];
             setSlot('');
             if (business[0].isOpen) {
                 setIsOpen(true);
                 if (assigned_to !== "0") {
                     const user = userList.find(item => item.id === assigned_to);
-                    const employee = isOpenForWork(trndate, user.scheduleinfo[0]);
+                    // const employee = isOpenForWork(trndate, user.scheduleinfo[0]);
                     setEmployeeName(user.fullname);
-                    
-                    if (employee[0].isOpen) {
+                    let inTimeEmployee = '00:00:00';
+                    let outTimeEmployee = '00:00:00';
+                    let isOpenEmployee = false;
+                    //setIsLoading(true);
+                    try {
+                        const Body = JSON.stringify({
+                            cid: localStorage.getItem('cid'),
+                            uid: assigned_to,
+                            trndate: trndate
+                        });
+                        const res = await apiCalls("POST", 'app/schedule/date', null, null, Body);
+                        if (res.status === 200) {
+                            inTimeEmployee = res.data.data.startshift;
+                            outTimeEmployee = res.data.data.endshift;
+                            isOpenEmployee = Boolean(res.data.data.dayoff)
+                        }
+                    }
+                    catch {
+                        inTimeEmployee = '00:00:00';
+                        outTimeEmployee = '00:00:00';
+                        isOpenEmployee = false;
+                    }
+                    //setIsLoading(false);
+
+                    if (isOpenEmployee) {
                         setUserWorking(true);
                         appointments = orderList.filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === assigned_to && a.status !== 'Cancelled' && a.id !== id));
-                        
+
                         let minutes = 0;
                         servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item => { minutes += item.minutes; });
 
-                        let loginTime = compareTimes(business[0].inTime, employee[0].inTime);
-                        let logoutTime = compareTimes(business[0].outTime, employee[0].outTime);
-                        let inTime = loginTime === -1 ? employee[0].inTime : (loginTime === 1 || loginTime === 0) && business[0].inTime;
-                        let outTime = logoutTime === -1 ? business[0].outTime : (logoutTime === 1 || logoutTime === 0) && employee[0].outTime;
-                        let availableSlots = generateTimeSlotsWithDate(trndate, inTime, outTime, minutes === 0 ? 30 : minutes, appointments);                
+                        let loginTime = compareTimes(business[0].inTime, inTimeEmployee);
+                        let logoutTime = compareTimes(business[0].outTime, outTimeEmployee);
+                        let inTime = loginTime === -1 ? inTimeEmployee : (loginTime === 1 || loginTime === 0) && business[0].inTime;
+                        let outTime = logoutTime === -1 ? business[0].outTime : (logoutTime === 1 || logoutTime === 0) && outTimeEmployee;
+
+                        let availableSlots = generateTimeSlotsWithDate(trndate, inTime, outTime, minutes === 0 ? 30 : minutes, appointments);
+                        let localTime = toMinutes(LocalTime('HH:mm'));
+                        if (trndate === LocalDate()) {
+                            availableSlots = availableSlots.filter(item => toMinutes(item.start) >= localTime);
+                        }
                         
                         setMorningSlot(availableSlots.filter(item => item.category === 'Morning'));
                         setAfternoonSlot(availableSlots.filter(item => item.category === 'Afternoon'));
@@ -226,7 +259,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                         }
 
                     }
-                    else 
+                    else
                         setUserWorking(false);
 
                 }
@@ -238,8 +271,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             else
                 setIsOpen(false);
         }
-    }, [trndate, assigned_to,servicesItem])
-
+    }
     return (
         <div class='flex flex-col font-normal gap-3 mt-2'>
             <TextboxFlex label={'Search'} input={

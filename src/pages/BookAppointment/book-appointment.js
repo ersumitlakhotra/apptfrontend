@@ -43,7 +43,6 @@ const BookAppointment = () => {
     const [prevAssigned_To, setPrevAssigned_To] = useState(0);
     
     const [employeeName, setEmployeeName] = useState('');
-    const [employeeSchedule, setEmployeeSchedule] = useState(null);
 
     const [servicesItem, setServicesItem] = useState([]);
     const [prevServicesItem, setPrevServicesItem] = useState([]);
@@ -114,7 +113,7 @@ const BookAppointment = () => {
     }, [cid]);
 
     useEffect(() => {
-        userList.filter(a => a.id === assigned_to).map(item => { setEmployeeName(item.fullname); setEmployeeSchedule(item.scheduleinfo[0]); })
+        userList.filter(a => a.id === assigned_to).map(item => setEmployeeName(item.fullname))
     }, [assigned_to]);
 
     useEffect(() => {
@@ -127,10 +126,10 @@ const BookAppointment = () => {
     }, [servicesItem]);
 
     useEffect(() => {
-        if (employeeSchedule !== null && cid !== 0) {
+        if (cid !== 0) {
             onTrnDateChange();          
         }
-        }, [trndate, employeeSchedule]);
+        }, [trndate]);
 
     const onTrnDateChange = async () => {
         const body = JSON.stringify({ date: get_Date(trndate, 'YYYY-MM-DD').toString(), uid: parseInt(assigned_to) });
@@ -155,20 +154,42 @@ const BookAppointment = () => {
                 setIsOpen(true);
                 if (assigned_to !== 0) {
                     const user = userList.find(item => item.id === assigned_to);
-                    const employee = isOpenForWork(trndate, user.scheduleinfo[0]);
                     setEmployeeName(user.fullname);
 
-                    if (employee[0].isOpen) {
+                    let inTimeEmployee = '00:00:00';
+                    let outTimeEmployee = '00:00:00';
+                    let isOpenEmployee = false;
+                    setIsLoading(true);
+                    try {
+                        const Body = JSON.stringify({
+                            cid: cid,
+                            uid: assigned_to,
+                            trndate: trndate
+                        });
+                        const res = await apiCalls("POST", 'app/schedule/date', null, null, Body);
+                        if (res.status === 200) {
+                            inTimeEmployee = res.data.data.startshift;
+                            outTimeEmployee = res.data.data.endshift;
+                            isOpenEmployee = Boolean(res.data.data.dayoff)
+                        }
+                    }
+                    catch {
+                        inTimeEmployee = '00:00:00';
+                        outTimeEmployee = '00:00:00';
+                        isOpenEmployee = false;
+                    }
+                    setIsLoading(false);
+                    if (isOpenEmployee) {
                         setUserWorking(true);
                         appointments = orderList.filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === assigned_to && a.status !== 'Cancelled' && a.id !== order_id));
 
                         let minutes = 0;
                         servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item => { minutes += item.minutes; });
 
-                        let loginTime = compareTimes(business[0].inTime, employee[0].inTime);
-                        let logoutTime = compareTimes(business[0].outTime, employee[0].outTime);
-                        let inTime = loginTime === -1 ? employee[0].inTime : (loginTime === 1 || loginTime === 0) && business[0].inTime;
-                        let outTime = logoutTime === -1 ? business[0].outTime : (logoutTime === 1 || logoutTime === 0) && employee[0].outTime;
+                        let loginTime = compareTimes(business[0].inTime, inTimeEmployee);
+                        let logoutTime = compareTimes(business[0].outTime, outTimeEmployee);
+                        let inTime = loginTime === -1 ? inTimeEmployee : (loginTime === 1 || loginTime === 0) && business[0].inTime;
+                        let outTime = logoutTime === -1 ? business[0].outTime : (logoutTime === 1 || logoutTime === 0) && outTimeEmployee;
                         setAvailableSlot(generateTimeSlotsWithDate(trndate, inTime, outTime, minutes === 0 ? 30 : minutes, appointments));
                        
                         if (prevTrnDate === trndate && order_id !== 0 && prevAssigned_To === assigned_to && prevServicesItem === servicesItem) {

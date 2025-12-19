@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Badge, Button,  Select, Drawer, Space, Input, Tooltip, Rate, Avatar, Image } from "antd";
-import {  EditOutlined, PlusOutlined, SaveOutlined, UserOutlined, ContainerOutlined } from '@ant-design/icons';
+import {  EditOutlined, PlusOutlined, SaveOutlined, UserOutlined, ContainerOutlined, EyeOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from "react";
 import UserDetail from "../../components/Users/user_detail";
+import UserView from "../../components/Users/user_view.js";
 import { IoSearchOutline } from "react-icons/io5";
 import DataTable from "../../common/datatable";
 import { getTableItem } from "../../common/items";
@@ -12,11 +13,12 @@ import ExportToExcel from "../../common/export.js";
 import { UTC_LocalDateTime } from "../../common/localDate.js";
 
 
-const Users = ({ userList, userPermissionList, logsList, saveData }) => {
+const Users = ({ userList, userPermissionList, logsList, scheduleList, saveData }) => {
     const ref= useRef();
 
 
     const [open, setOpen] = useState(false);
+    const [openView, setOpenView] = useState(false);
     const [title, setTitle] = useState('New')
     const [id, setId] = useState(0);
     const [refresh, setRefresh] = useState(0);
@@ -63,6 +65,11 @@ const Users = ({ userList, userPermissionList, logsList, saveData }) => {
         setRefresh(refresh + 1);
         setId(id);
         setOpen(true);
+    }
+    const btn_ViewClick = (id) => {
+        setRefresh(refresh + 1);
+        setId(id);
+        setOpenView(true);
     }
     const btn_LogsClick = (id) => {
         setId(id);
@@ -148,6 +155,9 @@ const Users = ({ userList, userPermissionList, logsList, saveData }) => {
                                     <Tooltip placement="top" title={'Edit'} >
                                         <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
                                     </Tooltip>
+                                    <Tooltip placement="top" title={'View'} >
+                                        <Button type="link" icon={<EyeOutlined />} onClick={() => btn_ViewClick(item.id)} />
+                                    </Tooltip>
                                     <Tooltip placement="top" title={'Logs'} >
                                         <Button type="link" icon={<ContainerOutlined />} onClick={() => btn_LogsClick(item.id)} />
                                     </Tooltip>
@@ -163,6 +173,12 @@ const Users = ({ userList, userPermissionList, logsList, saveData }) => {
 
                 <UserDetail id={id} refresh={refresh} ref={ref} userList={userList} userPermissionList={userPermissionList} saveData={saveData} setOpen={setOpen} />
             </Drawer>
+
+            {/* Drawer on View*/}
+            <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
+                <UserView id={id} refresh={refresh} userList={userList} scheduleListAll={scheduleList} setOpenView={setOpenView} saveData={saveData} />
+            </Drawer>
+
             {/* Drawer on logs */}
             <Drawer title={"Logs Detail"} placement='right' width={500} onClose={() => setOpenLogs(false)} open={openLogs}>
                 <LogsView id={id} ltype={'Users'} logsList={logsList} userList={userList} servicesList={[]} />

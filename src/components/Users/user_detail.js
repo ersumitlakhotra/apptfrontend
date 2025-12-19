@@ -38,16 +38,6 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
     const [users, setUsers] = useState(false);
     const [sales, setSales] = useState(false);
     const [setting, setSetting] = useState(false);
-
-    const [monday, setMonday] = useState(['09:00:00', '21:00:00', true]);
-    const [tuesday, setTuesday] = useState(['09:00:00', '21:00:00', true]);
-    const [wednesday, setWednesday] = useState(['09:00:00', '21:00:00', true]);
-    const [thursday, setThursday] = useState(['09:00:00', '21:00:00', true]);
-    const [friday, setFriday] = useState(['09:00:00', '21:00:00', true]);
-    const [saturday, setSaturday] = useState(['09:00:00', '21:00:00', true]);
-    const [sunday, setSunday] = useState(['09:00:00', '21:00:00', true]);
-
-
     const { contextHolder, error, warning } = useAlert();
     let refimage=useRef();
 
@@ -61,14 +51,6 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
             setGender('Male'); setStatus('Active');
             setDashboard(true); setTasks(false); setOrder(false); setEvent(false); setPayment(false);
             setCustomer(false); setServices(false); setUsers(false); setSales(false); setSetting(false);
-
-            setMonday(['09:00:00', '21:00:00', true]);
-            setTuesday(['09:00:00', '21:00:00', true]);
-            setWednesday(['09:00:00', '21:00:00', true]);
-            setThursday(['09:00:00', '21:00:00', true]);
-            setFriday(['09:00:00', '21:00:00', true]);
-            setSaturday(['09:00:00', '21:00:00', true]);
-            setSunday(['09:00:00', '21:00:00', true]);
         }
         else {
             const editList = userList.find(item => item.id === id)
@@ -98,40 +80,10 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
                 setSales(b.sales);
                 setSetting(b.setting);
             })
-
-            if (editList.scheduleinfo !== null) {
-                setSunday(editList.scheduleinfo[0].sunday);
-                setMonday(editList.scheduleinfo[0].monday);
-                setTuesday(editList.scheduleinfo[0].tuesday);
-                setWednesday(editList.scheduleinfo[0].wednesday);
-                setThursday(editList.scheduleinfo[0].thursday);
-                setFriday(editList.scheduleinfo[0].friday);
-                setSaturday(editList.scheduleinfo[0].saturday);
-                
-            }
-            else {
-            setMonday(['09:00:00', '21:00:00', true]);
-            setTuesday(['09:00:00', '21:00:00', true]);
-            setWednesday(['09:00:00', '21:00:00', true]);
-            setThursday(['09:00:00', '21:00:00', true]);
-            setFriday(['09:00:00', '21:00:00', true]);
-            setSaturday(['09:00:00', '21:00:00', true]);
-            setSunday(['09:00:00', '21:00:00', true]);  }
-
         }
     }, [refresh])
   
-    function getUserSchedule() {
-        return [{
-            sunday: sunday,
-            monday: monday,
-            tuesday: tuesday,
-            wednesday: wednesday,
-            thursday: thursday,
-            friday: friday,
-            saturday: saturday,
-        }]
-    }
+ 
 
     
     const save = async () => {
@@ -145,7 +97,6 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
                 password: password,
                 role: role,
                 rating: rating,
-                scheduleinfo:getUserSchedule(),
                 status: status,
                 accounttype: accounttype,
                 profilepic: profilepic,
@@ -216,23 +167,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
             setSales={setSales}
             setting={setting}
             setSetting={setSetting}
-        />)),
-        getTabItems('3', 'Schedule', <ClockCircleOutlined/>, <UserSchedule 
-            sunday={sunday}
-            setSunday={setSunday}
-            monday={monday}
-            setMonday={setMonday}
-            tuesday={tuesday}
-            setTuesday={setTuesday}
-            wednesday={wednesday}
-            setWednesday={setWednesday}
-            thursday={thursday}
-            setThursday={setThursday}
-            friday={friday}
-            setFriday={setFriday}
-            saturday={saturday}
-            setSaturday={setSaturday}
-            />)
+        />))
     ];
     const handleFileChange = (event) => {
         const file = event.target.files[0]; // Access the first selected file

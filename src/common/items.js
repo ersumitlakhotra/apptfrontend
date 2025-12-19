@@ -51,12 +51,14 @@ export function getTag  (value, name) {
         case 'UPCOMING':
             return <Tag color='yellow' bordered={false}>{name}</Tag>;
         case 'IN PROGRESS':
+        case 'WORKING':
             return <Tag color='blue' bordered={false}>{name}</Tag>;
         case 'COMPLETED':
         case 'LIVE':
             return <Tag color='green' bordered={false}>{name}</Tag>;
         case 'CANCELLED':
         case 'PAST':
+        case 'OFF':
             return <Tag color='red' bordered={false}>{name}</Tag>;
         default:
             return <Tag color='gray' bordered={false}>{name}</Tag>;

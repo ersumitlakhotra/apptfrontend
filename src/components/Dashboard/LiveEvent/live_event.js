@@ -13,7 +13,7 @@ const LiveEvent = ({ eventList, servicesList, onSelected }) => {
     return (
         <div class='flex flex-col gap-4 w-full'>
             <div class='flex justify-between items-center'>
-                <Badge count={2} color="#52c41a" offset={[15, 10]}>{/*liveList.length*/}
+                <Badge count={liveList === null ? 0 : liveList.length} color="#52c41a" offset={[15, 10]}>{/*liveList.length*/}
                     <span class="text-lg font-semibold text-gray-800">Live Events</span>
                 </Badge>
                 <Button color="primary" variant="outlined" onClick={() => onSelected('Event')} >

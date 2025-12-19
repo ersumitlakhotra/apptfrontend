@@ -48,6 +48,7 @@ const MasterPage = () => {
   const [logsList, setLogsList] = useState([]);
   const [billingList, setBillingList] = useState([]);
   const [customerList, setCustomerList] = useState([]);
+  const [scheduleList, setScheduleList] = useState([]);
   const [userPermissionList, setUserPermissionList] = useState([]);
 
   const [storeName, setStoreName] = useState('');
@@ -342,6 +343,7 @@ const MasterPage = () => {
       case 'Users':
         {
           getData(setLogsList, "logs");
+          getData(setScheduleList, "schedule");
           getData(setUserPermissionList, "userpermission");
           getData(setUserList, "user");
           break;
@@ -440,6 +442,7 @@ const MasterPage = () => {
         userList={userList}
         userPermissionList={userPermissionList}
         logsList={logsList}
+        scheduleList={scheduleList}
         saveData={saveData}
       />;
   } else if (content === 'Sales') {
