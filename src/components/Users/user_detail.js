@@ -25,6 +25,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
     const [rating, setRating] = useState(0);
     const [accounttype, setAccountType] = useState('Basic');
     const [profilepic, setProfile] = useState(null);
+    const [appschedule, setAppSchedule] = useState(true);
     const [status, setStatus] = useState('Active');
 
 
@@ -48,7 +49,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
             setCell(''); setEmail(''); setAddress('');
             setUsername(''); setPassword(''); setRole('Employee'); setRating(0);
             setAccountType('Basic'); setProfile(null);
-            setGender('Male'); setStatus('Active');
+            setGender('Male'); setStatus('Active');setAppSchedule(true);
             setDashboard(true); setTasks(false); setOrder(false); setEvent(false); setPayment(false);
             setCustomer(false); setServices(false); setUsers(false); setSales(false); setSetting(false);
         }
@@ -66,6 +67,8 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
             setAccountType(editList.accounttype);
             setProfile(editList.profilepic);
             setStatus(editList.status);
+            setAppSchedule(Boolean(editList.appschedule));
+
             userPermissionList.filter(a => a.uid === id).map(b => {
                 setDashboard(b.dashboard);
                 setTasks(b.tasks);
@@ -97,6 +100,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
                 password: password,
                 role: role,
                 rating: rating,
+                appschedule: appschedule,
                 status: status,
                 accounttype: accounttype,
                 profilepic: profilepic,
@@ -144,6 +148,8 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
             setRole={setRole}
             status={status}
             setStatus={setStatus}
+            appschedule={appschedule}
+            setAppSchedule={setAppSchedule}
             />),
             (role === 'User' &&
         getTabItems('2', 'Permissions', <EyeOutlined />, <UserLoginPermissions

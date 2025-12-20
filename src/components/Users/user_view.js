@@ -1,12 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Avatar, Button, DatePicker,  Image,  Popover, Rate, Tooltip } from "antd";
-import {  UserOutlined, PlusOutlined, EditOutlined } from '@ant-design/icons';
+import { Avatar, Badge, Button, DatePicker, Image, Popover, Rate, Tooltip } from "antd";
+import { UserOutlined, PlusOutlined, EditOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import { firstDateOfMonth, get_Date, lastDateOfMonth, LocalDate, UTC_LocalDateTime } from "../../common/localDate";
 import dayjs from 'dayjs';
 import DataTable from "../../common/datatable";
 import { getTableItem } from "../../common/items";
 import { Tags } from "../../common/tags";
+import { LuSquareCheckBig } from "react-icons/lu";
 
 function convertTo12Hour(time24) {
     let [hour, minute] = time24.split(":");
@@ -15,9 +16,53 @@ function convertTo12Hour(time24) {
     hour = hour % 12 || 12; // convert 0 → 12
     return `${hour.toString().padStart(2, "0")}:${minute} ${ampm}`;
 }
-const UserView = ({ id, refresh, userList, scheduleListAll, setOpenView, saveData }) => {
+function calculateTime(startTime, endTime) {
+    const [sh, sm, ss] = startTime.split(':').map(Number);
+    const [eh, em, es] = endTime.split(':').map(Number);
+
+    const startMinutes = sh * 60 + sm + ss / 60;
+    const endMinutes = eh * 60 + em + es / 60;
+
+    let diffMinutes = endMinutes - startMinutes;
+
+    // Handle overnight time (e.g. 22:00:00 → 06:00:00)
+    if (diffMinutes < 0) {
+        diffMinutes += 24 * 60;
+    }
+
+    const hours = Math.floor(diffMinutes / 60);
+    const minutes = Math.floor(diffMinutes % 60);
+
+    return { hours, minutes };
+}
+function getMinutes(start, end) {
+    const [sh, sm, ss] = start.split(':').map(Number);
+    const [eh, em, es] = end.split(':').map(Number);
+
+    // Convert start and end times to total minutes
+    const startTotalMinutes = sh * 60 + sm + ss / 60;
+    const endTotalMinutes = eh * 60 + em + es / 60;
+
+    // Calculate difference in minutes
+    let diffMinutes = endTotalMinutes - startTotalMinutes;
+
+    return Math.floor(diffMinutes);
+}
+function convertMinutesIntoHours(totalMinutes) {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return { hours, minutes };
+}
+const UserView = ({ id, refresh, userList, scheduleListAll, saveData }) => {
     const [scheduleList, setScheduleList] = useState([]);
     const [filteredList, setFilteredList] = useState([]);
+    const [startShift, setStartShift] = useState('00:00 AM');
+    const [endShift, setEndShift] = useState('00:00 PM');
+    const [todayHours, setTodayHours] = useState('0');
+    const [isWorking, setIsWorking] = useState('Day Off');
+    const [workingDays, setWorkingDays] = useState(0);
+    const [daysOff, setDayOff] = useState(0);
+    const [totalHours, setTotalHours] = useState(0);
     //const filteredOptionsServices = servicesList.filter(o => !selectedItems.includes(o));
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -32,7 +77,9 @@ const UserView = ({ id, refresh, userList, scheduleListAll, setOpenView, saveDat
         setFilteredList(list);
         setExportList(list);
         setPage(1, 10, list);
-    }, [id])
+        setToday();
+        scheduleSummary();
+    }, [refresh, fromDate, toDate])
 
     const setPage = (page, pageSize, list = []) => {
         const indexOfLastItem = page * pageSize;
@@ -45,10 +92,39 @@ const UserView = ({ id, refresh, userList, scheduleListAll, setOpenView, saveDat
         getTableItem('1', 'Date'),
         getTableItem('2', 'Start'),
         getTableItem('3', 'End'),
-        getTableItem('4', 'Status'),
-        getTableItem('5', 'Last Modified'),
-        getTableItem('6', 'Action'),
+        getTableItem('4', 'Hours'),
+        getTableItem('5', 'Status'),
+        getTableItem('6', 'Last Modified'),
+        getTableItem('7', 'Action'),
     ];
+
+    const setToday = () => {
+        setStartShift('00:00 AM');
+        setEndShift('00:00 PM');
+        setTodayHours('0');
+        setIsWorking('Day Off');
+        scheduleListAll.filter(item => String(item.uid) === String(id) && get_Date(item.trndate, 'YYYY-MM-DD') === LocalDate()).map(data => {
+            setStartShift(convertTo12Hour(data.startshift));
+            setEndShift(convertTo12Hour(data.endshift));
+            const result = calculateTime(data.startshift, data.endshift);
+            setTodayHours(`${result.hours}h ${result.minutes}m`);
+            setIsWorking(Boolean(data.dayoff) ? 'Working' : "Day Off")
+        })
+    }
+ const scheduleSummary = () => {   
+        let list = scheduleListAll.filter(item => get_Date(item.trndate, 'YYYY-MM-DD') >= fromDate && get_Date(item.trndate, 'YYYY-MM-DD') <= toDate);
+        
+        const workingList = list.filter(item => item.dayoff);
+        setWorkingDays(workingList.length);
+        setDayOff(list.filter(item => !item.dayoff).length);
+        let hours=0
+        workingList.map((item,index) => {
+            hours += getMinutes(item.startshift, item.endshift)
+        }) 
+        const result = convertMinutesIntoHours(hours);
+        setTotalHours(`${result.hours}h ${result.minutes}m`)
+    }
+
     return (
         <div class="flex flex-col gap-2 mb-12  w-full">
 
@@ -73,57 +149,116 @@ const UserView = ({ id, refresh, userList, scheduleListAll, setOpenView, saveDat
                     <Button type="primary" icon={<PlusOutlined />} size="large">Add schedule</Button>
                 </div>
             </div>
+            <div class='flex flex-col md:flex-row gap-4 mt-6'>
+                <div class='w-full md:w-9/12 bg-white border rounded-lg p-4 flex flex-col gap-4 '>
+                       
+                        <div class='flex flex-col md:flex-row md:justify-end gap-4 '>
+                            <Popover placement="bottom" title={"Filter by From Date"} content={
+                                <div>
+                                    <DatePicker
+                                        style={{ width: '100%' }}
+                                        allowClear={false}
+                                        value={fromDate === '' ? fromDate : dayjs(fromDate, 'YYYY-MM-DD')}
+                                        onChange={(date, dateString) => setFromDate(dateString)} />
+                                </div>
+                            }>
+                                <Button className="text-xs"><span class='font-medium'>From Date :  </span><span class='text-blue-500'> {fromDate}  </span></Button>
+                            </Popover>
+                            <Popover placement="bottom" title={"Filter by To Date"} content={
+                                <div>
+                                    <DatePicker
+                                        style={{ width: '100%' }}
+                                        allowClear={false}
+                                        value={toDate === '' ? toDate : dayjs(toDate, 'YYYY-MM-DD')}
+                                        onChange={(date, dateString) => setToDate(dateString)} />
+                                </div>
+                            }>
+                                <Button className="text-xs"><span class='font-medium'>To Date :  </span><span class='text-blue-500'> {toDate}  </span></Button>
+                            </Popover>
 
-            <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 mt-4 '>
-                <div class='flex flex-col md:flex-row md:justify-end gap-4 '>
-                    <Popover placement="bottom" title={"Filter by From Date"} content={
-                        <div>
-                            <DatePicker
-                                style={{ width: '100%' }}
-                                allowClear={false}
-                                value={fromDate === '' ? fromDate : dayjs(fromDate, 'YYYY-MM-DD')}
-                                onChange={(date, dateString) => setFromDate(dateString)} />
                         </div>
-                    }>
-                        <Button className="text-xs"><span class='font-medium'>From Date :  </span><span class='text-blue-500'> {fromDate}  </span></Button>
-                    </Popover>
-                    <Popover placement="bottom" title={"Filter by To Date"} content={
-                        <div>
-                            <DatePicker
-                                style={{ width: '100%' }}
-                                allowClear={false}
-                                value={toDate === '' ? toDate : dayjs(toDate, 'YYYY-MM-DD')}
-                                onChange={(date, dateString) => setToDate(dateString)} />
-                        </div>
-                    }>
-                        <Button className="text-xs"><span class='font-medium'>To Date :  </span><span class='text-blue-500'> {toDate}  </span></Button>
-                    </Popover>
 
+                    <DataTable headerItems={headerItems} list={scheduleList}
+                        onChange={(page, pageSize) => {
+                            setCurrentPage(page);
+                            setItemsPerPage(pageSize);
+                            setPage(page, pageSize, scheduleList)
+                        }}
+                        body={(
+                            filteredList.map(item => {
+                                const result = calculateTime(item.startshift, item.endshift);
+                                return (
+                                    <tr key={item.id} class="bg-white border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50 ">
+                                        <td class="p-3 font-bold ">{get_Date(item.trndate, 'DD MMM YYYY')}</td>
+                                        <td class="p-3 ">{convertTo12Hour(item.startshift)}</td>
+                                        <td class="p-3 ">{convertTo12Hour(item.endshift)}</td>
+                                        <td class="p-3 font-body ">{`${result.hours}h ${result.minutes}m`}</td>
+                                        <td class="p-3">{Tags(item.dayoff ? "Working" : "Day off")}</td>
+                                        <td class="p-3 ">{UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A')}</td>
+                                        <td class="p-3">
+                                            <Tooltip placement="top" title={'Edit'} >
+                                                <Button type="link" icon={<EditOutlined />} />
+                                            </Tooltip>
+                                        </td>
+                                    </tr>
+                                )
+                            })
+                        )} />
                 </div>
 
-                <DataTable headerItems={headerItems} list={filteredList}
-                    onChange={(page, pageSize) => {
-                        setCurrentPage(page);
-                        setItemsPerPage(pageSize);
-                        setPage(page, pageSize, scheduleList)
-                    }}
-                    body={(
-                        filteredList.map(item => (
-                            <tr key={item.id} class="bg-white border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50 ">
-                                <td class="p-3 font-bold ">{get_Date(item.trndate, 'DD MMM YYYY')}</td>
-                                <td class="p-3 ">{convertTo12Hour(item.startshift)}</td>
-                                <td class="p-3 ">{convertTo12Hour(item.endshift)}</td>
-                                <td class="p-3">{Tags(item.dayoff ? "Working":"Day off")}</td>
-                                <td class="p-3 ">{UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A')}</td>
-                                <td class="p-3">
-                                    <Tooltip placement="top" title={'Edit'} >
-                                        <Button type="link" icon={<EditOutlined />} />
-                                    </Tooltip>
-                                </td>
-                            </tr>
-                        ))
-                    )} />
+                <div class='w-full md:w-3/12  flex flex-col gap-4 '>
+                    <div class='border rounded bg-white p-4 flex flex-col gap-4'>
+                        <div class='flex flex-row items-center justify-between'>
+                            <div class='flex flex-col'>
+                                <span class="text-lg font-bold text-gray-800">Today</span>
+                                <span class="text-xs text-gray-400">{UTC_LocalDateTime(LocalDate(), 'MMM DD YYYY')}</span>
+                            </div>
+                            {Tags(isWorking ? "Working" : "Day off")}
+                        </div>
+
+                        <div class='border rounded bg-gray-100 flex flex-col gap-2 p-4 px-8'>
+                            <div class='flex items-start justify-between text-xs'>
+                                <span class=" text-gray-600">Start</span>
+                                <span class="font-semibold text-black">{startShift}</span>
+                            </div>
+                            <div class='flex items-start justify-between text-xs'>
+                                <span class=" text-gray-600">End</span>
+                                <span class="font-semibold text-black">{endShift}</span>
+                            </div>
+                            <div class='flex items-start justify-between text-xs'>
+                                <span class=" text-gray-600">Hours</span>
+                                <span class="font-semibold text-black">{todayHours}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class='border rounded bg-white p-4 flex flex-col gap-4'>
+                        <div class='flex flex-row items-center justify-between'>
+                            <div class='flex flex-col'>
+                                <span class="text-lg font-bold text-gray-800">Schedule Summary</span>
+                                <span class="text-xs text-gray-400">{`${UTC_LocalDateTime(fromDate, 'MMM DD YYYY')} - ${UTC_LocalDateTime(toDate, 'MMM DD YYYY')}`}</span>
+                            </div>
+                        </div>
+
+                        <div class='border rounded bg-gray-100 flex flex-col gap-2 p-4 px-8'>
+                            <div class='flex items-start justify-between text-xs'>
+                                <span class=" text-gray-600">Working Days</span>
+                                <span class="font-semibold text-black">{workingDays}</span>
+                            </div>
+                            <div class='flex items-start justify-between text-xs'>
+                                <span class=" text-gray-600">Day Off</span>
+                                <span class="font-semibold text-black">{daysOff}</span>
+                            </div>
+                            <div class='flex items-start justify-between text-xs'>
+                                <span class=" text-gray-600">Total Hours</span>
+                                <span class="font-semibold text-black">{totalHours}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+           
         </div>
     )
 }

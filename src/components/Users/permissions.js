@@ -4,7 +4,7 @@ import { TextboxFlex } from "../../common/textbox";
 
 const UserLoginPermissions = ({ dashboard, setDashboard, tasks, setTasks, order, setOrder, event, setEvent, payment, setPayment, customer, setCustomer ,services ,setServices ,  
             users ,setUsers ,sales ,setSales ,setting ,setSetting  }) => {
-    const Checked = 'Allowed'; const Unchecked = 'Blocked';
+    const Checked = 'On'; const Unchecked = 'Off';
     return (
         <div class='flex flex-col font-normal gap-2 mt-2'>
 

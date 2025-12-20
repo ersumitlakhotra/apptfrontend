@@ -155,7 +155,7 @@ const Users = ({ userList, userPermissionList, logsList, scheduleList, saveData 
                                     <Tooltip placement="top" title={'Edit'} >
                                         <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
                                     </Tooltip>
-                                    <Tooltip placement="top" title={'View'} >
+                                    <Tooltip placement="top" title={'Schedule'} >
                                         <Button type="link" icon={<EyeOutlined />} onClick={() => btn_ViewClick(item.id)} />
                                     </Tooltip>
                                     <Tooltip placement="top" title={'Logs'} >
@@ -175,8 +175,8 @@ const Users = ({ userList, userPermissionList, logsList, scheduleList, saveData 
             </Drawer>
 
             {/* Drawer on View*/}
-            <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
-                <UserView id={id} refresh={refresh} userList={userList} scheduleListAll={scheduleList} setOpenView={setOpenView} saveData={saveData} />
+            <Drawer title={""} placement='bottom' height={'95%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
+                <UserView id={id} refresh={refresh} userList={userList} scheduleListAll={scheduleList} saveData={saveData} />
             </Drawer>
 
             {/* Drawer on logs */}
