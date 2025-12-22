@@ -1,19 +1,65 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { get_Date, LocalDate } from "../../../common/localDate";
-import { Avatar, Image } from "antd";
-import { UserOutlined } from '@ant-design/icons';
+import { Avatar, Button, Dropdown, Image, Space } from "antd";
+import { DownOutlined, UserOutlined } from '@ant-design/icons';
 import { Tags } from "../../../common/tags";
 import { convertTo12Hour } from "../../../common/general";
+import { useEffect, useState } from "react";
+import dayjs from 'dayjs';
 
 const Schedule = ({ scheduleList, userList }) => {
+    const [currentOption, setCurrentOption] = useState('Today');
+    const [filteredList,setFilteredList]= useState([]);
+    const items = [
+        { key: 'Today', label: 'Today' },
+        { key: 'Tomorrow', label: 'Tomorrow' },
+        { key: 'The Next Day', label: 'The Next Day' },
+    ];
+    const onItemChanged = e => { setCurrentOption(e.key) };
+    const menuProps = { items, onClick: onItemChanged, };
+
+    useEffect(() => {
+        filterSchedule();
+    }, [currentOption, scheduleList])
+
+    const filterSchedule=() => {
+        let editList = [];
+        if (currentOption === 'Today')
+            editList = scheduleList.filter(item => get_Date(item.trndate, 'YYYY-MM-DD') === LocalDate())
+        else if (currentOption === 'Tomorrow') {
+            editList = scheduleList.filter(item => get_Date(item.trndate, 'YYYY-MM-DD') === dayjs(LocalDate()).add(1, 'day').format('YYYY-MM-DD'))
+        }
+        else {
+            editList = scheduleList.filter(item => get_Date(item.trndate, 'YYYY-MM-DD') === dayjs(LocalDate()).add(2, 'day').format('YYYY-MM-DD'))
+        }
+
+        if (editList.length === 0)
+            setFilteredList([]);
+        else
+            setFilteredList(editList);
+    }
+
     return (
         <div class='flex  flex-col gap-4 w-full'>
-            <span class="text-lg font-semibold text-gray-800">Today Schedule</span>
+            <div class='flex justify-between items-center'>
+                <span class="text-lg font-semibold text-gray-800">Schedule</span>
+                <Dropdown menu={menuProps}>
+                    <Button>
+                        <Space>
+                            {currentOption}
+                            <DownOutlined />
+                        </Space>
+                    </Button>
+                </Dropdown>
+            </div>
             <div class='w-full bg-white border rounded p-5 flex flex-col gap-6  text-gray-500 max-h-[460px] h-[460px]  overflow-y-auto'>
                 {userList.map(user => {
                     let start = '00:00:00';
                     let end = '00:00:00';
                     let isWorking = false;
-                    scheduleList.filter(item => String(item.uid) === String(user.id) && get_Date(item.trndate, 'YYYY-MM-DD') === LocalDate()).map(
+                    filteredList.filter(item => String(item.uid) === String(user.id)
+                        //currentOption === 'Tomorrow' ? get_Date(item.trndate, 'YYYY-MM-DD') === current.add(1, 'day').format('YYYY-MM-DD') : get_Date(item.trndate, 'YYYY-MM-DD') === LocalDate() 
+                    ).map(
                         sch => {
                             start = sch.startshift;
                             end = sch.endshift;
