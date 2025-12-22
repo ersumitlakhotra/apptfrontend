@@ -107,3 +107,79 @@ export const getFutureDates=(numberOfDays)=> {
     }
     return dates;
 }
+
+export function convertTo12Hour(time24) {
+    let [hour, minute] = time24.split(":");
+    hour = parseInt(hour);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12; // convert 0 → 12
+    return `${hour.toString().padStart(2, "0")}:${minute} ${ampm}`;
+}
+export function calculateTime(startTime, endTime) {
+    const [sh, sm, ss] = startTime.split(':').map(Number);
+    const [eh, em, es] = endTime.split(':').map(Number);
+
+    const startMinutes = sh * 60 + sm + ss / 60;
+    const endMinutes = eh * 60 + em + es / 60;
+
+    let diffMinutes = endMinutes - startMinutes;
+
+    // Handle overnight time (e.g. 22:00:00 → 06:00:00)
+    if (diffMinutes < 0) {
+        diffMinutes += 24 * 60;
+    }
+
+    const hours = Math.floor(diffMinutes / 60);
+    const minutes = Math.floor(diffMinutes % 60);
+
+    return { hours, minutes };
+}
+export function getMinutes(start, end) {
+    const [sh, sm, ss] = start.split(':').map(Number);
+    const [eh, em, es] = end.split(':').map(Number);
+
+    // Convert start and end times to total minutes
+    const startTotalMinutes = sh * 60 + sm + ss / 60;
+    const endTotalMinutes = eh * 60 + em + es / 60;
+
+    // Calculate difference in minutes
+    let diffMinutes = endTotalMinutes - startTotalMinutes;
+
+    return Math.floor(diffMinutes);
+}
+export function convertMinutesIntoHours(totalMinutes) {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return { hours, minutes };
+}
+
+export function createDateSeries(startDate, endDate) {
+    const dates = [];
+    let current = new Date(startDate);
+    const end = new Date(endDate);
+
+    while (current <= end) {
+        dates.push(current.toISOString().split('T')[0]);
+        current.setDate(current.getDate() + 1);
+    }
+    return dates;
+}
+export function isoToLocalTime(isoString) {
+    const date = new Date(isoString); // convert ISO to Date
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+
+    return `${hours}:${minutes}:${seconds}`;
+}
+export function isTimeGreater(time1, time2) {
+    const [h1, m1, s1] = time1.split(':').map(Number);
+    const [h2, m2, s2] = time2.split(':').map(Number);
+
+    // Convert both times to total seconds
+    const totalSeconds1 = h1 * 3600 + m1 * 60 + s1;
+    const totalSeconds2 = h2 * 3600 + m2 * 60 + s2;
+
+    // Compare
+    return totalSeconds1 > totalSeconds2;
+}

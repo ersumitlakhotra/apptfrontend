@@ -60,9 +60,9 @@ const Hours = ({ companyList, saveData, setRefresh }) => {
         if (timeString[0] === '' && timeString[1] === '')
             setDay(['00:00:00', '00:00:00', day[2]])
         else
-            setDay([timeString[0], timeString[1], day[2]])
+            setDay([dayjs(timeString[0], 'h:mm a').format('HH:mm:ss'), dayjs(timeString[1], 'h:mm a').format('HH:mm:ss'), day[2]])
     };
-
+    
     const update = (day, setDay, OpenClosed) => {
         const updatedItems = [...day]
         updatedItems[2] = OpenClosed;
@@ -104,7 +104,11 @@ const Hours = ({ companyList, saveData, setRefresh }) => {
                     <div class={`border-b p-4 ps-6 flex flex-row gap-4  items-center`}>
                         <p class='w-28 font-medium text-gray-500'>Monday</p>
                         <RangePicker placeholder={['Start', 'End']}
-                            value={[dayjs(monday[0], 'HH:mm:ss'), dayjs(monday[1], 'HH:mm:ss')]}
+                            allowClear={false}
+                            use12Hours
+                            showSecond={false}
+                            format={"h:mm a"}
+                            value={[dayjs(monday[0], 'HH:mm'), dayjs(monday[1], 'HH:mm')]}
                             onChange={(time, timeString) => timeChange(time, timeString, monday, setMonday)} />
                         <Switch checkedChildren="Open" unCheckedChildren="Closed" defaultChecked={monday[2]}
                             onChange={(e) => update(monday, setMonday, e)} />
@@ -112,7 +116,11 @@ const Hours = ({ companyList, saveData, setRefresh }) => {
                     <div class={`border-b p-4 ps-6 flex flex-row gap-4  items-center`}>
                         <p class='w-28 font-medium text-gray-500'>Tuesday</p>
                         <RangePicker placeholder={['Start', 'End']}
-                            value={[dayjs(tuesday[0], 'HH:mm:ss'), dayjs(tuesday[1], 'HH:mm:ss')]}
+                            allowClear={false}
+                            use12Hours
+                            showSecond={false}
+                            format={"h:mm a"}
+                            value={[dayjs(tuesday[0], 'HH:mm'), dayjs(tuesday[1], 'HH:mm')]}
                             onChange={(time, timeString) => timeChange(time, timeString, tuesday, setTuesday)} />
                         <Switch checkedChildren="Open" unCheckedChildren="Closed" defaultChecked={tuesday[2]}
                             onChange={(e) => update(tuesday, setTuesday, e)} />
@@ -120,7 +128,11 @@ const Hours = ({ companyList, saveData, setRefresh }) => {
                     <div class={`border-b p-4 ps-6 flex flex-row gap-4  items-center`}>
                         <p class='w-28 font-medium text-gray-500'>Wednesday</p>
                         <RangePicker placeholder={['Start', 'End']}
-                            value={[dayjs(wednesday[0], 'HH:mm:ss'), dayjs(wednesday[1], 'HH:mm:ss')]}
+                            allowClear={false}
+                            use12Hours
+                            showSecond={false}
+                            format={"h:mm a"}
+                            value={[dayjs(wednesday[0], 'HH:mm'), dayjs(wednesday[1], 'HH:mm')]}
                             onChange={(time, timeString) => timeChange(time, timeString, wednesday, setWednesday)} />
                         <Switch checkedChildren="Open" unCheckedChildren="Closed" defaultChecked={wednesday[2]}
                             onChange={(e) => update(wednesday, setWednesday, e)} />
@@ -128,7 +140,11 @@ const Hours = ({ companyList, saveData, setRefresh }) => {
                     <div class={`border-b p-4 ps-6 flex flex-row gap-4  items-center`}>
                         <p class='w-28 font-medium text-gray-500'>Thursday</p>
                         <RangePicker placeholder={['Start', 'End']}
-                            value={[dayjs(thursday[0], 'HH:mm:ss'), dayjs(thursday[1], 'HH:mm:ss')]}
+                            allowClear={false}
+                            use12Hours
+                            showSecond={false}
+                            format={"h:mm a"}
+                            value={[dayjs(thursday[0], 'HH:mm'), dayjs(thursday[1], 'HH:mm')]}
                             onChange={(time, timeString) => timeChange(time, timeString, thursday, setThursday)} />
                         <Switch checkedChildren="Open" unCheckedChildren="Closed" defaultChecked={thursday[2]}
                             onChange={(e) => update(thursday, setThursday, e)} />
@@ -136,7 +152,11 @@ const Hours = ({ companyList, saveData, setRefresh }) => {
                     <div class={`border-b p-4 ps-6 flex flex-row gap-4  items-center`}>
                         <p class='w-28 font-medium text-gray-500'>Friday</p>
                         <RangePicker placeholder={['Start', 'End']}
-                            value={[dayjs(friday[0], 'HH:mm:ss'), dayjs(friday[1], 'HH:mm:ss')]}
+                            allowClear={false}
+                            use12Hours
+                            showSecond={false}
+                            format={"h:mm a"}
+                            value={[dayjs(friday[0], 'HH:mm'), dayjs(friday[1], 'HH:mm')]}
                             onChange={(time, timeString) => timeChange(time, timeString, friday, setFriday)} />
                         <Switch checkedChildren="Open" unCheckedChildren="Closed" defaultChecked={friday[2]}
                             onChange={(e) => update(friday, setFriday, e)} />
@@ -144,7 +164,11 @@ const Hours = ({ companyList, saveData, setRefresh }) => {
                     <div class={`border-b p-4 ps-6 flex flex-row gap-4  items-center`}>
                         <p class='w-28 font-medium text-gray-500'>Saturday</p>
                         <RangePicker placeholder={['Start', 'End']}
-                            value={[dayjs(saturday[0], 'HH:mm:ss'), dayjs(saturday[1], 'HH:mm:ss')]}
+                            allowClear={false}
+                            use12Hours
+                            showSecond={false}
+                            format={"h:mm a"}
+                            value={[dayjs(saturday[0], 'HH:mm'), dayjs(saturday[1], 'HH:mm')]}
                             onChange={(time, timeString) => timeChange(time, timeString, saturday, setSaturday)} />
                         <Switch checkedChildren="Open" unCheckedChildren="Closed" defaultChecked={saturday[2]}
                             onChange={(e) => update(saturday, setSaturday, e)} />
@@ -152,7 +176,11 @@ const Hours = ({ companyList, saveData, setRefresh }) => {
                     <div class={`p-4 ps-6 flex flex-row gap-4  items-center`}>
                         <p class='w-28 font-medium text-gray-500'>Sunday</p>
                         <RangePicker placeholder={['Start', 'End']}
-                            value={[dayjs(sunday[0], 'HH:mm:ss'), dayjs(sunday[1], 'HH:mm:ss')]}
+                            allowClear={false}
+                            use12Hours
+                            showSecond={false}
+                            format={"h:mm a"}
+                            value={[dayjs(sunday[0], 'HH:mm'), dayjs(sunday[1], 'HH:mm')]}
                             onChange={(time, timeString) => timeChange(time, timeString, sunday, setSunday)} />
                         <Switch checkedChildren="Open" unCheckedChildren="Closed" defaultChecked={sunday[2]}
                             onChange={(e) => update(sunday, setSunday, e)} />

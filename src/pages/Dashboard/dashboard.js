@@ -12,8 +12,9 @@ import { useEffect, useState } from "react";
 import { get_Date, lastDateOfMonth } from "../../common/localDate.js";
 import dayjs from 'dayjs';
 import { AreaChartCard } from "../../components/Dashboard/Charts/charts.js";
+import Schedule from "../../components/Dashboard/Schedule/schedule.js";
 
-const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList, logsList, companyList, onSelected }) => {  
+const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList, logsList, companyList, scheduleList, onSelected }) => {  
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
     const [orderChart, setOrderChart] = useState(null);
     const [totalOrders, setTotalOrders] = useState(0);
@@ -110,7 +111,7 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList,
                 <div class='flex flex-col gap-4 w-full md:w-2/6'>
                     <LiveEvent eventList={eventList} servicesList={servicesList} onSelected={onSelected} />
                     <RecentActivities orderList={orderList} userList={userList} eventList={eventList} servicesList={servicesList} expensesList={expensesList} logsList={logsList} />  
-                    <Statistics orderList={orderList} />                        
+                    <Schedule scheduleList={scheduleList} userList={userList} />                        
                 </div>
             </div>   
 

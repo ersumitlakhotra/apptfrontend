@@ -59,7 +59,7 @@ const RecentActivities = ({ orderList, expensesList, servicesList, userList, eve
                         logsData.map(item =>                                                                                 
                                 <Badge.Ribbon
                                     key={item.id}
-                                    text={item.ltype}
+                                    text={item.ltype +' ' + item.status}
                                     color={item.status.toUpperCase() === "CREATED" ? "yellow" : item.status.toUpperCase() === "MODIFIED" ? "blue" : "red"} >
                                     <Collapse
                                         items={[{

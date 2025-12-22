@@ -1,65 +1,23 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Avatar, Badge, Button, DatePicker, Image, Popover, Rate, Tooltip } from "antd";
-import { UserOutlined, PlusOutlined, EditOutlined } from '@ant-design/icons';
-import { useEffect, useState } from "react";
+import { Avatar, Badge, Button, DatePicker, Drawer, Image, Popover, Rate, Space, Tooltip } from "antd";
+import { UserOutlined, PlusOutlined, EditOutlined, SaveOutlined } from '@ant-design/icons';
+import { useEffect, useRef, useState } from "react";
 import { firstDateOfMonth, get_Date, lastDateOfMonth, LocalDate, UTC_LocalDateTime } from "../../common/localDate";
 import dayjs from 'dayjs';
 import DataTable from "../../common/datatable";
 import { getTableItem } from "../../common/items";
 import { Tags } from "../../common/tags";
-import { LuSquareCheckBig } from "react-icons/lu";
+import { convertTo12Hour, calculateTime, getMinutes, convertMinutesIntoHours } from "../../common/general";
+import ScheduleDetail from "./schedule_detail";
 
-function convertTo12Hour(time24) {
-    let [hour, minute] = time24.split(":");
-    hour = parseInt(hour);
-    const ampm = hour >= 12 ? "PM" : "AM";
-    hour = hour % 12 || 12; // convert 0 → 12
-    return `${hour.toString().padStart(2, "0")}:${minute} ${ampm}`;
-}
-function calculateTime(startTime, endTime) {
-    const [sh, sm, ss] = startTime.split(':').map(Number);
-    const [eh, em, es] = endTime.split(':').map(Number);
-
-    const startMinutes = sh * 60 + sm + ss / 60;
-    const endMinutes = eh * 60 + em + es / 60;
-
-    let diffMinutes = endMinutes - startMinutes;
-
-    // Handle overnight time (e.g. 22:00:00 → 06:00:00)
-    if (diffMinutes < 0) {
-        diffMinutes += 24 * 60;
-    }
-
-    const hours = Math.floor(diffMinutes / 60);
-    const minutes = Math.floor(diffMinutes % 60);
-
-    return { hours, minutes };
-}
-function getMinutes(start, end) {
-    const [sh, sm, ss] = start.split(':').map(Number);
-    const [eh, em, es] = end.split(':').map(Number);
-
-    // Convert start and end times to total minutes
-    const startTotalMinutes = sh * 60 + sm + ss / 60;
-    const endTotalMinutes = eh * 60 + em + es / 60;
-
-    // Calculate difference in minutes
-    let diffMinutes = endTotalMinutes - startTotalMinutes;
-
-    return Math.floor(diffMinutes);
-}
-function convertMinutesIntoHours(totalMinutes) {
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    return { hours, minutes };
-}
 const UserView = ({ id, refresh, userList, scheduleListAll, saveData }) => {
+    const ref= useRef();
     const [scheduleList, setScheduleList] = useState([]);
     const [filteredList, setFilteredList] = useState([]);
     const [startShift, setStartShift] = useState('00:00 AM');
     const [endShift, setEndShift] = useState('00:00 PM');
     const [todayHours, setTodayHours] = useState('0');
-    const [isWorking, setIsWorking] = useState('Day Off');
+    const [isWorking, setIsWorking] = useState(false);
     const [workingDays, setWorkingDays] = useState(0);
     const [daysOff, setDayOff] = useState(0);
     const [totalHours, setTotalHours] = useState(0);
@@ -70,6 +28,11 @@ const UserView = ({ id, refresh, userList, scheduleListAll, saveData }) => {
 
     const [fromDate, setFromDate] = useState(dayjs(firstDateOfMonth(new Date())).format("YYYY-MM-DD"));
     const [toDate, setToDate] = useState(dayjs(lastDateOfMonth(new Date())).format("YYYY-MM-DD"));
+
+    const [open, setOpen] = useState(false);
+    const [title, setTitle] = useState('New')
+    const [scheduleId, setScheduleId] = useState(0);
+    const [refreshSchedule, setRefreshSchedule] = useState(0);
 
     useEffect(() => {
         const list = scheduleListAll.filter(item => String(item.uid) === String(id) && new Date(get_Date(item.trndate, 'YYYY-MM-DDT09:00:00')) >= new Date(fromDate) && new Date(item.trndate) <= new Date(toDate));
@@ -102,17 +65,17 @@ const UserView = ({ id, refresh, userList, scheduleListAll, saveData }) => {
         setStartShift('00:00 AM');
         setEndShift('00:00 PM');
         setTodayHours('0');
-        setIsWorking('Day Off');
+        setIsWorking(false);
         scheduleListAll.filter(item => String(item.uid) === String(id) && get_Date(item.trndate, 'YYYY-MM-DD') === LocalDate()).map(data => {
             setStartShift(convertTo12Hour(data.startshift));
             setEndShift(convertTo12Hour(data.endshift));
             const result = calculateTime(data.startshift, data.endshift);
             setTodayHours(`${result.hours}h ${result.minutes}m`);
-            setIsWorking(Boolean(data.dayoff) ? 'Working' : "Day Off")
+            setIsWorking(Boolean(data.dayoff))
         })
     }
  const scheduleSummary = () => {   
-        let list = scheduleListAll.filter(item => get_Date(item.trndate, 'YYYY-MM-DD') >= fromDate && get_Date(item.trndate, 'YYYY-MM-DD') <= toDate);
+     let list = scheduleListAll.filter(item => String(item.uid) === String(id) && get_Date(item.trndate, 'YYYY-MM-DD') >= fromDate && get_Date(item.trndate, 'YYYY-MM-DD') <= toDate);
         
         const workingList = list.filter(item => item.dayoff);
         setWorkingDays(workingList.length);
@@ -123,6 +86,17 @@ const UserView = ({ id, refresh, userList, scheduleListAll, saveData }) => {
         }) 
         const result = convertMinutesIntoHours(hours);
         setTotalHours(`${result.hours}h ${result.minutes}m`)
+    }
+
+    const btn_Click = (id) => {
+        setTitle(id === 0 ? "New Schedule" : "Edit Schedule");
+        setRefreshSchedule(refreshSchedule + 1);
+        setScheduleId(id);
+        setOpen(true);
+    }
+
+    const btnSave = async () => {
+        await ref.current?.save();
     }
 
     return (
@@ -146,7 +120,7 @@ const UserView = ({ id, refresh, userList, scheduleListAll, saveData }) => {
                         )}
                 </div>
                 <div class="flex gap-2">
-                    <Button type="primary" icon={<PlusOutlined />} size="large">Add schedule</Button>
+                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Add schedule</Button>
                 </div>
             </div>
             <div class='flex flex-col md:flex-row gap-4 mt-6'>
@@ -197,7 +171,7 @@ const UserView = ({ id, refresh, userList, scheduleListAll, saveData }) => {
                                         <td class="p-3 ">{UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A')}</td>
                                         <td class="p-3">
                                             <Tooltip placement="top" title={'Edit'} >
-                                                <Button type="link" icon={<EditOutlined />} />
+                                                <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
                                             </Tooltip>
                                         </td>
                                     </tr>
@@ -258,7 +232,12 @@ const UserView = ({ id, refresh, userList, scheduleListAll, saveData }) => {
                 </div>
             </div>
 
-           
+            {/* Drawer on right*/}
+            <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
+                extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
+
+                <ScheduleDetail id={scheduleId} uid={id} refresh={refreshSchedule} ref={ref} scheduleList={scheduleListAll} saveData={saveData} setOpen={setOpen} />
+            </Drawer>
         </div>
     )
 }
