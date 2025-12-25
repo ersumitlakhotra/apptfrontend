@@ -6,6 +6,7 @@ import MasterPage from './pages/main/master.js';
 import Signup from './pages/Signup/signup.js';
 import BookAppointment from './pages/BookAppointment/book-appointment.js';
 import Support from './pages/Support/support.js'
+import Privacy from './pages/Privacy/privacy.js'
 import {
  BrowserRouter as Router,
  Routes,
@@ -24,6 +25,7 @@ function App() {
         <Route path="main" element={<MasterPage />} />
         <Route path="book-appointment" element={<BookAppointment />} />
         <Route path="support" element={<Support/>} />
+        <Route path="privacy" element={<Privacy/>} />
       </Routes>
     </Router>
   );

@@ -15,7 +15,7 @@ const Support = () => {
                     </p>
 
                     <p class="text-white font-medium  p-4 rounded">
-                        Want to get in touch? We'd like to hear from you, Here's howyou can reach us ...
+                        Want to get in touch? We'd like to hear from you, Here's how you can reach us ...
                     </p>
                 </div>
             </div>
