@@ -15,17 +15,6 @@ export const Login = ({ logo }) => {
   const [loading, setLoading] = useState(false);
   const { contextHolder, error } = useAlert();
 
-  useEffect(() => {
-    //localStorage.removeItem('cid');
-    //localStorage.removeItem('uid');
-    //localStorage.removeItem('email');
-    //localStorage.removeItem('password');
-    //const companyId = localStorage.getItem('cid');
-    //if (companyId) {
-    //  navigate("/main");
-    //}
-  });
-
   const onSubmit = async () => {
     setLoading(true);
     try {
