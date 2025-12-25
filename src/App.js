@@ -25,7 +25,7 @@ function App() {
         <Route path="main" element={<MasterPage />} />
         <Route path="book-appointment" element={<BookAppointment />} />
         <Route path="support" element={<Support/>} />
-        <Route path="privacy" element={<Privacy/>} />
+        <Route path="privacy-policy" element={<Privacy/>} />
       </Routes>
     </Router>
   );
