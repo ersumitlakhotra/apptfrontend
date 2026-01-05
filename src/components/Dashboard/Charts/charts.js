@@ -91,13 +91,13 @@ const AreaChartCard = ({ categoriesArray, series, color,name }) => {
         />
     )
 }
-const BarChart = ({ dataArray}) => {
+const BarChart = ({ dataArray, onSelected, setFromDate, setToDate }) => {
     //const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
     return (
         <Chart
             options={{
                 stroke: {
-                    curve: 'smooth',
+                    curve: 'smooth',          
                 },
                 dataLabels: {
                     enabled: true,
@@ -107,24 +107,43 @@ const BarChart = ({ dataArray}) => {
                     offsetY: -20,
                     style: {
                         fontSize: '12px',
-                        colors: ["#FFFFFF"]
+                        colors: ["#FFFFFF"]                     
                     }
-                }, plotOptions: {
+                }, 
+                plotOptions: {
                     bar: {
                         borderRadius: 12,
                         dataLabels: {
-                            position: 'center', // top, center, bottom
+                            position: 'center', // top, center, bottom                      
                         },
                     }
-                }, grid: {
+                }, 
+                grid: {
                     show: false
                 },
+                chart:{
+                    events: {
+                        dataPointSelection: (event, chartContext, config) => {          
+                            const dataPointIndex = config.dataPointIndex;
+                            dataArray.find((item, index) => {
+                                if (index === dataPointIndex) {
+                                    setFromDate(item.frm);
+                                    setToDate(item.to)
+                                }
+                            });
+                            onSelected('Order');      
+                        } 
+                         
+                    }    
+                }
+                
             }}
             series={[{
                 name: 'Orders',
                 data: dataArray.map(a => ({ x: a.month, y: a.count}))
                  //data: dataArray.map(a => ({ x: a.month, y: a.count, fillColor: months[dayjs().get('month')] === a.month ? '#a3c2c2' : '' }))
             }]}
+        
             type="bar"
             height={400}
             width={'100%'}

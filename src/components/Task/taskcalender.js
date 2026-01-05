@@ -44,17 +44,21 @@ const TaskCalender = ({ orderList, servicesList, userList, companyList, trndate,
             <div class='flex flex-col py-2 '>
                 {slots.map((item, index) =>
                 (
-                    <div class='border-b h-12  p-2 text-sm w-max min-w-full inline-flex gap-3'   >
+                    <div class='border-b h-12  p-2 text-sm w-max min-w-full inline-flex gap-3 '   >
                         <div class='w-20  p-1'>{convertTo12Hour(item.start)}</div>
                         {userList.map(a => (
                             <div class=' w-44'>
                                 {orderList.filter(b => b.assignedto === a.id && b.start === item.start).map(c => (
-                                    <div key={c.id} style={{ height: getHeight(c.start, c.end)}} class={`flex flex-col gap-2 px-2 mt-4 border rounded-md text-xs border-s-4 ${getBorder(c.status)}`}>
+                                    <div 
+                                    key={c.id} 
+                                    onClick={() => btn_ViewClick(c.id)} 
+                                    style={{ height: getHeight(c.start, c.end), cursor:'pointer'}} 
+                                    class={`flex flex-col gap-2 px-2 mt-4 border rounded-md text-xs border-s-4 ${getBorder(c.status)}`}>
                                         <div class='flex items-center justify-between  font-medium'>
-                                            <p class='underline cursor-pointer' onClick={() => btn_ViewClick(c.id)} ># {c.order_no}</p>
+                                            <p class='underline' ># {c.order_no}</p>
                                             <p>$ {c.price}</p>
                                         </div>
-                                        <div class='flex flex-col overflow-hidden whitespace-nowrap'>
+                                        <div class='flex flex-col overflow-hidden whitespace-nowrap '>
                                             {c.serviceinfo !== null &&
                                                 servicesList.filter(sl =>
                                                     c.serviceinfo.some(b => b === sl.id)

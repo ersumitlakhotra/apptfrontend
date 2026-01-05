@@ -1,15 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { get_Date, LocalDate } from "../../../common/localDate";
-import { Avatar, Button, Dropdown, Image, Space } from "antd";
-import { DownOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Button, Drawer, Dropdown, Image, Space } from "antd";
+import { DownOutlined, UserOutlined, SaveOutlined } from '@ant-design/icons';
 import { Tags } from "../../../common/tags";
 import { convertTo12Hour } from "../../../common/general";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dayjs from 'dayjs';
+import ScheduleDetail from "../../Schedule/schedule_detail";
 
-const Schedule = ({ scheduleList, userList }) => {
+const Schedule = ({ scheduleList, userList, saveData }) => {
+    const ref= useRef();
     const [currentOption, setCurrentOption] = useState('Today');
     const [filteredList,setFilteredList]= useState([]);
+    const [open, setOpen] = useState(false);
+    const [title, setTitle] = useState('New')
+    const [id, setId] = useState(0);
+    const [refresh, setRefresh] = useState(0);
+    const [uid, setUid] = useState(null);
+    const [trnDate, setTrnDate] = useState(LocalDate());
+
+
     const items = [
         { key: 'Today', label: 'Today' },
         { key: 'Tomorrow', label: 'Tomorrow' },
@@ -22,21 +32,35 @@ const Schedule = ({ scheduleList, userList }) => {
         filterSchedule();
     }, [currentOption, scheduleList])
 
-    const filterSchedule=() => {
+    const filterSchedule = () => {
         let editList = [];
-        if (currentOption === 'Today')
+        if (currentOption === 'Today') {
             editList = scheduleList.filter(item => get_Date(item.trndate, 'YYYY-MM-DD') === LocalDate())
+            setTrnDate(LocalDate())
+        }
         else if (currentOption === 'Tomorrow') {
             editList = scheduleList.filter(item => get_Date(item.trndate, 'YYYY-MM-DD') === dayjs(LocalDate()).add(1, 'day').format('YYYY-MM-DD'))
+            setTrnDate(dayjs(LocalDate()).add(1, 'day').format('YYYY-MM-DD'))
         }
         else {
             editList = scheduleList.filter(item => get_Date(item.trndate, 'YYYY-MM-DD') === dayjs(LocalDate()).add(2, 'day').format('YYYY-MM-DD'))
+            setTrnDate(dayjs(LocalDate()).add(2, 'day').format('YYYY-MM-DD'))
         }
 
         if (editList.length === 0)
             setFilteredList([]);
         else
             setFilteredList(editList);
+    }
+
+    const btn_Click = (id) => {
+        setTitle(id === 0 ? "New Schedule" : "Edit Schedule");
+        setRefresh(refresh + 1);
+        setId(id);
+        setOpen(true);
+    }
+    const btnSave = async () => {
+        await ref.current?.save();
     }
 
     return (
@@ -52,23 +76,25 @@ const Schedule = ({ scheduleList, userList }) => {
                     </Button>
                 </Dropdown>
             </div>
-            <div class='w-full bg-white border rounded p-5 flex flex-col gap-6  text-gray-500 max-h-[460px] h-[460px]  overflow-y-auto'>
+            <div class='w-full bg-white border rounded p-3 flex flex-col gap-2  text-gray-500 max-h-[460px] h-[460px]  overflow-y-auto'>
                 {userList.map(user => {
+                    let id = 0;
                     let start = '00:00:00';
                     let end = '00:00:00';
                     let isWorking = false;
-                    filteredList.filter(item => String(item.uid) === String(user.id)
-                        //currentOption === 'Tomorrow' ? get_Date(item.trndate, 'YYYY-MM-DD') === current.add(1, 'day').format('YYYY-MM-DD') : get_Date(item.trndate, 'YYYY-MM-DD') === LocalDate() 
-                    ).map(
+                    let isFound = false;
+                    filteredList.filter(item => String(item.uid) === String(user.id)).map(
                         sch => {
+                            id = sch.id;
                             start = sch.startshift;
                             end = sch.endshift;
                             isWorking = sch.dayoff;
+                            isFound = true;
                         }
                     )
                     return (
-                        <div class='flex flex-row justify-between'>
-                            <div class='flex flex-row gap-3 text-gray-800  font-medium font-sans'>
+                        <div class='flex flex-row justify-between  items-center cursor-pointer p-2 hover:bg-gray-50 ' onClick={() => { setUid(String(user.id)); btn_Click(id);}}>
+                            <div class='flex flex-row gap-3  items-center text-gray-800  font-medium font-sans'>
                                 {user.profilepic !== null ?
                                     <Image width={30} height={30} src={user.profilepic} style={{ borderRadius: 15 }} /> :
                                     <Avatar size={30} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
@@ -78,12 +104,18 @@ const Schedule = ({ scheduleList, userList }) => {
                                     <p class='text-gray-400 text-xs font-normal'>{`${convertTo12Hour(start)} - ${convertTo12Hour(end)}`}</p>
                                 </div>
                             </div>
-                            <p>{Tags(isWorking ? "Working" : "Day off")}</p>
+                            <p>{Tags(isFound ? isWorking ? "Working" : "Day off" : "Add Schedule")}</p>
                         </div>
                     )
                 }
                 )}
             </div>
+            {/* Drawer on right*/}
+            <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
+                extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
+
+                <ScheduleDetail id={id} refresh={refresh} ref={ref} scheduleList={scheduleList} userList={userList} saveData={saveData} setOpen={setOpen} userId={uid} frmDate={trnDate} />
+            </Drawer>
         </div>
     )
 }

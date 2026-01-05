@@ -1,6 +1,6 @@
 import { Pagination } from "antd"
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
-const DataTable = ({ headerItems, list, body, onChange, isFooter = true }) => {
+const DataTable = ({ headerItems, list, body, onChange, current=1, isFooter = true }) => {
     return (
         <div class="relative overflow-x-auto">
             <table class="w-full text-left h-40 overflow-auto">
@@ -33,8 +33,8 @@ const DataTable = ({ headerItems, list, body, onChange, isFooter = true }) => {
                                 total={list.length}
                                 showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
                                 defaultPageSize={10}
-                                defaultCurrent={1}
-                                pageSizeOptions={[10]}
+                                current={current}
+                                pageSizeOptions={[10]}                               
                                 onChange={onChange}
                             />
                         </td>

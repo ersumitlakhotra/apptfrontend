@@ -25,6 +25,7 @@ const Users = ({ userList, userPermissionList, logsList, scheduleList, saveData 
 
     const [openLogs, setOpenLogs] = useState(false);
     const [filteredList, setFilteredList] = useState(userList);
+    const [list, setList] = useState(userList);
 
     const [searchInput, setSearchInput] = useState('');
     const [sortStatus, setSortStatus] = useState('');
@@ -36,6 +37,7 @@ const Users = ({ userList, userPermissionList, logsList, scheduleList, saveData 
     
     useEffect(() => {
         setFilteredList(userList);
+        setList(userList);
         setExportList(userList);
         setPage(1, 10, userList);
     }, [])
@@ -45,11 +47,9 @@ const Users = ({ userList, userPermissionList, logsList, scheduleList, saveData 
         (item.fullname.toLowerCase().includes(searchInput.toLowerCase()) &&
             (sortStatus !== '' ? item.status.toLowerCase() === (sortStatus.toLowerCase()) : item.status.toLowerCase().includes('active')
             )));
-
+        setList(searchedList);
         setExportList(searchedList);
-        if (searchInput === '' && sortStatus === '')
-            setPage(currentPage, itemsPerPage, searchedList)
-        else
+        setCurrentPage(1)
             setPage(1, itemsPerPage, searchedList)
     }, [userList,searchInput, sortStatus])
     
@@ -124,11 +124,11 @@ const Users = ({ userList, userPermissionList, logsList, scheduleList, saveData 
                     </div>
                 </div>
 
-                <DataTable headerItems={headerItems} list={(searchInput === '' && sortStatus === '') ? userList : filteredList}
+                <DataTable headerItems={headerItems} current={currentPage} list={list}
                     onChange={(page, pageSize) => {
                         setCurrentPage(page);
                         setItemsPerPage(pageSize);
-                        setPage(page, pageSize, userList)
+                        setPage(page, pageSize, list)
                     }}
                     body={(
                         filteredList.map(item => (

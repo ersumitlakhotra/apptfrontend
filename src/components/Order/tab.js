@@ -16,6 +16,7 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_View
   
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(orderList);
+    const [list, setList] = useState(orderList);
 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -24,6 +25,7 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_View
 
     useEffect(() => {
         setFilteredList(orderList);
+        setList(orderList);
         setExportList(orderList);
         setSearchInput('');
         setAssignedTo('');
@@ -38,18 +40,16 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_View
             searchedList = searchedList.filter(item => item.assignedto === assigned_to)
 
         setExportList(searchedList);
-        if (searchInput === '' && assigned_to === '')
-            setPage(currentPage, itemsPerPage, searchedList)
-        else
-            setPage(1, itemsPerPage, searchedList)
+        setList(searchedList);
+        setCurrentPage(1)
+        setPage(1, itemsPerPage, searchedList)
     }, [searchInput, assigned_to])
 
     const setPage = (page, pageSize, list = []) => {
         const indexOfLastItem = page * pageSize;
         const indexOfFirstItem = indexOfLastItem - pageSize;
         const searchedList = list.slice(indexOfFirstItem, indexOfLastItem);
-        setFilteredList(searchedList);
-        
+        setFilteredList(searchedList);   
     }
  
 
@@ -110,11 +110,11 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_View
                     {/**/}
                 </div>
             </div>
-            <DataTable headerItems={headerItems} list={(searchInput === '' && assigned_to === '') ? orderList : filteredList}
+            <DataTable headerItems={headerItems} current={currentPage} list={list}
                 onChange={(page, pageSize) => {
                     setCurrentPage(page);
                     setItemsPerPage(pageSize);
-                    setPage(page, pageSize, orderList)
+                    setPage(page, pageSize, list)
                 }}
                 body={(
                     filteredList.map(item => (

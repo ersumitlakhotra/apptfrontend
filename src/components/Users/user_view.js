@@ -8,7 +8,7 @@ import DataTable from "../../common/datatable";
 import { getTableItem } from "../../common/items";
 import { Tags } from "../../common/tags";
 import { convertTo12Hour, calculateTime, getMinutes, convertMinutesIntoHours } from "../../common/general";
-import ScheduleDetail from "./schedule_detail";
+import ScheduleDetail from "../Schedule/schedule_detail";
 
 const UserView = ({ id, refresh, userList, scheduleListAll, saveData }) => {
     const ref= useRef();

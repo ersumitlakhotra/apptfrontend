@@ -22,6 +22,7 @@ const Services = ({ servicesList, setServicesList, logsList, userList, saveData 
     const [id, setId] = useState(0);
     const [refresh, setRefresh] = useState(0);
     const [filteredList, setFilteredList] = useState(servicesList);
+    const [list, setList] = useState(servicesList);
 
     const [searchInput, setSearchInput] = useState('');
     const [sortStatus, setSortStatus] = useState('');
@@ -33,6 +34,7 @@ const Services = ({ servicesList, setServicesList, logsList, userList, saveData 
 
     useEffect(() => {
         setFilteredList(servicesList);
+        setList(servicesList);
         setExportList(servicesList);
         setPage(1, 10, servicesList);
     }, [])
@@ -57,10 +59,9 @@ const Services = ({ servicesList, setServicesList, logsList, userList, saveData 
             (sortStatus !== '' ? item.status.toLowerCase() === (sortStatus.toLowerCase()) : item.status.toLowerCase().includes('active')
             )));
 
+        setList(searchedList);
         setExportList(searchedList);
-        if (searchInput === '' && sortStatus === '')
-            setPage(currentPage, itemsPerPage, searchedList)
-        else
+        setCurrentPage(1);
             setPage(1, itemsPerPage, searchedList)
     }, [servicesList,searchInput, sortStatus,sortAscDesc])
 
@@ -147,11 +148,11 @@ const Services = ({ servicesList, setServicesList, logsList, userList, saveData 
                 </div>
 
 
-                <DataTable headerItems={headerItems} list={(searchInput === '' && sortStatus === '') ? servicesList : filteredList} 
+                <DataTable headerItems={headerItems} current={currentPage} list={list} 
                     onChange={(page, pageSize) => {
                         setCurrentPage(page);
                         setItemsPerPage(pageSize); 
-                        setPage(page, pageSize,servicesList)}} 
+                        setPage(page, pageSize, list)}} 
 
                     body={(
                     filteredList.map(item => (

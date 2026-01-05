@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import { firstDateOfMonth, get_Date, lastDateOfMonth } from "../../../common/localDate";
 import { BarChart } from "../Charts/charts";
 
-const Appointment = ({ orderList, yearList, months }) => {
+const Appointment = ({ orderList, yearList, months, onSelected, setFromDate , setToDate }) => {
     const [chart, setChart] = useState(null);
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
@@ -23,9 +23,9 @@ const Appointment = ({ orderList, yearList, months }) => {
             let to = dayjs(lastDateOfMonth(new Date(date))).format("YYYY-MM-DD");
 
             const order = orderList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= frm && get_Date(a.trndate,'YYYY-MM-DD') <= to);
-            dataArray.push({ month: a, count: order.length });
+            dataArray.push({ month: a, count: order.length,frm:frm , to:to });
         })
-        setChart(<BarChart dataArray={dataArray} />)
+        setChart(<BarChart dataArray={dataArray} onSelected={onSelected} setFromDate={setFromDate} setToDate={setToDate} />)
     }, [orderList, currentYear])
     
     return (

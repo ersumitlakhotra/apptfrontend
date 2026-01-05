@@ -5,7 +5,8 @@ import { Button } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import {  getExcelItem } from './items';
 import dayjs from 'dayjs';
-import { UTC_LocalDateTime } from './localDate';
+import { get_Date, UTC_LocalDateTime } from './localDate';
+import { calculateTime, convertTo12Hour } from './general';
 
 const ExportToExcel = ({ data, fileName, servicesList, userList }) => {
   const exportExcel = async () => {
@@ -121,8 +122,8 @@ const ExportToExcel = ({ data, fileName, servicesList, userList }) => {
       case 'CUSTOMERS': {
         worksheet.columns = [
           getExcelItem('Name', 30),
-          getExcelItem('Email', 30),
-          getExcelItem('Cell', 10),
+          getExcelItem('Email', 50),
+          getExcelItem('Cell', 20),
           getExcelItem('Last_Modified', 30)
         ];
         data.forEach(item => {
@@ -152,8 +153,9 @@ const ExportToExcel = ({ data, fileName, servicesList, userList }) => {
             Last_Modified: UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A'),
           });
         });
-          break; }
-      case 'USER': { 
+        break;
+      }
+      case 'USER': {
         worksheet.columns = [
           getExcelItem('Name', 30),
           getExcelItem('Cell', 20),
@@ -181,7 +183,33 @@ const ExportToExcel = ({ data, fileName, servicesList, userList }) => {
           });
         });
         break;
-       }
+      }
+      case 'SCHEDULE': {
+        worksheet.columns = [
+          getExcelItem('Date', 30),
+          getExcelItem('User', 50),
+          getExcelItem('Start', 20),
+          getExcelItem('End', 20),
+          getExcelItem('Hours', 20),
+          getExcelItem('Status', 20),
+          getExcelItem('Last_Modified', 30)
+        ];
+        data.forEach(item => {
+          const result = calculateTime(item.startshift, item.endshift);
+          return (
+            worksheet.addRow({
+              Date: get_Date(item.trndate, 'DD MMM YYYY'),
+              User: userList.filter(user => user.id === item.uid).map(a => a.fullname).toString(),
+              Start: convertTo12Hour(item.startshift),
+              End: convertTo12Hour(item.endshift),
+              Hours: `${result.hours}h ${result.minutes}m`,
+              Status: item.dayoff ? "Working" : "Day off",
+              Last_Modified: UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A'),
+            })
+          )
+        });
+        break;
+      }
       case 'SALES': { 
         worksheet.columns = [
           getExcelItem('User', 30),

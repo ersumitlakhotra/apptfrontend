@@ -21,6 +21,7 @@ const Customer = ({ customerList,setCustomerList,saveData }) => {
     const [id, setId] = useState(0);
     const [refresh, setRefresh] = useState(0);
     const [filteredList, setFilteredList] = useState(customerList);
+    const [list, setList] = useState(customerList);
 
     const [searchInput, setSearchInput] = useState('');
     const [sortAscDesc, setSortAscDesc] = useState('name asc');
@@ -31,6 +32,7 @@ const Customer = ({ customerList,setCustomerList,saveData }) => {
 
     useEffect(() => {
         setFilteredList(customerList);
+        setList(customerList);
         setExportList(customerList);
         setPage(1, 10, customerList);
     }, [])
@@ -57,10 +59,9 @@ const Customer = ({ customerList,setCustomerList,saveData }) => {
             ));
 
         setExportList(searchedList);
-        if (searchInput === '')
-            setPage(currentPage, itemsPerPage, searchedList)
-        else
-            setPage(1, itemsPerPage, searchedList)
+        setList(searchedList);
+        setCurrentPage(1);
+        setPage(1, itemsPerPage, searchedList);
     }, [customerList,searchInput, sortAscDesc])
 
     const setPage = (page, pageSize,list=[]) => {
@@ -130,11 +131,11 @@ const Customer = ({ customerList,setCustomerList,saveData }) => {
                 </div>
 
 
-                <DataTable headerItems={headerItems} list={searchInput === ''  ? customerList : filteredList} 
+                <DataTable headerItems={headerItems} current={currentPage} list={list} 
                     onChange={(page, pageSize) => {
                         setCurrentPage(page);
                         setItemsPerPage(pageSize); 
-                        setPage(page, pageSize,customerList)}} 
+                        setPage(page, pageSize,list)}} 
 
                     body={(
                     filteredList.map(item => (

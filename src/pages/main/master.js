@@ -20,6 +20,7 @@ import Sales from "../Sales/sales.js";
 import Payment from "../Payment/payment.js";
 import { setLocalStorageWithExpiry } from "../../common/localStorage.js";
 import Customer from "../Customer/customer.js";
+import Schedule from "../Schedule/schedule.js";
 
 const MasterPage = () => {
   const navigate = useNavigate();
@@ -349,6 +350,14 @@ const MasterPage = () => {
           getData(setUserList, "user");
           break;
         }
+      case 'Schedule':
+        {
+          getData(setLogsList, "logs");
+          getData(setScheduleList, "schedule");
+          getData(setUserPermissionList, "userpermission");
+          getData(setUserList, "user");
+          break;
+        }
       case 'Setting':
         {
           getData(setCompanyList, "company");
@@ -372,8 +381,11 @@ const MasterPage = () => {
         logsList={logsList}
         companyList={companyList}
         scheduleList={scheduleList}
+        saveData={saveData}
         onSelected={onSelected}
-        refresh={refresh}
+        refresh={refresh} 
+        setFromDate={setFromDate}    
+        setToDate={setToDate}
       />;
   } else if (content === 'Tasks') {
     displayedContent =
@@ -444,6 +456,13 @@ const MasterPage = () => {
         userList={userList}
         userPermissionList={userPermissionList}
         logsList={logsList}
+        scheduleList={scheduleList}
+        saveData={saveData}
+      />;
+  } else if (content === 'Schedule') {
+    displayedContent =
+      <Schedule
+        userList={userList}
         scheduleList={scheduleList}
         saveData={saveData}
       />;

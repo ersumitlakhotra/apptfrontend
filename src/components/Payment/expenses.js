@@ -13,24 +13,25 @@ const Expenses = ({ key, expensesData, btn_Click, btn_LogsClick, fromDate, setFr
   
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(expensesData);
+    const [list, setList] = useState(expensesData);
 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
     useEffect(() => {
         setFilteredList(expensesData)
+        setList(expensesData)
         setExportList(expensesData)
         setPage(1, 10, expensesData);
     }, [expensesData])
 
   useEffect(() => {
       const searchedList = expensesData.filter(item => 
-            item.name.toLowerCase().includes(searchInput.toLowerCase()));
+          item.name.toLowerCase().includes(searchInput.toLowerCase()));
       setExportList(searchedList);
-        if (searchInput === '')
-            setPage(currentPage, itemsPerPage, searchedList)
-        else
-            setPage(1, itemsPerPage, searchedList)
+      setList(searchedList);
+       setCurrentPage(1);
+        setPage(1, itemsPerPage, searchedList)
     }, [searchInput])
 
     const setPage = (page, pageSize, list = []) => {
@@ -90,11 +91,11 @@ const Expenses = ({ key, expensesData, btn_Click, btn_LogsClick, fromDate, setFr
                     {/**/}
                 </div>
             </div>
-            <DataTable headerItems={headerItems} list={(searchInput === '') ? expensesData : filteredList}
+            <DataTable headerItems={headerItems} current={currentPage} list={list}
                 onChange={(page, pageSize) => {
                     setCurrentPage(page);
                     setItemsPerPage(pageSize);
-                    setPage(page, pageSize, expensesData)
+                    setPage(page, pageSize, list)
                 }}
 
                 body={(

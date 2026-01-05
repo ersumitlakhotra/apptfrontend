@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { useEffect, useImperativeHandle, useState } from "react";
-import {  Button, DatePicker,  Popover, Radio,  Switch,  TimePicker } from "antd";
+import {  Button, DatePicker,  Popover, Radio,  Select,  Switch,  TimePicker } from "antd";
 import { CloudUploadOutlined, EyeOutlined, UserOutlined,ClockCircleOutlined } from '@ant-design/icons';
 import useAlert from "../../common/alert.js";
 import { TextboxFlex } from "../../common/textbox.js";
@@ -9,43 +9,60 @@ import { get_Date, LocalDate } from "../../common/localDate.js";
 import dayjs from 'dayjs';
 import { createDateSeries } from "../../common/general.js";
 import { apiCalls } from "../../hook/apiCall.js";
+import AssignedTo from "../../common/assigned_to.js";
 const { RangePicker } = TimePicker;
 
 
-const ScheduleDetail = ({ id, uid, refresh, ref, scheduleList,   saveData ,setOpen}) => {
+const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList,  saveData ,setOpen,userId=null,frmDate=LocalDate() }) => {
     const [fromDate, setFromDate] = useState(LocalDate());
     const [toDate, setToDate] = useState(LocalDate());
     const [startTime, setStartTime] = useState('09:00:00');
     const [endTime, setEndTime] = useState('21:00:00');
     const [isWorking, setIsWorking] = useState(true);
     const [value, setValue] = useState('Single');
+    const [uid, setUid] = useState('');
     const { contextHolder, error, warning } = useAlert();
 
-
     useEffect(() => {
-     
         if (id === 0) {
-            setFromDate(LocalDate());setToDate(LocalDate());
-            setStartTime('09:00:00'); setEndTime('21:00:00'); 
-            setIsWorking(true); setValue('Single');
+            setFromDate(frmDate); setToDate(LocalDate());
+            setStartTime('09:00:00'); setEndTime('21:00:00');
+            setIsWorking(true); setValue('Single'); 
+            setUid(userId === null ? '' : userId );
         }
         else {
-            const editList = scheduleList.find(item => item.id === id)            
-            setFromDate(get_Date(editList.trndate,'YYYY-MM-DD') ); 
+            const editList = scheduleList.find(item => item.id === id)
+            setFromDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
             setToDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
-            setStartTime(editList.startshift); 
+            setStartTime(editList.startshift);
             setEndTime(editList.endshift);
-            setIsWorking(editList.dayoff); 
-            setValue('Single');            
+            setIsWorking(editList.dayoff);
+            setValue('Single');
+            setUid(editList.uid);
         }
-    }, [refresh])
+    }, [refresh]) 
+    
+    useEffect(() => {
+        if (isWorking) {
+            if (startTime === '00:00:00')
+                setStartTime('09:00:00');
+            if (endTime === '00:00:00')
+                setEndTime('21:00:00');
+        }
+    }, [isWorking])
   
     const save = async () => {
         if (id === 0) {
-            if (value === 'Single')
-                createSingleSchedule();
-            else
-                createMultipleSchedule();
+            if (uid === '') {
+                warning('Please, fill out the required fields !')
+            }
+            else {
+                if (value === 'Single')
+                    createSingleSchedule();
+                else
+                    createMultipleSchedule();
+            }
+
         }
         else {
             updateSchedule();
@@ -136,11 +153,27 @@ const ScheduleDetail = ({ id, uid, refresh, ref, scheduleList,   saveData ,setOp
         <div class='flex flex-col font-normal gap-3 mt-2'>
             <p class="text-gray-400 mb-4">Schedule Information</p>
 
-            <TextboxFlex label={'Option'} mandatory={false} input={
+            <TextboxFlex label={'User'} mandatory={true} input={
+                <Select
+                    value={uid}
+                    placeholder="Select User"
+                    status={uid === '' ? 'error' : ''}
+                    style={{ width: 300 }}                
+                    size="large"
+                    disabled={id !== 0} 
+                    onChange={(value) => setUid(value)}
+                    options={[{ value: '', label: '' }, ...userList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
+                        value: item.id,
+                        label: <AssignedTo key={item.id} userId={item.id} userList={userList} />
+                    }))]}
+                />
+            } /> 
+            
+            <TextboxFlex label={'Option'} mandatory={true} input={
                 <Radio.Group options={plainOptions} onChange={(e) => setValue(e.target.value)} value={value} disabled={id !== 0} />
             } />
 
-            <TextboxFlex label={'Date'} mandatory={false} input={
+            <TextboxFlex label={'Date'} mandatory={true} input={
                 <div class='flex flex-col md:flex-row md:justify-end gap-2 '>
                     <Popover placement="bottom" title={"Filter by From Date"} content={
                         <div>
@@ -171,7 +204,7 @@ const ScheduleDetail = ({ id, uid, refresh, ref, scheduleList,   saveData ,setOp
                 </div>
             } />
 
-            <TextboxFlex label={'Time'} mandatory={false} input={
+            <TextboxFlex label={'Time'} mandatory={true} input={
                 <RangePicker placeholder={['Start', 'End']}
                     allowClear={false}
                     use12Hours
@@ -184,7 +217,7 @@ const ScheduleDetail = ({ id, uid, refresh, ref, scheduleList,   saveData ,setOp
                     }} />
             } />
 
-            <TextboxFlex label={'Working'} mandatory={false} input={
+            <TextboxFlex label={'Working'} mandatory={true} input={
                 <Switch checkedChildren={'Working'} unCheckedChildren={'Day off'} value={isWorking} onChange={(e) => setIsWorking(e)} />
             } />
 

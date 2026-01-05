@@ -37,6 +37,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
     const [customer, setCustomer] = useState(false);
     const [services, setServices] = useState(false);
     const [users, setUsers] = useState(false);
+    const [schedule, setSchedule] = useState(false);
     const [sales, setSales] = useState(false);
     const [setting, setSetting] = useState(false);
     const { contextHolder, error, warning } = useAlert();
@@ -51,7 +52,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
             setAccountType('Basic'); setProfile(null);
             setGender('Male'); setStatus('Active');setAppSchedule(true);
             setDashboard(true); setTasks(false); setOrder(false); setEvent(false); setPayment(false);
-            setCustomer(false); setServices(false); setUsers(false); setSales(false); setSetting(false);
+            setCustomer(false); setServices(false); setUsers(false); setSchedule(false); setSales(false); setSetting(false);
         }
         else {
             const editList = userList.find(item => item.id === id)
@@ -79,6 +80,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
                 setCustomer(b.customer);
                 setServices(b.services);
                 setUsers(b.users);
+                setSchedule(b.schedule)
 
                 setSales(b.sales);
                 setSetting(b.setting);
@@ -112,6 +114,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
                 customer: customer,
                 services: services,
                 users: users,
+                schedule: schedule,
                 sales: sales,
                 setting: setting,
             }); 
@@ -169,6 +172,8 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
             setServices={setServices}
             users={users}
             setUsers={setUsers}
+            schedule={schedule}
+            setSchedule={setSchedule}
             sales={sales}
             setSales={setSales}
             setting={setting}

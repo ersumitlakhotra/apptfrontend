@@ -11,6 +11,7 @@ import { get_Date, UTC_LocalDateTime } from "../../common/localDate";
 const Payments = ({ key, expensesData, userList, btn_LogsClick, btn_Click, fromDate, setFromDate, toDate, setToDate, saveData, setExportList }) => {
 
     const [filteredList, setFilteredList] = useState(expensesData);
+    const [list, setList] = useState(expensesData);
 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -19,20 +20,20 @@ const Payments = ({ key, expensesData, userList, btn_LogsClick, btn_Click, fromD
 
     useEffect(() => {
         setFilteredList(expensesData)
+        setList(expensesData)
         setExportList(expensesData);
         setPage(1, 10, expensesData);
     }, [expensesData])
 
     useEffect(() => {
-        
-        if (assigned_to === '')
-            setPage(currentPage, itemsPerPage, expensesData)
-        else
-        {
-            const searchedList = expensesData.filter(item =>item.assignedto === assigned_to);
-            setExportList(searchedList);
-            setPage(1, itemsPerPage, searchedList)
-        }
+        let searchedList = expensesData;   
+        if (assigned_to !== '')
+            searchedList = expensesData.filter(item => item.assignedto === assigned_to);
+            
+        setExportList(searchedList);
+        setList(searchedList); 
+        setCurrentPage(1);
+        setPage(1, itemsPerPage, searchedList)
     }, [assigned_to])
 
     const setPage = (page, pageSize, list = []) => {
@@ -65,7 +66,7 @@ const Payments = ({ key, expensesData, userList, btn_LogsClick, btn_Click, fromD
                         <Select
                             value={assigned_to}
                             style={{ width: 300 }}
-                            size="middle"
+                            size="large"
                             onChange={(value) => setAssignedTo(value)}
                             options={[{ value: '', label: 'All Users' }, ...userList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
                                 value: item.id,
@@ -101,11 +102,11 @@ const Payments = ({ key, expensesData, userList, btn_LogsClick, btn_Click, fromD
                     {/**/}
                 </div>
             </div>
-            <DataTable headerItems={headerItems} list={(assigned_to === '') ? expensesData : filteredList}
+            <DataTable headerItems={headerItems} current={currentPage} list={list}
                 onChange={(page, pageSize) => {
                     setCurrentPage(page);
                     setItemsPerPage(pageSize);
-                    setPage(page, pageSize, expensesData)
+                    setPage(page, pageSize, list)
                 }}
 
                 body={(

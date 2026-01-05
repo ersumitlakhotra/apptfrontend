@@ -14,12 +14,14 @@ const Events = ({ eventList, servicesList, btn_Click, btn_LogsClick, fromDate, s
     const [searchInput, setSearchInput] = useState('');
 
     const [filteredList, setFilteredList] = useState(eventList);
+    const [list, setList] = useState(eventList);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     
 
     useEffect(() => {
         setFilteredList(eventList)
+        setList(eventList);
         setExportList(eventList);
         setPage(1, 10, eventList);
     }, [eventList])
@@ -28,9 +30,8 @@ const Events = ({ eventList, servicesList, btn_Click, btn_LogsClick, fromDate, s
         const searchedList = eventList.filter(item =>
             (item.title.toLowerCase().includes(searchInput.toLowerCase())));
         setExportList(searchedList);
-        if (searchInput === '')
-            setPage(currentPage, itemsPerPage, searchedList)
-        else
+        setList(searchedList);
+        setCurrentPage(1);
             setPage(1, itemsPerPage, searchedList)
     }, [searchInput])
 
@@ -85,11 +86,11 @@ const Events = ({ eventList, servicesList, btn_Click, btn_LogsClick, fromDate, s
                     {/**/}
                 </div>
             </div>
-            <DataTable headerItems={headerItems} list={searchInput === '' ? eventList : filteredList}
+            <DataTable headerItems={headerItems} current={currentPage} list={list}
                 onChange={(page, pageSize) => {
                     setCurrentPage(page);
                     setItemsPerPage(pageSize);
-                    setPage(page, pageSize, eventList)
+                    setPage(page, pageSize, list)
                 }}
                 body={(
                     filteredList.map(item => (

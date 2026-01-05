@@ -14,7 +14,7 @@ import dayjs from 'dayjs';
 import { AreaChartCard } from "../../components/Dashboard/Charts/charts.js";
 import Schedule from "../../components/Dashboard/Schedule/schedule.js";
 
-const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList, logsList, companyList, scheduleList, onSelected }) => {  
+const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList, logsList, companyList, scheduleList, saveData, onSelected ,setFromDate,setToDate }) => {  
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
     const [orderChart, setOrderChart] = useState(null);
     const [totalOrders, setTotalOrders] = useState(0);
@@ -104,14 +104,14 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList,
 
             <div class='flex flex-col gap-4 mt-4  w-full md:flex-row'>
                 <div class='flex flex-col gap-4 w-full md:w-4/6'>
-                    <Appointment orderList={orderList} yearList={yearList} months={months} />
+                    <Appointment orderList={orderList} yearList={yearList} months={months} onSelected={onSelected} setFromDate={setFromDate} setToDate={setToDate}  />
                     <AnnualReport orderList={orderList} expensesList={expensesList} yearList={yearList} months={months} />   
                     <Task orderList={orderList} userList={userList} />                   
                 </div>
                 <div class='flex flex-col gap-4 w-full md:w-2/6'>
                     <LiveEvent eventList={eventList} servicesList={servicesList} onSelected={onSelected} />
                     <RecentActivities orderList={orderList} userList={userList} eventList={eventList} servicesList={servicesList} expensesList={expensesList} logsList={logsList} />  
-                    <Schedule scheduleList={scheduleList} userList={userList} />                        
+                    <Schedule scheduleList={scheduleList} userList={userList} saveData={saveData}  />                        
                 </div>
             </div>   
 

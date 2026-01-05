@@ -10,6 +10,7 @@ import {
   CustomerServiceOutlined,
    FallOutlined, 
    FundOutlined, DollarOutlined,
+   SolutionOutlined,
    ContactsOutlined} from '@ant-design/icons';
 import SideBarButton from '../sidebar_button';
 import { useEffect, useState } from 'react';
@@ -40,6 +41,7 @@ const Sidebar = ({ onSelected, content, open, uid, getData}) => {
   const [customer, setCustomer] = useState(false);
   const [services, setServices] = useState(false);
   const [users, setUsers] = useState(false);
+  const [schedule, setSchedule] = useState(false);
   const [sales, setSales] = useState(false);
   const [setting, setSetting] = useState(false);
 
@@ -61,6 +63,7 @@ const Sidebar = ({ onSelected, content, open, uid, getData}) => {
         setCustomer(b.customer);
         setServices(b.services);
         setUsers(b.users);
+        setSchedule(b.schedule);
 
         setSales(b.sales);
         setSetting(b.setting);
@@ -88,6 +91,7 @@ const Sidebar = ({ onSelected, content, open, uid, getData}) => {
     getItem('Customers', 21, <ContactsOutlined />, customer),
     getItem('Services', 22, <UnorderedListOutlined />, services),
     getItem('Users', 23, <UserOutlined />, users),
+    getItem('Schedule', 24, <SolutionOutlined />, schedule),
   ]);
 
   const report = ([
@@ -109,16 +113,16 @@ const Sidebar = ({ onSelected, content, open, uid, getData}) => {
           <span class={`font-semibold whitespace-nowrap duration-150 ${!open && ' scale-0'}`}>{process.env.REACT_APP_PROJECT_NAME}</span>
         </div>
 
-        <span class={` text-sm  px-5 mt-6 duration-150 ${!open && 'scale-0'}  ${overview.filter(item => item.isVisible === true).length === 0 && 'hidden'} whitespace-nowrap`}>Overview</span>
+        <span class={` text-sm px-5 mt-6 duration-150 font-medium  ${!open && 'scale-0'}  ${overview.filter(item => item.isVisible === true).length === 0 && 'hidden'} whitespace-nowrap`}>Overview</span>
         {overview.map(item => item.isVisible && <SideBarButton key={item.key} isOpen={open} icon={item.icon} label={item.label} badge={item.badge} content={content} onSelected={(e) => onSelected(e)} />)}
            
-        <span class={` text-sm  px-5 mt-6 duration-150 ${!open && 'scale-0'} ${management.filter(item => item.isVisible === true).length === 0 && 'hidden'} whitespace-nowrap`}>Management</span>
+        <span class={` text-sm  px-5 mt-6 duration-150 font-medium  ${!open && 'scale-0'} ${management.filter(item => item.isVisible === true).length === 0 && 'hidden'} whitespace-nowrap`}>Management</span>
         {management.map(item => item.isVisible && <SideBarButton key={item.key} isOpen={open} icon={item.icon} label={item.label} badge={item.badge} content={content} onSelected={(e) => onSelected(e)} />)}
         
-        <span class={` text-sm  px-5 mt-6 duration-150 ${!open && 'scale-0'} ${report.filter(item => item.isVisible === true).length === 0 && 'hidden'} whitespace-nowrap`}>Report</span>
+        <span class={` text-sm  px-5 mt-6 duration-150 font-medium  ${!open && 'scale-0'} ${report.filter(item => item.isVisible === true).length === 0 && 'hidden'} whitespace-nowrap`}>Report</span>
         {report.map(item => item.isVisible && <SideBarButton key={item.key} isOpen={open} icon={item.icon} label={item.label} badge={item.badge} content={content} onSelected={(e) => onSelected(e)} />)}
  
-        <span class={` text-sm  px-5 mt-6 duration-150 ${!open && 'scale-0'} ${misc.filter(item => item.isVisible === true).length === 0 && 'hidden'} whitespace-nowrap`}>Misc</span>
+        <span class={` text-sm  px-5 mt-6 duration-150 font-medium  ${!open && 'scale-0'} ${misc.filter(item => item.isVisible === true).length === 0 && 'hidden'} whitespace-nowrap`}>Misc</span>
         {misc.map(item => item.isVisible && <SideBarButton key={item.key} isOpen={open} icon={item.icon} label={item.label} badge={item.badge} content={content} onSelected={(e) => onSelected(e)} />)}
        
       </div>
