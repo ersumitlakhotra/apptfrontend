@@ -1,12 +1,11 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { LoadingOutlined } from '@ant-design/icons';
 import useAlert from "../../common/alert.js";
 import { Spin } from 'antd';
 import { loginAuth } from "../../hook/apiCall.js";
 import { useNavigate } from "react-router-dom";
 import { setLocalStorageWithExpiry } from "../../common/localStorage.js";
-
 
 export const Login = ({ logo }) => {
   const navigate = useNavigate();
@@ -24,7 +23,7 @@ export const Login = ({ logo }) => {
         setLocalStorageWithExpiry('uid', res.data.data.id);
         setLocalStorageWithExpiry('email', email, 720);
         setLocalStorageWithExpiry('password', password, 720);
-        navigate("/main"); //success('Login Successfully');     
+        navigate("/main", { replace: true }); //success('Login Successfully');     
       }
       else
         error('Login Failed. Invalid username or password.')

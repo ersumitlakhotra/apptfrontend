@@ -251,6 +251,8 @@ const BookAppointment = () => {
                         isNext = false;
                         setOpenSearch(true);
                     }
+                    if(bookingType === 0)
+                        setTrnDate(LocalDate())
                     break;
                 }
             case 2:

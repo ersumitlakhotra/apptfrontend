@@ -108,7 +108,7 @@ const MasterPage = () => {
   useEffect(() => {
     const companyId = localStorage.getItem('cid');
     if (!isUserValid() || !companyId) {
-      navigate("/");
+      navigate("/",{ replace: true });
     }
   }, [navigate, signout]);
 
