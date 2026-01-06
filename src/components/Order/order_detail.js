@@ -1,11 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable array-callback-return */
 import { useEffect, useImperativeHandle, useState } from "react";
-import { Avatar, Badge, Button, DatePicker, Divider, Image, Input, Select, Tag } from "antd";
+import { Avatar, Badge, Button, DatePicker, Divider, Flex, Image, Input, Radio, Select, Tag } from "antd";
 import dayjs from 'dayjs';
 import { TextboxFlex } from "../../common/textbox";
-import { isValidEmail, setCellFormat, setPriceNumberOnly } from "../../common/cellformat";
-import { UserOutlined } from '@ant-design/icons';
+import { isValidEmail, setCellFormat, setNumberAndDot } from "../../common/cellformat";
+import { UserOutlined,  CreditCardOutlined } from '@ant-design/icons';
+import { BsCash } from "react-icons/bs";
 import useAlert from "../../common/alert";
 import { get_Date, LocalDate, LocalTime } from "../../common/localDate";
 import { generateTimeSlotsWithDate, toMinutes } from "../../common/generateTimeSlots";
@@ -31,6 +32,10 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
     const [slot, setSlot] = useState('');
     const [start, setStart] = useState('');
     const [end, setEnd] = useState('');
+
+    const [received, setReceived] = useState(0);
+    const [tip, setTip] = useState(0);
+    const [mode, setMode] = useState('Cash');
     const [servicesItem, setServicesItem] = useState([]);
     //const filteredOptionsServices = servicesList.filter(o => !selectedItems.includes(o));
     const [liveList, setLiveList] = useState([]);
@@ -69,7 +74,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');
             setStatus('Pending'); setPrice('0'); setTax('0'); setTotal('0'); setDiscount('0'); setCoupon(''); setTaxAmount('0'); setTrnDate(LocalDate());
             setAssignedTo('0'); setOrderNo(''); setServicesItem([]); setSlot(''); setPrevSlot(''); setPrevTrnDate(''); setPrevServicesItem([]);
-            setStart(''); setEnd(''); 
+            setStart(''); setEnd(''); setReceived('0'); setMode('Cash'); setTip(0);
         }
         else {
             const editList = orderList.find(item => item.id === id);
@@ -94,6 +99,9 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setStart(editList.start);
             setEnd(editList.end);
             setStatus(editList.status);
+            setReceived(editList.received);
+            setMode(editList.mode);
+            setTip(editList.tip);
         }
         const liveList = eventList.filter(a => a.case.toUpperCase() === 'LIVE');
         setLiveList(liveList.length > 0 ? liveList : [])
@@ -111,36 +119,51 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
         if (customerName !== '' && customerPhone !== '' && customerPhone.length === 12 && servicesItem.length !== 0 &&
             price !== '' && price !== '.' && trndate !== '' && customerEmail !== '' && isValidEmail(customerEmail) &&
             isOpen && isUserWorking && (assigned_to === '0' ? true : slot === '' ? false : true)) {
-            const Body = JSON.stringify({
-                customerName: customerName,
-                customerPhone: customerPhone,
-                customerEmail: customerEmail,
-                serviceinfo: servicesItem,
-                price: price,
-                discount: discount,
-                tax: tax,
-                taxamount: taxamount,
-                total: total,
-                coupon: coupon,
-                status: status,
-                trndate: trndate,
-                assignedto: assigned_to === '0' ? 0 : assigned_to,
-                slot: slot,
-                start: start,
-                end: end,
-                bookedvia: 'Walk-In',
-            });
+        
+            if ((received === '' || received <= 0) && status === 'Completed') {
+                if (received === '')
+                warning('Please, fill out the required fields !') 
+                else if (received <= 0)
+                warning('Please, Payment received amount can not be Zero! ')
+            }
+            else {
+                const Body = JSON.stringify({
+                    customerName: customerName,
+                    customerPhone: customerPhone,
+                    customerEmail: customerEmail,
+                    serviceinfo: servicesItem,
+                    price: price,
+                    discount: discount,
+                    tax: tax,
+                    taxamount: taxamount,
+                    total: total,
+                    coupon: coupon,
+                    status: status,
+                    trndate: trndate,
+                    assignedto: assigned_to === '0' ? 0 : assigned_to,
+                    slot: slot,
+                    start: start,
+                    end: end,
+                    received: status ==='Completed' ? received : '0',
+                    mode: mode,
+                    tip: status === 'Completed' ? tip : '0' ,// received > total ? parseFloat(received - total).toFixed(2) : '0',
+                    bookedvia: 'Walk-In',
+                });
 
-            saveData("Order", id !== 0 ? 'PUT' : 'POST', "order", id !== 0 ? id : null, Body);
+                saveData("Order", id !== 0 ? 'PUT' : 'POST', "order", id !== 0 ? id : null, Body);
 
-            setOpen(false);
+                setOpen(false);
+            }
         }
         else {
-            isOpen ? isUserWorking ? (slot === '' && assigned_to !== '0')
-                ? warning(`Please select a valid slot !`)
-                : warning('Please, fill out the required fields !')
-                : warning(`The ${employeeName} has the DAY OFF.`)
-                : warning('Business is marked as closed . Please book an appointment for another day!')
+            if (!isOpen)
+                warning('Business is marked as closed . Please book an appointment for another day!')
+            else if (!isUserWorking)
+                warning(`The ${employeeName} has the DAY OFF.`)
+            else if (slot === '' && assigned_to !== '0')
+                warning(`Please select a valid slot !`)
+            else
+                warning('Please, fill out the required fields !') 
         }
     }
 
@@ -165,6 +188,8 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setTaxAmount(0);
             setCoupon('');
             setTotal(0.00);
+            setTip(0);
+            setReceived(0);
         }
         else {
            
@@ -192,6 +217,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
 
         }
     }, [status, price, discount, tax, coupon])
+
 
     useEffect(() => {
         onTrnDateChange();
@@ -273,7 +299,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
         }
     }
     return (
-        <div class='flex flex-col font-normal gap-3 mt-2'>
+        <div class='flex flex-col font-normal gap-3 '>
             <TextboxFlex label={'Search'} input={
                 <Select
                     showSearch
@@ -291,7 +317,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     } />
             } />
 
-            <p class="text-gray-400 mb-4">Customer Detail</p>
+            <p class="text-gray-400 my-4">Customer Detail</p>
 
             <TextboxFlex label={'Name'} mandatory={true} input={
                 <Input placeholder="Name" status={customerName === '' ? 'error' : ''} value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
@@ -313,7 +339,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 <Select
                     value={status}
                     style={{ width: '100%' }}
-                    onChange={(value) => setStatus(value)}
+                    onChange={(value) => { CalculatePrice(servicesItem) ;setStatus(value);}}
                     options={[
                         { value: 'Pending', label: <Badge color={'yellow'} text={'Pending'} /> },
                         { value: 'In progress', label: <Badge color={'blue'} text={'In progress'} /> },
@@ -356,23 +382,24 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 />
             } />
 
-            <TextboxFlex label={'Price ($)'} mandatory={true} input={
-                <Input placeholder="Price" value={price} status={price === '' ? 'error' : ''} onChange={(e) => setPrice(setPriceNumberOnly(e.target.value))} />
+            <TextboxFlex label={'Price ($)'}  input={
+                <Input placeholder="Price" value={price} status={price === '' ? 'error' : ''} readOnly={true} style={{ backgroundColor: '#FAFAFA' }} onChange={(e) => setPrice(setNumberAndDot(e.target.value))} />
             } />
 
             <TextboxFlex label={'Discount'} input={
-                <Input placeholder="Discount" value={discount} readOnly={coupon !==''} onChange={(e) => setDiscount(setPriceNumberOnly(e.target.value))} />
+                <Input placeholder="Discount" value={discount} readOnly={coupon !== ''} onChange={(e) => setDiscount(setNumberAndDot(e.target.value))} />
             } />
-            <TextboxFlex label={'Tax (%)'} mandatory={true} input={
+            <TextboxFlex label={'Tax (%)'}  input={
                 <Select
                     value={tax}
+                    mode="single"
                     style={{ width: '100%' }}
                     onChange={(value) => setTax(value)}
                     options={[
-                        { value: 0.0, label: '0%' },
-                        { value: 0.05, label: '5%' },
-                        { value: 0.13, label: '13%' },
-                        { value: 0.15, label: '15%' }
+                        { value: '0.0', label: '0%' },
+                        { value: '0.05', label: '5%' },
+                        { value: '0.13', label: '13%' },
+                        { value: '0.15', label: '15%' }
                     ]}
                 />
             } />
@@ -381,6 +408,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 <Input placeholder="Total" style={{ backgroundColor: '#FAFAFA' }} readOnly={true} value={total} />
             } />
 
+           
             <TextboxFlex label={'Event'} input={
                 <Select
                     value={coupon}
@@ -394,7 +422,44 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 />
             } />
 
+            {status === 'Completed' && <>
+                <p class="text-gray-400 ">Payment Detail </p>
 
+                <TextboxFlex label={'Type'}  input={
+                    <Radio.Group onChange={(e) => setMode(e.target.value)} value={mode} style={{ width: '100%' }}>
+                        <Radio.Button value="Cash">
+                            <Flex gap="small" justify="center" align="center"  >
+                                <BsCash style={{ fontSize: 14 }} />
+                                Cash
+                            </Flex>
+                        </Radio.Button>
+                        <Radio.Button value="Card">
+                            <Flex gap="small" justify="center" align="center"  >
+                                <CreditCardOutlined style={{ fontSize: 14 }} />
+                                Visa Card
+                            </Flex>
+                        </Radio.Button>
+                    </Radio.Group>
+                } />
+
+
+                <TextboxFlex label={'Received'} mandatory={status === 'Completed'} input={
+                    <Input placeholder="Received" value={received} status={received === '' ? 'error' : ''}
+                        onChange={(e) => {
+                            let _value = setNumberAndDot(e.target.value) // _tax > 0 ? parseFloat((_subTotal * _tax) + _subTotal).toFixed(2) : _subTotal;
+                            setReceived(_value);
+                            let tip = parseFloat(_value).toFixed(2) - parseFloat(total).toFixed(2);
+                            if (tip > 0)
+                                setTip(parseFloat(tip).toFixed(2));
+                            else
+                                setTip(0);
+                        }} />
+                } />
+                <TextboxFlex label={'Tip'} input={
+                    <Input placeholder="Total" style={{ backgroundColor: '#FAFAFA' }} readOnly={true} value={tip} />
+                } />
+            </>
+            }
 
             <Divider />
             <p class="text-gray-400 mb-4">Booking Details</p>

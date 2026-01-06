@@ -376,6 +376,9 @@ const BookAppointment = () => {
                 slot: slot,
                 start: start,
                 end: end,
+                received: '0',
+                mode: 'Cash',
+                tip: '0',
                 bookedvia: 'Appointment',
             });
 

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { get_Date, LocalDate } from "../../../common/localDate";
-import { Avatar, Button, Drawer, Dropdown, Image, Space } from "antd";
+import { Avatar, Button, Drawer, Dropdown, Image, Skeleton, Space } from "antd";
 import { DownOutlined, UserOutlined, SaveOutlined } from '@ant-design/icons';
 import { Tags } from "../../../common/tags";
 import { convertTo12Hour } from "../../../common/general";
@@ -77,7 +77,9 @@ const Schedule = ({ scheduleList, userList, saveData }) => {
                 </Dropdown>
             </div>
             <div class='w-full bg-white border rounded p-3 flex flex-col gap-2  text-gray-500 max-h-[460px] h-[460px]  overflow-y-auto'>
-                {userList.map(user => {
+                {userList === null ? <Skeleton active style={{ padding: '16px' }} paragraph={{ rows: 10 }} /> :
+                    userList.length === 0 ? <p class='text-left p-4 text-sm font-medium text-gray-500'> There aren't any active users .</p> :      
+                    userList.map(user => {
                     let id = 0;
                     let start = '00:00:00';
                     let end = '00:00:00';
@@ -93,7 +95,7 @@ const Schedule = ({ scheduleList, userList, saveData }) => {
                         }
                     )
                     return (
-                        <div class='flex flex-row justify-between  items-center cursor-pointer p-2 hover:bg-gray-50 ' onClick={() => { setUid(String(user.id)); btn_Click(id);}}>
+                        <div class='flex flex-row justify-between  items-center cursor-pointer p-2 hover:bg-gray-50 hover:shadow-md ' onClick={() => { setUid(String(user.id)); btn_Click(id);}}>
                             <div class='flex flex-row gap-3  items-center text-gray-800  font-medium font-sans'>
                                 {user.profilepic !== null ?
                                     <Image width={30} height={30} src={user.profilepic} style={{ borderRadius: 15 }} /> :

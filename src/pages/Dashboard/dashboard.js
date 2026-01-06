@@ -76,11 +76,11 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList,
         setOrderChart(<AreaChartCard categoriesArray={categoryArray} color={'#99ddff'} series={orderSeries} name={'#'} />)
         setTotalOrders(totalOrder);
         setSalesChart(<AreaChartCard categoriesArray={categoryArray} color={'#a6f2a6'} series={salesSeries} name={'$'} />)
-        setTotalSales(totalSales);
+        setTotalSales(parseFloat(totalSales).toFixed(2));
         setExpenseChart(<AreaChartCard categoriesArray={categoryArray} color={'#ff9999'} series={expensesSeries} name={'$'} />)
-        setTotalExpenses(totalExpenses);
+        setTotalExpenses(parseFloat(totalExpenses).toFixed(2) );
         setRevenueChart(<AreaChartCard categoriesArray={categoryArray} series={revenueSeries} name={'$'} />)
-        setTotalRevenue(totalRevenue);
+        setTotalRevenue(parseFloat(totalRevenue).toFixed(2));
     }, [orderList])
 
     useEffect(() => {       
@@ -109,7 +109,7 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList,
                     <Task orderList={orderList} userList={userList} />                   
                 </div>
                 <div class='flex flex-col gap-4 w-full md:w-2/6'>
-                    <LiveEvent eventList={eventList} servicesList={servicesList} onSelected={onSelected} />
+                    <LiveEvent eventList={eventList} servicesList={servicesList} onSelected={onSelected} saveData={saveData} />
                     <RecentActivities orderList={orderList} userList={userList} eventList={eventList} servicesList={servicesList} expensesList={expensesList} logsList={logsList} />  
                     <Schedule scheduleList={scheduleList} userList={userList} saveData={saveData}  />                        
                 </div>

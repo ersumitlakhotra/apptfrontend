@@ -1,11 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Avatar, Button, Divider, Image,  Rate, Steps } from "antd";
-import { CheckOutlined, CloseOutlined, CalendarOutlined, ClockCircleOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Button, Divider, Flex, Image,  Input,  Modal,  Radio,  Rate, Steps } from "antd";
+import { CheckOutlined, CloseOutlined, CalendarOutlined, ClockCircleOutlined, UnorderedListOutlined, UserOutlined, CreditCardOutlined, SaveOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import { UTC_LocalDateTime } from "../../common/localDate";
 import Services from "../../common/services";
+import { TextboxFlex } from "../../common/textbox";
+import { BsCash } from "react-icons/bs";
+import { setNumberAndDot } from "../../common/cellformat";
+import useAlert from "../../common/alert";
 const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView, saveData }) => {
-
+    const { contextHolder, warning } = useAlert();
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
@@ -23,8 +27,33 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
     const [createdat, setCreatedat] = useState(new Date());
     const [slot, setSlot] = useState('');
     const [bookedvia, setBookedVia] = useState('Walk-In');
+    const [received, setReceived] = useState(0);
+    const [tip, setTip] = useState(0);
+    const [mode, setMode] = useState('Cash');
     const [servicesItem, setServicesItem] = useState([]);
+
     //const filteredOptionsServices = servicesList.filter(o => !selectedItems.includes(o));
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    
+    const saveComplete = () => {
+        if ((received === '' || received <= 0) && status === 'Completed') {
+            if (received === '')
+                warning('Please, fill out the required fields !')
+            else if (received <= 0)
+                warning('Please, Payment received amount can not be Zero! ')
+        }
+        else {
+            const Body = JSON.stringify({             
+                received: received,
+                mode: mode,
+                tip: tip ,
+            });
+            saveData("Order", "POST", "order/complete", id, Body, true, false);
+            setIsModalOpen(false)
+            setOpenView(false);
+        } 
+    };
 
     useEffect(() => {
         if (id === 0) {
@@ -54,23 +83,17 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
         }
     }, [refresh])
 
-    const updateStatus = (isCancel = false) => {
-        if(isCancel)
-            saveData("Order","POST", "order/cancel",id, [],true,false);
-        else
-            saveData("Order","POST", "order/complete",id, [],true,false);
-
-        setOpenView(false);
-    }
-
     return (
         <div class="flex flex-col gap-2 mb-12  w-full">
             <div class='flex items-center justify-between'>
                 <span class="text-2xl font-bold text-gray-800">Order #{order_no}</span>
                 {(status === 'Pending' || status === 'In progress') &&
                     <div class="flex gap-2">
-                        <Button color="cyan" variant="solid" icon={<CheckOutlined />} size="large" onClick={() => updateStatus()}>Completed</Button>
-                        <Button color="danger" variant="solid" icon={<CloseOutlined />} size="large" onClick={() => updateStatus(true)}>Cancelled</Button>
+                        <Button color="cyan" variant="solid" icon={<CheckOutlined />} size="large" onClick={() => setIsModalOpen(true)}>Completed</Button>
+                        <Button color="danger" variant="solid" icon={<CloseOutlined />} size="large" onClick={() => {
+                            saveData("Order", "POST", "order/cancel", id, [], true, false);
+                            setOpenView(false);
+                        }}>Cancelled</Button>
 
                         {/*<Button type='default' icon={<PrinterOutlined />} size="middle">Print</Button>*/}
                     </div>
@@ -188,6 +211,55 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
                     </div>
                 </div>
             </div>
+
+            <Modal
+                title="Payment Detail"
+                closable={{ 'aria-label': 'Custom Close Button' }}
+                open={isModalOpen}
+                //onOk={saveComplete}
+                onCancel={() => setIsModalOpen(false)} 
+                footer={[
+                    <Button color="primary" variant="solid" icon={<SaveOutlined />} size="middle" onClick={saveComplete}>Save</Button>
+                    
+                ]}
+            >
+                <div class='flex flex-col font-normal gap-3 '>
+                    <TextboxFlex label={'Type'} input={
+                        <Radio.Group onChange={(e) => setMode(e.target.value)} value={mode} style={{ width: '100%' }}>
+                            <Radio.Button value="Cash">
+                                <Flex gap="small" justify="center" align="center"  >
+                                    <BsCash style={{ fontSize: 14 }} />
+                                    Cash
+                                </Flex>
+                            </Radio.Button>
+                            <Radio.Button value="Card">
+                                <Flex gap="small" justify="center" align="center"  >
+                                    <CreditCardOutlined style={{ fontSize: 14 }} />
+                                    Visa Card
+                                </Flex>
+                            </Radio.Button>
+                        </Radio.Group>
+                    } />
+
+
+                    <TextboxFlex label={'Received'} mandatory={status === 'Completed'} input={
+                        <Input placeholder="Received" value={received} status={received === '' ? 'error' : ''}
+                            onChange={(e) => {
+                                let _value = setNumberAndDot(e.target.value) // _tax > 0 ? parseFloat((_subTotal * _tax) + _subTotal).toFixed(2) : _subTotal;
+                                setReceived(_value);
+                                let tip = parseFloat(_value).toFixed(2) - parseFloat(total).toFixed(2);
+                                if (tip > 0)
+                                    setTip(parseFloat(tip).toFixed(2));
+                                else
+                                    setTip(0);
+                            }} />
+                    } />
+                    <TextboxFlex label={'Tip'} input={
+                        <Input placeholder="Total" style={{ backgroundColor: '#FAFAFA' }} readOnly={true} value={tip} />
+                    } />
+                </div>
+            </Modal>
+            {contextHolder}
         </div>
     )
 }

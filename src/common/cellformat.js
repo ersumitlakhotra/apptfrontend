@@ -11,7 +11,10 @@ export function setCellFormat (cellValue)  {
     else
         return phoneNumber.substring(0, 12);
 }
-
+export function setNumberAndDot(Value) {
+    let result = Value.replace(/[^0-9.]/g, ''); // Remove non-numeric characters
+    return result
+}
 export function setPriceNumberOnly(inputValue) {
         const regex = /^\d*(\.\d*)?$/;
 

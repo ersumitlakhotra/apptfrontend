@@ -9,7 +9,7 @@ import OrderView from "../../components/Order/order_view";
 import { get_Date, LocalDate } from "../../common/localDate";
 import TaskCalender from "../../components/Task/taskcalender";
 
-const Tasks = ({ orderList, servicesList, userList, companyList, customerList, saveData, reload, setReload }) => {
+const Tasks = ({ orderList, servicesList, userList, companyList, customerList, eventList, saveData, reload, setReload }) => {
     const [date, setDate] = useState(LocalDate());
     const [orders, setOrders] = useState([]);
     const [refresh, setRefresh] = useState(0);
@@ -58,7 +58,7 @@ const Tasks = ({ orderList, servicesList, userList, companyList, customerList, s
             </div>
 
             <div class={`w-full bg-white border rounded-lg overflow-auto`}>
-                <TaskCalender orderList={orders} servicesList={servicesList} userList={userList} companyList={companyList} trndate={date} btn_ViewClick={btn_ViewClick} />            
+                <TaskCalender orderList={orders} servicesList={servicesList} userList={userList} companyList={companyList} customerList={customerList} eventList={eventList} trndate={date} btn_ViewClick={btn_ViewClick} saveData={saveData} />            
             </div>
 
             {/* Drawer on View*/}

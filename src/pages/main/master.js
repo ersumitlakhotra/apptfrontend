@@ -301,6 +301,7 @@ const MasterPage = () => {
       case 'Tasks':
         {
           getData(setCustomerList, "customer");
+          getData(setEventList, "event", true);
           getData(setUserList, "user");
           getData(setServicesList, "services");
           getData(setOrderList, "order");
@@ -395,6 +396,7 @@ const MasterPage = () => {
         servicesList={servicesList}
         companyList={companyList}
         customerList={customerList}
+        eventList={eventList}
         saveData={saveData}
         reload={refresh}
         setReload={setRefresh}
