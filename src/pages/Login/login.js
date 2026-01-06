@@ -23,7 +23,7 @@ export const Login = ({ logo }) => {
         setLocalStorageWithExpiry('uid', res.data.data.id);
         setLocalStorageWithExpiry('email', email, 720);
         setLocalStorageWithExpiry('password', password, 720);
-        navigate("/main", { replace: true }); //success('Login Successfully');     
+        navigate("/main"); //success('Login Successfully');     
       }
       else
         error('Login Failed. Invalid username or password.')

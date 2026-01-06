@@ -109,7 +109,7 @@ const MasterPage = () => {
   useEffect(() => {
     const companyId = localStorage.getItem('cid');
     if (!isUserValid() || !companyId) {
-      navigate("/",{ replace: true });
+      navigate("/");
     }
   }, [navigate, signout]);
 

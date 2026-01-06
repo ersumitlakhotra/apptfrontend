@@ -12,7 +12,7 @@ import Details from '../../components/BookAppointment/detail.js';
 import { apiCalls } from '../../hook/apiCall';
 import { get_Date, LocalDate, LocalTime } from '../../common/localDate.js';
 import useAlert from '../../common/alert.js';
-import { isValidEmail } from '../../common/cellformat.js';
+import { isValidEmail, setCellFormat } from '../../common/cellformat.js';
 import FirstPage from '../../components/BookAppointment/first_page.js';
 import BookingOption from '../../components/BookAppointment/book_reschedule.js';
 import ViewBooking from '../../components/BookAppointment/view_booking.js';
@@ -20,6 +20,7 @@ import { TextboxFlexCol } from '../../common/textbox.js';
 import { useIdleTimer } from 'react-idle-timer';
 import { compareTimes, isOpenForWork } from '../../common/general.js';
 import { generateTimeSlotsWithDate, toMinutes } from '../../common/generateTimeSlots.js';
+import AssignedTo from '../../common/assigned_to.js';
 
 const BookAppointment = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -126,7 +127,7 @@ const BookAppointment = () => {
     }, [servicesItem]);
 
     useEffect(() => {
-        if (cid !== 0) {
+        if (cid !== 0 && trndate !== '') {
             onTrnDateChange();          
         }
         }, [trndate]);
@@ -475,10 +476,11 @@ const BookAppointment = () => {
     }
 
     const searchOrder = async () => {
-        if (order_no !== '' && customerEmail !== '') {
+        if (order_no !== '' && customerPhone !== '' && customerPhone.length === 12) {
             setIsLoading(true);
+            setTrnDate('');
             let result = false;
-            let message = 'Either Booking# or E-mail id is incorrect!';
+            let message = 'Either Booking# or Cell # is incorrect!';
             try {
                 const Body = JSON.stringify({
                     order_no: order_no
@@ -486,12 +488,11 @@ const BookAppointment = () => {
                 const res = await apiCalls("POST", "order/reschedule", cid, null, Body);
                 if (res.data.data.length > 0) {
                     const editList = res.data.data[0];
-                    if (editList.email.toLowerCase() === customerEmail.toLowerCase()) {
+                    if (editList.cell === customerPhone) {
 
                         const date1 = new Date(editList.trndate);
                         const date2 = new Date(LocalDate());
-
-                        if (date1 < date2 || (date1 === date2 && toMinutes(editList.start) < toMinutes(LocalTime('HH:mm')))) {
+                        if (date1 < date2 || (get_Date(editList.trndate,'YYYY-MM-DD') === LocalDate() && toMinutes(editList.start) < toMinutes(LocalTime('HH:mm')))) {
                             result = false;
                             message = `Past order can't be rescheduled or cancel.`;
                         }
@@ -514,7 +515,7 @@ const BookAppointment = () => {
                             setPrevTrnDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
                             setTrnDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
                             setCustomerName(editList.name);
-                            setCustomerPhone(editList.cell);
+                            setCustomerEmail(editList.email);
                             setPrice(editList.price);
                             setTotal(editList.total);
                             setCoupon(editList.coupon);
@@ -668,9 +669,10 @@ const BookAppointment = () => {
                         <Input placeholder="Enter your booking #" size="large" status={order_no === '' ? 'error' : ''} value={order_no} onChange={(e) => setOrder_no(e.target.value)} />
                     } />
 
-                    <TextboxFlexCol label={'E-mail'} mandatory={true} input={
-                        <Input placeholder="Enter your e-mail address . ." size="large" status={customerEmail === '' || !isValidEmail(customerEmail) ? 'error' : ''} value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} />
+                    <TextboxFlexCol label={'Cell #'} mandatory={true} input={
+                        <Input placeholder="Enter your 10 digit phone number . ." size="large" status={customerPhone === '' ? 'error' : ''} value={customerPhone} onChange={(e) => setCustomerPhone(setCellFormat(e.target.value))} />
                     } />
+                       
                     <div class='my-4 flex justify-end items-center'>
                         <Button size='large' color='default' variant="solid" onClick={() => searchOrder()}  >Submit</Button>
                     </div>
@@ -688,16 +690,11 @@ const BookAppointment = () => {
 
                     {assigned_to !== 0 && <ViewBooking title={'Professional'} content={2} setContent={setContent} setOpenOrder={setOpenOrder}
                         value={
-                        <div class='flex flex-row gap-4  items-center'>
-                            {userList.filter(f => f.id === assigned_to).map(item =>
-                                <div key={item.id}>
-                                    {item.profilepic !== null ?
-                                        <Image width={24} height={24} src={item.profilepic} style={{ borderRadius: 10 }} /> :
-                                        <Avatar size={24} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
-                                    }
-                                    <p class="text-xs font-medium">{item.fullname}</p>
-                                </div>)}
-                        </div>
+                            <div class='flex flex-row gap-4 w-full items-center'>
+                                {userList.filter(f => f.id === assigned_to).map(item =>
+                                    <AssignedTo key={item.id} userId={item.id} userList={userList} style='font-medium text-xs ' />
+                                )}
+                            </div>
                         } />
                     }
 

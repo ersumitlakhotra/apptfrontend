@@ -1,26 +1,22 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Badge, Button,  Select, Drawer, Space, Input, Tooltip, Rate, Avatar, Image, Popover, DatePicker } from "antd";
-import {  EditOutlined, PlusOutlined, SaveOutlined, UserOutlined, ContainerOutlined, EyeOutlined } from '@ant-design/icons';
+import {  Button,  Select, Drawer, Space,  Tooltip, Popover, DatePicker } from "antd";
+import {  EditOutlined, PlusOutlined, SaveOutlined,  EyeOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from "react";
-import UserDetail from "../../components/Users/user_detail";
-import UserView from "../../components/Users/user_view.js";
-import { IoSearchOutline } from "react-icons/io5";
 import DataTable from "../../common/datatable";
 import { getTableItem } from "../../common/items";
 import { Tags } from "../../common/tags";
-import LogsView from "../../components/Logs/logs_view.js";
 import ExportToExcel from "../../common/export.js";
-import { firstDateOfMonth, get_Date, lastDateOfMonth, LocalDate, UTC_LocalDateTime } from "../../common/localDate.js";
-import { convertTo12Hour, calculateTime, getMinutes, convertMinutesIntoHours } from "../../common/general";
+import {  get_Date, LocalDate, UTC_LocalDateTime } from "../../common/localDate.js";
+import { convertTo12Hour, calculateTime} from "../../common/general";
 import AssignedTo from "../../common/assigned_to.js";
 import dayjs from 'dayjs';
 import { Sort } from "../../common/sort.js";
 import ScheduleDetail from "../../components/Schedule/schedule_detail.js";
+import ScheduleView from "../../components/Schedule/schedule_view.js";
 
 
 const Schedule = ({ userList, scheduleList,saveData }) => {
     const ref= useRef();
-
     const [filteredList, setFilteredList] = useState(scheduleList);
     const [list, setList] = useState(scheduleList);
 
@@ -32,8 +28,10 @@ const Schedule = ({ userList, scheduleList,saveData }) => {
     const [exportList, setExportList] = useState([]);
 
     const [open, setOpen] = useState(false);
+    const [openView, setOpenView] = useState(false);
     const [title, setTitle] = useState('New')
     const [id, setId] = useState(0);
+    const [uid, setUid] = useState(0);
     const [refresh, setRefresh] = useState(0);
 
     const [assigned_to, setAssignedTo] = useState('');
@@ -83,7 +81,11 @@ const Schedule = ({ userList, scheduleList,saveData }) => {
         setId(id);
         setOpen(true);
     }
-
+    const btn_ViewClick = (id) => {
+        setRefresh(refresh + 1);
+        setUid(id);
+        setOpenView(true);
+    }
     const btnSave = async () => {
         await ref.current?.save();
     }
@@ -165,6 +167,9 @@ const Schedule = ({ userList, scheduleList,saveData }) => {
                                         <Tooltip placement="top" title={'Edit'} >
                                             <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
                                         </Tooltip>
+                                        <Tooltip placement="top" title={'View'} >
+                                            <Button type="link" icon={<EyeOutlined />} onClick={() => btn_ViewClick(item.uid)} />
+                                        </Tooltip>
                                     </td>
                                 </tr>
                             )
@@ -176,7 +181,12 @@ const Schedule = ({ userList, scheduleList,saveData }) => {
             <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
-                <ScheduleDetail id={id} uid={0} refresh={refresh} ref={ref} scheduleList={scheduleList} userList={userList} saveData={saveData} setOpen={setOpen} />
+                <ScheduleDetail id={id} refresh={refresh} ref={ref} scheduleList={scheduleList} userList={userList} saveData={saveData} setOpen={setOpen} />
+            </Drawer>
+
+            {/* Drawer on View*/}
+            <Drawer title={""} placement='bottom' height={'95%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
+                <ScheduleView id={uid} refresh={refresh} userList={userList} scheduleListAll={scheduleList}  />
             </Drawer>
         </div>
     )
