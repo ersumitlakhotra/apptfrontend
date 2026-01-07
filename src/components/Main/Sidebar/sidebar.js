@@ -12,6 +12,7 @@ import {
    FundOutlined, DollarOutlined,
    SolutionOutlined,
    ContactsOutlined} from '@ant-design/icons';
+import { FaHandHoldingUsd } from "react-icons/fa";
 import SideBarButton from '../sidebar_button';
 import { useEffect, useState } from 'react';
 import logo from '../../../Images/logo.png';
@@ -43,6 +44,7 @@ const Sidebar = ({ onSelected, content, open, uid, getData}) => {
   const [users, setUsers] = useState(false);
   const [schedule, setSchedule] = useState(false);
   const [sales, setSales] = useState(false);
+  const [collection, setCollection] = useState(false);
   const [setting, setSetting] = useState(false);
 
   useEffect(() => {
@@ -66,6 +68,7 @@ const Sidebar = ({ onSelected, content, open, uid, getData}) => {
         setSchedule(b.schedule);
 
         setSales(b.sales);
+        setCollection(b.collection);
         setSetting(b.setting);
       })
     }
@@ -95,8 +98,9 @@ const Sidebar = ({ onSelected, content, open, uid, getData}) => {
   ]);
 
   const report = ([
-    getItem('Sales', 31, <FundOutlined />,sales),
-    getItem('Expenses', 32, <FallOutlined />),
+    getItem('Sales', 31, <FundOutlined />, sales),
+    getItem('Collection', 32, <FaHandHoldingUsd />,collection),
+    getItem('Expenses', 33, <FallOutlined />),
   ]);
 
   const misc = ([

@@ -121,14 +121,16 @@ const Billing = ({ companyList,billingList, saveData, setRefresh }) => {
 
                 <div class='mx-6 flex flex-col gap-16 md:flex-row '>
                     <PricingCard key={1} title={'STARTUP'} price={'0.00'} current={plan === 'STARTUP'} />
-                    <PricingCard key={2} title={'STANDARD'} price={'120.00'} current={plan === 'STANDARD'} />
+                    <PricingCard key={2} title={'STANDARD'} price={'100.00'} current={plan === 'STANDARD'} />
                     <PricingCard key={3} title={'ENTERPRISE'} price={'150.00'} current={plan === 'ENTERPRISE'} />
                 </div>
+                {false &&
                 <div class='mx-6 mt-4 flex justify-end items-center'>
                     <Tooltip placement="top" title={'Click to upgrade or downgrade your plan.'}>
                         <Button size='large' color="primary" variant="solid"  >Upgrade plan</Button>
                     </Tooltip>
                 </div>
+                }
                 <Divider />
 
                 <div class='flex items-center justify-between'>

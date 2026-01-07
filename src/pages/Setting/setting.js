@@ -19,7 +19,7 @@ const Setting = ({ companyList, saveData, setRefresh, tabActiveKey, setTabActive
     const tabItems = [
         getTabItems('1', 'Account', <IdcardOutlined />, <Account companyList={companyList} saveData={saveData} logoList={logoList} setRefresh={setRefresh} onSetSignout={onSetSignout} />),
         getTabItems('2', 'Billing & plans', <ContainerOutlined />, <Billing companyList={companyList} billingList={billingList} saveData={saveData} setRefresh={setRefresh} />),
-        getTabItems('3', 'Notifications', <NotificationOutlined />, <Notification />),
+        //getTabItems('3', 'Notifications', <NotificationOutlined />, <Notification />),
         getTabItems('4', 'Security', <LockOutlined />, <Security companyList={companyList} saveData={saveData} />),
         getTabItems('5', 'Social links', <ShareAltOutlined />, <SocialLink companyList={companyList} saveData={saveData} />),
         getTabItems('6', 'QR Code', <QrcodeOutlined />, <QRcode companyList={companyList} />),

@@ -11,7 +11,7 @@ const DailyReport = ({ orderList, expensesList, yearList }) => {
     const [chart, setChart] = useState(null);
 
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-    const onYearChanged = e => { setCurrentYear(e.label) };
+    const onYearChanged = e => { setCurrentYear(e.key) };
     const menuProps = { items: yearList, onClick: onYearChanged, };
 
     const monthsList = [
@@ -68,7 +68,8 @@ const DailyReport = ({ orderList, expensesList, yearList }) => {
                                 <DownOutlined />
                             </Space>
                         </Button>
-                    </Dropdown> <Dropdown menu={menuProps}>
+                    </Dropdown> 
+                    <Dropdown menu={menuProps}>
                         <Button>
                             <Space>
                                 {currentYear}

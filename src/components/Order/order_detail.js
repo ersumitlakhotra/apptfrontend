@@ -12,6 +12,7 @@ import { get_Date, LocalDate, LocalTime } from "../../common/localDate";
 import { generateTimeSlotsWithDate, toMinutes } from "../../common/generateTimeSlots";
 import { compareTimes, isOpenForWork } from "../../common/general";
 import { apiCalls } from "../../hook/apiCall";
+import { TbTransfer } from "react-icons/tb";
 
 function disabledDate(current) {
   // Can not select days before today and today
@@ -448,10 +449,16 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                                 Cash
                             </Flex>
                         </Radio.Button>
+                        <Radio.Button value="Interac">
+                            <Flex gap="small" justify="center" align="center"  >
+                                 <TbTransfer style={{ fontSize: 14 }} />
+                                E-Transfer
+                            </Flex>
+                        </Radio.Button>
                         <Radio.Button value="Card">
                             <Flex gap="small" justify="center" align="center"  >
                                 <CreditCardOutlined style={{ fontSize: 14 }} />
-                                Visa Card
+                                By Card
                             </Flex>
                         </Radio.Button>
                     </Radio.Group>

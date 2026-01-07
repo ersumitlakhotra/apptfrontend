@@ -8,6 +8,8 @@ import { TextboxFlex } from "../../common/textbox";
 import { BsCash } from "react-icons/bs";
 import { setNumberAndDot } from "../../common/cellformat";
 import useAlert from "../../common/alert";
+ import { TbTransfer } from "react-icons/tb";
+
 const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView, saveData }) => {
     const { contextHolder, warning } = useAlert();
     const [customerName, setCustomerName] = useState('');
@@ -253,10 +255,16 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
                                     Cash
                                 </Flex>
                             </Radio.Button>
+                            <Radio.Button value="Interac">
+                                <Flex gap="small" justify="center" align="center"  >
+                                    <TbTransfer style={{ fontSize: 14 }} />
+                                    E-Transfer
+                                </Flex>
+                            </Radio.Button>
                             <Radio.Button value="Card">
                                 <Flex gap="small" justify="center" align="center"  >
                                     <CreditCardOutlined style={{ fontSize: 14 }} />
-                                    Visa Card
+                                    By Card
                                 </Flex>
                             </Radio.Button>
                         </Radio.Group>

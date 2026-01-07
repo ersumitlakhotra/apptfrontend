@@ -22,6 +22,7 @@ import { setLocalStorageWithExpiry } from "../../common/localStorage.js";
 import Customer from "../Customer/customer.js";
 import Schedule from "../Schedule/schedule.js";
 import warning from "antd/es/_util/warning.js";
+import Collection from "../Collection/collection.js";
 
 const MasterPage = () => {
   const navigate = useNavigate();
@@ -348,6 +349,11 @@ const MasterPage = () => {
           getData(setOrderList, "order");
           break;
         }
+      case 'Collection':
+        {
+          getData(setOrderList, "order");
+          break;
+        }
       case 'Users':
         {
           getData(setLogsList, "logs");
@@ -480,6 +486,11 @@ const MasterPage = () => {
         userList={userList}
         expensesList={expenseList}
         companyList={companyList}
+      />;
+  } else if (content === 'Collection') {
+    displayedContent =
+      <Collection
+      orderList={orderList}     
       />;
   } else if (content === 'Setting') {
     displayedContent =

@@ -39,6 +39,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
     const [users, setUsers] = useState(false);
     const [schedule, setSchedule] = useState(false);
     const [sales, setSales] = useState(false);
+    const [collection, setCollection] = useState(false);
     const [setting, setSetting] = useState(false);
     const { contextHolder, error, warning } = useAlert();
     let refimage=useRef();
@@ -52,7 +53,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
             setAccountType('Basic'); setProfile(null);
             setGender('Male'); setStatus('Active');setAppSchedule(true);
             setDashboard(true); setTasks(false); setOrder(false); setEvent(false); setPayment(false);
-            setCustomer(false); setServices(false); setUsers(false); setSchedule(false); setSales(false); setSetting(false);
+            setCustomer(false); setServices(false); setUsers(false); setSchedule(false); setSales(false); setCollection(false); setSetting(false);
         }
         else {
             const editList = userList.find(item => item.id === id)
@@ -83,6 +84,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
                 setSchedule(b.schedule)
 
                 setSales(b.sales);
+                setCollection(b.collection);
                 setSetting(b.setting);
             })
         }
@@ -116,6 +118,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
                 users: users,
                 schedule: schedule,
                 sales: sales,
+                collection:collection,
                 setting: setting,
             }); 
             saveData("Users", id !== 0 ? 'PUT' : 'POST', "user", id !== 0 ? id : null, Body);
@@ -176,6 +179,8 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
             setSchedule={setSchedule}
             sales={sales}
             setSales={setSales}
+            collection={collection}
+            setCollection={setCollection}
             setting={setting}
             setSetting={setSetting}
         />))
