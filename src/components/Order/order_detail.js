@@ -13,6 +13,11 @@ import { generateTimeSlotsWithDate, toMinutes } from "../../common/generateTimeS
 import { compareTimes, isOpenForWork } from "../../common/general";
 import { apiCalls } from "../../hook/apiCall";
 
+function disabledDate(current) {
+  // Can not select days before today and today
+  return current < dayjs().startOf('day');
+}
+
 const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, userList, companyList, eventList, customerList, saveData, setOpen }) => {
 
 
@@ -74,7 +79,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');
             setStatus('Pending'); setPrice('0'); setTax('0'); setTotal('0'); setDiscount('0'); setCoupon(''); setTaxAmount('0'); setTrnDate(LocalDate());
             setAssignedTo('0'); setOrderNo(''); setServicesItem([]); setSlot(''); setPrevSlot(''); setPrevTrnDate(''); setPrevServicesItem([]);
-            setStart(''); setEnd(''); setReceived('0'); setMode('Cash'); setTip(0);
+            setStart(''); setEnd(''); setReceived(0); setMode('Cash'); setTip(0);
         }
         else {
             const editList = orderList.find(item => item.id === id);
@@ -90,7 +95,10 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setPrevAssigned_To(editList.assignedto);
             setPrice(editList.price);
             setTax(editList.tax);
-            setTaxAmount(editList.taxamount);
+            setTaxAmount(editList.taxamount);           
+            setReceived(editList.received);
+            setMode(editList.mode);
+            setTip(editList.tip);
             setTotal(editList.total);
             setCoupon(editList.coupon);
             setDiscount(editList.discount);
@@ -99,9 +107,6 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setStart(editList.start);
             setEnd(editList.end);
             setStatus(editList.status);
-            setReceived(editList.received);
-            setMode(editList.mode);
-            setTip(editList.tip);
         }
         const liveList = eventList.filter(a => a.case.toUpperCase() === 'LIVE');
         setLiveList(liveList.length > 0 ? liveList : [])
@@ -151,7 +156,6 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 });
 
                 saveData("Order", id !== 0 ? 'PUT' : 'POST', "order", id !== 0 ? id : null, Body);
-
                 setOpen(false);
             }
         }
@@ -218,6 +222,15 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
         }
     }, [status, price, discount, tax, coupon])
 
+    const calculateTip = (value) => {
+        let _value = setNumberAndDot(value) // _tax > 0 ? parseFloat((_subTotal * _tax) + _subTotal).toFixed(2) : _subTotal;
+        setReceived(_value);
+        let tip = parseFloat(_value).toFixed(2) - parseFloat(total).toFixed(2);
+        if (tip > 0)
+            setTip(parseFloat(tip).toFixed(2));
+        else
+            setTip(0);
+    }
 
     useEffect(() => {
         onTrnDateChange();
@@ -298,6 +311,8 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 setIsOpen(false);
         }
     }
+
+    
     return (
         <div class='flex flex-col font-normal gap-3 '>
             <TextboxFlex label={'Search'} input={
@@ -445,16 +460,9 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
 
                 <TextboxFlex label={'Received'} mandatory={status === 'Completed'} input={
                     <Input placeholder="Received" value={received} status={received === '' ? 'error' : ''}
-                        onChange={(e) => {
-                            let _value = setNumberAndDot(e.target.value) // _tax > 0 ? parseFloat((_subTotal * _tax) + _subTotal).toFixed(2) : _subTotal;
-                            setReceived(_value);
-                            let tip = parseFloat(_value).toFixed(2) - parseFloat(total).toFixed(2);
-                            if (tip > 0)
-                                setTip(parseFloat(tip).toFixed(2));
-                            else
-                                setTip(0);
-                        }} />
+                        onChange={(e) =>calculateTip(e.target.value)} />
                 } />
+
                 <TextboxFlex label={'Tip'} input={
                     <Input placeholder="Total" style={{ backgroundColor: '#FAFAFA' }} readOnly={true} value={tip} />
                 } />
@@ -468,6 +476,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 <DatePicker status={trndate === '' ? 'error' : ''}
                     style={{ width: '100%' }}
                     allowClear={false}
+                    disabledDate={id===0 && disabledDate}
                     value={trndate === '' ? trndate : dayjs(trndate, 'YYYY-MM-DD')}
                     onChange={(date, dateString) => setTrnDate(dateString)} />
             } />

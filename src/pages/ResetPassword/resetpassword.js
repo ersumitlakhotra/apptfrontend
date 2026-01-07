@@ -29,11 +29,15 @@ export const ResetPassword = ({ logo }) => {
         const body = JSON.stringify({ email: email });
         const res = await apiCalls('POST', 'company/isExist', null, null, body);
         if (res.status === 200 && res.data.data !== null) {
-          let name = res.data.data.name;
-          setCid(res.data.data.id);
-          setUid(res.data.data.uid);
-          sendEmail(name);
-          setOpenVerification(true);
+          if (Boolean(res.data.data.active)) {
+            let name = res.data.data.name;
+            setCid(res.data.data.id);
+            setUid(res.data.data.uid);
+            sendEmail(name);
+            setOpenVerification(true);
+          }
+          else
+            error('Your account is deactivated and cannot access the application. Please contact our help desk!')
         }
         else {
           warning('Could not find that email address, Sorry.');

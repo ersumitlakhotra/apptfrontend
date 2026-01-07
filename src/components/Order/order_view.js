@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Avatar, Button, Divider, Flex, Image,  Input,  Modal,  Radio,  Rate, Steps } from "antd";
+import { Avatar, Button, Divider, Flex, Image, Input, Modal, Radio, Rate, Steps } from "antd";
 import { CheckOutlined, CloseOutlined, CalendarOutlined, ClockCircleOutlined, UnorderedListOutlined, UserOutlined, CreditCardOutlined, SaveOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import { UTC_LocalDateTime } from "../../common/localDate";
@@ -35,7 +35,7 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
     //const filteredOptionsServices = servicesList.filter(o => !selectedItems.includes(o));
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    
+
     const saveComplete = () => {
         if ((received === '' || received <= 0) && status === 'Completed') {
             if (received === '')
@@ -44,15 +44,15 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
                 warning('Please, Payment received amount can not be Zero! ')
         }
         else {
-            const Body = JSON.stringify({             
+            const Body = JSON.stringify({
                 received: received,
                 mode: mode,
-                tip: tip ,
+                tip: tip,
             });
             saveData("Order", "POST", "order/complete", id, Body, true, false);
             setIsModalOpen(false)
             setOpenView(false);
-        } 
+        }
     };
 
     useEffect(() => {
@@ -74,7 +74,7 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
             setAssignedTo(editList.assignedto);
             setPrice(editList.price);
             setTax(editList.tax);
-            setTaxAmount(editList.taxamount); 
+            setTaxAmount(editList.taxamount);
             setTotal(editList.total);
             setCoupon(editList.coupon);
             setDiscount(editList.discount);
@@ -82,6 +82,16 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
             setBookedVia(editList.bookedvia);
         }
     }, [refresh])
+
+    const calculateTip = (value) => {
+        let _value = setNumberAndDot(value) // _tax > 0 ? parseFloat((_subTotal * _tax) + _subTotal).toFixed(2) : _subTotal;
+        setReceived(_value);
+        let tip = parseFloat(_value).toFixed(2) - parseFloat(total).toFixed(2);
+        if (tip > 0)
+            setTip(parseFloat(tip).toFixed(2));
+        else
+            setTip(0);
+    }
 
     return (
         <div class="flex flex-col gap-2 mb-12  w-full">
@@ -112,14 +122,14 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
                         <span class="text-xs text-gray-400">Current Order Status</span>
                         <div class='mt-4'>
                             <Steps
-                                current={status === 'Pending' ? 0 : (status === 'In progress' ? 1 : 2)} 
+                                current={status === 'Pending' ? 0 : (status === 'In progress' ? 1 : 2)}
                                 percent={60}
-                                labelPlacement="vertical" 
-                                size="small" 
+                                labelPlacement="vertical"
+                                size="small"
                                 status={status === 'Cancelled' ? "error" : (status === 'Completed' ? "finish" : "process")}
                                 items={[
                                     { title: 'Pending' }, { title: 'In Progress' }, { title: status === 'Cancelled' ? 'Cancelled' : 'Completed' }
-                                ]} />                      
+                                ]} />
 
                         </div>
                     </div>
@@ -144,7 +154,7 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
                         <div class='mt-4 p-4'>
                             <div class='border border-s-4 border-s-cyan-600 p-4 flex flex-col gap-3'>
                                 <span class="text-xs text-gray-400">Working info</span>
-                               {/* <Progress percent={50} size='small' status="active" strokeColor={{ from: '#108ee9', to: '#87d068' }} />*/}
+                                {/* <Progress percent={50} size='small' status="active" strokeColor={{ from: '#108ee9', to: '#87d068' }} />*/}
                                 <div class='flex flex-row gap-2'>
                                     <CalendarOutlined />
                                     <span class="text-xs font-medium text-black">Appointment - {UTC_LocalDateTime(trndate, 'MMMM, DD YYYY')}</span>
@@ -155,7 +165,7 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
                                 </div>
                                 <div class='flex flex-row gap-2'>
                                     <UnorderedListOutlined />
-                                    <Services servicesItem={servicesItem} servicesList={servicesList} />       
+                                    <Services servicesItem={servicesItem} servicesList={servicesList} />
                                 </div>
                             </div>
                         </div>
@@ -196,17 +206,28 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
                         </div>
                     </div>
 
-                    <div class='border rounded bg-white p-4 flex flex-col'>
-                        <span class="text-lg font-bold text-gray-800">Customer</span>
-                        <span class="text-xs text-gray-400">Information Detail</span>
+                    <div class='border rounded bg-white p-4 flex flex-col gap-4'>
+                        <div class='flex flex-row items-center justify-between'>
+                            <div class='flex flex-col'>
+                                <span class="text-lg font-bold text-gray-800">Customer</span>
+                                <span class="text-xs text-gray-400">Information Detail</span>
+                            </div>
+                            {/*<Button type='default' icon={<DownloadOutlined />} size="middle">Download Invoice</Button>*/}
+                        </div>
 
-                        <div class='border rounded flex flex-col gap-1 p-2  mt-4'>
-                            <p class='flex flex-row gap-2'><UserOutlined size={26} /> <span class='text-xs font-semibold'>General Information</span></p>
-                            <ul class='text-xs text-gray-400 ps-10 list-disc'>
-                                <li> {customerName}</li>
-                                <li> {customerPhone}</li>
-                                <li> {customerEmail}</li>
-                            </ul>
+                        <div class='border rounded bg-gray-100 flex flex-col gap-2 p-4 px-8'>
+                            <div class='flex items-start justify-between text-xs'>
+                                <span class=" text-gray-600">Name</span>
+                                <span class="font-semibold text-black">{customerName}</span>
+                            </div>
+                            <div class='flex items-start justify-between text-xs'>
+                                <span class=" text-gray-600">Cell</span>
+                                <span class="font-semibold text-black">{customerPhone}</span>
+                            </div>
+                            <div class='flex items-start justify-between text-xs'>
+                                <span class=" text-gray-600">E-mail</span>
+                                <span class="font-semibold text-black">{customerEmail}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -217,10 +238,10 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
                 closable={{ 'aria-label': 'Custom Close Button' }}
                 open={isModalOpen}
                 //onOk={saveComplete}
-                onCancel={() => setIsModalOpen(false)} 
+                onCancel={() => setIsModalOpen(false)}
                 footer={[
                     <Button color="primary" variant="solid" icon={<SaveOutlined />} size="middle" onClick={saveComplete}>Save</Button>
-                    
+
                 ]}
             >
                 <div class='flex flex-col font-normal gap-3 '>
@@ -241,18 +262,9 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
                         </Radio.Group>
                     } />
 
-
                     <TextboxFlex label={'Received'} mandatory={status === 'Completed'} input={
                         <Input placeholder="Received" value={received} status={received === '' ? 'error' : ''}
-                            onChange={(e) => {
-                                let _value = setNumberAndDot(e.target.value) // _tax > 0 ? parseFloat((_subTotal * _tax) + _subTotal).toFixed(2) : _subTotal;
-                                setReceived(_value);
-                                let tip = parseFloat(_value).toFixed(2) - parseFloat(total).toFixed(2);
-                                if (tip > 0)
-                                    setTip(parseFloat(tip).toFixed(2));
-                                else
-                                    setTip(0);
-                            }} />
+                            onChange={(e) => calculateTip(e.target.value)} />
                     } />
                     <TextboxFlex label={'Tip'} input={
                         <Input placeholder="Total" style={{ backgroundColor: '#FAFAFA' }} readOnly={true} value={tip} />

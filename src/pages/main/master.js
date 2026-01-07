@@ -21,6 +21,7 @@ import Payment from "../Payment/payment.js";
 import { setLocalStorageWithExpiry } from "../../common/localStorage.js";
 import Customer from "../Customer/customer.js";
 import Schedule from "../Schedule/schedule.js";
+import warning from "antd/es/_util/warning.js";
 
 const MasterPage = () => {
   const navigate = useNavigate();
@@ -71,14 +72,18 @@ const MasterPage = () => {
     };
 
     window.addEventListener('resize', handleResize);
-    if (!isUserValid()) {
-      setRefresh(refresh + 1);
-    }
-
+   
     // Clean up the event listener on component unmount
     return () => {
       window.removeEventListener('resize', handleResize);
     };
+  }, []); 
+  
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      isUserValid();
+    }, 7200000); // 7200000  2 hours
+    return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
@@ -225,7 +230,7 @@ const MasterPage = () => {
     return isEmailSend;
   }
 
-  const isUserValid = () => {
+  const isUserValid =async () => {
     let result = true;
     const now = new Date();
     setUid(localStorage.getItem('uid'));
@@ -236,7 +241,7 @@ const MasterPage = () => {
         const email = JSON.parse(localStorage.getItem('email')).value;
         const password = JSON.parse(localStorage.getItem('password')).value;
         clearLocalStorage();
-        result = onSubmit(email, password);
+        result = await onSubmit(email, password);
       }
 
       if (!result) {
@@ -254,11 +259,11 @@ const MasterPage = () => {
     setIsLoading(true);
     try {
       const res = await loginAuth(email, password);
-      if (res.status === 200) {
+      if (res.status === 200 && Boolean(res.data.data.active)) {
         setLocalStorageWithExpiry('cid', res.data.data.cid);
         setLocalStorageWithExpiry('uid', res.data.data.id);
-        setLocalStorageWithExpiry('email', email, 720);
-        setLocalStorageWithExpiry('password', password, 720);
+        setLocalStorageWithExpiry('email', email, 1);
+        setLocalStorageWithExpiry('password', password, 1);
         return true;
       }
       else
