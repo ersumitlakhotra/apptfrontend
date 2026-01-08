@@ -39,11 +39,13 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
 
 
     const saveComplete = () => {
-        if ((received === '' || received <= 0) && status === 'Completed') {
+        if (received === '' || received <= 0 || parseFloat(received).toFixed(2) < parseFloat(total).toFixed(2)) {
             if (received === '')
                 warning('Please, fill out the required fields !')
             else if (received <= 0)
                 warning('Please, Payment received amount can not be Zero! ')
+            else if (parseFloat(received).toFixed(2) < parseFloat(total).toFixed(2))
+                warning('Payment received can not be less than total amount!')
         }
         else {
             const Body = JSON.stringify({

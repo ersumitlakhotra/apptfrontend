@@ -1,10 +1,11 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Space, Dropdown, Drawer,  Badge, Button } from 'antd';
-import { MenuUnfoldOutlined, LogoutOutlined, BellFilled, DownOutlined } from '@ant-design/icons';
+import { MenuUnfoldOutlined, LogoutOutlined, BellFilled, DownOutlined, BookOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import AssignedTo from '../../../common/assigned_to.js';
 import NotificationDetail from '../Notification/notification_detail.js';
+import { SlEarphonesAlt } from "react-icons/sl";
 
 function getItem(key, label, icon, extra, disabled, danger) {
   return {
@@ -46,7 +47,10 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, uid }) =
     setUnread(unread.length > 0 ? unread : [])
   }, [notificationList]);
 
-
+  const openExtendedLink = (address) => {
+    // window.open(address);
+    window.open(address, '_blank', 'noopener noreferrer');
+  };
 
   useEffect(() => {
     if (userList.length > 0) {
@@ -62,6 +66,8 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, uid }) =
                 <p>{b.cell} </p>
               </div>
             </div>, null, null, true),
+          { type: 'divider', },
+          getItem('2', 'Help Center', <SlEarphonesAlt />),
           { type: 'divider', },
           getItem('9', 'Sign Out', <LogoutOutlined />, null, null, true),
         ])
@@ -87,6 +93,11 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, uid }) =
 
   const handleMenuClick = e => {
     switch (e.key) {
+      case '2': // Sign Out
+        {
+          openExtendedLink('https://appointstack.com/support')
+          break;
+        }
       case '9': // Sign Out
         {
           onSignout();

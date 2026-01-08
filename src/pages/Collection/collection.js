@@ -1,16 +1,17 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import { firstDateOfMonth, get_Date, lastDateOfMonth, UTC_LocalDateTime } from "../../common/localDate.js";
+import { firstDateOfMonth, get_Date, lastDateOfMonth } from "../../common/localDate.js";
 import dayjs from 'dayjs';
 import ExportToExcel from "../../common/export.js";
 import Card from "../../components/Collection/card.js";
-import { Button, DatePicker, Popover, Skeleton, Select,Badge } from "antd";
+import { Button, DatePicker, Popover, Skeleton, Select,Badge, Drawer } from "antd";
 import DataTable from "../../common/datatable.js";
 import { getTableItem } from "../../common/items.js";
 import { Tags } from "../../common/tags.js";
+import OrderView from "../../components/Order/order_view.js";
 
-const Collection = ({ orderList }) => {  
+const Collection = ({ orderList, servicesList, userList,saveData }) => {  
     const [price, setPrice] = useState(null);
     const [tax, setTax] = useState(null);
     const [received, setReceived] = useState(null);
@@ -24,13 +25,23 @@ const Collection = ({ orderList }) => {
     const [fromDate, setFromDate] = useState(dayjs(firstDateOfMonth(new Date())).format("YYYY-MM-DD"));
     const [toDate, setToDate] = useState(dayjs(lastDateOfMonth(new Date())).format("YYYY-MM-DD"));
 
+    const [openView, setOpenView] = useState(false);
+    const [id, setId] = useState(0);
+    const [refresh, setRefresh] = useState(0);
+
+    const btn_ViewClick = (id) => {
+        setRefresh(refresh + 1);
+        setId(id);
+        setOpenView(true);
+    }
+
     useEffect(() => {
         search();
     }, []) 
     
     useEffect(() => {
         search();
-    }, [fromDate, toDate,sortStatus])
+    }, [orderList,fromDate, toDate,sortStatus])
 
     const search = () => {
         setPrice(null);
@@ -150,7 +161,7 @@ const Collection = ({ orderList }) => {
                         body={(
                             filteredList.map(item => (
                                 <tr key={item.id} class="bg-white border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50 ">
-                                    <td class="p-3 text-blue-500 italic hover:underline cursor-pointer"  ># {item.order_no}</td>
+                                    <td class="p-3 text-blue-500 italic hover:underline cursor-pointer" onClick={() => btn_ViewClick(item.id)}  ># {item.order_no}</td>
                                     <td class="p-3 font-semibold">{get_Date(item.trndate, 'DD MMM YYYY')}</td>
                                     <td class="p-3">$ {item.price}</td>
                                     <td class="p-3">$ {item.discount}</td>
@@ -166,6 +177,11 @@ const Collection = ({ orderList }) => {
                         )} />
                 }
             </div>
+
+            {/* Drawer on View*/}
+            <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
+                <OrderView id={id} refresh={refresh} orderList={orderList} servicesList={servicesList} userList={userList} setOpenView={setOpenView} saveData={saveData} />
+            </Drawer>
         </div>
     )
 }

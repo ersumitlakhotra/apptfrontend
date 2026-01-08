@@ -116,7 +116,7 @@ const Order = ({ orderList, servicesList, userList, companyList, eventList, logs
 
             {/* Drawer on View*/}
             <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor:'#F9FAFB'}} onClose={() => setOpenView(false)} open={openView}>
-                <OrderView id={id} refresh={refresh} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} setOpenView={setOpenView} saveData={saveData} />
+                <OrderView id={id} refresh={refresh} orderList={orderList} servicesList={servicesList} userList={userList} setOpenView={setOpenView} saveData={saveData} />
             </Drawer>
 
             {/* Drawer on logs */}

@@ -351,6 +351,8 @@ const MasterPage = () => {
         }
       case 'Collection':
         {
+          getData(setUserList, "user");
+          getData(setServicesList, "services");
           getData(setOrderList, "order");
           break;
         }
@@ -490,7 +492,10 @@ const MasterPage = () => {
   } else if (content === 'Collection') {
     displayedContent =
       <Collection
-      orderList={orderList}     
+      orderList={orderList}  
+      servicesList={servicesList}
+      userList={userList} 
+      saveData={saveData}
       />;
   } else if (content === 'Setting') {
     displayedContent =

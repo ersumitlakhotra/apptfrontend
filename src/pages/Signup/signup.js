@@ -198,7 +198,9 @@ export const Signup = ({ logo }) => {
             <button onClick={() => onSubmit()} type="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Sign up</button>
 
             <p class="block mb-2 text-center text-xs font-small text-gray-500 dark:text-white">
-              By signing up to create an account, you are accepting our terms of service and privacy policy
+              By signing up to create an account, you are accepting 
+              <a href="/privacy-policy" target="_blank" class="font-medium text-primary-600 hover:underline dark:text-primary-500"> our terms of service </a>and 
+              <a href="/privacy-policy" target="_blank" class="font-medium text-primary-600 hover:underline dark:text-primary-500"> privacy policy</a>
             </p>
           </div>
         </div>

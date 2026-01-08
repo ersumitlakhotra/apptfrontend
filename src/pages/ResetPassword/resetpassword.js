@@ -150,9 +150,14 @@ export const ResetPassword = ({ logo }) => {
                 placeholder="name@company.com" required onChange={(e) => setEmail(e.target.value)} />
             </div>
             <button type="submit" onClick={() => onSubmit()} class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Request verification code</button>
-            <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-              Already have an account? <a href="/" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign in</a>
-            </p>
+            <div>
+              <p class="text-sm font-light text-gray-500 dark:text-gray-400">
+                Already have an account? <a href="/" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign in</a>
+              </p>
+              <p class="text-sm font-light text-gray-500 dark:text-gray-400">
+                Feel free to  <a href="/support" target="_blank" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Contact us</a>
+              </p>
+            </div>
           </div>
         </div>
       </div>
