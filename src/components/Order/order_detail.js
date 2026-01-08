@@ -97,9 +97,6 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setPrice(editList.price);
             setTax(editList.tax);
             setTaxAmount(editList.taxamount);           
-            setReceived(editList.received);
-            setMode(editList.mode);
-            setTip(editList.tip);
             setTotal(editList.total);
             setCoupon(editList.coupon);
             setDiscount(editList.discount);
@@ -108,6 +105,9 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setStart(editList.start);
             setEnd(editList.end);
             setStatus(editList.status);
+             setReceived(editList.received);
+            setMode(editList.mode);
+            setTip(editList.tip);
         }
         const liveList = eventList.filter(a => a.case.toUpperCase() === 'LIVE');
         setLiveList(liveList.length > 0 ? liveList : [])
@@ -126,11 +126,13 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             price !== '' && price !== '.' && trndate !== '' && customerEmail !== '' && isValidEmail(customerEmail) &&
             isOpen && isUserWorking && (assigned_to === '0' ? true : slot === '' ? false : true)) {
         
-            if ((received === '' || received <= 0) && status === 'Completed') {
+            if ((received === '' || received <= 0 || parseFloat(received).toFixed(2) < parseFloat(total).toFixed(2)) && status === 'Completed') {
                 if (received === '')
                 warning('Please, fill out the required fields !') 
                 else if (received <= 0)
                 warning('Please, Payment received amount can not be Zero! ')
+                else if (parseFloat(received).toFixed(2) < parseFloat(total).toFixed(2))
+                warning('Payment received can not be less than total amount!')
             }
             else {
                 const Body = JSON.stringify({
@@ -232,6 +234,11 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
         else
             setTip(0);
     }
+
+    useEffect(() => {
+        if(parseFloat(received).toFixed(2) > 0)
+            calculateTip(received)
+    }, [total])
 
     useEffect(() => {
         onTrnDateChange();

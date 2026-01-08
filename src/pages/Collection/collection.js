@@ -5,7 +5,7 @@ import { firstDateOfMonth, get_Date, lastDateOfMonth, UTC_LocalDateTime } from "
 import dayjs from 'dayjs';
 import ExportToExcel from "../../common/export.js";
 import Card from "../../components/Collection/card.js";
-import { Button, DatePicker, Popover, Skeleton } from "antd";
+import { Button, DatePicker, Popover, Skeleton, Select,Badge } from "antd";
 import DataTable from "../../common/datatable.js";
 import { getTableItem } from "../../common/items.js";
 import { Tags } from "../../common/tags.js";
@@ -19,6 +19,8 @@ const Collection = ({ orderList }) => {
     const [total, setTotal] = useState(null);
     const [exportList, setExportList] = useState([]);
     const [filteredList, setFilteredList] = useState(null);
+    
+    const [sortStatus, setSortStatus] = useState('');
     const [fromDate, setFromDate] = useState(dayjs(firstDateOfMonth(new Date())).format("YYYY-MM-DD"));
     const [toDate, setToDate] = useState(dayjs(lastDateOfMonth(new Date())).format("YYYY-MM-DD"));
 
@@ -28,7 +30,7 @@ const Collection = ({ orderList }) => {
     
     useEffect(() => {
         search();
-    }, [fromDate, toDate])
+    }, [fromDate, toDate,sortStatus])
 
     const search = () => {
         setPrice(null);
@@ -45,7 +47,10 @@ const Collection = ({ orderList }) => {
         let _discount = 0;
         let _tip = 0;
         let _total = 0;
-        const list=orderList.filter(item => get_Date(item.trndate, 'YYYY-MM-DD') >= fromDate && get_Date(item.trndate, 'YYYY-MM-DD') <= toDate);    
+        let list=orderList.filter(item => get_Date(item.trndate, 'YYYY-MM-DD') >= fromDate && get_Date(item.trndate, 'YYYY-MM-DD') <= toDate);   
+        if(sortStatus !=='')
+             list=list.filter(item => item.mode === sortStatus);
+
         list.map(b => {
             _price += parseFloat(b.price);
             _tax += parseFloat(b.taxamount);
@@ -96,11 +101,21 @@ const Collection = ({ orderList }) => {
                 <Card key={5} title={'Received'} value={received} backgroundColor={'#fde3cf'} color={'#f56a00'} />
                 <Card key={6} title={'Tip'} value={tip} backgroundColor={'#fde3cf'} color={'#f56a00'} />             
             </div>
-            <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
+            <div class='w-full  bg-white border rounded-lg p-4 flex flex-col gap-4 '>
                 <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
                     <div class='w-full flex flex-row gap-2 items-center md:w-1/3'>
-                        <p class='text-sm text-gray-500 whitespace-nowrap'>Filter user</p>
-                        
+                        <p class='text-sm text-gray-500 whitespace-nowrap'>Filter by</p>
+                        <Select
+                            value={sortStatus}
+                            style={{ width: 120 }}
+                            onChange={(e) => setSortStatus(e)}
+                            options={[
+                                { value: '', label: <Badge color={'blue'} text={'All'} /> },
+                                { value: 'Cash', label: <Badge color={'lime'} text={'Cash'} /> },
+                                { value: 'Interac', label: <Badge color={'gold'} text={'Interac'} /> },
+                                { value: 'Card', label: <Badge color={'hwb(205 6% 9%)'} text={'Card'} /> }
+                            ]}
+                        />
                     </div>
                     <div class='w-full md:w-2/3'>
                         <div class='flex flex-col md:flex-row md:justify-end gap-4 '>

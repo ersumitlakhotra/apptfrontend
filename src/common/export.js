@@ -228,6 +228,74 @@ const ExportToExcel = ({ data, fileName, servicesList, userList }) => {
         break;
       
       }
+      case 'COLLECTION': { 
+        worksheet.columns = [
+          getExcelItem('Order', 30),
+          getExcelItem('Date', 30),
+          getExcelItem('Price', 20),
+          getExcelItem('Discount', 20),
+          getExcelItem('Tax', 20),
+          getExcelItem('Total', 20),
+          getExcelItem('Received', 20),
+          getExcelItem('Tip', 20),
+          getExcelItem('Mode', 20),
+          getExcelItem('Status', 20),
+        ];
+        let _price = 0;
+        let _tax = 0;
+        let _received = 0;
+        let _discount = 0;
+        let _tip = 0;
+        let _total = 0;
+        
+           
+        data.forEach(item => {
+            _price += parseFloat(item.price);
+            _tax += parseFloat(item.taxamount);
+            _received += parseFloat(item.received);
+            _discount += parseFloat(item.discount);
+            _tip += parseFloat(item.tip);
+            _total += parseFloat(item.total);
+
+          worksheet.addRow({
+            Order:`# ${item.order_no}`,
+            Date: get_Date(item.trndate, 'DD MMM YYYY'),
+            Price: item.price,
+            Discount: item.discount,
+            Tax: item.taxamount,
+            Total: item.total,
+            Received: item.received,
+            Tip: item.tip,
+            Mode: item.mode,
+            Status: item.status
+          });
+        });
+
+        const row = worksheet.addRow({
+            Order:'Total',
+            Date: '',
+            Price: _price,
+            Discount: _discount,
+            Tax: _tax,
+            Total: _total,
+            Received: _received,
+            Tip: _tip,
+            Mode:'',
+            Status: ''
+          });
+
+        row.eachCell((cell) => {
+          cell.border = {
+            top: { style: "thick" },
+            bottom: { style: "thick" },
+          };
+          cell.font = {
+            bold:true
+          }
+}); 
+        break;
+      
+      }
       default: { break; }
     }
 
