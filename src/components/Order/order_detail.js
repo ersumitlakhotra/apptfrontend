@@ -291,7 +291,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                         let inTime = loginTime === -1 ? inTimeEmployee : (loginTime === 1 || loginTime === 0) && business[0].inTime;
                         let outTime = logoutTime === -1 ? business[0].outTime : (logoutTime === 1 || logoutTime === 0) && outTimeEmployee;
 
-                        let availableSlots = generateTimeSlotsWithDate(trndate, inTime, outTime, minutes === 0 ? 30 : minutes, appointments);
+                        let availableSlots = generateTimeSlotsWithDate(trndate, inTime, outTime, minutes === 0 ? 30 : minutes, appointments, assigned_to);
                         let localTime = toMinutes(LocalTime('HH:mm'));
                         if (trndate === LocalDate()) {
                             availableSlots = availableSlots.filter(item => toMinutes(item.start) >= localTime);

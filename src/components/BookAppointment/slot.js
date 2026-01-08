@@ -16,7 +16,7 @@ function getFutureDates(numberOfDays) {
     }
     return dates;
 }
-const Slot = ({ daysAdvance, trndate, setTrnDate, slot, setSlot, setStart, setEnd, isOpen, isUserWorking, availableSlots, employeeName }) => {
+const Slot = ({ daysAdvance, trndate, setTrnDate, slot, setSlot, setStart, setEnd, setEmployeeId, isOpen, isUserWorking, availableSlots, employeeName }) => {
 
     const [dateAvailable, setDateAvailable] = useState([]);
     const [morningSlot, setMorningSlot] = useState([]);
@@ -75,6 +75,7 @@ const Slot = ({ daysAdvance, trndate, setTrnDate, slot, setSlot, setStart, setEn
                                                 setSlot(item.slot);
                                                 setStart(item.start);
                                                 setEnd(item.end);
+                                                setEmployeeId(item.uid);
                                             }}>
 
                                             {item.slot}

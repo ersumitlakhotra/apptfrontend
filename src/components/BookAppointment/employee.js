@@ -7,7 +7,7 @@ const Employee = ({ userList, user, setUser }) => {
     const [filteredList, setFilteredList] = useState(userList);
 
     useEffect(() => {
-        setFilteredList(userList);
+        setFilteredList([{ id: -1, status: 'active', profilepic: null, fullname: 'Any' }, ...userList]);
     }, [userList])
 
     return (

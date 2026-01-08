@@ -3,7 +3,7 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
 import { Button, Spin, Modal, Drawer, Image, Avatar, Input } from 'antd';
 import { LoadingOutlined, ArrowLeftOutlined, CloseOutlined, UpCircleOutlined, UserOutlined, CalendarOutlined, ContactsOutlined } from '@ant-design/icons';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Services from '../../components/BookAppointment/services.js';
 import Employee from '../../components/BookAppointment/employee.js';
@@ -42,8 +42,10 @@ const BookAppointment = () => {
     const [bookingType, setBookingType] = useState(0);
     const [assigned_to, setAssignedTo] = useState(0);
     const [prevAssigned_To, setPrevAssigned_To] = useState(0);
+    const [activeEmployee, setActiveEmployee]=useState([])
     
     const [employeeName, setEmployeeName] = useState('');
+    const [employeeId, setEmployeeId] = useState(0);
 
     const [servicesItem, setServicesItem] = useState([]);
     const [prevServicesItem, setPrevServicesItem] = useState([]);
@@ -114,8 +116,29 @@ const BookAppointment = () => {
     }, [cid]);
 
     useEffect(() => {
-        userList.filter(a => a.id === assigned_to).map(item => setEmployeeName(item.fullname))
+        if (assigned_to > 0)
+            userList.filter(a => a.id === assigned_to).map(item => setEmployeeName(item.fullname))
+        else if (assigned_to === -1) {
+            let active = [];
+            userList.map(async item => {
+                const employee = await getUserSchedule(item.id);
+                if (employee[0].isOpen) {
+                    active.push({
+                        id: item.id,    // <-- date included here
+                        inTime: employee[0].inTime,
+                        outTime: employee[0].outTime,
+                        isOpen: employee[0].isOpen,
+                    });
+                }
+            })
+            setActiveEmployee(active);
+        }
     }, [assigned_to]);
+
+    useEffect(() => {
+        if (employeeId > 0)
+            userList.filter(a => a.id === employeeId).map(item => setEmployeeName(item.fullname))     
+    }, [employeeId]);
 
     useEffect(() => {
         let price = 0
@@ -133,65 +156,28 @@ const BookAppointment = () => {
         }, [trndate]);
 
     const onTrnDateChange = async () => {
-        const body = JSON.stringify({ date: get_Date(trndate, 'YYYY-MM-DD').toString(), uid: parseInt(assigned_to) });
-        let orderList = [];
-
-        setIsLoading(true);
-        try {
-            const res = await apiCalls("POST", "order/booking", cid, null, body, false);
-            orderList = res.data.data;
-        }
-        catch (e) {
-            orderList = [];
-            //error(error.message)
-        }
-        setIsLoading(false);
-
         //setSlot(prevTrnDate === trndate && bookingType > 1 ? prevSlot :'' );
         setSlot('');
         const business = isOpenForWork(trndate, storeSchedule);
-        let appointments = [];
          if (business[0].isOpen) {
                 setIsOpen(true);
-                if (assigned_to !== 0) {
+                if (assigned_to > 0) {
                     const user = userList.find(item => item.id === assigned_to);
                     setEmployeeName(user.fullname);
-
-                    let inTimeEmployee = '00:00:00';
-                    let outTimeEmployee = '00:00:00';
-                    let isOpenEmployee = false;
-                    setIsLoading(true);
-                    try {
-                        const Body = JSON.stringify({
-                            cid: cid,
-                            uid: assigned_to,
-                            trndate: trndate
-                        });
-                        const res = await apiCalls("POST", 'app/schedule/date', null, null, Body);
-                        if (res.status === 200) {
-                            inTimeEmployee = res.data.data.startshift;
-                            outTimeEmployee = res.data.data.endshift;
-                            isOpenEmployee = Boolean(res.data.data.dayoff)
-                        }
-                    }
-                    catch {
-                        inTimeEmployee = '00:00:00';
-                        outTimeEmployee = '00:00:00';
-                        isOpenEmployee = false;
-                    }
-                    setIsLoading(false);
-                    if (isOpenEmployee) {
+                    const employee =await getUserSchedule(assigned_to);            
+                    if (employee[0].isOpen) {
                         setUserWorking(true);
-                        appointments = orderList.filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === assigned_to && a.status !== 'Cancelled' && a.id !== order_id));
-
+                        let orderList =await getOrderList(assigned_to);
+                        let appointments = orderList[0].filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === assigned_to && a.status !== 'Cancelled' && a.id !== order_id));
+                       
                         let minutes = 0;
                         servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item => { minutes += item.minutes; });
 
-                        let loginTime = compareTimes(business[0].inTime, inTimeEmployee);
-                        let logoutTime = compareTimes(business[0].outTime, outTimeEmployee);
-                        let inTime = loginTime === -1 ? inTimeEmployee : (loginTime === 1 || loginTime === 0) && business[0].inTime;
-                        let outTime = logoutTime === -1 ? business[0].outTime : (logoutTime === 1 || logoutTime === 0) && outTimeEmployee;
-                        setAvailableSlot(generateTimeSlotsWithDate(trndate, inTime, outTime, minutes === 0 ? 30 : minutes, appointments));
+                        let loginTime = compareTimes(business[0].inTime, employee[0].inTime);
+                        let logoutTime = compareTimes(business[0].outTime, employee[0].outTime);
+                        let inTime = loginTime === -1 ? employee[0].inTime : (loginTime === 1 || loginTime === 0) && business[0].inTime;
+                        let outTime = logoutTime === -1 ? business[0].outTime : (logoutTime === 1 || logoutTime === 0) && employee[0].outTime;
+                        setAvailableSlot(generateTimeSlotsWithDate(trndate, inTime, outTime, minutes === 0 ? 30 : minutes, appointments,assigned_to));
                        
                         if (prevTrnDate === trndate && order_id !== 0 && prevAssigned_To === assigned_to && prevServicesItem === servicesItem) {
                             setSlot(prevSlot);
@@ -201,6 +187,40 @@ const BookAppointment = () => {
                     else
                         setUserWorking(false);
 
+                }
+                else if (assigned_to === -1)
+                {
+                    setUserWorking(true);
+                    let minutes = 0;
+                    servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item => { minutes += item.minutes; });
+                    let orderList = [];
+                    let appointments = [];
+                    let data = [];
+                    activeEmployee.map(async (employee,index) => {
+                        orderList =await getOrderList(employee.id);
+                        appointments = orderList[0].filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === employee.id && a.status !== 'Cancelled' && a.id !== order_id));
+                      
+                        let loginTime = compareTimes(business[0].inTime, employee.inTime);
+                        let logoutTime = compareTimes(business[0].outTime, employee.outTime);
+                        let inTime = loginTime === -1 ? employee.inTime : (loginTime === 1 || loginTime === 0) && business[0].inTime;
+                        let outTime = logoutTime === -1 ? business[0].outTime : (logoutTime === 1 || logoutTime === 0) && employee.outTime;
+                        let slots = generateTimeSlotsWithDate(trndate, inTime, outTime, minutes === 0 ? 30 : minutes, appointments, employee.id);   
+                        data.push(slots);
+
+                        if(index === activeEmployee.length -1)
+                        {
+                            let distinctSlotObjects = [
+                                ...new Map(
+                                    data.flat().map(item => [item.slot, item])
+                                ).values()
+                            ];
+                            setAvailableSlot(distinctSlotObjects) 
+                        }
+                    })  
+                    
+                    if (prevTrnDate === trndate && order_id !== 0 && prevAssigned_To === assigned_to && prevServicesItem === servicesItem) {
+                        setSlot(prevSlot);
+                    }
                 }
                 else {
                     setUserWorking(true);
@@ -212,8 +232,60 @@ const BookAppointment = () => {
 
     }
 
+    const getUserSchedule =async (uid) => {
+        const _result = [];
+        let inTimeEmployee = '00:00:00';
+        let outTimeEmployee = '00:00:00';
+        let isOpenEmployee = false;
+        setIsLoading(true);
+        try {
+            const Body = JSON.stringify({
+                cid: cid,
+                uid: uid,
+                trndate: trndate
+            });
+            const res = await apiCalls("POST", 'app/schedule/date', null, null, Body);
+            if (res.status === 200) {
+                inTimeEmployee = res.data.data.startshift;
+                outTimeEmployee = res.data.data.endshift;
+                isOpenEmployee = Boolean(res.data.data.dayoff)
+            }
+        }
+        catch {
+            inTimeEmployee = '00:00:00';
+            outTimeEmployee = '00:00:00';
+            isOpenEmployee = false;
+        }
+        setIsLoading(false);
+        _result.push({    
+            uid: uid,    // <-- date included here
+            inTime: inTimeEmployee,
+            outTime: outTimeEmployee,
+            isOpen: isOpenEmployee,
+        });
+        return _result;
+    }
+
+    const getOrderList = async (uid) => {
+        let orderList = [];
+        setIsLoading(true);
+        const body = JSON.stringify({ 
+            date: get_Date(trndate, 'YYYY-MM-DD').toString(), 
+            uid: parseInt(uid) 
+        });
+        try {
+            const res = await apiCalls("POST", "order/booking", cid, null, body, false);
+            orderList.push(res.data.data);
+        }
+        catch (e) {
+            orderList = [];
+            //error(error.message)
+        }
+        setIsLoading(false);
+        return orderList;
+    }
     const getData = async (setList, method, endPoint, id = null, body = [], eventDate = false) => {
-       
+
         setIsLoading(true);
         try {
             const res = await apiCalls(method, endPoint, cid, id, body, eventDate);
@@ -372,7 +444,7 @@ const BookAppointment = () => {
                 coupon: coupon,
                 status: 'Pending',
                 trndate: trndate,
-                assignedto: assigned_to,
+                assignedto: employeeId,
                 slot: slot,
                 start: start,
                 end: end,
@@ -383,7 +455,7 @@ const BookAppointment = () => {
             });
 
             if (bookingType === 1 || bookingType === 2) {
-                const bodyOrderCheck = JSON.stringify({ date: get_Date(trndate, 'YYYY-MM-DD').toString(), uid: parseInt(assigned_to) });
+                const bodyOrderCheck = JSON.stringify({ date: get_Date(trndate, 'YYYY-MM-DD').toString(), uid: parseInt(employeeId) });
                  let orderList=[];
                 setIsLoading(true);
                 try {
@@ -572,6 +644,7 @@ const BookAppointment = () => {
             setSlot={setSlot}
             setStart={setStart}
             setEnd={setEnd}
+            setEmployeeId={setEmployeeId}
             isOpen={isOpen}
             isUserWorking={isUserWorking}
             availableSlots={availableSlot}
@@ -694,7 +767,11 @@ const BookAppointment = () => {
                     {assigned_to !== 0 && <ViewBooking title={'Professional'} content={2} setContent={setContent} setOpenOrder={setOpenOrder}
                         value={
                             <div class='flex flex-row gap-4 w-full items-center'>
-                                {userList.filter(f => f.id === assigned_to).map(item =>
+                                {
+                                    assigned_to === -1 ? 
+                                        <AssignedTo key={-1} userId={-1} userList={userList} style='font-medium text-xs ' />
+                                    :                            
+                                    userList.filter(f => f.id === assigned_to).map(item =>
                                     <AssignedTo key={item.id} userId={item.id} userList={userList} style='font-medium text-xs ' />
                                 )}
                             </div>
