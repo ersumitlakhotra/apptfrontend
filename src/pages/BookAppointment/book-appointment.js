@@ -72,6 +72,7 @@ const BookAppointment = () => {
     const [companyList, setCompanyList] = useState([]);
     const [servicesList, setServicesList] = useState([]);
     const [userList, setUserList] = useState([]);
+    const [eventList, setEventList] = useState([]);
 
 
     const [order_no, setOrder_no] = useState('');
@@ -111,6 +112,7 @@ const BookAppointment = () => {
                 setStoreAddress(address);
             }
         });
+        getData(setEventList, "GET", "event",null,[], true);
         getData(setServicesList, "GET", "services");
         getData(setUserList, "GET", "user");
     }, [cid]);
@@ -141,13 +143,30 @@ const BookAppointment = () => {
     }, [employeeId]);
 
     useEffect(() => {
-        let price = 0
-        servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item => (price = price + parseFloat(item.price)));
-        setPrice(price);
-        setTotal(price);
-        setDiscount(discount);
+        let _price = 0
+        let _discount = 0
+        let _total = 0
+        servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item => {
+            let list = eventList.filter(event => event.case.toUpperCase() !== 'PAST' && event.serviceinfo[0] === item.id &&
+                get_Date(trndate, 'YYYY-MM-DD') >= get_Date(event.startdate, 'YYYY-MM-DD') &&
+                get_Date(trndate, 'YYYY-MM-DD') <= get_Date(event.enddate, 'YYYY-MM-DD'));
+            let _isDiscountApplied = false;
+            let _eventTotal = 0
+            let _eventDiscount = 0
+            if (list.length > 0) {
+                _isDiscountApplied = true;
+                _eventTotal = list[0].total;
+                _eventDiscount = list[0].discount;
+            }
+            _price += parseFloat(item.price);
+            _discount += (_isDiscountApplied ? parseFloat(_eventDiscount) : 0)
+            _total += (_isDiscountApplied ? parseFloat(_eventTotal) : parseFloat(item.price))
+        });
+        setPrice(_price);
+        setTotal(_total);
+        setDiscount(_discount);
         setCoupon(coupon);
-    }, [servicesItem]);
+    }, [servicesItem,trndate]);
 
     useEffect(() => {
         if (cid !== 0 && trndate !== '') {
@@ -461,6 +480,13 @@ const BookAppointment = () => {
                 try {
                     const res = await apiCalls("POST", "order/booking", cid, null, bodyOrderCheck, false);
                     orderList = res.data.data.filter(a => a.status !== "Cancelled" && a.slot === slot);
+
+                    if (bookingType === 2 && orderList.length === 1 )
+                    {
+                        if (orderList[0].slot === prevSlot)
+                            orderList=[];
+                    }
+
                     if(orderList.length === 0)
                     {
                         if (bookingType === 1) {
@@ -631,10 +657,14 @@ const BookAppointment = () => {
     } else if (content === 3) {
         displayedContent = <Services
             servicesList={servicesList}
+            eventList={eventList}
             next={next}
             servicesItem={servicesItem}
             setServicesItem={setServicesItem}
-            setPrice={setPrice} setDiscount={setDiscount} setTotal={setTotal} setCoupon={setCoupon} />
+            setPrice={setPrice} 
+            setDiscount={setDiscount} 
+            setTotal={setTotal} 
+            setCoupon={setCoupon} />
     } else if (content === 4) {
         displayedContent = <Slot
             daysAdvance={daysAdvance}
@@ -769,10 +799,10 @@ const BookAppointment = () => {
                             <div class='flex flex-row gap-4 w-full items-center'>
                                 {
                                     assigned_to === -1 ? 
-                                        <AssignedTo key={-1} userId={-1} userList={userList} style='font-medium text-xs ' />
+                                        <AssignedTo key={-1} userId={-1} userList={userList} />
                                     :                            
                                     userList.filter(f => f.id === assigned_to).map(item =>
-                                    <AssignedTo key={item.id} userId={item.id} userList={userList} style='font-medium text-xs ' />
+                                    <AssignedTo key={item.id} userId={item.id} userList={userList}  />
                                 )}
                             </div>
                         } />
@@ -781,13 +811,37 @@ const BookAppointment = () => {
                     {servicesItem.length !== 0 && <ViewBooking title={'Services'} content={3} setContent={setContent} setOpenOrder={setOpenOrder}
                         value={<div class='flex flex-col gap-2'>
                             {servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item =>
+                            {
+                                let list = eventList.filter(event => event.case.toUpperCase() !== 'PAST' && event.serviceinfo[0] === item.id && 
+                                    get_Date(trndate, 'YYYY-MM-DD') >= get_Date(event.startdate, 'YYYY-MM-DD') &&
+                                    get_Date(trndate, 'YYYY-MM-DD') <= get_Date(event.enddate, 'YYYY-MM-DD'));
+                                let _isDiscountApplied = false;
+                                let _price = 0;
+                                if (list.length > 0) {
+                                    _isDiscountApplied = true;
+                                    _price = list[0].total;
+                                }
+
+                                return(
                                 <div key={item.id} class='flex flex-row items-center text-gray-700'>
-                                    <p class='bg-gray-50 w-10 p-1 text-xs text-gray-600 font-medium font-sans border-r shadow-md rounded-r-md'>
-                                        $ {item.price}
-                                    </p>
+                                        <div class='bg-gray-100 py-1 px-2  text-gray-600 font-semibold font-sans border-r shadow-md rounded-r-md flex items-center gap-2'>
+                                            {_isDiscountApplied ?
+                                                <>
+                                                    <span class="relative text-sm font-bold text-black  before:absolute before:inset-0 before:top-1/2 before:h-[2px] before:bg-red-500 before:rotate-[-15deg]">
+                                                        $ {parseFloat(item.price).toFixed(2)}
+                                                    </span>
+                                                    <span class="text-sm font-bold text-black">$ {parseFloat(_price).toFixed(2)}</span>
+                                                </>
+                                                : <>
+                                                    <span class="relative text-sm font-bold text-black  ">
+                                                        $ {parseFloat(item.price).toFixed(2)}
+                                                    </span>
+                                                </>
+                                            }
+                                        </div>   
                                     <p style={{ fontSize: 11, fontWeight: 500, marginLeft: 8 }}>{item.name}</p>
                                 </div>
-                            )}
+                           )})}
                         </div>
                         } />
                     }

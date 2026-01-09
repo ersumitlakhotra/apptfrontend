@@ -98,16 +98,16 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setTax(editList.tax);
             setTaxAmount(editList.taxamount);           
             setTotal(editList.total);
-            setCoupon(editList.coupon);
-            setDiscount(editList.discount);
+            setCoupon(editList.coupon);       
             setSlot(editList.slot);
             setPrevSlot(editList.slot);
             setStart(editList.start);
             setEnd(editList.end);
             setStatus(editList.status);
-             setReceived(editList.received);
+            setReceived(editList.received);
             setMode(editList.mode);
             setTip(editList.tip);
+            setDiscount(editList.discount);
         }
         const liveList = eventList.filter(a => a.case.toUpperCase() === 'LIVE');
         setLiveList(liveList.length > 0 ? liveList : [])
@@ -184,8 +184,8 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
         let rate = 0;
         servicesList.filter(a => items.some(b => b === a.id)).map(item => (rate = rate + parseFloat(item.price)));
         setPrice(parseFloat(rate).toFixed(2));
+      
     }
-
 
     useEffect(() => {
         if (status === 'Cancelled') {
@@ -203,16 +203,6 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             let _price = price;
             let _discount = discount;
             let _tax = tax;
-         
-            if (coupon !== '') {
-                const couponServices = eventList.filter(a => a.coupon === coupon);
-                for (let i = 0; i < couponServices[0].serviceinfo.length; i++) {
-                    if (servicesItem.includes(couponServices[0].serviceinfo[i])) {
-                        _discount = parseFloat(couponServices[0].discount).toFixed(2);
-                        setDiscount(_discount);
-                    }
-                }
-            }
 
             let _subTotal = _price - _discount;
             let _total = _tax > 0 ? parseFloat((_subTotal * _tax) + _subTotal).toFixed(2) : _subTotal;
@@ -223,7 +213,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setTotal(_total);
 
         }
-    }, [status, price, discount, tax, coupon])
+    }, [status, price, discount, tax])
 
     const calculateTip = (value) => {
         let _value = setNumberAndDot(value) // _tax > 0 ? parseFloat((_subTotal * _tax) + _subTotal).toFixed(2) : _subTotal;
@@ -233,6 +223,17 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setTip(parseFloat(tip).toFixed(2));
         else
             setTip(0);
+    }
+    const calculateDiscount = (items,date=trndate) => {
+        let _discount = 0;
+        liveList.filter(item =>
+            get_Date(date, 'YYYY-MM-DD') >= get_Date(item.startdate, 'YYYY-MM-DD') &&
+            get_Date(date, 'YYYY-MM-DD') <= get_Date(item.enddate, 'YYYY-MM-DD') &&
+            items.some(b => b === item.serviceinfo[0])
+        ).map(event => {
+            _discount += parseFloat(event.discount);
+        })
+        setDiscount(parseFloat(_discount).toFixed(2))
     }
 
     useEffect(() => {
@@ -379,7 +380,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     mode="multiple"
                     value={servicesItem}
                     style={{ width: '100%' }}
-                    onChange={(value) => {setServicesItem(value); CalculatePrice(value)}}
+                    onChange={(value) => { setServicesItem(value); CalculatePrice(value); calculateDiscount(value,trndate) }}
                     options={servicesList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
                         value: item.id,
                         label: item.name
@@ -428,10 +429,10 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             } />
 
             <TextboxFlex label={'Total'} input={
-                <Input placeholder="Total" style={{ backgroundColor: '#FAFAFA' }} readOnly={true} value={total} />
+                <Input placeholder="Total" style={{ backgroundColor: '#FAFAFA' }} status={parseFloat(total).toFixed(2) < 0  ? 'error' : ''} readOnly={true} value={total} />
             } />
 
-           
+           {false &&
             <TextboxFlex label={'Event'} input={
                 <Select
                     value={coupon}
@@ -444,7 +445,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     }))]}
                 />
             } />
-
+           }
             {status === 'Completed' && <>
                 <p class="text-gray-400 ">Payment Detail </p>
 
@@ -473,7 +474,8 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
 
 
                 <TextboxFlex label={'Received'} mandatory={status === 'Completed'} input={
-                    <Input placeholder="Received" value={received} status={received === '' ? 'error' : ''}
+                    <Input placeholder="Received" value={received} 
+                        status={received === ''   ? 'error' : ''}
                         onChange={(e) =>calculateTip(e.target.value)} />
                 } />
 
@@ -492,7 +494,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     allowClear={false}
                     disabledDate={id===0 && disabledDate}
                     value={trndate === '' ? trndate : dayjs(trndate, 'YYYY-MM-DD')}
-                    onChange={(date, dateString) => setTrnDate(dateString)} />
+                    onChange={(date, dateString) => { setTrnDate(dateString); calculateDiscount(servicesItem, dateString) }} />
             } />
 
             <TextboxFlex label={'Employee'} input={
