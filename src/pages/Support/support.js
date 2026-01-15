@@ -26,17 +26,17 @@ const Support = () => {
                     <p class='text-xs mt-4 flex-1 justify-center items-center'>Sometimes you need a little help from your friends. Don't worry , we're here for you.</p>
 
 
-                    <p class='font-medium text-sm text-blue-400 mt-4'>+1 (647)-680-0045</p>
-                    <p class='font-medium text-sm text-blue-400 mt-2'>info@appointstack.com</p>
+                    <p class='font-medium text-sm text-blue-400 mt-4'>{process.env.REACT_APP_SUPPORT_PHONE}</p>
+                    <p class='font-medium text-sm text-blue-400 mt-2'>{process.env.REACT_APP_SUPPORT_EMAIL}</p>
                 </div>
 
                 <div class='bg-gray-50 p-8 h-72 border-2 border-gray-200 rounded-md w-96 flex flex-col justify-center items-center '>
                     <IoCall size={44} />
                     <p class='font-semibold'>Talk to Sales Team</p>
-                    <p class='text-xs mt-4 flex-1 justify-center items-center'>Interested in Appoint Stack software? Pick-up the phone to chat with a member of our sales team.</p>
+                    <p class='text-xs mt-4 flex-1 justify-center items-center'>Interested in {process.env.REACT_APP_PROJECT_NAME} software? Pick-up the phone to chat with a member of our sales team.</p>
 
 
-                    <p class='font-medium text-sm text-blue-400 mt-4'>+1 (647)-680-0045</p>
+                    <p class='font-medium text-sm text-blue-400 mt-4'>{process.env.REACT_APP_SALES_PHONE}</p>
                 </div>
             </div>
         </section>

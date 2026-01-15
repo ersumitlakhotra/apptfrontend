@@ -44,12 +44,12 @@ export const Signup = ({ logo }) => {
 
   const sendEmail = async () => {
     const newCode = Math.floor(100000 + Math.random() * 900000);
-    const Subject = "Appoint Stack Verification Code";
+    const Subject = `${process.env.REACT_APP_PROJECT_NAME} Verification Code`;
 
     let message = '<p>Hi ' + business_name + '</p>';
     message += '<p>Please enter the following verification code to create you account.</p><br/>';
     message += '<p><big><b>' + newCode + ' </b></big></p>';
-    message += '<p>In case you were not trying to create your account & are seeing this email, please contact us at info@appointstack.com</p>';
+    message += `<p>In case you were not trying to create your account & are seeing this email, please contact us at ${process.env.REACT_APP_SUPPORT_EMAIL}</p>`;
 
     const emailMessage = JSON.stringify({
       to: email,
@@ -148,15 +148,14 @@ export const Signup = ({ logo }) => {
   };
 
   return (
-    <section class="bg-gray-50 ">
-      <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0 ">
-        <a href="#" class="flex items-center mb-6 mt-12 text-2xl font-semibold text-gray-900 dark:text-white">
-          <img class="w-10 h-8 mr-2" src={logo} alt="logo" />
-          {process.env.REACT_APP_PROJECT_NAME}
-        </a>
+    <div class="bg-gray-50  p-4">
+      <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-full lg:py-0 ">
+        <div class='flex flex-1 justify-center items-center mb-2'>
+          <img class="w-20 h-20" src={logo} alt="logo" />
+        </div>
         <div class="w-full bg-white rounded-lg shadow  md:mt-0 sm:max-w-md xl:p-0 ">
           <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+            <h1 class="text-xl font-bold font-sans leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Sign up
             </h1>
             <p class="block mb-2 text-sm font-small text-gray-700 dark:text-white">
@@ -198,8 +197,8 @@ export const Signup = ({ logo }) => {
             <button onClick={() => onSubmit()} type="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Sign up</button>
 
             <p class="block mb-2 text-center text-xs font-small text-gray-500 dark:text-white">
-              By signing up to create an account, you are accepting 
-              <a href="/privacy-policy" target="_blank" class="font-medium text-primary-600 hover:underline dark:text-primary-500"> our terms of service </a>and 
+              By signing up to create an account, you are accepting
+              <a href="/privacy-policy" target="_blank" class="font-medium text-primary-600 hover:underline dark:text-primary-500"> our terms of service </a>and
               <a href="/privacy-policy" target="_blank" class="font-medium text-primary-600 hover:underline dark:text-primary-500"> privacy policy</a>
             </p>
           </div>
@@ -248,7 +247,7 @@ export const Signup = ({ logo }) => {
       </Drawer>
 
       {contextHolder}
-    </section>
+    </div>
   );
 };
 

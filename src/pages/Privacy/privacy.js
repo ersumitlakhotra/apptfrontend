@@ -12,7 +12,7 @@ const PrivacyPolicy = () => {
                 <p> Effective <span class='italic'>November 01, 2025</span></p>
                 <p> Our Privacy Policy has been updated </p>
                 <h3 class='text-4xl mt-10 mb-4'>Your Privacy Matters</h3>
-                <p>Appoint Stack respects your privacy and is committed to protecting your personal information.
+                <p>{process.env.REACT_APP_PROJECT_NAME} respects your privacy and is committed to protecting your personal information.
                     This Privacy Policy explains how we collect, use, and safeguard your data when you use our app.</p>
                 <Divider />
                 <h3 class='text-xl mt-10 mb-2 font-medium'>1. Information We Collect</h3>
@@ -53,7 +53,7 @@ const PrivacyPolicy = () => {
                         <li>Access, update, or delete your personal information.</li>
                         <li>Opt-out of communications or data collection where applicable.</li>
                     </ul>         
-                    <p class='m-2'>To exercise your rights, please contact us at: info@appointstack.com</p>
+                    <p class='m-2'>To exercise your rights, please contact us at: {process.env.REACT_APP_SUPPORT_EMAIL}</p>
                 </div>
                 <Divider />
                 <h3 class='text-xl mt-10 mb-2 font-medium'>6. Changes to This Policy</h3>
@@ -64,8 +64,8 @@ const PrivacyPolicy = () => {
                 <h3 class='text-xl mt-10 mb-2 font-medium'>7. Contact Us</h3>
                 <div class='ml-4'>
                     <p class='mb-2'>If you have questions about this Privacy Policy, please contact us at: </p>
-                    <p class='mb-2'><span class='font-bold'>Email : </span>info@appointstack.com </p>
-                    <p class='mb-2'><span class='font-bold'>Website : </span><a href="https://www.appointstack.com/support" class='italic text-blue-400 hover:underline'>https://www.appointstack.com/support</a> </p>
+                    <p class='mb-2'><span class='font-bold'>Email : </span>{process.env.REACT_APP_SUPPORT_EMAIL}</p>
+                    <p class='mb-2'><span class='font-bold'>Website : </span><a href={`${process.env.REACT_APP_DOMAIN}/support`} class='italic text-blue-400 hover:underline'>{process.env.REACT_APP_DOMAIN}/support</a> </p>
                 </div>
             </div>
 

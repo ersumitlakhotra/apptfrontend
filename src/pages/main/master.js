@@ -199,7 +199,7 @@ const MasterPage = () => {
   const sendEmail = async (cid, id, order_no, servicesItem, customerName, customerEmail, employeeName, trndate, slot, isCancelled) => {
     let isEmailSend = false;
     const Subject = isCancelled ? 'Booking Cancellation' : id === null ? "Booking Confirmation" : "Re-Schedule Confirmation";
-    const link = 'https://appointstack.com/book-appointment?store=' + storeId;
+    const link = `${process.env.REACT_APP_DOMAIN}/book-appointment?store=` + storeId;
     let serviceNames = '';
     servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item =>
       serviceNames += item.name + ', '
@@ -518,7 +518,7 @@ const MasterPage = () => {
         <header class='h-16 border-b bg-white '>
           <Header onSignout={onSetSignout} open={open} setOpen={setOpen} getData={getData} saveData={saveData} refresh={refresh} uid={uid}  />
         </header>
-        <section class='overflow-y-scroll p-8 w-full'>
+        <div class='overflow-y-scroll p-8 w-full'>
           {isLoading ? (
             <div
               style={{
@@ -539,7 +539,7 @@ const MasterPage = () => {
           ) :
             displayedContent
           }
-        </section>
+        </div>
       </div>
       {contextHolder}
     </div>

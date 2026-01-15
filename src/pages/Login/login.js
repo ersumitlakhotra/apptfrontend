@@ -42,12 +42,9 @@ export const Login = ({ logo }) => {
 
 
   return (
-    <section class="bg-gray-50 dark:bg-gray-900">
+    <div class="bg-gray-50 h-screen py-4">
       <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-        <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-          <img class="w-10 h-8 mr-2" src={logo} alt="logo" />
-          {process.env.REACT_APP_PROJECT_NAME}
-        </a>
+          <img class="w-20 h-20 mb-2" src={logo} alt="logo" />
         <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
@@ -107,7 +104,7 @@ export const Login = ({ logo }) => {
         </div>
       )}
       {contextHolder}
-    </section>
+    </div>
   );
 };
 

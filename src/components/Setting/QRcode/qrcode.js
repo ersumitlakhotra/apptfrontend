@@ -12,7 +12,7 @@ const QRcode = ({ companyList }) => {
 
     useEffect(() => {
         if (companyList.length !== 0) {
-            setLink('https://www.appointstack.com/book-appointment?store=' + companyList.store);
+            setLink(`${process.env.REACT_APP_DOMAIN}/book-appointment?store=` + companyList.store);
         }
     }, [companyList])   
 

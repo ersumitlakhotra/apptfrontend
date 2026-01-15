@@ -113,8 +113,8 @@ const Sidebar = ({ onSelected, content, open, uid, getData}) => {
       <div class='w-full flex flex-col ' >
 
         <div  class='h-16  p-3 flex items-center gap-1 cursor-pointer '>
-          <img class="w-10 h-8 rounded-full bg-white" src={logo} alt="Rounded avatar" />
-          <span class={`font-semibold whitespace-nowrap duration-150 ${!open && ' scale-0'}`}>{process.env.REACT_APP_PROJECT_NAME}</span>
+          <img class="w-8 h-12 rounded-full bg-white" src={logo} alt="Rounded avatar" />
+          <span class={`font-medium font-sans text-sm  whitespace-nowrap duration-150 ${!open && ' scale-0'}`}>{process.env.REACT_APP_PROJECT_NAME}</span>
         </div>
 
         <span class={` text-sm px-5 mt-6 duration-150 font-medium  ${!open && 'scale-0'}  ${overview.filter(item => item.isVisible === true).length === 0 && 'hidden'} whitespace-nowrap`}>Overview</span>

@@ -546,7 +546,7 @@ const BookAppointment = () => {
 
     const sendEmail = async (id, order_no, isCancelled) => {
         const Subject = isCancelled ? 'Booking Cancellation' : id === null ? "Booking Confirmation" : "Re-Schedule Confirmation";
-        const link = 'https://appointstack.com/book-appointment?store=' + storeId;
+        const link = `${process.env.REACT_APP_DOMAIN}/book-appointment?store=` + storeId;
         let serviceNames = '';
         servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item =>
             serviceNames += item.name + ', '
