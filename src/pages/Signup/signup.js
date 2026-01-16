@@ -149,10 +149,8 @@ export const Signup = ({ logo }) => {
 
   return (
     <div class="bg-gray-50  p-4">
-      <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-full lg:py-0 ">
-        <div class='flex flex-1 justify-center items-center mb-2'>
-          <img class="w-20 h-20" src={logo} alt="logo" />
-        </div>
+      <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-full lg:h-screen lg:py-0 ">
+          <img class="w-20 h-20 mb-2" src={logo} alt="logo" />
         <div class="w-full bg-white rounded-lg shadow  md:mt-0 sm:max-w-md xl:p-0 ">
           <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 class="text-xl font-bold font-sans leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">

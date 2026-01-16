@@ -3,9 +3,8 @@ import { useEffect, useState } from "react";
 import { LoadingOutlined } from '@ant-design/icons';
 import useAlert from "../../common/alert.js";
 import { Spin } from 'antd';
-import { loginAuth } from "../../hook/apiCall.js";
 import { useNavigate } from "react-router-dom";
-import { setLocalStorageWithExpiry } from "../../common/localStorage.js";
+import { clearLocalStorage, handleAuth } from "../../auth/auth.js";
 
 export const Login = ({ logo }) => {
   const navigate = useNavigate();
@@ -14,30 +13,19 @@ export const Login = ({ logo }) => {
   const [loading, setLoading] = useState(false);
   const { contextHolder, error } = useAlert();
 
+  useEffect(() => {
+    clearLocalStorage();
+  }, [])
+   
   const onSubmit = async () => {
     setLoading(true);
-    try {
-      const res = await loginAuth(email, password);
-      if (res.status === 200) {
-        if (Boolean(res.data.data.active)) {
-          setLocalStorageWithExpiry('cid', res.data.data.cid);
-          setLocalStorageWithExpiry('uid', res.data.data.id);
-          setLocalStorageWithExpiry('email', email, 1);
-          setLocalStorageWithExpiry('password', password, 1);
-          navigate("/main"); //success('Login Successfully'); 
-        }
-        else
-          error('Your account is deactivated and cannot access the application. Please contact our help desk!')
-      }
-      else
-        error('Login Failed. Invalid username or password.')
+    const res =await handleAuth(email, password);
+    if (res.status === 200) {
+      navigate("/main"); //success('Login Successfully'); 
     }
-    catch (err) {
-      error(String(err.message))
-    }
-    finally {
-      setLoading(false);
-    }
+    else
+      error(res.message);
+    setLoading(false);
   }
 
 

@@ -1,7 +1,6 @@
 
 import Chart from "react-apexcharts";
 
-
 const AreaChart = ({ sales,expense, categoriesArray }) => {
     return (
         <Chart

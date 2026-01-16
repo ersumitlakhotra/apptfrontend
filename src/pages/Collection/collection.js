@@ -104,13 +104,17 @@ const Collection = ({ orderList, servicesList, userList,saveData }) => {
                 <span class="text-lg font-semibold text-gray-800">Collection</span>
                     <ExportToExcel data={exportList} fileName="Collection" servicesList={[]} userList={[]} />
             </div> 
-            <div class='flex flex-col gap-6 md:flex-row '>
-                <Card key={1} title={'Price'} value={price} backgroundColor={'#fde3cf'} color={'#f56a00'} />
-                <Card key={2} title={'Discount'} value={discount} backgroundColor={'#fde3cf'} color={'#f56a00'} />
-                <Card key={3} title={'Tax'} value={tax} backgroundColor={'#fde3cf'} color={'#f56a00'} />
-                <Card key={4} title={'Total'} value={total} backgroundColor={'#fde3cf'} color={'#f56a00'} />
-                <Card key={5} title={'Received'} value={received} backgroundColor={'#fde3cf'} color={'#f56a00'} />
-                <Card key={6} title={'Tip'} value={tip} backgroundColor={'#fde3cf'} color={'#f56a00'} />             
+            <div class='flex flex-col gap-4 xl:flex-row '>
+                <div class='w-full flex flex-col gap-4 md:flex-row '>
+                    <Card key={1} index={1} title={'Price'} value={price} backgroundColor={'#fde3cf'} color={'#f56a00'} />
+                    <Card key={2} index={2} title={'Discount'} value={discount} backgroundColor={'#fde3cf'} color={'#f56a00'} />
+                    <Card key={3} index={3} title={'Tax'} value={tax} backgroundColor={'#fde3cf'} color={'#f56a00'} />
+                </div>
+                <div class=' w-full flex flex-col gap-4 md:flex-row '>
+                    <Card key={4} index={4} title={'Total'} value={total} backgroundColor={'#fde3cf'} color={'#f56a00'} />
+                    <Card key={5} index={5} title={'Received'} value={received} backgroundColor={'#fde3cf'} color={'#f56a00'} />
+                    <Card key={6} index={6} title={'Tip'} value={tip} backgroundColor={'#fde3cf'} color={'#f56a00'} />
+                </div>
             </div>
             <div class='w-full  bg-white border rounded-lg p-4 flex flex-col gap-4 '>
                 <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>

@@ -6,7 +6,7 @@ import OrderDetail from "../../components/Order/order_detail";
 import OrderView from "../../components/Order/order_view";
 import {  getTabItems } from "../../common/items.js";
 import OrderTabs from "../../components/Order/tab.js";
-import { LocalDate, get_Date } from "../../common/localDate.js";
+import {  get_Date } from "../../common/localDate.js";
 import LogsView from "../../components/Logs/logs_view.js";
 import ExportToExcel from "../../common/export.js";
 
@@ -81,11 +81,11 @@ const Order = ({ orderList, servicesList, userList, companyList, eventList, logs
     }
 
     const tabItems = [
-        getTabItems('1', customLabelTab("All", "cyan", ordersList.length), null, <OrderTabs key={1} orderList={ordersList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
-        getTabItems('2', customLabelTab("Pending", "yellow", pendingList.length), null, <OrderTabs key={2} orderList={pendingList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
-        getTabItems('3', customLabelTab("InProgress", "blue", inprogressList.length), null, <OrderTabs key={3} orderList={inprogressList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
-        getTabItems('4', customLabelTab("Completed", "green", completedList.length), null, <OrderTabs key={4} orderList={completedList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
-        getTabItems('5', customLabelTab("Cancelled", "red", cancelledList.length), null, <OrderTabs key={5} orderList={cancelledList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
+        getTabItems('1', customLabelTab("All", "cyan", ordersList.length), null, <OrderTabs key={1} index={1} orderList={ordersList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
+        getTabItems('2', customLabelTab("Pending", "yellow", pendingList.length), null, <OrderTabs key={2} index={2} orderList={pendingList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
+        getTabItems('3', customLabelTab("InProgress", "blue", inprogressList.length), null, <OrderTabs key={3} index={3} orderList={inprogressList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
+        getTabItems('4', customLabelTab("Completed", "green", completedList.length), null, <OrderTabs key={4} index={4} orderList={completedList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
+        getTabItems('5', customLabelTab("Cancelled", "red", cancelledList.length), null, <OrderTabs key={5} index={5} orderList={cancelledList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} />),
     ];
   
 

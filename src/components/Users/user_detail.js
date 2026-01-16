@@ -2,11 +2,10 @@
 
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Avatar,  Button,  Image,  Rate, Tabs } from "antd";
-import { CloudUploadOutlined, EyeOutlined, UserOutlined,ClockCircleOutlined } from '@ant-design/icons';
+import { CloudUploadOutlined, EyeOutlined, UserOutlined } from '@ant-design/icons';
 import UserAbout from "./about.js";
 import useAlert from "../../common/alert.js";
 import UserLoginPermissions from "./permissions.js";
-import UserSchedule from "./schedule.js";
 import {  isValidEmail } from "../../common/cellformat.js";
 
 function getTabItems(key, label, icon, children) {
@@ -86,6 +85,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
                 setSales(b.sales);
                 setCollection(b.collection);
                 setSetting(b.setting);
+                return(<></>)
             })
         }
     }, [refresh])

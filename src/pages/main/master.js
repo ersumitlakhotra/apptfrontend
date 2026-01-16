@@ -6,29 +6,27 @@ import Sidebar from "../../components/Main/Sidebar/sidebar.js";
 import Dashboard from '../Dashboard/dashboard.js'
 import Order from '../Order/order.js'
 import Users from "../Users/users.js";
-import { useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import { Spin } from "antd";
 import { LoadingOutlined } from '@ant-design/icons';
 import Services from "../Services/services.js";
 import Event from "../Event/event.js";
 import Tasks from "../Tasks/tasks.js";
 import Setting from "../Setting/setting.js";
-import { apiCalls, loginAuth } from "../../hook/apiCall.js";
+import { apiCalls } from "../../hook/apiCall.js";
 import useAlert from "../../common/alert.js";
 import { get_Date, LocalDate } from "../../common/localDate.js";
 import Sales from "../Sales/sales.js";
 import Payment from "../Payment/payment.js";
-import { setLocalStorageWithExpiry } from "../../common/localStorage.js";
 import Customer from "../Customer/customer.js";
 import Schedule from "../Schedule/schedule.js";
-import warning from "antd/es/_util/warning.js";
 import Collection from "../Collection/collection.js";
+import { clearLocalStorage, isAuthenticated } from "../../auth/auth.js";
 
 const MasterPage = () => {
   const navigate = useNavigate();
   const [content, setContent] = useState('Dashboard');
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-  const [signout, setSignout] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [refresh, setRefresh] = useState(0);
   const [open, setOpen] = useState(true);
@@ -60,18 +58,11 @@ const MasterPage = () => {
   const [emailUser, setEmailUser] = useState('');
   const [emailPass, setEmailPass] = useState('');
 
-  const onSelected = (newContent) => {
-    setIsLoading(true);
-    setContent(newContent);
-    setRefresh(refresh + 1)
-    setIsLoading(false);
-  };
 
   useEffect(() => {
     const handleResize = () => {
       setScreenWidth(window.innerWidth);
     };
-
     window.addEventListener('resize', handleResize);
    
     // Clean up the event listener on component unmount
@@ -80,12 +71,7 @@ const MasterPage = () => {
     };
   }, []); 
   
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      isUserValid();
-    }, 7200000); // 7200000  2 hours
-    return () => clearInterval(intervalId);
-  }, []);
+
 
   useEffect(() => {
     if (companyList.length !== 0) {
@@ -112,36 +98,46 @@ const MasterPage = () => {
     [screenWidth]
   );
 
+
   useEffect(() => {
-    const companyId = localStorage.getItem('cid');
-    if (!isUserValid() || !companyId) {
+    const intervalId = setInterval(() => {
+        handleAuth();
+    }, 3600000); // 7200000  2 hours 3600000 1 Hour
+    return () => clearInterval(intervalId);
+  }, []);
+
+
+  useEffect(() => {
+    handleAuth();
+    setUid(localStorage.getItem('uid'));
+  }, []);
+
+  const handleAuth = async() => {
+    const res=await isAuthenticated()
+    if (!res) 
       navigate("/");
-    }
-  }, [navigate, signout]);
+  }
 
   const onSetSignout = () => {
     clearLocalStorage();
-    setSignout(true);
+    navigate("/");
   }
-  const clearLocalStorage = () => {
-    localStorage.removeItem('cid');
-    localStorage.removeItem('uid');
-    localStorage.removeItem('email');
-    localStorage.removeItem('password');
-  }
+ 
 
   const getData = async (setList, endPoint, eventDate = false, isLoadingShow = true) => {
-    isLoadingShow && setIsLoading(true);
-    try {
-      const companyId = localStorage.getItem('cid');
-      const res = await apiCalls("GET", endPoint, companyId, null, null, eventDate);   
-      setList(res.data.data);
+    if (localStorage.getItem('cid') !== null && localStorage.getItem('cid')) {
+      isLoadingShow && setIsLoading(true);
+      try {
+        const companyId = localStorage.getItem('cid');
+        const res = await apiCalls("GET", endPoint, companyId, null, null, eventDate);
+        setList(res.data.data);
+      }
+      catch (e) {
+        setList([])
+        //error(error.message)
+      }
+      isLoadingShow && setIsLoading(false);
     }
-    catch (e) {
-      setList([])
-      //error(error.message)
-    }
-    isLoadingShow && setIsLoading(false);
   }
 
   const saveData = async (label, method, endPoint, id = null, body = null, notify = true, logs = true) => {
@@ -231,53 +227,12 @@ const MasterPage = () => {
     return isEmailSend;
   }
 
-  const isUserValid =async () => {
-    let result = true;
-    const now = new Date();
-    setUid(localStorage.getItem('uid'));
-    const itemString = localStorage.getItem('email');
-    if (itemString) {
-      const item = JSON.parse(itemString);
-      if (now.getTime() > item.expiry) {
-        const email = JSON.parse(localStorage.getItem('email')).value;
-        const password = JSON.parse(localStorage.getItem('password')).value;
-        clearLocalStorage();
-        result = await onSubmit(email, password);
-      }
-
-      if (!result) {
-        onSetSignout();
-      }
-    }
-    else {
-      onSetSignout();
-    }
-
-    return result;
-  };
-
-  const onSubmit = async (email, password) => {
+  const onSelected = (newContent) => {
     setIsLoading(true);
-    try {
-      const res = await loginAuth(email, password);
-      if (res.status === 200 && Boolean(res.data.data.active)) {
-        setLocalStorageWithExpiry('cid', res.data.data.cid);
-        setLocalStorageWithExpiry('uid', res.data.data.id);
-        setLocalStorageWithExpiry('email', email, 1);
-        setLocalStorageWithExpiry('password', password, 1);
-        return true;
-      }
-      else
-        return false;
-    }
-    catch (err) {
-      return false;
-    }
-    finally {
-      setIsLoading(false);
-    }
-  }
-
+    setContent(newContent);
+    setRefresh(refresh + 1)
+    setIsLoading(false);
+  };
 
   useEffect(() => {
     switch (content) {
@@ -513,11 +468,11 @@ const MasterPage = () => {
 
   return (
     <div class='h-screen w-full flex flex-row '>
-      <Sidebar onSelected={onSelected} content={content} open={open} uid={uid} getData={getData} />
+      <Sidebar key={1} onSelected={onSelected} content={content} open={open} uid={uid} getData={getData} />
       <div class='flex flex-col w-full bg-gray-50 '>
-        <header class='h-16 border-b bg-white '>
+        <div class='h-16 border-b bg-white '>
           <Header onSignout={onSetSignout} open={open} setOpen={setOpen} getData={getData} saveData={saveData} refresh={refresh} uid={uid}  />
-        </header>
+        </div>
         <div class='overflow-y-scroll p-8 w-full'>
           {isLoading ? (
             <div

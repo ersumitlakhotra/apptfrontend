@@ -117,12 +117,12 @@ const Billing = ({ companyList,billingList, saveData, setRefresh }) => {
 
             <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
 
-                <Heading label={"Change plan"} desc={'You can upgrade or downgrade whenever you want.'} icon={<CreditCardFilled  />} />
+                <Heading label={"Change plan"} desc={'You can upgrade or downgrade whenever you want.'} Icon={<CreditCardFilled  />} />
 
                 <div class='mx-6 flex flex-col gap-16 md:flex-row '>
-                    <PricingCard key={1} title={'STARTUP'} price={'0.00'} current={plan === 'STARTUP'} />
-                    <PricingCard key={2} title={'STANDARD'} price={'100.00'} current={plan === 'STANDARD'} />
-                    <PricingCard key={3} title={'ENTERPRISE'} price={'150.00'} current={plan === 'ENTERPRISE'} />
+                    <PricingCard key={1} index={1} title={'STARTUP'} price={'0.00'} current={plan === 'STARTUP'} />
+                    <PricingCard key={2} index={2} title={'STANDARD'} price={'100.00'} current={plan === 'STANDARD'} />
+                    <PricingCard key={3} index={3} title={'ENTERPRISE'} price={'150.00'} current={plan === 'ENTERPRISE'} />
                 </div>
                 {false &&
                 <div class='mx-6 mt-4 flex justify-end items-center'>
@@ -134,7 +134,7 @@ const Billing = ({ companyList,billingList, saveData, setRefresh }) => {
                 <Divider />
 
                 <div class='flex items-center justify-between'>
-                    <Heading label={"Billing details"} icon={<WalletFilled  />} />
+                    <Heading label={"Billing details"} Icon={<WalletFilled  />} />
                     {isEdit ?
                         <Space>
                             <Button color="primary" variant="solid" onClick={saveBillingDetails} >Save changes</Button>
@@ -199,7 +199,7 @@ const Billing = ({ companyList,billingList, saveData, setRefresh }) => {
                 </div>
             </div>
             <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
-                <Heading label={"Invoice history"} desc={"If you've just made a payment, it may take a few hours for it to appear in the table below."} icon={<CreditCardFilled  />} />
+                <Heading label={"Invoice history"} desc={"If you've just made a payment, it may take a few hours for it to appear in the table below."} Icon={<CreditCardFilled  />} />
                 <div class='ml-6 mb-6'>
                     <DataTable headerItems={headerItems} list={billingList}
                         onChange={(page, pageSize) => {

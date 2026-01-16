@@ -46,21 +46,22 @@ export function getBorder (value) {
     }
 }
 export function getTag  (value, name) {
+    const index = Date.now().toString() + Math.floor(Math.random() * 1000);
     switch (value.toUpperCase()) {
         case 'PENDING':
         case 'UPCOMING':
-            return <Tag color='yellow' bordered={false}>{name}</Tag>;
+            return <Tag key={index}  color='yellow' bordered={false}>{name}</Tag>;
         case 'IN PROGRESS':
         case 'WORKING':
-            return <Tag color='blue' bordered={false}>{name}</Tag>;
+            return <Tag key={index} color='blue' bordered={false}>{name}</Tag>;
         case 'COMPLETED':
         case 'LIVE':
-            return <Tag color='green' bordered={false}>{name}</Tag>;
+            return <Tag key={index} color='green' bordered={false}>{name}</Tag>;
         case 'CANCELLED':
         case 'PAST':
         case 'OFF':
-            return <Tag color='red' bordered={false}>{name}</Tag>;
+            return <Tag key={index} color='red' bordered={false}>{name}</Tag>;
         default:
-            return <Tag color='gray' bordered={false}>{name}</Tag>;
+            return <Tag key={index} color='gray' bordered={false}>{name}</Tag>;
     }
 }

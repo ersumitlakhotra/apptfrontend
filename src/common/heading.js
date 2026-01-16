@@ -1,7 +1,7 @@
-const Heading = ({label,icon,desc}) => {
+const Heading = ({label,Icon,desc}) => {
     return (
         <div class='flex flex-row gap-3 text-gray-800 text-lg font-medium font-sans'>
-            <icon style={{ color: '#4192d3' }}>{icon}</icon>
+            <span style={{ color: '#4192d3' }}>{Icon}</span>
             <div class='flex flex-col'>
                 {label}
                 <p class='text-gray-400 text-sm font-normal'>{desc}</p>

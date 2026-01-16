@@ -1,7 +1,6 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable react-hooks/exhaustive-deps */
 import Card from "../../components/Dashboard/Header/card.js";
-import Statistics from "../../components/Dashboard/Statistics/statistics.js";
 import Appointment from "../../components/Dashboard/Appointments/appointment.js";
 import { YearsList } from "../../common/yearslist.js";
 import AnnualReport from "../../components/Dashboard/AnnualReport/annual_report.js";
@@ -14,7 +13,7 @@ import dayjs from 'dayjs';
 import { AreaChartCard } from "../../components/Dashboard/Charts/charts.js";
 import Schedule from "../../components/Dashboard/Schedule/schedule.js";
 
-const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList, logsList, companyList, scheduleList, saveData, onSelected ,setFromDate,setToDate }) => {  
+const Dashboard = ({refresh, orderList, expensesList, servicesList, userList, eventList, logsList, companyList, scheduleList, saveData, onSelected ,setFromDate,setToDate }) => {  
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
     const [orderChart, setOrderChart] = useState(null);
     const [totalOrders, setTotalOrders] = useState(0);
@@ -79,16 +78,9 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList,
         setTotalSales(parseFloat(totalSales).toFixed(2));
         setExpenseChart(<AreaChartCard categoriesArray={categoryArray} color={'#ff9999'} series={expensesSeries} name={'$'} />)
         setTotalExpenses(parseFloat(totalExpenses).toFixed(2) );
-        setRevenueChart(<AreaChartCard categoriesArray={categoryArray} series={revenueSeries} name={'$'} />)
+        setRevenueChart(<AreaChartCard categoriesArray={categoryArray} color={'#fff899'} series={revenueSeries} name={'$'} />)
         setTotalRevenue(parseFloat(totalRevenue).toFixed(2));
-    }, [orderList])
-
-    useEffect(() => {       
-        setOrderChart(orderChart)
-        setSalesChart(salesChart)
-        setExpenseChart(expenseChart)
-        setRevenueChart(revenueChart)
-    }, [orderChart, salesChart, expenseChart, revenueChart])
+    }, [orderList, refresh])
 
     return (
         <div class="flex flex-col gap-4 mb-12">
@@ -96,10 +88,10 @@ const Dashboard = ({ orderList, expensesList, servicesList, userList, eventList,
             {/* cards*/}
             <span class="text-lg font-semibold text-gray-800">Dashboard</span>         
             <div class='flex flex-col gap-6 md:flex-row '>
-                <Card key={1} title={'Orders'} value={totalOrders} sign={'#'} chart={orderChart} />
-                <Card key={2} title={'Sales'} value={totalSales} sign={'$'} chart={salesChart} />
-                <Card key={3} title={'Expenses'} value={totalExpenses} sign={'$'} chart={expenseChart} />
-                <Card key={4} title={'Profit/Loss'} value={totalRevenue} sign={'$'} chart={revenueChart} />              
+                <Card index={1} title={'Orders'} value={totalOrders} sign={'#'} chart={orderChart} />
+                <Card index={2} title={'Sales'} value={totalSales} sign={'$'} chart={salesChart} />
+                <Card index={3} title={'Expenses'} value={totalExpenses} sign={'$'} chart={expenseChart} />
+                <Card index={4} title={'Profit/Loss'} value={totalRevenue} sign={'$'} chart={revenueChart} />              
             </div>
 
             <div class='flex flex-col gap-4 mt-4  w-full md:flex-row'>

@@ -1,15 +1,18 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import { Button, QRCode } from "antd";
 import { useEffect, useRef, useState } from "react";
 import {  DownloadOutlined } from '@ant-design/icons';
 import PrintQRcode from "./printqrcode";
 import { PDFDownloadLink } from "@react-pdf/renderer";
+import { Buffer } from "buffer";
+window.Buffer = Buffer;
 
 const QRcode = ({ companyList }) => {
     const [link, setLink] = useState('');
     const [urlImage, setUrlImage] = useState('');
     const qrCodeRef = useRef(null);
-
+ 
     useEffect(() => {
         if (companyList.length !== 0) {
             setLink(`${process.env.REACT_APP_DOMAIN}/book-appointment?store=` + companyList.store);
@@ -17,15 +20,19 @@ const QRcode = ({ companyList }) => {
     }, [companyList])   
 
     useEffect(() => {
+        handleQr();
+    }, [qrCodeRef, link])   
+
+    const handleQr = async()=>{
         if (qrCodeRef !== null && link !== '') {
             const canvas = qrCodeRef.current.querySelector('canvas'); // Assuming qrCodeRef points to the QRCode component
             if (canvas) {
-                const dataURL = canvas.toDataURL('image/png'); // Or 'image/jpeg'
+                const dataURL = await canvas.toDataURL('image/png'); // Or 'image/jpeg'
                 const base64Image = dataURL.split(',')[1]; // Extract the Base64 part
                 setUrlImage(base64Image);
             }
         }
-    }, [qrCodeRef, link])   
+    }
 
     return (
         <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>

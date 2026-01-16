@@ -1,9 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Badge, Button,  Select, Drawer, Space, Input, Tooltip, Rate, Avatar, Image } from "antd";
-import {  EditOutlined, PlusOutlined, SaveOutlined, UserOutlined, ContainerOutlined, EyeOutlined } from '@ant-design/icons';
+import {  EditOutlined, PlusOutlined, SaveOutlined, UserOutlined, ContainerOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from "react";
 import UserDetail from "../../components/Users/user_detail";
-import UserView from "../../components/Users/user_view.js";
 import { IoSearchOutline } from "react-icons/io5";
 import DataTable from "../../common/datatable";
 import { getTableItem } from "../../common/items";

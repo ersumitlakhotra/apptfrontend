@@ -98,7 +98,7 @@ const BasicInfo = ({ companyList, saveData, logoList }) => {
     };
     return (
         <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
-            <Heading label={"Basic information"} icon={<FcInfo size={26} />} />
+            <Heading label={"Basic information"} Icon={<FcInfo size={26} />} />
             <div class='ml-8'>
                 <div class='my-6 text-gray-500 flex gap-6'>
                     {logo !== null ?

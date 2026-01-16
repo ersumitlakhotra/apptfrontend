@@ -1,8 +1,7 @@
 import { Button, Tabs, Image, Avatar } from "antd"
 import { getTabItems } from "../../common/items.js"
-import { ContainerOutlined, IdcardOutlined, NotificationOutlined, ShareAltOutlined, UserOutlined, LockOutlined, QrcodeOutlined } from '@ant-design/icons';
+import { ContainerOutlined, IdcardOutlined, ShareAltOutlined, UserOutlined, LockOutlined, QrcodeOutlined } from '@ant-design/icons';
 import Account from "../../components/Setting/Account/account.js";
-import Notification from "../../components/Setting/Notification/notification.js";
 import SocialLink from "../../components/Setting/Social/sociallink.js";
 import Billing from "../../components/Setting/Billing/billing.js";
 import Heading from "../../common/heading.js";
@@ -19,7 +18,7 @@ const Setting = ({ companyList, saveData, setRefresh, tabActiveKey, setTabActive
     const tabItems = [
         getTabItems('1', 'Account', <IdcardOutlined />, <Account companyList={companyList} saveData={saveData} logoList={logoList} setRefresh={setRefresh} onSetSignout={onSetSignout} />),
         getTabItems('2', 'Billing & plans', <ContainerOutlined />, <Billing companyList={companyList} billingList={billingList} saveData={saveData} setRefresh={setRefresh} />),
-        //getTabItems('3', 'Notifications', <NotificationOutlined />, <Notification />),
+       // getTabItems('3', 'Notifications', <NotificationOutlined />, <Notification />),
         getTabItems('4', 'Security', <LockOutlined />, <Security companyList={companyList} saveData={saveData} />),
         getTabItems('5', 'Social links', <ShareAltOutlined />, <SocialLink companyList={companyList} saveData={saveData} />),
         getTabItems('6', 'QR Code', <QrcodeOutlined />, <QRcode companyList={companyList} />),
@@ -69,7 +68,7 @@ const Setting = ({ companyList, saveData, setRefresh, tabActiveKey, setTabActive
                 }
 
                 <div class='flex-col flex gap-2'>
-                    <Heading label={name} desc={address} />
+                    <Heading label={name}  desc={address} />
                     <div class='flex flex-row ml-1'>
                         <Button color="default" variant="link" icon={<TbWorldWww size={16} style={{ color: '#1877F2' }} />} onClick={() => openExtendedLink(website)} />
                         <Button color="default" variant="link" icon={<ImFacebook size={16} style={{ color: '#1877F2' }} />} onClick={() => openExtendedLink(facebook)} />

@@ -64,16 +64,16 @@ const TaskCalender = ({ orderList, servicesList, userList, companyList, customer
             <div class='flex flex-col py-2 '>
                 {slots.map((item, index) =>
                 (
-                    <div class='border-b h-12  p-2 text-sm w-max min-w-full inline-flex gap-3 '   >
+                    <div key={index} class='border-b h-12  p-2 text-sm w-max min-w-full inline-flex gap-3 '   >
                         <div class='w-20  p-1'>{convertTo12Hour(item.start)}</div>
                         {userList.map(a => (
-                            <div class=' w-44'>
+                            <div key={a.id} class=' w-44'>
                                 {orderList.filter(b => b.assignedto === a.id && b.start === item.start).map(c => (
-                                    <div 
-                                    key={c.id} 
-                                   
-                                    style={{ height: getHeight(c.start, c.end), cursor:'pointer'}} 
-                                    class={`flex flex-col gap-2 px-2 mt-4 border rounded-md text-xs border-s-4 ${getBorder(c.status)}`}>
+                                    <div
+                                        key={c.id}
+
+                                        style={{ height: getHeight(c.start, c.end), cursor: 'pointer' }}
+                                        class={`flex flex-col gap-2 px-2 mt-4 border rounded-md text-xs border-s-4 ${getBorder(c.status)}`}>
                                         <div class='flex items-center justify-between  font-medium'>
                                             <p class='underline' onClick={() => btn_ViewClick(c.id)}  ># {c.order_no}</p>
                                             <Tooltip placement="top" title={'Edit'} >

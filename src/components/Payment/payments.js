@@ -8,7 +8,7 @@ import {  getTableItem } from "../../common/items";
 import dayjs from 'dayjs';
 import AssignedTo from "../../common/assigned_to";
 import { get_Date, UTC_LocalDateTime } from "../../common/localDate";
-const Payments = ({ key, expensesData, userList, btn_LogsClick, btn_Click, fromDate, setFromDate, toDate, setToDate, saveData, setExportList }) => {
+const Payments = ({ index, expensesData, userList, btn_LogsClick, btn_Click, fromDate, setFromDate, toDate, setToDate, saveData, setExportList }) => {
 
     const [filteredList, setFilteredList] = useState(expensesData);
     const [list, setList] = useState(expensesData);
@@ -59,7 +59,7 @@ const Payments = ({ key, expensesData, userList, btn_LogsClick, btn_Click, fromD
         saveData("Expense", 'DELETE', "payment", id, Body);
     };
     return (
-        <div key={key} class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
+        <div key={index} class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
             <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
                 <div class='w-full flex flex-row gap-2 items-center md:w-1/3'>
                         <p class='text-sm text-gray-500 whitespace-nowrap'>Filter user</p>

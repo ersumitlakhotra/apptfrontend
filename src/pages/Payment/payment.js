@@ -60,8 +60,8 @@ const Payment = ({ expensesList, userList, logsList, saveData, tabActiveKey, set
     }
  
     const tabItems = [
-        getTabItems('1', 'Expenses', null, <Expenses key={1} expensesList={expensesList} expensesData={expensesData} userList={userList} btn_Click={btn_Click_Expense} btn_LogsClick={btn_LogsClick} fromDate={fromDateExpenses} setFromDate={setFromDateExpenses} toDate={toDateExpenses} setToDate={setToDateExpenses} saveData={saveData} setExportList={setExportList} /> ),
-        getTabItems('2', 'Payments', null, <Payments key={2} expensesList={expensesList} expensesData={paymentData} userList={userList} btn_Click={btn_Click_Payment} btn_LogsClick={btn_LogsClick} fromDate={fromDatePayment} setFromDate={setFromDatePayment} toDate={toDatePayment} setToDate={setToDatePayment} saveData={saveData} setExportList={setExportList} /> )
+        getTabItems('1', 'Expenses', null, <Expenses key={1} index={1} expensesList={expensesList} expensesData={expensesData} userList={userList} btn_Click={btn_Click_Expense} btn_LogsClick={btn_LogsClick} fromDate={fromDateExpenses} setFromDate={setFromDateExpenses} toDate={toDateExpenses} setToDate={setToDateExpenses} saveData={saveData} setExportList={setExportList} /> ),
+        getTabItems('2', 'Payments', null, <Payments key={2} index={2} expensesList={expensesList} expensesData={paymentData} userList={userList} btn_Click={btn_Click_Payment} btn_LogsClick={btn_LogsClick} fromDate={fromDatePayment} setFromDate={setFromDatePayment} toDate={toDatePayment} setToDate={setToDatePayment} saveData={saveData} setExportList={setExportList} /> )
     ];
 
     return (

@@ -88,7 +88,7 @@ const Hours = ({ companyList, saveData, setRefresh }) => {
     return (
         <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
             <div class='flex items-center justify-between'>
-                <Heading label={"Weekly Scheduled"} icon={<ClockCircleFilled />} />
+                <Heading label={"Weekly Scheduled"} Icon={<ClockCircleFilled />} />
 
                 {isEdit ?
                     <Space>

@@ -2,13 +2,12 @@
 import {  useEffect, useRef, useState } from "react";
 import { EditOutlined } from '@ant-design/icons';
 import { IoSearchOutline } from "react-icons/io5";
-import { Badge, Button,  Drawer, Input,  Select,  Space, Tooltip } from "antd";
-import {  PlusOutlined, SaveOutlined, ContainerOutlined } from '@ant-design/icons';
+import {  Button,  Drawer, Input,  Select,  Space, Tooltip } from "antd";
+import {  PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import DataTable from "../../common/datatable";
 import {  getTableItem } from "../../common/items";
 import {Sort} from '../../common/sort.js'
 import { FaSortAlphaDown, FaSortAlphaUp } from "react-icons/fa";
-import LogsView from "../../components/Logs/logs_view.js";
 import ExportToExcel from "../../common/export.js";
 import { UTC_LocalDateTime } from "../../common/localDate.js";
 import CustomerDetail from "../../components/Customer/customer_detail.js";
@@ -16,7 +15,6 @@ import CustomerDetail from "../../components/Customer/customer_detail.js";
 const Customer = ({ customerList,setCustomerList,saveData }) => {
     const ref= useRef();
     const [open, setOpen] = useState(false);
-    const [openLogs, setOpenLogs] = useState(false);
     const [title, setTitle] = useState('New');
     const [id, setId] = useState(0);
     const [refresh, setRefresh] = useState(0);
@@ -42,10 +40,6 @@ const Customer = ({ customerList,setCustomerList,saveData }) => {
         setRefresh(refresh + 1);
         setId(id);
         setOpen(true);
-    }
-    const btn_LogsClick = (id) => {
-        setId(id);
-        setOpenLogs(true);
     }
     const btnSave = async () => {
         await ref.current?.save(); 

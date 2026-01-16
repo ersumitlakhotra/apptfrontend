@@ -12,7 +12,7 @@ import AssignedTo from "../../common/assigned_to";
 import { UTC_LocalDateTime, get_Date } from "../../common/localDate";
 
 
-const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_ViewClick, btn_LogsClick, refresh, fromDate, setFromDate, toDate, setToDate ,setExportList }) => {
+const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_ViewClick, btn_LogsClick, refresh, fromDate, setFromDate, toDate, setToDate ,setExportList }) => {
   
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(orderList);
@@ -65,7 +65,7 @@ const OrderTabs = ({ key, orderList, servicesList, userList, btn_Click, btn_View
         getTableItem('9', 'Action'),
     ];
     return (
-        <div key={key} class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
+        <div key={index} class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
             <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
                 <div class='w-full md:w-1/4'>
                     <Input size="large" placeholder="Search" prefix={<IoSearchOutline />} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />

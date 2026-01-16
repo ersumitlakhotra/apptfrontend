@@ -1,10 +1,7 @@
 
-import { Button, Space, Switch, TimePicker } from "antd";
-import Heading from "../../common/heading";
+import { Switch, TimePicker } from "antd";
 
-import { ClockCircleFilled, CloseOutlined, EditOutlined } from '@ant-design/icons';
-import Accordion from "../../common/accordion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import dayjs from 'dayjs';
 const { RangePicker } = TimePicker;
 var localizedFormat = require("dayjs/plugin/localizedFormat");
@@ -13,7 +10,6 @@ const UserSchedule = ({ sunday, setSunday, monday, setMonday, tuesday, setTuesda
     thursday, setThursday, friday, setFriday, saturday, setSaturday }) => {
 
     dayjs.extend(localizedFormat);
-    const [isEdit, setIsEdit] = useState(true);
     const Checked = 'Working'; const Unchecked = 'off';
 
     const today = new Date();

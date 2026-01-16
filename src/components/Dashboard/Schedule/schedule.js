@@ -95,7 +95,7 @@ const Schedule = ({ scheduleList, userList, saveData }) => {
                         }
                     )
                     return (
-                        <div class='flex flex-row justify-between  items-center cursor-pointer p-2 hover:bg-gray-50 hover:shadow-md ' onClick={() => { setUid(String(user.id)); btn_Click(id);}}>
+                        <div key={user.id} class='flex flex-row justify-between  items-center cursor-pointer p-2 hover:bg-gray-50 hover:shadow-md ' onClick={() => { setUid(String(user.id)); btn_Click(id);}}>
                             <div class='flex flex-row gap-3  items-center text-gray-800  font-medium font-sans'>
                                 {user.profilepic !== null ?
                                     <Image width={30} height={30} src={user.profilepic} style={{ borderRadius: 15 }} /> :
