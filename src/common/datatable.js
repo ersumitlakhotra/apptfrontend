@@ -4,7 +4,7 @@ const DataTable = ({ headerItems, list, body, onChange, current=1, isFooter = tr
     return (
         <div class="relative overflow-x-auto">
             <table class="w-full text-left h-40 overflow-auto">
-                <thead class="h-12 border-b text-gray-700 bg-zinc-50 ">
+                <thead class="h-12 border-b text-gray-700 bg-zinc-50 z-50 sticky top-0 ">
                     <tr>
                         {headerItems.map(items => (
                             <th scope="col" id={items.key} key={items.key} class={`py-3 font-medium `}>

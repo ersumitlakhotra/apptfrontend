@@ -86,6 +86,7 @@ const AreaChartCard = ({ categoriesArray, series, color,name }) => {
                 data: series
             }]}
             type="area"
+            width={'90%'}
             height={100}
         />
     )

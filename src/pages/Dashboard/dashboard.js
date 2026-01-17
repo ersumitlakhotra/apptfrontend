@@ -87,11 +87,15 @@ const Dashboard = ({refresh, orderList, expensesList, servicesList, userList, ev
 
             {/* cards*/}
             <span class="text-lg font-semibold text-gray-800">Dashboard</span>         
-            <div class='flex flex-col gap-6 md:flex-row '>
-                <Card index={1} title={'Orders'} value={totalOrders} sign={'#'} chart={orderChart} />
-                <Card index={2} title={'Sales'} value={totalSales} sign={'$'} chart={salesChart} />
-                <Card index={3} title={'Expenses'} value={totalExpenses} sign={'$'} chart={expenseChart} />
-                <Card index={4} title={'Profit/Loss'} value={totalRevenue} sign={'$'} chart={revenueChart} />              
+            <div class='flex flex-col gap-2 xl:flex-row '>
+                <div class='w-full flex flex-col gap-2 md:flex-row '>
+                    <Card index={1} title={'Orders'} value={totalOrders} sign={'#'} chart={orderChart} />
+                    <Card index={2} title={'Sales'} value={totalSales} sign={'$'} chart={salesChart} />
+                </div>
+                <div class='w-full flex flex-col gap-2 md:flex-row '>
+                    <Card index={3} title={'Expenses'} value={totalExpenses} sign={'$'} chart={expenseChart} />
+                    <Card index={4} title={'Profit/Loss'} value={totalRevenue} sign={'$'} chart={revenueChart} />
+                </div>
             </div>
 
             <div class='flex flex-col gap-4 mt-4  w-full md:flex-row'>

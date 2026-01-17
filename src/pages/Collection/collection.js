@@ -116,7 +116,7 @@ const Collection = ({ orderList, servicesList, userList,saveData }) => {
                     <Card key={6} index={6} title={'Tip'} value={tip} backgroundColor={'#fde3cf'} color={'#f56a00'} />
                 </div>
             </div>
-            <div class='w-full  bg-white border rounded-lg p-4 flex flex-col gap-4 '>
+            <div class='w-full overflow-auto bg-white border rounded-lg p-4 flex flex-col gap-4  ' style={{height:'80vh'}}>
                 <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
                     <div class='w-full flex flex-row gap-2 items-center md:w-1/3'>
                         <p class='text-sm text-gray-500 whitespace-nowrap'>Filter by</p>

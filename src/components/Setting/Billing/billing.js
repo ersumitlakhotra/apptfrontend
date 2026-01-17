@@ -120,7 +120,7 @@ const Billing = ({ companyList,billingList, saveData, setRefresh }) => {
                 <Heading label={"Change plan"} desc={'You can upgrade or downgrade whenever you want.'} Icon={<CreditCardFilled  />} />
 
                 <div class='mx-6 flex flex-col gap-16 md:flex-row '>
-                    <PricingCard key={1} index={1} title={'STARTUP'} price={'0.00'} current={plan === 'STARTUP'} />
+                    <PricingCard key={1} index={1} title={'FREE TRIAL'} price={'0.00'} current={plan === 'FREE TRIAL'} />
                     <PricingCard key={2} index={2} title={'STANDARD'} price={'100.00'} current={plan === 'STANDARD'} />
                     <PricingCard key={3} index={3} title={'ENTERPRISE'} price={'150.00'} current={plan === 'ENTERPRISE'} />
                 </div>

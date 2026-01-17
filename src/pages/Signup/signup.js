@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { useState } from "react";
-import { LoadingOutlined, MailFilled } from '@ant-design/icons';
-import { Drawer, Spin, Input, Button } from 'antd';
+import { DownOutlined, LoadingOutlined, MailFilled } from '@ant-design/icons';
+import { Drawer, Spin, Input, Button, Dropdown, Space } from 'antd';
 import { apiCalls } from "../../hook/apiCall.js";
 import useAlert from "../../common/alert.js";
 import { isValidEmail, setCellFormat } from "../../common/cellformat.js";
@@ -12,11 +12,23 @@ export const Signup = ({ logo }) => {
   const [cell, setCell] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [pricing, setPricing] = useState(0.00);
+  const [menuOption, setMenuOption] = useState('FREE TRIAL : $ 0.00 / 30 days');
+  const [plan, setPlan] = useState('FREE TRIAL');
   const [loading, setLoading] = useState(false);
   const { contextHolder, success, error, warning } = useAlert();
   const [code, setCode] = useState('');
   const [codeEnter, setCodeEnter] = useState('');
   const [openVerification, setOpenVerification] = useState(false);
+
+
+    const items = [
+        { key: 'FREE TRIAL', label: 'FREE TRIAL : $ 0.00 / 30 days',price:0.00 },
+        { key: 'STANDARD', label: 'STANDARD : $ 100.00 / Month',price:100.00 },
+        { key: 'ENTERPRISE', label: 'ENTERPRISE : $ 150.00 / Month',price:150.00 },
+    ];
+    const onItemChanged = e => {  items.filter(item => item.key === e.key).map(res => {setPricing(res.price); setPlan(res.key); setMenuOption(res.label);})  };
+    const menuProps = { items, onClick: onItemChanged };
 
   const onSubmit = async () => {
     if (business_name !== '' && cell !== '' && cell.length === 12 && email !== '' && isValidEmail(email) && password !== '') {
@@ -71,6 +83,8 @@ export const Signup = ({ logo }) => {
     setPassword('');
     setCode('');
     setCodeEnter('');
+    setPricing(0.00);
+    setPlan('FREE TRIAL');
     setOpenVerification(false);
   }
 
@@ -109,7 +123,9 @@ export const Signup = ({ logo }) => {
               role: 'Administrator',
               rating: '5',
               status: 'Active',
-              accounttype: 'Basic'
+              accounttype: 'Basic',
+              pricing:pricing,
+              plan:plan,
             });
             const resUser = await apiCalls('POST', 'user', cid, null, userBody);
             if (resUser.status === 201) {
@@ -149,8 +165,8 @@ export const Signup = ({ logo }) => {
 
   return (
     <div class="bg-gray-50  p-4">
-      <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-full lg:h-screen lg:py-0 ">
-          <img class="w-20 h-20 mb-2" src={logo} alt="logo" />
+      <div class="flex flex-col items-center justify-center px-6 py-8 h-full ">
+        <img class="w-20 h-20 mb-2 mt-4" src={logo} alt="logo" />
         <div class="w-full bg-white rounded-lg shadow  md:mt-0 sm:max-w-md xl:p-0 ">
           <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 class="text-xl font-bold font-sans leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
@@ -182,6 +198,17 @@ export const Signup = ({ logo }) => {
               <input type="password" name="password" id="password" placeholder="••••••••" value={password}
                 class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 required onChange={(e) => setPassword(e.target.value)} />
+            </div>  
+            <div>
+              <label for="plan" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Pricing Plan <span class='text-red-500'>*</span></label>
+              <Dropdown menu={menuProps} className="flex flex-row items-center justify-start" >
+                    <Button size="large" style={{width:'100%'}} >
+                        <div class="w-full text-sm flex flex-row items-center justify-between">
+                            {menuOption}
+                            <DownOutlined />
+                        </div>
+                    </Button>
+              </Dropdown>
             </div>
             <div class="flex items-center justify-between">
               <div class="flex items-start">
