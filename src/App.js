@@ -15,6 +15,7 @@ import {
 } from "react-router-dom";
 
 import logo from './Images/logo.png'
+import TermsCondition from './pages/TermsConditions/terms.js';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         <Route path="book-appointment" element={<BookAppointment />} />
         <Route path="support" element={<Support/>} />
         <Route path="privacy-policy" element={<Privacy/>} />
+        <Route path="terms-conditions" element={<TermsCondition/>} />
       </Routes>
     </BrowserRouter>
   );

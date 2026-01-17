@@ -140,7 +140,7 @@ const MasterPage = () => {
     }
   }
 
-  const saveData = async (label, method, endPoint, id = null, body = null, notify = true, logs = true) => {
+  const saveData = async (label, method, endPoint, id = null, body = null, notify = true, logs = true,email=false) => {
     setIsLoading(true);
     try {
 
@@ -152,36 +152,11 @@ const MasterPage = () => {
       }
       else {
         let status = result.status === 201 ? 'Created' : result.status === 200 ? 'Modified' : 'Deleted/Cancelled';
-        if (logs) {
-          const Log = JSON.stringify({
-            ltype: label,
-            lid: result.data.data.id,
-            lname: '',
-            userid: localStorage.getItem('uid'),
-            status: status,
-            datainfo: [body]
-          });
-
-          await apiCalls('POST', 'logs', companyId, null, Log);
-        }
-        if (label === 'Order' && result.data.data.status !== 'Completed') {
-          let order_no = result.data.data.order_no;
-          let customerName = result.data.data.name; 
-          let customerEmail = result.data.data.email;
-          let serviceinfo = result.data.data.serviceinfo;
-         let employeeName = '';
-          userList.filter(a => a.id === result.data.data.assignedto).map(b =>
-            employeeName = b.fullname
-          )
-
-          let trndate = result.data.data.trndate;
-          let slot = result.data.data.slot;
-          let isCancelled = result.data.data.status === 'Cancelled' ? true : false;
-          let isEmailSend = sendEmail(companyId, id, order_no, serviceinfo, customerName, customerEmail, employeeName, trndate, slot, isCancelled);
-          if (!isEmailSend)
-            error('There is some issue while send the email. Please try again later.')
-        }
-
+        if (logs)
+          saveLogs(label,result.data.data.id,'',status,body,companyId)
+        if (email)
+           sendEmail(companyId, id,result);
+    
         notify && success(`The ${label} has been ${status} successfully.`);
         setRefresh(refresh + 1)
       }
@@ -192,8 +167,36 @@ const MasterPage = () => {
     setIsLoading(false);
   }
 
-  const sendEmail = async (cid, id, order_no, servicesItem, customerName, customerEmail, employeeName, trndate, slot, isCancelled) => {
+  const saveLogs = async (label, id, lname, status, body,companyId) => {
+    try {
+      const Log = JSON.stringify({
+        ltype: label,
+        lid: id,
+        lname: lname,
+        userid: localStorage.getItem('uid'),
+        status: status,
+        datainfo: [body]
+      });
+      await apiCalls('POST', 'logs', companyId, null, Log);
+    }
+    catch{   
+    }
+  }
+ const sendEmail = async (cid, id,result) => {
     let isEmailSend = false;
+   let order_no = result.data.data.order_no;
+   let customerName = result.data.data.name;
+   let customerEmail = result.data.data.email;
+   let servicesItem = result.data.data.serviceinfo;
+   let employeeName = '';
+   userList.filter(a => a.id === result.data.data.assignedto).map(b =>
+     employeeName = b.fullname
+   )
+
+   let trndate = result.data.data.trndate;
+   let slot = result.data.data.slot;
+   let isCancelled = result.data.data.status === 'Cancelled' ? true : false;
+
     const Subject = isCancelled ? 'Booking Cancellation' : id === null ? "Booking Confirmation" : "Re-Schedule Confirmation";
     const link = `${process.env.REACT_APP_DOMAIN}/book-appointment?store=` + storeId;
     let serviceNames = '';
@@ -226,7 +229,6 @@ const MasterPage = () => {
 
     return isEmailSend;
   }
-
   const onSelected = (newContent) => {
     setIsLoading(true);
     setContent(newContent);

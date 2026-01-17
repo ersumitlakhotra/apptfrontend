@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable array-callback-return */
 import { useEffect, useImperativeHandle, useState } from "react";
-import { Avatar, Badge, Button, DatePicker, Divider, Flex, Image, Input, Radio, Select, Tag } from "antd";
+import { Avatar, Badge, Button, DatePicker, Divider, Dropdown, Flex, Image, Input, Radio, Select, Tag } from "antd";
 import dayjs from 'dayjs';
 import { TextboxFlex } from "../../common/textbox";
 import { isValidEmail, setCellFormat, setNumberAndDot } from "../../common/cellformat";
-import { UserOutlined,  CreditCardOutlined } from '@ant-design/icons';
+import { UserOutlined,  CreditCardOutlined, DownOutlined } from '@ant-design/icons';
 import { BsCash } from "react-icons/bs";
 import useAlert from "../../common/alert";
 import { get_Date, LocalDate, LocalTime } from "../../common/localDate";
@@ -25,6 +25,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
+    const [sendEmail, setSendEmail] = useState('no');
     const [status, setStatus] = useState('');
     const [price, setPrice] = useState('0');
     const [tax, setTax] = useState('0');
@@ -75,12 +76,21 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
         }
     }
 
+
+   const items = [
+        { key: 'no', label: 'Do not send e-mail' },
+        { key: 'yes', label: 'Send e-mail ' },
+    ];
+    const onItemChanged = e => {  setSendEmail(e.key)  };
+    const menuProps = { items, onClick: onItemChanged };
+
     useEffect(() => {
         if (id === 0) {
             setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');
             setStatus('Pending'); setPrice('0'); setTax('0'); setTotal('0'); setDiscount('0'); setCoupon(''); setTaxAmount('0'); setTrnDate(LocalDate());
             setAssignedTo('0'); setOrderNo(''); setServicesItem([]); setSlot(''); setPrevSlot(''); setPrevTrnDate(''); setPrevServicesItem([]);
             setStart(''); setEnd(''); setReceived(0); setMode('Cash'); setTip(0);
+            
         }
         else {
             const editList = orderList.find(item => item.id === id);
@@ -109,6 +119,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setTip(editList.tip);
             setDiscount(editList.discount);
         }
+        setSendEmail('no');
         const liveList = eventList.filter(a => a.case.toUpperCase() === 'LIVE');
         setLiveList(liveList.length > 0 ? liveList : [])
     }, [refresh])
@@ -158,7 +169,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     bookedvia: 'Walk-In',
                 });
 
-                saveData("Order", id !== 0 ? 'PUT' : 'POST', "order", id !== 0 ? id : null, Body);
+                saveData("Order", id !== 0 ? 'PUT' : 'POST', "order", id !== 0 ? id : null, Body,true,true,sendEmail === 'yes');
                 setOpen(false);
             }
         }
@@ -320,7 +331,6 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 setIsOpen(false);
         }
     }
-
     
     return (
         <div class='flex flex-col font-normal gap-3 '>
@@ -354,6 +364,17 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
 
             <TextboxFlex label={'E-mail'} mandatory={true} input={
                 <Input placeholder="abcd@company.com" status={customerEmail === '' || !isValidEmail(customerEmail) ? 'error' : ''} value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} />
+            } /> 
+            
+            <TextboxFlex label={'Notification'}  input={
+               <Dropdown menu={menuProps} className="flex flex-row items-center justify-start" >
+                    <Button size="large" style={{width:'100%'}} >
+                        <div class="w-full text-sm flex flex-row items-center justify-between">
+                            {items.filter(item => item.key === sendEmail).map( res => res.label)}
+                            <DownOutlined />
+                        </div>
+                    </Button>
+              </Dropdown>
             } />
 
             <Divider />
