@@ -223,7 +223,7 @@ export const Signup = ({ logo }) => {
 
             <p class="block mb-2 text-center text-xs font-small text-gray-500 dark:text-white">
               By signing up to create an account, you are accepting
-              <a href="/privacy-policy" target="_blank" class="font-medium text-primary-600 hover:underline dark:text-primary-500"> our terms of service </a>and
+              <a href="/terms-conditions" target="_blank" class="font-medium text-primary-600 hover:underline dark:text-primary-500"> our terms of service </a>and
               <a href="/privacy-policy" target="_blank" class="font-medium text-primary-600 hover:underline dark:text-primary-500"> privacy policy</a>
             </p>
           </div>
