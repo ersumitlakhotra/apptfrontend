@@ -33,11 +33,11 @@ const Order = ({ orderList, servicesList, userList, companyList, eventList, logs
 
 
     useEffect(() => {
-        setTitle(id === 0 ? "New Order" : `Edit Order - ${order_no}`);
+        setTitle(id === 0 ? "New Appointment" : `Edit Appointment - ${order_no}`);
     }, [order_no])
 
     const btn_Click = (id) => {
-        setTitle(id === 0 ? "New Order" : `Edit Order - ${order_no}`);
+        setTitle(id === 0 ? "New Appointment" : `Edit Appointment - ${order_no}`);
         setRefresh(refresh + 1);
         setId(id);
         setOpen(true);
@@ -67,7 +67,11 @@ const Order = ({ orderList, servicesList, userList, companyList, eventList, logs
 
 
     const load = async () => {
-        const order = orderList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= fromDate && get_Date(a.trndate,'YYYY-MM-DD') <= toDate);
+        let order = orderList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= fromDate && get_Date(a.trndate,'YYYY-MM-DD') <= toDate);
+        const role = localStorage.getItem('role');
+        const userid = localStorage.getItem('uid');
+        if(role === 'Employee')
+            order = order.filter(item => item.assignedto === userid )
         const pending = order.filter(a => a.status.toUpperCase() === 'PENDING');
         const inprogress = order.filter(a => a.status.toUpperCase() === 'IN PROGRESS');
         const completed = order.filter(a => a.status.toUpperCase() === 'COMPLETED');
@@ -98,10 +102,10 @@ const Order = ({ orderList, servicesList, userList, companyList, eventList, logs
         <div class="flex flex-col gap-4 mb-12 w-full">
 
             <div class='flex items-center justify-between'>
-                <span class="text-lg font-semibold text-gray-800">Order</span>
+                <span class="text-lg font-semibold text-gray-800">Appointment</span>
                 <div class="flex gap-2">             
-                    <ExportToExcel data={exportList} fileName="Order" servicesList={servicesList} userList={userList} />
-                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create order</Button>
+                    <ExportToExcel data={exportList} fileName="Appointment" servicesList={servicesList} userList={userList} />
+                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create Appointment</Button>
                 </div>
             </div>  
 

@@ -76,7 +76,7 @@ const Schedule = ({ userList, scheduleList,saveData }) => {
     ];
 
     const btn_Click = (id) => {
-        setTitle(id === 0 ? "New Schedule" : "Edit Schedule");
+        setTitle(id === 0 ? "New TimeSheet" : "Edit TimeSheet");
         setRefresh(refresh + 1);
         setId(id);
         setOpen(true);
@@ -94,10 +94,10 @@ const Schedule = ({ userList, scheduleList,saveData }) => {
         <div class="flex flex-col gap-4 mb-12">
 
             <div class='flex items-center justify-between'>
-                <span class="text-lg font-semibold text-gray-800">Schedule</span>
+                <span class="text-lg font-semibold text-gray-800">TimeSheet</span>
                 <div class="flex gap-2">
                     <ExportToExcel data={exportList} fileName="Schedule" servicesList={[]} userList={userList} />
-                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create schedule</Button>
+                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create TimeSheet</Button>
                 </div>
             </div>
 

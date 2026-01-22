@@ -6,7 +6,6 @@ import { CloudUploadOutlined, EyeOutlined, UserOutlined } from '@ant-design/icon
 import UserAbout from "./about.js";
 import useAlert from "../../common/alert.js";
 import UserLoginPermissions from "./permissions.js";
-import {  isValidEmail } from "../../common/cellformat.js";
 
 function getTabItems(key, label, icon, children) {
     return {key,label,children,icon,};
@@ -29,17 +28,17 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
 
 
     const [dashboard, setDashboard] = useState(true);
-    const [tasks, setTasks] = useState(false);
-    const [order, setOrder] = useState(false);
-    const [event, setEvent] = useState(false);
-    const [payment, setPayment] = useState(false);
-    const [customer, setCustomer] = useState(false);
-    const [services, setServices] = useState(false);
-    const [users, setUsers] = useState(false);
-    const [schedule, setSchedule] = useState(false);
-    const [sales, setSales] = useState(false);
-    const [collection, setCollection] = useState(false);
-    const [setting, setSetting] = useState(false);
+    const [tasks, setTasks] = useState(true);
+    const [order, setOrder] = useState(true);
+    const [event, setEvent] = useState(true);
+    const [payment, setPayment] = useState(true);
+    const [customer, setCustomer] = useState(true);
+    const [services, setServices] = useState(true);
+    const [users, setUsers] = useState(true);
+    const [schedule, setSchedule] = useState(true);
+    const [sales, setSales] = useState(true);
+    const [collection, setCollection] = useState(true);
+    const [setting, setSetting] = useState(true);
     const { contextHolder, error, warning } = useAlert();
     let refimage=useRef();
 
@@ -48,11 +47,13 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
         if (id === 0) {
             setFullname('');
             setCell(''); setEmail(''); setAddress('');
-            setUsername(''); setPassword(''); setRole('Employee'); setRating(0);
+            setUsername(''); 
+            setPassword(''); setRole('Employee'); setRating(0);
             setAccountType('Basic'); setProfile(null);
             setGender('Male'); setStatus('Active');setAppSchedule(true);
-            setDashboard(true); setTasks(false); setOrder(false); setEvent(false); setPayment(false);
-            setCustomer(false); setServices(false); setUsers(false); setSchedule(false); setSales(false); setCollection(false); setSetting(false);
+            setDashboard(false); setTasks(true); setOrder(true);
+            setEvent(false); setPayment(false);
+            setCustomer(false); setServices(false); setUsers(false); setSchedule(false); setSales(false); setCollection(false); setSetting(false);   
         }
         else {
             const editList = userList.find(item => item.id === id)
@@ -85,20 +86,54 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
                 setSales(b.sales);
                 setCollection(b.collection);
                 setSetting(b.setting);
-                return(<></>)
             })
         }
     }, [refresh])
+
+    useEffect(() => {
+        if (role === 'Employee')
+        {
+            setDashboard(false); setTasks(true); setOrder(true);
+            setEvent(false); setPayment(false);
+            setCustomer(false); setServices(false); setUsers(false); setSchedule(false); setSales(false); setCollection(false); setSetting(false);   
+        }
+        else if (role === 'User' && id === 0 )
+        {
+            setDashboard(true); setTasks(true); setOrder(true); setEvent(true); setPayment(true);
+            setCustomer(true); setServices(true); setUsers(true); setSchedule(true); setSales(true); setCollection(true); setSetting(true);
+        }
+        else if (role === 'User' && id !== 0)
+        {
+            userPermissionList.filter(a => a.uid === id).map(b => {
+                setDashboard(b.dashboard);
+                setTasks(b.tasks);
+                setOrder(b.order);
+                setEvent(b.event);
+                setPayment(b.payment);
+
+                setCustomer(b.customer);
+                setServices(b.services);
+                setUsers(b.users);
+                setSchedule(b.schedule)
+
+                setSales(b.sales);
+                setCollection(b.collection);
+                setSetting(b.setting);
+            })
+        }
+
+    },[role])
   
  
 
     
     const save = async () => {
-        if (fullname !== '' && (role === "User" ? password !== '':true) && isValidEmail(email) ) {
+        if (fullname !== '' &&  password !== ''  && cell.length === 12 && cell !== '' ) {
             const Body = JSON.stringify({
                 fullname: fullname,
                 cell: cell,
                 email: email,
+                username: cell.replace(/\D/g, ""),
                 address: address,
                 gender: gender,
                 password: password,
@@ -125,9 +160,9 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
             setOpen(false);
         }
         else{
-            if (!isValidEmail(email))
-                warning('Please, fill out the valid email address !');
-            else
+           // if (!isValidEmail(email))
+               // warning('Please, fill out the valid email address !');
+            //else
             warning('Please, fill out the required fields !');
         }
     }
@@ -147,7 +182,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
             address={address}
             setAddress={setAddress}
             gender={gender}
-            setGender={setGender} username={username}
+            setGender={setGender} 
             password={password}
             setPassword={setPassword}
             role={role}

@@ -77,7 +77,7 @@ const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList,  saveData ,s
                 trndate: fromDate
             });
             const isValid = await apiCalls("POST", 'app/schedule/date', null, null, ScheduleBody);
-            if (isValid.status === 404) {
+            if (isValid.status === 500) {
 
                 const Body = JSON.stringify({
                     uid: uid,
@@ -86,11 +86,11 @@ const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList,  saveData ,s
                     endshift: isWorking ? endTime : '00:00:00',
                     dayoff: isWorking
                 });
-                saveData("Schedule", 'POST', "schedule",  null, Body, true, false);
+                saveData("TimeSheet", 'POST', "schedule",  null, Body, true, false);
                 setOpen(false);
             }
             else {
-                warning(`The schedule for ${get_Date(fromDate, 'MMMM DD,YYYY')} already exists.`);
+                warning(`The TimeSheet for ${get_Date(fromDate, 'MMMM DD,YYYY')} already exists.`);
             }
         }
         catch (err) {
@@ -107,7 +107,7 @@ const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList,  saveData ,s
                     trndate: date
                 });
                 const isValid = await apiCalls("POST", 'app/schedule/date', null, null, ScheduleBody);
-                if (isValid.status === 404) {
+                if (isValid.status === 500) {
 
                     const Body = JSON.stringify({
                         uid: uid,
@@ -116,7 +116,7 @@ const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList,  saveData ,s
                         endshift: isWorking ? endTime : '00:00:00',
                         dayoff: isWorking
                     });
-                    saveData("Schedule", 'POST', "schedule", null, Body, true, false);                  
+                    saveData("TimeSheet", 'POST', "schedule", null, Body, true, false);                  
                 }
             })
             setOpen(false);
@@ -135,7 +135,7 @@ const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList,  saveData ,s
                 endshift: isWorking ? endTime : '00:00:00',
                 dayoff: isWorking
             });
-            saveData("Schedule", 'PUT', "schedule", id, Body, true, false);
+            saveData("TimeSheet", 'PUT', "schedule", id, Body, true, false);
             setOpen(false);
         }
         catch (err) {
@@ -151,7 +151,7 @@ const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList,  saveData ,s
     const plainOptions = ['Single', 'Multiple'];
     return (
         <div class='flex flex-col font-normal gap-3 mt-2'>
-            <p class="text-gray-400 mb-4">Schedule Information</p>
+            <p class="text-gray-400 mb-4">TimeSheet Information</p>
 
             <TextboxFlex label={'User'} mandatory={true} input={
                 <Select

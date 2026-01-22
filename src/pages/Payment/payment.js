@@ -71,8 +71,8 @@ const Payment = ({ expensesList, userList, logsList, saveData, tabActiveKey, set
                 <span class="text-lg font-semibold text-gray-800">Payment</span>
                 <div class="flex gap-2">
                     <ExportToExcel data={exportList} fileName={tabActiveKey === '1' ? 'Expense':'Payment'} servicesList={[]} userList={userList} />
-                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click_Expense(0)}>Create expense</Button>
-                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click_Payment(0)}>Create payment</Button>
+                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click_Expense(0)}>Create Expense</Button>
+                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click_Payment(0)}>Create Payment</Button>
                 </div>
             </div>
 

@@ -169,7 +169,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     bookedvia: 'Walk-In',
                 });
 
-                saveData("Order", id !== 0 ? 'PUT' : 'POST', "order", id !== 0 ? id : null, Body,true,true,sendEmail === 'yes');
+                saveData("Appointment", id !== 0 ? 'PUT' : 'POST', "order", id !== 0 ? id : null, Body,true,true,sendEmail === 'yes');
                 setOpen(false);
             }
         }

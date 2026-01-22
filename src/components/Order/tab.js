@@ -23,18 +23,24 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
 
     const [assigned_to, setAssignedTo] = useState('');
 
+    const [dropDownVisible,setDropDownVisible] = useState(true)
+
     useEffect(() => {
         setFilteredList(orderList);
         setList(orderList);
         setExportList(orderList);
         setSearchInput('');
-        setAssignedTo('');
+        const role = localStorage.getItem('role');
+        const userid = localStorage.getItem('uid');
+        setAssignedTo(role === 'Employee' ? userid : '' );
+        setDropDownVisible(role === 'Employee' ? false : true);
         setPage(1, 10, orderList);
     }, [refresh, orderList])
 
     useEffect(() => {
-        let searchedList = orderList.filter(item => 
+        let searchedList = orderList.filter(item =>
             item.name.toLowerCase().includes(searchInput.toLowerCase()) ||
+            item.cell.toLowerCase().replace(/\D/g, "").includes(searchInput.toLowerCase().replace(/\D/g, "")) ||
             item.order_no.toString().includes(searchInput.toLowerCase()));
         if (assigned_to !== '')
             searchedList = searchedList.filter(item => item.assignedto === assigned_to)
@@ -54,7 +60,7 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
  
 
     const headerItems = [
-        getTableItem('1', 'Order'),
+        getTableItem('1', '# No.'),
         getTableItem('2', 'Customer'),
         getTableItem('3', 'Date'),
         getTableItem('4', 'Services'),
@@ -71,7 +77,7 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
                     <Input size="large" placeholder="Search" prefix={<IoSearchOutline />} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
                 </div>
                 <div class='w-full md:w-1/4'>
-                    <Select
+                    {dropDownVisible &&  <Select
                         value={assigned_to}
                         style={{ width: '100%' }}
                         size="large"
@@ -81,6 +87,7 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
                             label: <AssignedTo key={item.id} userId={item.id} userList={userList} />                                                                     
                         }))]}
                     />
+                    }
                 </div>
                 <div class='w-full md:w-2/4'>
                     <div class='flex flex-col md:flex-row md:justify-end gap-4 '>

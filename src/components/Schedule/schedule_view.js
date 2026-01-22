@@ -189,7 +189,7 @@ const ScheduleView = ({ id, refresh, userList, scheduleListAll }) => {
                     <div class='border rounded bg-white p-4 flex flex-col gap-4'>
                         <div class='flex flex-row items-center justify-between'>
                             <div class='flex flex-col'>
-                                <span class="text-lg font-bold text-gray-800">Schedule Summary</span>
+                                <span class="text-lg font-bold text-gray-800">Summary</span>
                                 <span class="text-xs text-gray-400">{`${UTC_LocalDateTime(fromDate, 'MMM DD YYYY')} - ${UTC_LocalDateTime(toDate, 'MMM DD YYYY')}`}</span>
                             </div>
                         </div>

@@ -14,7 +14,7 @@ const ExportToExcel = ({ data, fileName, servicesList, userList }) => {
     const worksheet = workbook.addWorksheet(fileName);
 
     switch (fileName.toUpperCase()) {
-      case 'ORDER': {
+      case 'APPOINTMENT': {
         worksheet.columns = [
           getExcelItem('Order', 10),
           getExcelItem('Customer_Name', 30),

@@ -89,7 +89,7 @@ const Users = ({ userList, userPermissionList, logsList, scheduleList, saveData 
                 <span class="text-lg font-semibold text-gray-800">Users</span>
                 <div class="flex gap-2">
                     <ExportToExcel data={exportList} fileName="User" servicesList={[]} userList={userList} />
-                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create user</Button>
+                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create User</Button>
                 </div>
             </div>
 

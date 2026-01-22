@@ -66,7 +66,7 @@ const Schedule = ({ scheduleList, userList, saveData }) => {
     return (
         <div class='flex  flex-col gap-4 w-full'>
             <div class='flex justify-between items-center'>
-                <span class="text-lg font-semibold text-gray-800">Schedule</span>
+                <span class="text-lg font-semibold text-gray-800">TimeSheet</span>
                 <Dropdown menu={menuProps}>
                     <Button>
                         <Space>

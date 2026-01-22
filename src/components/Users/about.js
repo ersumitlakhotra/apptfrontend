@@ -3,7 +3,7 @@ import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { setCellFormat } from "../../common/cellformat";
 import { TextboxFlex } from "../../common/textbox";
 
-const UserAbout = ({ fullname, setFullname, cell, setCell, email, setEmail, address, setAddress, gender, setGender, username, password, setPassword, role, setRole, status, setStatus, appschedule, setAppSchedule }) => {
+const UserAbout = ({ fullname, setFullname, cell, setCell, email, setEmail, address, setAddress, gender, setGender, password, setPassword, role, setRole, status, setStatus, appschedule, setAppSchedule }) => {
     const Checked = 'On'; const Unchecked = 'Off';
     return (
         <div class='flex flex-col font-normal gap-2 mt-2'>
@@ -26,27 +26,26 @@ const UserAbout = ({ fullname, setFullname, cell, setCell, email, setEmail, addr
                 />
             } />
 
-            <TextboxFlex label={'Cell #'} input={
-                <Input placeholder="111-222-3333" value={cell} onChange={(e) => setCell(setCellFormat(e.target.value))} />
+            <TextboxFlex label={'E-Mail'}  input={
+                <Input placeholder="abcd@company.com" value={email} onChange={(e) => setEmail(e.target.value)} />
             } />
 
-            <TextboxFlex label={'E-Mail'} mandatory={true} input={
-                <Input placeholder="abcd@company.com" value={email} status={email === '' ? 'error' : ''} onChange={(e) => setEmail(e.target.value)} />
+            <TextboxFlex label={'Cell #'} mandatory={true} input={
+                <Input placeholder="111-222-3333" value={cell} status={cell === '' ? 'error' : ''} onChange={(e) => setCell(setCellFormat(e.target.value))} />
             } />
-
 
             <TextboxFlex label={'Password'} mandatory={true} input={
                 <Input placeholder="password" status={password === '' ? 'error' : ''} value={password} onChange={(e) => setPassword(e.target.value)} />
             } />
 
-            <TextboxFlex label={'Schedule'} input={
+            {/*<TextboxFlex label={'Schedule'} input={
                 <div class='flex flex-row gap-2 w-full'>
                     <div class='flex-1 justify-start'>
                         <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} value={appschedule} onChange={(e) => setAppSchedule(e)} />
                     </div>
-                    <p class='text-sm italic text-gray-500'>This option will allow user to add/modify the schedule via app.</p>
+                    <p class='text-sm italic text-gray-500'>This option will allow user to add/modify the TimeSheet via app.</p>
                 </div>
-            } />
+            } />*/}
 
             <TextboxFlex label={'Address'} input={
                 <Input placeholder="Address" value={address} onChange={(e) => setAddress(e.target.value)} />

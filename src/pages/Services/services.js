@@ -93,7 +93,7 @@ const Services = ({ servicesList, setServicesList, logsList, userList, saveData 
                 <span class="text-lg font-semibold text-gray-800">Services</span>
                 <div class="flex gap-2">
                     <ExportToExcel data={exportList} fileName="Services" servicesList={servicesList} userList={userList} />
-                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create service</Button>
+                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create Service</Button>
                 </div>
             </div>
 

@@ -44,7 +44,7 @@ const Tasks = ({ orderList, servicesList, userList, companyList, customerList, e
         <div class="flex flex-col gap-4 mb-12  w-full h-full">
             
             <div class='flex  items-center justify-between'>
-                <span class="text-lg font-semibold text-gray-800">Task</span>
+                <span class="text-lg font-semibold text-gray-800">Calender</span>
                 <div class='flex flex-row items-center gap-4'>
                  <Button type="primary" icon={<ReloadOutlined />} size="large" onClick={() => onReload()}>Refresh</Button>
                 

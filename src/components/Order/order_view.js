@@ -100,7 +100,7 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
     return (
         <div class="flex flex-col gap-2 mb-12  w-full">
             <div class='flex items-center justify-between'>
-                <span class="text-2xl font-bold text-gray-800">Order #{order_no}</span>
+                <span class="text-2xl font-bold text-gray-800">Appointment #{order_no}</span>
                 {(status === 'Pending' || status === 'In progress') &&
                     <div class="flex gap-2">
                         <Button color="cyan" variant="solid" icon={<CheckOutlined />} size="large" onClick={() => setIsModalOpen(true)}>Completed</Button>

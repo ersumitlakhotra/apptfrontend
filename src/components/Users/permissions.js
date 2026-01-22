@@ -9,15 +9,15 @@ const UserLoginPermissions = ({ dashboard, setDashboard, tasks, setTasks, order,
         <div class='flex flex-col font-normal gap-2 mt-2'>
 
             <p class="text-gray-400">Overview</p>
-           {/*<TextboxFlex label={'Dashboard'} input={
-                <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={dashboard}  disabled onChange={(e) => setDashboard(e)}/>
-            } />*/} 
+           <TextboxFlex label={'Dashboard'} input={
+                <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={dashboard}  onChange={(e) => setDashboard(e)}/>
+            } /> 
 
-            <TextboxFlex label={'Tasks'} input={
+            <TextboxFlex label={'Calender'} input={
                 <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={tasks} onChange={(e) => setTasks(e)}  />
             } />
 
-            <TextboxFlex label={'Order'} input={
+            <TextboxFlex label={'Appointment'} input={
                 <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={order} onChange={(e) => setOrder(e)} />
             } />
 

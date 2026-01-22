@@ -15,7 +15,7 @@ import {
 } from '@ant-design/icons';
 import { FaHandHoldingUsd } from "react-icons/fa";
 import SideBarButton from '../sidebar_button';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import logo from '../../../Images/logo.png';
 
 
@@ -32,7 +32,7 @@ function getItem(label, key, icon, isVisible, badge, btn, children, dropdown) {
   };
 }
 
-const Sidebar = ({ onSelected, content, open, uid, getData }) => {
+const Sidebar = ({ onSelected, content, open, uid, getData, setContent }) => {
 
   const [permissionList, setPermissionList] = useState([]);
   const [dashboard, setDashboard] = useState(false);
@@ -48,38 +48,65 @@ const Sidebar = ({ onSelected, content, open, uid, getData }) => {
   const [collection, setCollection] = useState(false);
   const [setting, setSetting] = useState(false);
 
+  const hasSet = useRef(false);
   useEffect(() => {
     if (uid > 0)
       getData(setPermissionList, "userpermission")
   }, [uid]);
 
   useEffect(() => {
-
+    let hasSet = false;
     if (permissionList.length > 0) {
       permissionList.filter(a => a.uid === uid).map(b => {
-        setDashboard(b.dashboard);
-        setTasks(b.tasks);
-        setOrder(b.order);
-        setEvent(b.event);
-        setPayment(b.payment);
+        Init("Dashboard", setDashboard, b.dashboard);
+        Init("Calender", setTasks, b.tasks);
+        Init("Appointment", setOrder, b.order);
+        Init("Event", setEvent, b.event);
+        Init("Payment", setPayment, b.payment);
 
-        setCustomer(b.customer);
-        setServices(b.services);
-        setUsers(b.users);
-        setSchedule(b.schedule);
+        Init("Customers", setCustomer, b.customer);
+        Init("Services", setServices, b.services);
+        Init("Users", setUsers, b.users);
+        Init("TimeSheet", setSchedule, b.schedule);
 
-        setSales(b.sales);
-        setCollection(b.collection);
-        setSetting(b.setting);
+        Init("Sales", setSales, b.sales);
+        Init("Collection", setCollection, b.collection);
+        Init("Setting", setSetting, b.setting);
+
+
+
+       // setDashboard(b.dashboard);
+       // setTasks(b.tasks);
+       // setOrder(b.order);
+        //setEvent(b.event);
+        //setPayment(b.payment);
+
+       // setCustomer(b.customer);
+       // setServices(b.services);
+       // setUsers(b.users);
+       // setSchedule(b.schedule);
+
+       // setSales(b.sales);
+        //setCollection(b.collection);
+       // setSetting(b.setting);
       })
     }
   }, [permissionList]);
 
+  const Init = (name, setItem, value) => {
+    setItem(value)
+    if (Boolean(value) === true && content === 'Default' && !hasSet.current)
+    {
+      onSelected(name)
+      hasSet.current = true;
+    }
+  }
+
 
   const overview = ([
     getItem('Dashboard', 11, <PieChartOutlined />, dashboard),
-    getItem('Tasks', 12, <CheckSquareOutlined />, tasks),
-    getItem('Order', 13, <ProductOutlined />, order),
+    getItem('Calender', 12, <CheckSquareOutlined />, tasks),
+    getItem('Appointment', 13, <ProductOutlined />, order),
     getItem('Event', 14, <NotificationOutlined />, event),
     getItem('Payment', 15, <DollarOutlined />, payment),
   ]);
@@ -95,7 +122,7 @@ const Sidebar = ({ onSelected, content, open, uid, getData }) => {
     getItem('Customers', 21, <ContactsOutlined />, customer),
     getItem('Services', 22, <UnorderedListOutlined />, services),
     getItem('Users', 23, <UserOutlined />, users),
-    getItem('Schedule', 24, <SolutionOutlined />, schedule),
+    getItem('TimeSheet', 24, <SolutionOutlined />, schedule),
   ]);
 
   const report = ([

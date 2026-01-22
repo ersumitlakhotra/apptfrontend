@@ -85,7 +85,7 @@ const Customer = ({ customerList,setCustomerList,saveData }) => {
                 <span class="text-lg font-semibold text-gray-800">Customers</span>
                 <div class="flex gap-2">
                     <ExportToExcel data={exportList} fileName="Customers" customerList={customerList}  />
-                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create customer</Button>
+                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create Customer</Button>
                 </div>
             </div>
 

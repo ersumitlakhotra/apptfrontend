@@ -25,7 +25,7 @@ import { clearLocalStorage, isAuthenticated } from "../../auth/auth.js";
 
 const MasterPage = () => {
   const navigate = useNavigate();
-  const [content, setContent] = useState('Dashboard');
+  const [content, setContent] = useState('Default');
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [isLoading, setIsLoading] = useState(false);
   const [refresh, setRefresh] = useState(0);
@@ -130,6 +130,14 @@ const MasterPage = () => {
       try {
         const companyId = localStorage.getItem('cid');
         const res = await apiCalls("GET", endPoint, companyId, null, null, eventDate);
+        const role = localStorage.getItem('role');
+        if (endPoint === 'user' && role === 'Employee' )
+        {
+          const userId = localStorage.getItem('uid');
+          const list = res.data.data.filter(item => item.id === userId)
+          setList(list);
+        }
+       else
         setList(res.data.data);
       }
       catch (e) {
@@ -250,7 +258,7 @@ const MasterPage = () => {
           getData(setOrderList, "order");
           break;
         }
-      case "Order":
+      case "Appointment":
         {
           getData(setServicesList, "services");
           getData(setUserList, "user");
@@ -261,7 +269,7 @@ const MasterPage = () => {
           getData(setOrderList, "order");
           break;
         }
-      case 'Tasks':
+      case 'Calender':
         {
           getData(setCustomerList, "customer");
           getData(setEventList, "event", true);
@@ -321,7 +329,7 @@ const MasterPage = () => {
           getData(setUserList, "user");
           break;
         }
-      case 'Schedule':
+      case 'TimeSheet':
         {
           getData(setLogsList, "logs");
           getData(setScheduleList, "schedule");
@@ -358,7 +366,7 @@ const MasterPage = () => {
         setFromDate={setFromDate}    
         setToDate={setToDate}
       />;
-  } else if (content === 'Tasks') {
+  } else if (content === 'Calender') {
     displayedContent =
       <Tasks
         orderList={orderList}
@@ -371,7 +379,7 @@ const MasterPage = () => {
         reload={refresh}
         setReload={setRefresh}
       />;
-  } else if (content === 'Order') {
+  } else if (content === 'Appointment') {
     displayedContent =
       <Order
         orderList={orderList}
@@ -431,7 +439,7 @@ const MasterPage = () => {
         scheduleList={scheduleList}
         saveData={saveData}
       />;
-  } else if (content === 'Schedule') {
+  } else if (content === 'TimeSheet') {
     displayedContent =
       <Schedule
         userList={userList}
@@ -470,13 +478,13 @@ const MasterPage = () => {
 
   return (
     <div class='h-screen w-full flex flex-row '>
-      <Sidebar key={1} onSelected={onSelected} content={content} open={open} uid={uid} getData={getData} />
+      <Sidebar key={1} onSelected={onSelected} content={content} setContent={setContent} open={open} uid={uid} getData={getData} />
       <div class='flex flex-col w-full bg-gray-50 '>
         <div class='h-16 border-b bg-white '>
           <Header onSignout={onSetSignout} open={open} setOpen={setOpen} getData={getData} saveData={saveData} refresh={refresh} uid={uid}  />
         </div>
         <div class='overflow-y-scroll p-8 w-full'>
-          {isLoading ? (
+          {isLoading || content === 'Default' ? (
             <div
               style={{
                 position: 'fixed',

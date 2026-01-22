@@ -8,14 +8,14 @@ export const isAuthenticated = async() => {
   {
     let isValid=false;
     const now = new Date();
-    const itemString = localStorage.getItem('email');
+    const itemString = localStorage.getItem('username');
     if (itemString) {
       const item = JSON.parse(itemString);
       if (now.getTime() > item.expiry) {
-        const email = JSON.parse(localStorage.getItem('email')).value;
+        const username = JSON.parse(localStorage.getItem('username')).value;
         const password = JSON.parse(localStorage.getItem('password')).value;
         clearLocalStorage();
-        const result = await handleAuth(email, password);
+        const result = await handleAuth(username, password);
         isValid =result.status === 200;
       }
       else
@@ -26,14 +26,15 @@ export const isAuthenticated = async() => {
 };
 
 
-export const handleAuth = async (email,password) => {
+export const handleAuth = async (username,password) => {
     try {
-      const res = await loginAuth(email, password);
+      const res = await loginAuth(username, password);
       if (res.status === 200 && res.data.data.length === 1) {
         if (Boolean(res.data.data[0].active)) {
           setLocalStorageWithExpiry('cid', res.data.data[0].cid);
           setLocalStorageWithExpiry('uid', res.data.data[0].id);
-          setLocalStorageWithExpiry('email', email, 60);
+          setLocalStorageWithExpiry('role', res.data.data[0].role);
+          setLocalStorageWithExpiry('username', username, 60);
           setLocalStorageWithExpiry('password', password, 60); 
           return { status: res.status, data: res.data.data[0], message: 'Login Successful'};       
         }
@@ -53,6 +54,7 @@ export const handleAuth = async (email,password) => {
 export const clearLocalStorage = () => {
   localStorage.removeItem('cid');
   localStorage.removeItem('uid');
-  localStorage.removeItem('email');
+  localStorage.removeItem('username');
   localStorage.removeItem('password');
+  localStorage.removeItem('role');
 }

@@ -78,7 +78,7 @@ const Event = ({ eventList, servicesList, logsList, userList, saveData }) => {
                 <span class="text-lg font-semibold text-gray-800">Events</span>
                 <div class="flex gap-2">
                     <ExportToExcel data={exportList} fileName="Event" servicesList={servicesList} userList={userList} />
-                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create event</Button>
+                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create Event</Button>
                 </div>
             </div>
 
