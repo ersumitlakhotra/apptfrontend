@@ -5,6 +5,7 @@ import useAlert from "../../common/alert.js";
 import { Spin } from 'antd';
 import { useNavigate } from "react-router-dom";
 import { clearLocalStorage, handleAuth } from "../../auth/auth.js";
+import { useAuth } from "../../auth/authContext.js";
 
 export const Login = ({ logo }) => {
   const navigate = useNavigate();
@@ -12,12 +13,13 @@ export const Login = ({ logo }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { contextHolder, error } = useAlert();
+  const { login } = useAuth();
 
   useEffect(() => {
     clearLocalStorage();
   }, [])
    
-  const onSubmit = async () => {
+  {/*const onSubmit = async () => {
     setLoading(true);
     const res = await handleAuth(username, password);
     if (res.status === 200) {
@@ -25,6 +27,19 @@ export const Login = ({ logo }) => {
     }
     else
       error(res.message);
+    setLoading(false);
+  }*/}
+
+  const onSubmit = async () => {
+    setLoading(true);
+    const res = await login(username, password);
+    if (res.status) {
+      navigate("/main"); //success('Login Successfully'); 
+      
+    }
+    else
+      error(res.message);
+
     setLoading(false);
   }
 

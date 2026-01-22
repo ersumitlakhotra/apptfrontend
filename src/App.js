@@ -16,21 +16,37 @@ import {
 
 import logo from './Images/logo.png'
 import TermsCondition from './pages/TermsConditions/terms.js';
+import { AuthProvider } from './auth/authContext.js';
+import ProtectedRoute from './auth/protectedRoute.js';
+import { Homepage ,Profile,Settings} from './pages/HomePage/homepage.js';
+import ProtectedLayout from './auth/protectedLayout.js';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login logo={logo} />} />
-        <Route path="signup" element={<Signup logo={logo}/>} />
-        <Route path="resetpassword" element={<ResetPassword logo={logo} />} />
-        <Route path="main" element={<MasterPage />} />
-        <Route path="book-appointment" element={<BookAppointment />} />
-        <Route path="support" element={<Support/>} />
-        <Route path="privacy-policy" element={<Privacy/>} />
-        <Route path="terms-conditions" element={<TermsCondition/>} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Login logo={logo} />} />
+          <Route path="signup" element={<Signup logo={logo} />} />
+          <Route path="resetpassword" element={<ResetPassword logo={logo} />} />
+          <Route path="main" element={<MasterPage />} />
+          <Route path="book-appointment" element={<BookAppointment />} />
+          <Route path="support" element={<Support />} />
+          <Route path="privacy-policy" element={<Privacy />} />
+          <Route path="terms-conditions" element={<TermsCondition />} />
+
+          {/* Protected Routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route element={<ProtectedLayout />}>
+              <Route path="/home" element={<Homepage />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/settings" element={<Settings />} />
+            </Route>
+          </Route>
+          
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
