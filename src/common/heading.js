@@ -4,7 +4,7 @@ const Heading = ({label,Icon,desc}) => {
             <span style={{ color: '#4192d3' }}>{Icon}</span>
             <div class='flex flex-col'>
                 {label}
-                <p class='text-gray-400 text-sm font-normal'>{desc}</p>
+                <p class='text-gray-400 text-xs font-normal'>{desc}</p>
             </div>
         </div>
     )

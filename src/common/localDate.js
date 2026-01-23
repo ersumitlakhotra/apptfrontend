@@ -96,4 +96,12 @@ const firstDateOfMonth = (date = new Date()) =>
 const lastDateOfMonth = (date = new Date()) =>
     new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
-export { LocalDate, LocalTime, LocalDateTime, UTC_LocalDateTime, firstDateOfMonth, lastDateOfMonth, UTC_LocalDateTime_relative, get_Date }
+function getDay(date,short=false) {
+    let weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    if(short)
+     weekdays = ["Sun", "Mon", "Tues", "Wed", "Thu", "Fri", "Sat"];
+    const dayNum = dayjs(get_Date(date, 'YYYY-MM-DD')).get('day');
+    return weekdays[dayNum];
+}
+
+export { LocalDate, LocalTime, LocalDateTime, UTC_LocalDateTime, firstDateOfMonth, lastDateOfMonth, UTC_LocalDateTime_relative, get_Date ,getDay}

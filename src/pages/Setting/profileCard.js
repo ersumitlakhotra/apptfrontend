@@ -31,7 +31,7 @@ const ProfileCard = () => {
             method: 'GET',
             endPoint: 'logo'
         })
-        setLogo(logoList.data.length !== 0 ? logoList.logo : null);
+        setLogo((logoList.data).length !== 0 ? (logoList.data).logo : null);
 
         const companyList = await FetchData({
             method: 'GET',
@@ -39,16 +39,16 @@ const ProfileCard = () => {
         })
         
         if (companyList.data.length !== 0) {
-            setName(companyList.data.name);
-            if (companyList.addressinfo !== null) {
-                setAddress(companyList.addressinfo[0].street);
+            setName((companyList.data).name);       
+            if ((companyList.data).addressinfo !== null) {
+                setAddress((companyList.data).addressinfo[0].street);
             }
-            if (companyList.socialinfo !== null) {
-                setWebsite(companyList.socialinfo[0].website);
-                setFacebook(companyList.socialinfo[0].facebook);
-                setInstagram(companyList.socialinfo[0].instagram);
-                setTwitter(companyList.socialinfo[0].twitter);
-                setLinkedin(companyList.socialinfo[0].linkedin);
+            if ((companyList.data).socialinfo !== null) {
+                setWebsite((companyList.data).socialinfo[0].website);
+                setFacebook((companyList.data).socialinfo[0].facebook);
+                setInstagram((companyList.data).socialinfo[0].instagram);
+                setTwitter((companyList.data).socialinfo[0].twitter);
+                setLinkedin((companyList.data).socialinfo[0].linkedin);
             }
         }
         setIsLoading(false);
@@ -59,7 +59,7 @@ const ProfileCard = () => {
     };
 
     return (
-        <div class='w-full bg-white border rounded-3xl p-4 text-gray-500 flex gap-4 items-center'>
+        <div class='w-full bg-white border rounded-3xl p-4 text-gray-500 flex gap-2 items-center cursor-pointer hover:shadow-md '>
             {isLoading ? <Skeleton active style={{ padding: '16px' }} /> :
                 <>
                     {logo !== null ?
