@@ -34,7 +34,7 @@ export const Login = ({ logo }) => {
     setLoading(true);
     const res = await login(username, password);
     if (res.status) {
-      navigate("/home"); //success('Login Successfully'); 
+      navigate("/main"); //success('Login Successfully'); 
       
     }
     else

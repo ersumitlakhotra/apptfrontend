@@ -6,20 +6,22 @@ import { setLocalStorageWithExpiry } from "../common/localStorage";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     // Load user from localStorage on refresh
     useEffect(() => {
+        setIsLoading(true)
         const companyId = localStorage.getItem("cid");
-        const userId = localStorage.getItem("uid");
-
-        if (companyId && userId) {
-            setUser(userId);
+        if (companyId) {
+            setIsAuthenticated(true);
         }
+        setIsLoading(false)
     }, []);
 
     const login = async (username, password) => {
         // 🔁 replace with real API call
+        setIsLoading(true)
         try {
             const res = await loginAuth(username, password);
             if (res.status === 200 && res.data.data.length === 1) {
@@ -29,19 +31,33 @@ export const AuthProvider = ({ children }) => {
                     setLocalStorageWithExpiry('role', res.data.data[0].role);
                     setLocalStorageWithExpiry('username', username, 60);
                     setLocalStorageWithExpiry('password', password, 60);
-                    setUser(res.data.data[0].id);
+                    setIsAuthenticated(true);
                     return { status: true, data: res.data.data[0], message: 'Login Successful' };
                 }
                 else
+                {
+                    setIsAuthenticated(false);
                     return { status: false, data: null, message: 'Your account is deactivated and cannot access the application. Please contact our help desk!' };
+                }
             }
             else if (res.data.data.length > 1)
+            {
+                setIsAuthenticated(false);
                 return { status: false, data: null, message: 'The username is allocated to a separate potal. Ensure that each account has a unique password.' };
+            }
             else
+            { 
+                setIsAuthenticated(false); 
                 return { status: false, data: null, message: 'Login Failed. Invalid username or password.' };
+            }
         }
         catch (err) {
+            setIsAuthenticated(false);
             return { status: false, data: null, message: String(err.message) };
+        }
+        finally
+        {
+        setIsLoading(false)
         }
     };
 
@@ -51,11 +67,11 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('username');
         localStorage.removeItem('password');
         localStorage.removeItem('role');
-        setUser(null);
+        setIsAuthenticated(false);
     }; 
     
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

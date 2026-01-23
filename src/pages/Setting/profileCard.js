@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Button, Image, Avatar, Skeleton } from "antd"
 import Heading from "../../common/heading";
 import FetchData from '../../hook/fetchData';
+import IsLoading from '../../common/custom/isLoading';
 
 const ProfileCard = () => {
 
@@ -33,22 +34,25 @@ const ProfileCard = () => {
         })
         setLogo((logoList.data).length !== 0 ? (logoList.data).logo : null);
 
-        const companyList = await FetchData({
+        const companyList=await FetchData({
             method: 'GET',
             endPoint: 'company'
         })
-        
-        if (companyList.data.length !== 0) {
+        //console.log(companyList.data !)
+        console.log((companyList.data).length)
+        console.log((companyList.data).length === '1')
+        if ((companyList.data).length === '1' ) {
+            console.log((companyList.data).name)
             setName((companyList.data).name);       
             if ((companyList.data).addressinfo !== null) {
-                setAddress((companyList.data).addressinfo[0].street);
+               // setAddress((companyList.data).addressinfo[0].street);
             }
             if ((companyList.data).socialinfo !== null) {
-                setWebsite((companyList.data).socialinfo[0].website);
-                setFacebook((companyList.data).socialinfo[0].facebook);
-                setInstagram((companyList.data).socialinfo[0].instagram);
-                setTwitter((companyList.data).socialinfo[0].twitter);
-                setLinkedin((companyList.data).socialinfo[0].linkedin);
+               // setWebsite((companyList.data).socialinfo[0].website);
+              //  setFacebook((companyList.data).socialinfo[0].facebook);
+                //setInstagram((companyList.data).socialinfo[0].instagram);
+                //setTwitter((companyList.data).socialinfo[0].twitter);
+               // setLinkedin((companyList.data).socialinfo[0].linkedin);
             }
         }
         setIsLoading(false);
@@ -59,8 +63,8 @@ const ProfileCard = () => {
     };
 
     return (
-        <div class='w-full bg-white border rounded-3xl p-4 text-gray-500 flex gap-2 items-center cursor-pointer hover:shadow-md '>
-            {isLoading ? <Skeleton active style={{ padding: '16px' }} /> :
+        <div class='w-full bg-white border rounded-3xl p-4 text-gray-500 flex gap-2 items-center cursor-pointer shadow-md hover:shadow-xl '>
+            <IsLoading isLoading={isLoading} input={
                 <>
                     {logo !== null ?
                         <Image width={140} height={120} src={logo} style={{ borderRadius: 10 }} /> :
@@ -78,7 +82,7 @@ const ProfileCard = () => {
                         </div>
                     </div>
                 </>
-            }
+            } />
         </div>
     )
 }

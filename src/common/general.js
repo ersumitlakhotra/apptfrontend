@@ -183,3 +183,17 @@ export function isTimeGreater(time1, time2) {
     // Compare
     return totalSeconds1 > totalSeconds2;
 }
+
+export function SortUpcomingAppointments(data) {
+    let sortedArray = [...data]; // Create a copy to avoid mutating original data
+
+    sortedArray.sort((a, b) => {
+        const dateDiff = new Date(a.trndate) - new Date(b.trndate);
+        if (dateDiff !== 0) return dateDiff;
+
+        const [ah, am] = a.start.split(":").map(Number);
+        const [bh, bm] = b.start.split(":").map(Number);
+        return ah * 60 + am - (bh * 60 + bm);
+    });
+    return sortedArray;
+};
