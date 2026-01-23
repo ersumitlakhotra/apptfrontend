@@ -1,18 +1,40 @@
-const AppointmentCards = () => {
-    return (
-        <div class={` border border-s-4 p-4 bg-white border-gray-200 rounded-lg gap-3`}>
-            <div class='flex flex-row justify-between items-center'>
-                <p class='font-bold text-lg text-blue-400'># 1001</p>
-                <p class='font-bold text-lg '>$ 40</p>
-            </div>
+import { Button, Tooltip, Popconfirm } from "antd"
+import AssignedTo from "../../common/assigned_to"
+import { MdDownloadDone } from "react-icons/md";
+import { IoMdClose } from "react-icons/io";
+import { FiClock } from "react-icons/fi";
+import Services from "../../common/services";
+import FlexBoxRow from "../../common/custom/flexboxRow";
+import { get_Date, getDay } from "../../common/localDate"; 
+import { UnorderedListOutlined, ContactsOutlined } from '@ant-design/icons';
 
-            <div class='flex flex-row gap-2 items-center'>
-                {/*  {orderList.servicename.map((service, index) => (
-                    <div key={index} className={`p-2  rounded-lg`}>
-                        <p className=' text-sm text-white'>{service}</p>
-                    </div>
-                ))}*/}
+const AppointmentCards = ({ index, data, userList, servicesList }) => {  
+    return (
+        <div key={index} class={`border p-4  text-xs bg-gray-50 rounded-lg  mb-2 cursor-pointer hover:bg-gray-100 hover:shadow`}>
+            <div class='flex flex-row justify-between items-center mb-2'>
+                <AssignedTo key={data.id} userId={data.assignedto} userList={userList} />
+                <div class='flex flex-row gap-2 items-center justify-end'>
+                    <Tooltip placement="top" title={'Accept'} >
+                        <Button color="cyan" variant="solid" icon={<MdDownloadDone size={12} />} size="middle" />
+                    </Tooltip>
+                    <Tooltip placement="top" title={'Decline'} >
+                    <Popconfirm
+                        title="Decline"
+                        description="Are you sure to decline ? "
+                        //onConfirm={() => onDeactivate()}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button color="red" variant="solid" icon={<IoMdClose size={12} />} size="middle" />
+                    </Popconfirm>
+                    </Tooltip>
+                    
+                </div>   
             </div>
+            <FlexBoxRow icon={<FiClock size={12} />} lable={`${getDay(data.trndate)} ${get_Date(data.trndate, 'MMMM DD, YYYY')} [ ${data.slot} ]`} />
+            <FlexBoxRow icon={<ContactsOutlined size={12} />} lable={`${data.name} : ${data.cell}`} />
+            <FlexBoxRow icon={<UnorderedListOutlined size={12} />} lable={<Services servicesItem={data.serviceinfo} servicesList={servicesList} />} />
+            
             <div class='flex flex-col gap-1'>
             {/*
                 <FlexBoxRow icon={<Octicons name='clock' size={16} />} text={<Text className='font-semibold'>{orderList.slot}</Text>} />

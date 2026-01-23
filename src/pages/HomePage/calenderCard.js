@@ -1,13 +1,14 @@
 
 import { Tag } from "antd";
-import { get_Date, getDay, LocalDate } from "../../common/localDate"
-import { IoIosCalendar, IoMdClose } from "react-icons/io";
+import { get_Date, LocalDate } from "../../common/localDate"
+import { IoMdClose } from "react-icons/io";
 import { IoHourglassOutline } from "react-icons/io5";
 import { MdOutlineQuestionMark, MdDownloadDone, MdPendingActions } from "react-icons/md";
 import { useEffect, useState } from "react";
 import FetchData from "../../hook/fetchData";
 import { getStorage } from "../../common/localStorage";
 import IsLoading from "../../common/custom/isLoading";
+import CalenderIcon from "../../common/custom/calenderIcon"; 
 
 const CalenderCard = () => {
     const [ordersList, setOrdersList] = useState([]);
@@ -47,27 +48,24 @@ const CalenderCard = () => {
         setIsLoading(false);
     }
 
-    const listItems = ({ icon, label, value, color }) => {
+    const listItems = ({ icon, label, value }) => {
         return (
-            <div class='flex flex-row items-center justify-between  p-1 rounded-lg cursor-pointer hover:bg-black hover:text-white duration-150  hover:shadow-md'>
+            <div class='flex flex-row items-center justify-between text-white  p-1 rounded-lg cursor-pointer hover:bg-white hover:text-blue-900 duration-150  hover:shadow-md'>
                 <div class={`flex flex-row items-center gap-2 text-xs`}  >
                     {icon}
                     {label}
                 </div>
-                <Tag color={'#000000'}>{value}</Tag>
+                <Tag >{value}</Tag>
             </div>
         )
     }
     return (
-        <div class='w-full bg-gray-200 border rounded-3xl p-4 text-gray-800 flex gap-6  shadow-md   hover:shadow-lg '>
+        <div class='w-full bg-blue-900 border rounded-3xl p-4 text-gray-800 flex gap-6  shadow-md   hover:shadow-lg '>
             <IsLoading isLoading={isLoading} input={
                 <>
-                    <div class='w-1/3 flex flex-col justify-between text-xs font-semibold font-sans  '>
+                    <div class='w-1/3 flex flex-col justify-between text-xs font-semibold font-sans  text-white '>
                         <div class='flex flex-col gap-0 hover:font-bold hover:underline duration-150 cursor-pointer'>
-                            <div class='relative'>
-                                <IoIosCalendar size={40} />
-                                <span className="absolute top-4 left-3 text-xs">{getDay(LocalDate(), true)}</span>
-                            </div>
+                            <CalenderIcon size={40}/>
                             <span>{get_Date(LocalDate(), 'MMMM DD, YYYY')}</span>
                         </div>
                         <span class='hover:font-bold hover:underline duration-150 cursor-pointer'>{ordersList.length} Calender events</span>

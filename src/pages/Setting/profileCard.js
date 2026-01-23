@@ -34,27 +34,22 @@ const ProfileCard = () => {
         })
         setLogo((logoList.data).length !== 0 ? (logoList.data).logo : null);
 
-        const companyList=await FetchData({
+        const companyList = await FetchData({
             method: 'GET',
             endPoint: 'company'
         })
-        //console.log(companyList.data !)
-        console.log((companyList.data).length)
-        console.log((companyList.data).length === '1')
-        if ((companyList.data).length === '1' ) {
-            console.log((companyList.data).name)
-            setName((companyList.data).name);       
-            if ((companyList.data).addressinfo !== null) {
-               // setAddress((companyList.data).addressinfo[0].street);
-            }
-            if ((companyList.data).socialinfo !== null) {
-               // setWebsite((companyList.data).socialinfo[0].website);
-              //  setFacebook((companyList.data).socialinfo[0].facebook);
-                //setInstagram((companyList.data).socialinfo[0].instagram);
-                //setTwitter((companyList.data).socialinfo[0].twitter);
-               // setLinkedin((companyList.data).socialinfo[0].linkedin);
-            }
+        setName(companyList.data.name);
+        if (companyList.data.addressinfo !== null) {
+            setAddress((companyList.data).addressinfo[0].street);
         }
+        if (companyList.data.socialinfo !== null) {
+            setWebsite((companyList.data).socialinfo[0].website);
+            setFacebook((companyList.data).socialinfo[0].facebook);
+            setInstagram((companyList.data).socialinfo[0].instagram);
+            setTwitter((companyList.data).socialinfo[0].twitter);
+            setLinkedin((companyList.data).socialinfo[0].linkedin);
+        }
+
         setIsLoading(false);
     }
 
@@ -72,7 +67,7 @@ const ProfileCard = () => {
                     }
 
                     <div class='flex-col flex gap-2'>
-                        <Heading label={name} desc={address} />
+                        <Heading label={name} desc={address} labelColor={'bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent'} />
                         <div class='flex flex-row ml-1'>
                             <Button color="default" variant="link" icon={<TbWorldWww size={16} style={{ color: '#1877F2' }} />} onClick={() => openExtendedLink(website)} />
                             <Button color="default" variant="link" icon={<ImFacebook size={16} style={{ color: '#1877F2' }} />} onClick={() => openExtendedLink(facebook)} />

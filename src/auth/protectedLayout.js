@@ -9,10 +9,10 @@ const ProtectedLayout = () => {
         <div class='h-screen w-full flex flex-col '>
             <Header />
 
-            <main class="flex-1 bg-gray-50 px-8 py-2 scroll-auto">
+            <main class="flex-1 px-8 py-2 scroll-auto">
                 <Outlet />
             </main>
-            <footer class="h-16 bg-gray-300">Fotter</footer>
+            <footer class="h-16 bg-gray-300 sticky z-50 bottom-0">Fotter</footer>
 
             {/* Sidebar 
             <aside style={{ width: "200px", background: "#eee" }}>
