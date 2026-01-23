@@ -11,3 +11,11 @@ export const setLocalStorageWithExpiry = (key, value, expiryMinutes = 0) => {
         localStorage.setItem(key, value);
     }
 };
+
+export const getStorage = async() => {
+    return {
+        cid: localStorage.getItem("cid"),
+        uid: localStorage.getItem("uid"),
+        role: localStorage.getItem("role")
+    }
+};
