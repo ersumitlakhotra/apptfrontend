@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 const BookingDays = ({ companyList, saveData }) => {
     const [bookingdays, setBookingdays] = useState(0);
-
+    const headingLabel = 'Booking Horizons';
 
     useEffect(() => {
         if (companyList.length !== 0) {
@@ -17,11 +17,16 @@ const BookingDays = ({ companyList, saveData }) => {
         const Body = JSON.stringify({
             bookingdays: bookingdays,
         });
-        saveData("Booking Horizons", "PUT", "company/bookingdays", null, Body,true,false);
+        saveData({
+            label:headingLabel,
+            method: "PUT", 
+            endPoint:"company/bookingdays",
+            body: Body
+        });
     }
     return (
         <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
-            <Heading label={"Booking Horizons"} Icon={<CarryOutFilled />} desc={`Appointment can be booked up to ${bookingdays} days in advance`} />
+            <Heading label={headingLabel} Icon={<CarryOutFilled />} desc={`Appointment can be booked up to ${bookingdays} days in advance`} />
             <div class='ml-8 md:w-1/6'>
                 <Select
                     value={bookingdays}

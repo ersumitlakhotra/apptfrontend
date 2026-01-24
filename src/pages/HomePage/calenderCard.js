@@ -9,9 +9,11 @@ import FetchData from "../../hook/fetchData";
 import { getStorage } from "../../common/localStorage";
 import IsLoading from "../../common/custom/isLoading";
 import CalenderIcon from "../../common/custom/calenderIcon"; 
+import { IoMdWarning } from "react-icons/io";
 
 const CalenderCard = () => {
     const [ordersList, setOrdersList] = useState([]);
+    const [draftList, setDraftList] = useState([]);
     const [pendingList, setPendingList] = useState([]);
     const [inprogressList, setInprogressList] = useState([]);
     const [completedList, setCompletedList] = useState([]);
@@ -35,12 +37,14 @@ const CalenderCard = () => {
             order = order.filter(item => item.assignedto === localStorage.uid)
 
         const pending = order.filter(a => a.status.toUpperCase() === 'PENDING');
+        const draft = order.filter(a => a.status.toUpperCase() === 'DRAFT');
         const inprogress = order.filter(a => a.status.toUpperCase() === 'IN PROGRESS');
         const completed = order.filter(a => a.status.toUpperCase() === 'COMPLETED');
         const cancelled = order.filter(a => a.status.toUpperCase() === 'CANCELLED');
 
         setOrdersList(order.length > 0 ? order : [])
         setPendingList(pending.length > 0 ? pending : [])
+        setDraftList(draft.length > 0 ? draft : [])
         setInprogressList(inprogress.length > 0 ? inprogress : [])
         setCompletedList(completed.length > 0 ? completed : [])
         setCancelledList(cancelled.length > 0 ? cancelled : [])
@@ -72,11 +76,11 @@ const CalenderCard = () => {
                     </div>
 
                     <div class='w-2/3 flex flex-col text-xs font-semibold font-sans  '>
-                        {listItems({ icon: <MdOutlineQuestionMark size={12} />, label: 'Waiting for Response', value: 0, color: '#000000' })}
-                        {listItems({ icon: <MdPendingActions size={12} />, label: 'Pending', value: pendingList.length, color: 'yellow' })}
-                        {listItems({ icon: <IoHourglassOutline size={12} />, label: 'In Progress', value: inprogressList.length, color: 'blue' })}
-                        {listItems({ icon: <MdDownloadDone size={12} />, label: 'Completed', value: completedList.length, color: 'green' })}
-                        {listItems({ icon: <IoMdClose size={12} />, label: 'Cancelled', value: cancelledList.length, color: 'red' })}
+                        {listItems({ icon: <IoMdWarning size={12} />, label: 'Awaiting Request', value: draftList.length })}
+                        {listItems({ icon: <MdPendingActions size={12} />, label: 'Pending', value: pendingList.length})}
+                        {listItems({ icon: <IoHourglassOutline size={12} />, label: 'In Progress', value: inprogressList.length })}
+                        {listItems({ icon: <MdDownloadDone size={12} />, label: 'Completed', value: completedList.length })}
+                        {listItems({ icon: <IoMdClose size={12} />, label: 'Cancelled', value: cancelledList.length })}
                     </div>
                 </>} />
         </div>

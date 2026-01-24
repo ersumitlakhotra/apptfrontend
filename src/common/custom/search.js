@@ -10,7 +10,8 @@ const Search = ({ value, onChange }) => {
             placeholder="Search..."
             prefix={<IoSearchOutline color="silver" />}
             value={value}
-            onChange={(e) => onChange(e.target.value)} />
+            onChange={(e) => onChange(e.target.value)} 
+            />
     )
 }
 

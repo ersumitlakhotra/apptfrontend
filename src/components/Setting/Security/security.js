@@ -10,6 +10,7 @@ const Security = ({ companyList, saveData }) => {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const { contextHolder, error } = useAlert();
+    const headingLabel='Security'
     useEffect(() => {
         if (companyList.length !== 0) {          
             setPassword(companyList.password);
@@ -22,7 +23,12 @@ const Security = ({ companyList, saveData }) => {
                 password: newPassword,
                 id:Number(localStorage.getItem('uid')),
             });
-            saveData("Security", "PUT", "company/security", null, Body);    
+            saveData({
+            label:headingLabel,
+            method: "PUT", 
+            endPoint:"company/security",
+            body: Body
+        }); 
         }
         else {
             error("Your Current password is missing or incorrect. It's required to change the password.")
@@ -32,7 +38,7 @@ const Security = ({ companyList, saveData }) => {
     return (
         <div class='flex flex-col gap-8'>
             <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
-                <Heading label={"Security"} Icon={<MailFilled />} />
+                <Heading label={headingLabel} Icon={<MailFilled />} />
 
                 <div class='ml-8 my-4 flex flex-col gap-4'>
                     <div class='flex flex-col gap-6  md:flex-row'>

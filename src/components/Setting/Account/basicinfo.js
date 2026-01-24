@@ -21,7 +21,7 @@ const BasicInfo = ({ companyList, saveData, logoList }) => {
 
     const [logo, setLogo] = useState(null);
     const [logoId, setLogoId] = useState(0);
-
+    const headingLabel = 'Basic Information';
     useEffect(() => {
         if (companyList.length !== 0) {
             setName(companyList.name);
@@ -60,7 +60,12 @@ const BasicInfo = ({ companyList, saveData, logoList }) => {
                 postal: postal
             }]
         });
-        saveData("Basic Information", "PUT", "company/address", null, Body,true,false);
+        saveData({
+            label:headingLabel,
+            method: "PUT", 
+            endPoint:"company/address",
+            body: Body
+        });
     }
 
     const { contextHolder, error } = useAlert();
@@ -85,7 +90,13 @@ const BasicInfo = ({ companyList, saveData, logoList }) => {
                     const Body = JSON.stringify({
                         logo: base64String
                     });
-                    saveData("Logo", logoId === 0 ? "POST" : "PUT", "logo", logoId === 0 ? null : logoId, Body);
+                    saveData({
+                        label: "Logo",
+                        method: logoId === 0 ? "POST" : "PUT",
+                        endPoint: "logo",
+                        id:logoId === 0 ? null : logoId,
+                        body: Body
+                    });
                 };
 
                 reader.onerror = (error) => {
@@ -98,7 +109,7 @@ const BasicInfo = ({ companyList, saveData, logoList }) => {
     };
     return (
         <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
-            <Heading label={"Basic information"} Icon={<FcInfo size={26} />} />
+            <Heading label={headingLabel} Icon={<FcInfo size={26} />} />
             <div class='ml-8'>
                 <div class='my-6 text-gray-500 flex gap-6'>
                     {logo !== null ?

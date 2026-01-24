@@ -9,7 +9,7 @@ import Heading from "../../common/heading";
 import FetchData from '../../hook/fetchData';
 import IsLoading from '../../common/custom/isLoading';
 
-const ProfileCard = () => {
+const ProfileCard = ({onClick,refresh}) => {
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -24,7 +24,11 @@ const ProfileCard = () => {
 
     useEffect(() => {
         Init()
-    }, [])
+    }, []) 
+    
+    useEffect(() => {
+        Init()
+    }, [refresh])
 
     const Init = async () => {
         setIsLoading(true);
@@ -58,7 +62,8 @@ const ProfileCard = () => {
     };
 
     return (
-        <div class='w-full bg-white border rounded-3xl p-4 text-gray-500 flex gap-2 items-center cursor-pointer shadow-md hover:shadow-xl '>
+        <div class='w-full bg-white border rounded-3xl p-4 text-gray-500 flex gap-2 items-center cursor-pointer shadow-md hover:shadow-xl '
+        onClick={onClick}>
             <IsLoading isLoading={isLoading} input={
                 <>
                     {logo !== null ?

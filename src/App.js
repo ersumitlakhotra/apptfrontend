@@ -20,6 +20,7 @@ import { AuthProvider } from './auth/authContext.js';
 import ProtectedRoute from './auth/protectedRoute.js';
 import { Homepage ,Profile,Settings} from './pages/HomePage/homepage.js';
 import ProtectedLayout from './auth/protectedLayout.js';
+import Setting from './pages/Setting/setting.js';
 
 function App() {
   return (
@@ -40,7 +41,7 @@ function App() {
             <Route element={<ProtectedLayout />}>
               <Route path="/home" element={<Homepage />} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/settings" element={<Settings />} />
+              <Route path="/setting" element={<Setting />} />
             </Route>
           </Route>
           

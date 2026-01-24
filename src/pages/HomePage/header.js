@@ -5,11 +5,13 @@ import logo from '../../Images/logo.png'
 import {  Badge } from 'antd';
 import { BellFilled } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 const Header = () => {
     const navigate = useNavigate();
+    const [search,setSearch]=useState('');
     return (
-        <header class="p-2 bg-blue-500 border-b shadow-sm flex flex-row gap-2 sticky z-50 top-0">
+        <header class="p-2 bg-blue-500 border-b shadow-sm flex flex-row gap-2 sticky  z-50 top-0">
 
             {/* logo */}
             <div class={`w-1/12 md:w-3/12  flex items-center gap-2  cursor-pointer`} onClick={() => navigate("/home")} >
@@ -19,7 +21,7 @@ const Header = () => {
 
             {/* Search */}
             <div class='w-8/12 md:w-6/12 flex flex-row items-center'>
-                <Search />
+                <Search value={search} onChange={setSearch} />
             </div>  
             
             {/* notification and profile */}

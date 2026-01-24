@@ -16,7 +16,7 @@ const Hours = ({ companyList, saveData, setRefresh }) => {
     // Array to map day numbers to day names
     const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const dayName = weekdays[dayOfWeekNumber];
-
+    const headingLabel = 'Weekly Schedule';
     const [isEdit, setIsEdit] = useState(false);
     const [monday, setMonday] = useState(['00:00:00', '00:00:00', true]);
     const [tuesday, setTuesday] = useState(['00:00:00', '00:00:00', true]);
@@ -52,7 +52,12 @@ const Hours = ({ companyList, saveData, setRefresh }) => {
                 sunday: sunday,
             }]
         });
-        saveData("Weekly Schedule", "PUT", "company/timing", null, Body);
+        saveData({
+            label:headingLabel,
+            method: "PUT", 
+            endPoint:"company/timing",
+            body: Body
+        });
         setIsEdit(false);
     }
 
@@ -88,7 +93,7 @@ const Hours = ({ companyList, saveData, setRefresh }) => {
     return (
         <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
             <div class='flex items-center justify-between'>
-                <Heading label={"Weekly Scheduled"} Icon={<ClockCircleFilled />} />
+                <Heading label={headingLabel} Icon={<ClockCircleFilled />} />
 
                 {isEdit ?
                     <Space>

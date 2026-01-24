@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import FetchData from '../../hook/fetchData';
 import IsLoading from '../../common/custom/isLoading';
 import { getStorage } from '../../common/localStorage';
-import { get_Date, LocalDate } from '../../common/localDate';
 import { SortUpcomingAppointments } from '../../common/general';
 import AppointmentCards from "./appointmentCard";
 import { IoMdWarning } from "react-icons/io";
@@ -54,7 +53,7 @@ const WaitingApproval = () => {
             <IsLoading isLoading={isLoading} rows={9} input={
                 <>
                     <div class=' flex-1 overflow-auto w-full scroll-auto '>
-                        <div class='flex flex-row gap-2 bg-white items-center text-gray-800  font-medium font-sans pb-4 sticky top-0 z-50'>
+                        <div class='flex flex-row gap-2 bg-white items-center text-gray-800  font-medium font-sans pb-4 sticky top-0 z-40'>
                             <IoMdWarning  style={{ fontSize: '28px',color:'orange' }} />
                             <span>Awaiting Request</span>
                         </div>

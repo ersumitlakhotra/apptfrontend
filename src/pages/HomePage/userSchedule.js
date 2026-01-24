@@ -50,7 +50,7 @@ const UserSchedule = () => {
             <IsLoading isLoading={isLoading} rows={9} input={
                 <>
                     <div class=' flex-1 overflow-auto w-full scroll-auto '>
-                        <div class='flex w-full flex-row justify-between pr-2 sticky top-0 z-50 bg-white pb-4 '>
+                        <div class='flex w-full flex-row justify-between pr-2 sticky top-0 z-40 bg-white pb-4 '>
                             <div class='flex flex-row gap-2 items-center  text-gray-800  font-medium font-sans  '>
                                 <AiFillSchedule style={{ fontSize: '28px', color: '#008B8B' }} />
                                 <span>Schedule</span>

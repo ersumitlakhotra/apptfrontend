@@ -21,7 +21,7 @@ function YearDisplay() {
     }
     return years;
 }
-const Billing = ({ companyList,billingList, saveData, setRefresh }) => {
+const Billing = ({ companyList,billingList, saveData }) => {
    
     const [plan, setPlan] = useState('');
     const [pricing, setPricing] = useState('');
@@ -74,7 +74,12 @@ const Billing = ({ companyList,billingList, saveData, setRefresh }) => {
             }]
 
         });
-        saveData("Billing Details", "PUT", "company/billing", null, Body);
+         saveData({
+            label:"Billing Details",
+            method: "PUT", 
+            endPoint:"company/billing",
+            body: Body
+        });
         setIsEdit(false);
     }
 
@@ -138,7 +143,7 @@ const Billing = ({ companyList,billingList, saveData, setRefresh }) => {
                     {isEdit ?
                         <Space>
                             <Button color="primary" variant="solid" onClick={saveBillingDetails} >Save changes</Button>
-                            <Button color="default" variant="filled" icon={<CloseOutlined />} onClick={() => { setIsEdit(false); setRefresh(0); }} >Cancel</Button>
+                            <Button color="default" variant="filled" icon={<CloseOutlined />} onClick={() =>  {setIsEdit(false) }} >Cancel</Button>
                         </Space> :
                         <Button color="default" variant="filled" icon={<EditOutlined />} onClick={() => setIsEdit(true)} >Edit</Button>
                     }

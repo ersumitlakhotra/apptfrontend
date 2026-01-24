@@ -35,7 +35,12 @@ const SocialLink = ({ companyList, saveData }) => {
                 linkedin: linkedin
             }]
         });
-        saveData("Social links", "PUT", "company/social", null, Body);
+          saveData({
+            label:"Social links",
+            method: "PUT", 
+            endPoint:"company/social",
+            body: Body
+        }); 
 
     }
     return (

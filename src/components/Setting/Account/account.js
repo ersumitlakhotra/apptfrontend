@@ -4,14 +4,14 @@ import BasicInfo from "./basicinfo.js";
 import BookingDays from "./bookingdays.js";
 import GmailSetup from "./gmailsetup.js";
 
-const Account = ({ companyList, saveData, logoList, setRefresh,onSetSignout }) => {  
+const Account = ({ companyList, saveData, logoList}) => {  
     return (
         <div class='flex flex-col gap-8'>
             <BasicInfo companyList={companyList} saveData={saveData} logoList={logoList} />
-            <Hours companyList={companyList} saveData={saveData} setRefresh={setRefresh} />
+            <Hours companyList={companyList} saveData={saveData} />
             <BookingDays companyList={companyList} saveData={saveData} />
             <GmailSetup companyList={companyList} saveData={saveData} />   
-            <Deactivate onSetSignout={onSetSignout} /> 
+            <Deactivate /> 
         </div>
     )
 
