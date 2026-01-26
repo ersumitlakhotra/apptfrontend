@@ -2,7 +2,7 @@
 import { getStorage } from "../common/localStorage";
 import { apiCalls } from "./apiCall";
 
-const SaveData = async ({label,method,endPoint,id = null, body = null, notify = true, logs = true, email = false})  => {
+const SaveData = async ({label,method,endPoint,id = null, body = null, logs = true, email = false})  => {
     const localStorage =await getStorage();
    try {
         const res = await apiCalls(method, endPoint, localStorage.cid, id, body);

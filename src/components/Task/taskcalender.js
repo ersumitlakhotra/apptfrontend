@@ -45,9 +45,9 @@ const TaskCalender = ({ orderList, servicesList, userList, companyList, customer
         await ref.current?.save();
     }
     return (
-        <div className='relative h-full w-max min-w-full overflow-auto px-2'>
+        <div className='min-h-screen w-max min-w-full overflow-auto px-2'>
 
-            <div class='w-max min-w-full h-16 p-2 sticky top-0 border-b z-50 text-gray-700 font-medium bg-zinc-50 inline-flex gap-3'>
+            <div class='w-max min-w-full h-16 p-2 sticky top-0 border-b z-40 text-gray-700 font-medium bg-zinc-50 inline-flex gap-3'>
                 <p class='w-20 text-sm p-4'>Slots</p>
                 {userList.filter(item => !item.status.toLowerCase().includes('inactive')).map(a => (
                     <div key={a.id} class='inline-flex gap-2 items-center px-3 w-44 '>

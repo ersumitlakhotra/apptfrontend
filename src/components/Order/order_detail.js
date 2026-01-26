@@ -21,7 +21,6 @@ function disabledDate(current) {
 
 const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, userList, companyList, eventList, customerList, saveData, setOpen }) => {
 
-
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
@@ -168,8 +167,15 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     tip: status === 'Completed' ? tip : '0' ,// received > total ? parseFloat(received - total).toFixed(2) : '0',
                     bookedvia: 'Walk-In',
                 });
-
-                saveData("Appointment", id !== 0 ? 'PUT' : 'POST', "order", id !== 0 ? id : null, Body,true,true,sendEmail === 'yes');
+                saveData({
+                    label: "Appointment",
+                    method: id !== 0 ? 'PUT' : 'POST',
+                    endPoint: "order",
+                    id:id !== 0 ? id : null,
+                    logs:true,
+                    email:sendEmail === 'yes',
+                    body: Body
+                });
                 setOpen(false);
             }
         }
@@ -378,7 +384,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             } />
 
             <Divider />
-            <p class="text-gray-400 mb-4">Order Information</p>
+            <p class="text-gray-400 mb-4">Information</p>
 
             <TextboxFlex label={'Status'} input={
                 <Select

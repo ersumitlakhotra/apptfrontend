@@ -1,18 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Button, Drawer, Space, Tabs, Tag } from "antd";
-import {  PlusOutlined, SaveOutlined } from '@ant-design/icons';
+import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from "react";
 import OrderDetail from "../../components/Order/order_detail";
 import OrderView from "../../components/Order/order_view";
-import {  getTabItems } from "../../common/items.js";
+import { getTabItems } from "../../common/items.js";
 import OrderTabs from "../../components/Order/tab.js";
-import {  get_Date, LocalDate } from "../../common/localDate.js";
+import { get_Date, LocalDate } from "../../common/localDate.js";
 import IsLoading from "../../common/custom/isLoading.js";
 import LogsView from "../../components/Logs/logs_view.js";
 import ExportToExcel from "../../common/export.js";
+import { useOutletContext } from "react-router-dom";
 import { getStorage } from "../../common/localStorage.js";
 import FetchData from "../../hook/fetchData.js";
-import { useOutletContext } from "react-router-dom";
 
 const customLabelTab = (label, tagColor, tagValue) => {
     return (
@@ -23,10 +23,9 @@ const customLabelTab = (label, tagColor, tagValue) => {
     )
 }
 
-const Order = () => {
+const OrderB = () => {
     const ref = useRef();
-    const ranOnce = useRef(false);
-  const headingLabel = 'Appointment'
+    const headingLabel = 'Appointment'
     const { saveData, refresh  } = useOutletContext();
 
     const [isLoading, setIsLoading] = useState(false);
@@ -40,6 +39,10 @@ const Order = () => {
     const [reload, setReload] = useState(0);
     const [tabActiveKey, setTabActiveKey] = useState("1");
     const [order_no, setOrderNo] = useState('');
+
+    const [searchInput, setSearchInput] = useState('');
+    const [assigned_to, setAssignedTo] = useState('');
+    const [dropDownVisible,setDropDownVisible] = useState(true)
 
     const [servicesList, setServiceList] = useState([]);
     const [userList, setUserList] = useState([]);
@@ -57,17 +60,16 @@ const Order = () => {
     const [exportList, setExportList] = useState([]);
 
     useEffect(() => {
-        if (ranOnce.current) return;
-         ranOnce.current = true;
         Init();
+        getAppointments();
     }, [])
 
-    useEffect(() => {  
+    useEffect(() => {
         getAppointments();
     }, [refresh])
 
     const Init = async () => {
-    
+        setIsLoading(true);
         const localStorage = await getStorage();
 
         const serviceResponse = await FetchData({
@@ -96,16 +98,20 @@ const Order = () => {
         if (localStorage.role === 'Employee') {
             user = user.filter(item => item.id === localStorage.uid)
         }
+        setAssignedTo(localStorage.role === 'Employee' ? localStorage.uid : '' );
+        setDropDownVisible(localStorage.role === 'Employee' ? false : true);
 
         setServiceList(serviceResponse.data);
         setUserList(user);
         setCompanyList(companyResponse.data);
         setCustomerList(customerResponse.data);
         setEventList(eventResponse.data);
+
+        setIsLoading(false);
     }
 
     const getAppointments = async () => {
-       setIsLoading(true);
+        setIsLoading(true);
         const localStorage = await getStorage();
         const logsResponse = await FetchData({
             method: 'GET',
@@ -122,7 +128,7 @@ const Order = () => {
         }
         setLogsList(logsResponse.data);
         setOrderList(order);
-        load(order);
+        load(order, fromDate, toDate);
         setIsLoading(false);
     }
 
@@ -149,18 +155,25 @@ const Order = () => {
 
 
     useEffect(() => {
-        load(orderList);
-    }, [fromDate, toDate])
+        load(orderList, fromDate, toDate);
+    }, [orderList, fromDate, toDate])
 
+    const onSearch = (value) => {
+        setSearchInput(value)
+    }
 
+    const load = async(data, frm, to) => {
+        setIsLoading(true);
 
-    const load = async (dataList) => {
-        let order = dataList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= fromDate && get_Date(a.trndate,'YYYY-MM-DD') <= toDate);
-        
-        const localStorage = await getStorage();
-         if (localStorage.role === 'Employee') {
-            order = order.filter(item => item.assignedto === localStorage.uid)
-        }
+        let order = await data.filter(a => get_Date(a.trndate, 'YYYY-MM-DD') >= frm && get_Date(a.trndate, 'YYYY-MM-DD') <= to);
+        order = await order.filter(item =>
+            item.name.toLowerCase().includes(searchInput.toLowerCase()) ||
+            item.cell.toLowerCase().replace(/\D/g, "").includes(searchInput.toLowerCase().replace(/\D/g, "")) ||
+            item.order_no.toString().includes(searchInput.toLowerCase()));
+
+        if (assigned_to !== '')
+            order = await order.filter(item => item.assignedto === assigned_to)
+
         const pending = order.filter(a => a.status.toUpperCase() === 'PENDING');
         const inprogress = order.filter(a => a.status.toUpperCase() === 'IN PROGRESS');
         const completed = order.filter(a => a.status.toUpperCase() === 'COMPLETED');
@@ -171,16 +184,17 @@ const Order = () => {
         setInprogressList(inprogress.length > 0 ? inprogress : [])
         setCompletedList(completed.length > 0 ? completed : [])
         setCancelledList(cancelled.length > 0 ? cancelled : [])
+
+        setIsLoading(false);
     }
 
     const tabItems = [
-        getTabItems('1', customLabelTab("All", "cyan", ordersList.length), null, <OrderTabs key={1} index={1} orderList={ordersList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} />),
-        getTabItems('2', customLabelTab("Pending", "yellow", pendingList.length), null, <OrderTabs key={2} index={2} orderList={pendingList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading}/>),
-        getTabItems('3', customLabelTab("InProgress", "blue", inprogressList.length), null, <OrderTabs key={3} index={3} orderList={inprogressList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading}/>),
-        getTabItems('4', customLabelTab("Completed", "green", completedList.length), null, <OrderTabs key={4} index={4} orderList={completedList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} />),
-        getTabItems('5', customLabelTab("Cancelled", "red", cancelledList.length), null, <OrderTabs key={5} index={5} orderList={cancelledList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} />),
+        getTabItems('1', customLabelTab("All", "cyan", ordersList.length), null, <OrderTabs key={1} index={1} orderList={ordersList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} searchInput={searchInput} onSearch={onSearch} assigned_to={assigned_to} setAssignedTo={setAssignedTo} dropDownVisible={dropDownVisible}/>),
+        getTabItems('2', customLabelTab("Pending", "yellow", pendingList.length), null, <OrderTabs key={2} index={2} orderList={pendingList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} searchInput={searchInput} onSearch={onSearch}  assigned_to={assigned_to} setAssignedTo={setAssignedTo} dropDownVisible={dropDownVisible} />),
+        getTabItems('3', customLabelTab("InProgress", "blue", inprogressList.length), null, <OrderTabs key={3} index={3} orderList={inprogressList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} searchInput={searchInput} onSearch={onSearch} assigned_to={assigned_to} setAssignedTo={setAssignedTo} dropDownVisible={dropDownVisible} />),
+        getTabItems('4', customLabelTab("Completed", "green", completedList.length), null, <OrderTabs key={4} index={4} orderList={completedList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} searchInput={searchInput} onSearch={onSearch} assigned_to={assigned_to} setAssignedTo={setAssignedTo} dropDownVisible={dropDownVisible} />),
+        getTabItems('5', customLabelTab("Cancelled", "red", cancelledList.length), null, <OrderTabs key={5} index={5} orderList={cancelledList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={refresh} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} searchInput={searchInput} onSearch={onSearch}  assigned_to={assigned_to} setAssignedTo={setAssignedTo} dropDownVisible={dropDownVisible}/>),
     ];
-  
 
     const btnSave = async () => {
         await ref.current?.save();
@@ -188,18 +202,18 @@ const Order = () => {
 
 
     return (
-        <div class="flex flex-col gap-4 px-7 py-4 mb-12 w-full">
+        <div class="flex flex-col gap-4 px-7 py-4  mb-12 w-full">
 
             <div class='flex items-center justify-between'>
                 <span class="text-lg font-semibold text-gray-800">Appointment</span>
-                <div class="flex gap-2">             
+                <div class="flex gap-2">
                     <ExportToExcel data={exportList} fileName="Appointment" servicesList={servicesList} userList={userList} />
                     <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create Appointment</Button>
                 </div>
-            </div>  
-           
+            </div>
+            <IsLoading isLoading={isLoading} input={
                 <Tabs items={tabItems} defaultActiveKey={tabActiveKey} activeKey={tabActiveKey} onChange={(e) => { setTabActiveKey(e) }} />
-            
+            } />
             {/* Drawer on Add/ Edit*/}
             <Drawer title={title} placement='right' width={600} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
@@ -208,16 +222,16 @@ const Order = () => {
             </Drawer>
 
             {/* Drawer on View*/}
-            <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor:'#F9FAFB'}} onClose={() => setOpenView(false)} open={openView}>
+            <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
                 <OrderView id={id} refresh={refresh} orderList={orderList} servicesList={servicesList} userList={userList} setOpenView={setOpenView} saveData={saveData} />
             </Drawer>
 
             {/* Drawer on logs */}
             <Drawer title={"Logs Detail"} placement='right' width={500} onClose={() => setOpenLogs(false)} open={openLogs}>
-                <LogsView id={id} ltype={'Order'} logsList={logsList} orderList={orderList} userList={userList} servicesList={servicesList}/>
+                <LogsView id={id} ltype={'Order'} logsList={logsList} orderList={orderList} userList={userList} servicesList={servicesList} />
             </Drawer>
         </div>
     )
 }
 
-export default Order;
+export default OrderB;

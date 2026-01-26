@@ -1,25 +1,19 @@
-import { Button, Tabs, Image, Avatar } from "antd"
+import {  Tabs } from "antd"
 import { getTabItems } from "../../common/items.js"
-import { ContainerOutlined, IdcardOutlined, ShareAltOutlined, UserOutlined, LockOutlined, QrcodeOutlined } from '@ant-design/icons';
+import { ContainerOutlined, IdcardOutlined, ShareAltOutlined,  LockOutlined, QrcodeOutlined } from '@ant-design/icons';
 import Account from "../../components/Setting/Account/account.js";
 import SocialLink from "../../components/Setting/Social/sociallink.js";
 import Billing from "../../components/Setting/Billing/billing.js";
-import Heading from "../../common/heading.js";
-import { ImFacebook } from "react-icons/im";
-import { FaInstagram, FaLinkedinIn } from "react-icons/fa";
-import { BsTwitterX } from "react-icons/bs";
-import { TbWorldWww } from "react-icons/tb";
 import { useEffect, useState } from "react";
 import Security from "../../components/Setting/Security/security.js";
 import QRcode from "../../components/Setting/QRcode/qrcode.js";
 import ProfileCard from "./profileCard.js";
 import PageHeader from "../../common/pages/pageHeader.js";
 import { useOutletContext } from "react-router-dom";
-import { getStorage } from "../../common/localStorage.js";
 import FetchData from "../../hook/fetchData.js";
 
 const Setting = () => {
-    const { saveData, isLoading, refresh, setIsLoading } = useOutletContext();
+    const { saveData,  refresh, setIsLoading } = useOutletContext();
 
     const [tabActiveKey, setTabActiveKey] = useState('1');
     const [companyList, setCompanyList] = useState([]);
@@ -36,7 +30,6 @@ const Setting = () => {
 
     const Init = async () => {
         setIsLoading(true);
-        const localStorage = await getStorage();
 
         const companyResponse = await FetchData({
             method: 'GET',
@@ -67,7 +60,7 @@ const Setting = () => {
     ];
 
     return (
-        <div class="flex flex-col gap-4 mb-12">
+        <div class="flex flex-col gap-4 px-7 py-4 mb-12">
             <PageHeader label={'Settings'} isExport={false} isCreate={false} />
             <ProfileCard refresh={refresh} />
             <div class='w-full p-4'>

@@ -21,6 +21,8 @@ import ProtectedRoute from './auth/protectedRoute.js';
 import { Homepage ,Profile,Settings} from './pages/HomePage/homepage.js';
 import ProtectedLayout from './auth/protectedLayout.js';
 import Setting from './pages/Setting/setting.js';
+import Tasks from './pages/Tasks/tasks.js';
+import Order from './pages/Order/order.js';
 
 function App() {
   return (
@@ -40,7 +42,8 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<ProtectedLayout />}>
               <Route path="/home" element={<Homepage />} />
-              <Route path="/profile" element={<Profile />} />
+              <Route path="/calender" element={<Tasks />} />
+              <Route path="/appointment" element={<Order />} />
               <Route path="/setting" element={<Setting />} />
             </Route>
           </Route>

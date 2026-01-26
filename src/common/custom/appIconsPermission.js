@@ -52,8 +52,8 @@ const AppIconsPermission = () => {
 
     const apps = [
         getItem('Dashboard','', 1, <PieChartOutlined style={{ fontSize: '50px', color: 'white' }} />, dashboard, 'bg-blue-500'),
-        getItem('Calender','', 2, <CalenderIcon size={54} color={'text-white'} position="top-6 left-5" />, tasks, 'bg-blue-900'),
-        getItem('Appointment','', 3, <ProductOutlined style={{ fontSize: '50px', color: 'white' }} />, order, 'bg-orange-300'),
+        getItem('Calender','/calender', 2, <CalenderIcon size={54} color={'text-white'} position="top-6 left-5" />, tasks, 'bg-blue-900'),
+        getItem('Appointment','/appointment', 3, <ProductOutlined style={{ fontSize: '50px', color: 'white' }} />, order, 'bg-orange-300'),
         getItem('Event', '',4, <NotificationOutlined style={{ fontSize: '50px', color: 'white' }} />, event),
         getItem('Payment','', 5, <DollarOutlined style={{ fontSize: '50px', color: 'white' }} />, payment),
         getItem('Customers','', 6, <ContactsOutlined style={{ fontSize: '50px', color: 'white' }} />, customer),

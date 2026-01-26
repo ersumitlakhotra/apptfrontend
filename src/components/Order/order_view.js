@@ -8,7 +8,7 @@ import { TextboxFlex } from "../../common/textbox";
 import { BsCash } from "react-icons/bs";
 import { setNumberAndDot } from "../../common/cellformat";
 import useAlert from "../../common/alert";
- import { TbTransfer } from "react-icons/tb";
+import { TbTransfer } from "react-icons/tb";
 
 const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView, saveData }) => {
     const { contextHolder, warning } = useAlert();
@@ -53,7 +53,14 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
                 mode: mode,
                 tip: tip,
             });
-            saveData("Order", "POST", "order/complete", id, Body, true, false);
+            saveData({
+                label: "Appointment",
+                method: 'POST',
+                endPoint: "order/complete",
+                id: id,
+                body: Body
+            });
+            //saveData("Order", "POST", "order/complete", id, Body, true, false);
             setIsModalOpen(false)
             setOpenView(false);
         }
@@ -105,7 +112,13 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
                     <div class="flex gap-2">
                         <Button color="cyan" variant="solid" icon={<CheckOutlined />} size="large" onClick={() => setIsModalOpen(true)}>Completed</Button>
                         <Button color="danger" variant="solid" icon={<CloseOutlined />} size="large" onClick={() => {
-                            saveData("Order", "POST", "order/cancel", id, [], true, false);
+                            saveData({
+                                label: "Appointment",
+                                method: 'POST',
+                                endPoint: "order/cancel",
+                                id: id,
+                                body: []
+                            });
                             setOpenView(false);
                         }}>Cancelled</Button>
 

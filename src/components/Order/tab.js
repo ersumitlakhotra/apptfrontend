@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import {   Button, DatePicker,    Input,  Popover,   Select,   Skeleton,   Tooltip} from "antd"
+import { Button, DatePicker, Input, Popover, Select, Skeleton, Tooltip } from "antd"
 import { IoSearchOutline } from "react-icons/io5";
-import {  getTableItem } from "../../common/items";
+import { getTableItem } from "../../common/items";
 import DataTable from "../../common/datatable";
 import { useEffect, useState } from "react";
 import { ContainerOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
@@ -10,10 +10,11 @@ import { Tags } from "../../common/tags";
 import Services from "../../common/services";
 import AssignedTo from "../../common/assigned_to";
 import { UTC_LocalDateTime, get_Date } from "../../common/localDate";
+import IsLoading from "../../common/custom/isLoading.js";
 
 
-const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_ViewClick, btn_LogsClick, refresh, fromDate, setFromDate, toDate, setToDate ,setExportList }) => {
-  
+const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_ViewClick, btn_LogsClick, refresh, fromDate, setFromDate, toDate, setToDate, setExportList ,isLoading}) => {
+
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(orderList);
     const [list, setList] = useState(orderList);
@@ -23,7 +24,7 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
 
     const [assigned_to, setAssignedTo] = useState('');
 
-    const [dropDownVisible,setDropDownVisible] = useState(true)
+    const [dropDownVisible, setDropDownVisible] = useState(true)
 
     useEffect(() => {
         setFilteredList(orderList);
@@ -32,7 +33,7 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
         setSearchInput('');
         const role = localStorage.getItem('role');
         const userid = localStorage.getItem('uid');
-        setAssignedTo(role === 'Employee' ? userid : '' );
+        setAssignedTo(role === 'Employee' ? userid : '');
         setDropDownVisible(role === 'Employee' ? false : true);
         setPage(1, 10, orderList);
     }, [refresh, orderList])
@@ -55,9 +56,9 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
         const indexOfLastItem = page * pageSize;
         const indexOfFirstItem = indexOfLastItem - pageSize;
         const searchedList = list.slice(indexOfFirstItem, indexOfLastItem);
-        setFilteredList(searchedList);   
+        setFilteredList(searchedList);
     }
- 
+
 
     const headerItems = [
         getTableItem('1', '# No.'),
@@ -77,14 +78,14 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
                     <Input size="large" placeholder="Search" prefix={<IoSearchOutline />} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
                 </div>
                 <div class='w-full md:w-1/4'>
-                    {dropDownVisible &&  <Select
+                    {dropDownVisible && <Select
                         value={assigned_to}
                         style={{ width: '100%' }}
                         size="large"
                         onChange={(value) => setAssignedTo(value)}
-                        options={[{ value: '', label: 'All Users' },{ value: '0', label: 'None' }, ...userList.map(item => ({
+                        options={[{ value: '', label: 'All Users' }, { value: '0', label: 'None' }, ...userList.map(item => ({
                             value: item.id,
-                            label: <AssignedTo key={item.id} userId={item.id} userList={userList} />                                                                     
+                            label: <AssignedTo key={item.id} userId={item.id} userList={userList} />
                         }))]}
                     />
                     }
@@ -117,50 +118,52 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
                     {/**/}
                 </div>
             </div>
-            <DataTable headerItems={headerItems} current={currentPage} list={list}
-                onChange={(page, pageSize) => {
-                    setCurrentPage(page);
-                    setItemsPerPage(pageSize);
-                    setPage(page, pageSize, list)
-                }}
-                body={(
-                    filteredList.map(item => (
-                        <tr key={item.id} class="bg-white border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50 ">
-                            <td class="p-3 text-blue-500 italic hover:underline cursor-pointer" onClick={() => btn_ViewClick(item.id)} ># {item.order_no}</td>
+            <IsLoading isLoading={isLoading} rows={10} input={
+                <DataTable headerItems={headerItems} current={currentPage} list={list}
+                    onChange={(page, pageSize) => {
+                        setCurrentPage(page);
+                        setItemsPerPage(pageSize);
+                        setPage(page, pageSize, list)
+                    }}
+                    body={(
+                        filteredList.map(item => (
+                            <tr key={item.id} class="bg-white border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50 ">
+                                <td class="p-3 text-blue-500 italic hover:underline cursor-pointer" onClick={() => btn_ViewClick(item.id)} ># {item.order_no}</td>
 
-                            <td class="p-3">
-                                <>
-                                    <p class="font-semibold">{item.name}</p>
-                                    <p class="text-xs font-medium text-gray-400">{item.cell}</p>
-                                </>
-                            </td>
+                                <td class="p-3">
+                                    <>
+                                        <p class="font-semibold">{item.name}</p>
+                                        <p class="text-xs font-medium text-gray-400">{item.cell}</p>
+                                    </>
+                                </td>
 
-                            <td class="p-3">
-                                {(item.trndate !== null && item.trndate !== '') && <>
-                                    <p class="font-semibold">{get_Date(item.trndate,'DD MMM YYYY')}</p>
-                                    <p class="text-xs font-medium text-gray-400">{item.slot}</p>
-                                </>}
-                            </td>
+                                <td class="p-3">
+                                    {(item.trndate !== null && item.trndate !== '') && <>
+                                        <p class="font-semibold">{get_Date(item.trndate, 'DD MMM YYYY')}</p>
+                                        <p class="text-xs font-medium text-gray-400">{item.slot}</p>
+                                    </>}
+                                </td>
 
-                            <td class="p-3"><Services servicesItem={item.serviceinfo} servicesList={servicesList} /></td>
-                            <td class="p-3 font-semibold">$ {item.total}</td>
-                            <td class="p-3">{Tags(item.status)}</td>
-                            <td class="p-3"><AssignedTo userId={item.assignedto} userList={userList} /></td>
-                            <td class="p-3 ">{UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A')}</td>
-                            <td class="p-3">
-                                <Tooltip placement="top" title={'Edit'} >
-                                    <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
-                                </Tooltip>
-                                <Tooltip placement="top" title={'View'} >
-                                    <Button type="link" icon={<EyeOutlined />} onClick={() => btn_ViewClick(item.id)} />
-                                </Tooltip>
-                                <Tooltip placement="top" title={'Logs'} >
-                                    <Button type="link" icon={<ContainerOutlined /> } onClick={() => btn_LogsClick(item.id)} />
-                                </Tooltip>
-                            </td>
-                        </tr>
-                    ))
-                )} />   
+                                <td class="p-3"><Services servicesItem={item.serviceinfo} servicesList={servicesList} /></td>
+                                <td class="p-3 font-semibold">$ {item.total}</td>
+                                <td class="p-3">{Tags(item.status)}</td>
+                                <td class="p-3"><AssignedTo userId={item.assignedto} userList={userList} /></td>
+                                <td class="p-3 ">{UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A')}</td>
+                                <td class="p-3">
+                                    <Tooltip placement="top" title={'Edit'} >
+                                        <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
+                                    </Tooltip>
+                                    <Tooltip placement="top" title={'View'} >
+                                        <Button type="link" icon={<EyeOutlined />} onClick={() => btn_ViewClick(item.id)} />
+                                    </Tooltip>
+                                    <Tooltip placement="top" title={'Logs'} >
+                                        <Button type="link" icon={<ContainerOutlined />} onClick={() => btn_LogsClick(item.id)} />
+                                    </Tooltip>
+                                </td>
+                            </tr>
+                        ))
+                    )} />
+            } />
         </div>
     )
 

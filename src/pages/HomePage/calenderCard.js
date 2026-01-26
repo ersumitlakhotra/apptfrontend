@@ -10,8 +10,10 @@ import { getStorage } from "../../common/localStorage";
 import IsLoading from "../../common/custom/isLoading";
 import CalenderIcon from "../../common/custom/calenderIcon"; 
 import { IoMdWarning } from "react-icons/io";
+import { useNavigate } from "react-router-dom";
 
 const CalenderCard = () => {
+    const navigate = useNavigate();
     const [ordersList, setOrdersList] = useState([]);
     const [draftList, setDraftList] = useState([]);
     const [pendingList, setPendingList] = useState([]);
@@ -67,7 +69,7 @@ const CalenderCard = () => {
         <div class='w-full bg-blue-900 border rounded-3xl p-4 text-gray-800 flex gap-6  shadow-md   hover:shadow-lg '>
             <IsLoading isLoading={isLoading} input={
                 <>
-                    <div class='w-1/3 flex flex-col justify-between text-xs font-semibold font-sans  text-white '>
+                    <div class='w-1/3 flex flex-col justify-between text-xs font-semibold font-sans  text-white ' onClick={() => navigate('/calender') }>
                         <div class='flex flex-col gap-0 hover:font-bold hover:underline duration-150 cursor-pointer'>
                             <CalenderIcon size={40}/>
                             <span>{get_Date(LocalDate(), 'MMMM DD, YYYY')}</span>

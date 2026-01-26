@@ -41,9 +41,10 @@ const ProtectedLayout = () => {
         <div class='min-h-screen w-full flex flex-col  '>
             <Header />
 
-            <main class="flex-1 px-8 py-4 scroll-auto">
+            <main class="flex-1 px-8 scroll-auto">
                 <Outlet context={{ saveData, isLoading, setIsLoading, refresh }} />
             </main>
+
             <footer class="h-12 bg-gray-300 sticky z-50 bottom-0">Fotter</footer>
 
             {isLoading &&
