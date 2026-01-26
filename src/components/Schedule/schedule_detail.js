@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { useEffect, useImperativeHandle, useState } from "react";
-import {  Button, DatePicker,  Popover, Radio,  Select,  Switch,  TimePicker } from "antd";
-import { CloudUploadOutlined, EyeOutlined, UserOutlined,ClockCircleOutlined } from '@ant-design/icons';
+import { Button, DatePicker, Popover, Radio, Select, Switch, TimePicker } from "antd";
+import { CloudUploadOutlined, EyeOutlined, UserOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import useAlert from "../../common/alert.js";
 import { TextboxFlex } from "../../common/textbox.js";
 import { get_Date, LocalDate } from "../../common/localDate.js";
@@ -13,7 +13,7 @@ import AssignedTo from "../../common/assigned_to.js";
 const { RangePicker } = TimePicker;
 
 
-const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList,  saveData ,setOpen,userId=null,frmDate=LocalDate() }) => {
+const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList, saveData, setOpen, userId = null, frmDate = LocalDate() }) => {
     const [fromDate, setFromDate] = useState(LocalDate());
     const [toDate, setToDate] = useState(LocalDate());
     const [startTime, setStartTime] = useState('09:00:00');
@@ -27,8 +27,8 @@ const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList,  saveData ,s
         if (id === 0) {
             setFromDate(frmDate); setToDate(LocalDate());
             setStartTime('09:00:00'); setEndTime('21:00:00');
-            setIsWorking(true); setValue('Single'); 
-            setUid(userId === null ? '' : userId );
+            setIsWorking(true); setValue('Single');
+            setUid(userId === null ? '' : userId);
         }
         else {
             const editList = scheduleList.find(item => item.id === id)
@@ -40,8 +40,8 @@ const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList,  saveData ,s
             setValue('Single');
             setUid(editList.uid);
         }
-    }, [refresh]) 
-    
+    }, [refresh])
+
     useEffect(() => {
         if (isWorking) {
             if (startTime === '00:00:00')
@@ -50,7 +50,7 @@ const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList,  saveData ,s
                 setEndTime('21:00:00');
         }
     }, [isWorking])
-  
+
     const save = async () => {
         if (id === 0) {
             if (uid === '') {
@@ -86,7 +86,13 @@ const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList,  saveData ,s
                     endshift: isWorking ? endTime : '00:00:00',
                     dayoff: isWorking
                 });
-                saveData("TimeSheet", 'POST', "schedule",  null, Body, true, false);
+                saveData({
+                    label: "Schedule",
+                    method: 'POST',
+                    endPoint: "schedule",
+                    id: null,
+                    body: Body
+                });
                 setOpen(false);
             }
             else {
@@ -100,7 +106,7 @@ const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList,  saveData ,s
     const createMultipleSchedule = async () => {
         try {
             const dates = createDateSeries(fromDate, toDate);
-            dates.map(async (date,index) => {
+            dates.map(async (date, index) => {
                 const ScheduleBody = JSON.stringify({
                     cid: localStorage.getItem('cid'),
                     uid: uid,
@@ -116,7 +122,13 @@ const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList,  saveData ,s
                         endshift: isWorking ? endTime : '00:00:00',
                         dayoff: isWorking
                     });
-                    saveData("TimeSheet", 'POST', "schedule", null, Body, true, false);                  
+                    saveData({
+                        label: "Schedule",
+                        method: 'POST',
+                        endPoint: "schedule",
+                        id: null,
+                        body: Body
+                    });
                 }
             })
             setOpen(false);
@@ -135,7 +147,13 @@ const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList,  saveData ,s
                 endshift: isWorking ? endTime : '00:00:00',
                 dayoff: isWorking
             });
-            saveData("TimeSheet", 'PUT', "schedule", id, Body, true, false);
+            saveData({
+                label: "Schedule",
+                method: 'PUT',
+                endPoint: "schedule",
+                id: id,
+                body: Body
+            });
             setOpen(false);
         }
         catch (err) {
@@ -158,17 +176,17 @@ const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList,  saveData ,s
                     value={uid}
                     placeholder="Select User"
                     status={uid === '' ? 'error' : ''}
-                    style={{ width: 300 }}                
+                    style={{ width: 300 }}
                     size="large"
-                    disabled={id !== 0} 
+                    disabled={id !== 0}
                     onChange={(value) => setUid(value)}
                     options={[{ value: '', label: '' }, ...userList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
                         value: item.id,
                         label: <AssignedTo key={item.id} userId={item.id} userList={userList} />
                     }))]}
                 />
-            } /> 
-            
+            } />
+
             <TextboxFlex label={'Option'} mandatory={true} input={
                 <Radio.Group options={plainOptions} onChange={(e) => setValue(e.target.value)} value={value} disabled={id !== 0} />
             } />
@@ -185,7 +203,7 @@ const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList,  saveData ,s
                                 onChange={(date, dateString) => setFromDate(dateString)} />
                         </div>
                     }>
-                        <Button className="text-xs"><span class='font-medium'> {value === 'Multiple' ? 'From' : 'Date' } :  </span><span class='text-blue-500'> {fromDate}  </span></Button>
+                        <Button className="text-xs"><span class='font-medium'> {value === 'Multiple' ? 'From' : 'Date'} :  </span><span class='text-blue-500'> {fromDate}  </span></Button>
                     </Popover>
                     {value === 'Multiple' &&
                         <Popover placement="bottom" title={"Filter by To Date"} content={

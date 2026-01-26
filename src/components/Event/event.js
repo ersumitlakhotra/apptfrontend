@@ -9,8 +9,9 @@ import DataTable from "../../common/datatable";
 import { useEffect, useState } from "react";
 import Services from "../../common/services";
 import { get_Date, UTC_LocalDateTime } from "../../common/localDate";
+import IsLoading from "../../common/custom/isLoading";
 
-const Events = ({ eventList, servicesList, btn_Click, btn_LogsClick, fromDate, setFromDate, toDate, setToDate, setExportList }) => {
+const Events = ({ eventList, servicesList, btn_Click, btn_LogsClick, fromDate, setFromDate, toDate, setToDate, setExportList,isLoading }) => {
     const [searchInput, setSearchInput] = useState('');
 
     const [filteredList, setFilteredList] = useState(eventList);
@@ -86,6 +87,7 @@ const Events = ({ eventList, servicesList, btn_Click, btn_LogsClick, fromDate, s
                     {/**/}
                 </div>
             </div>
+            <IsLoading isLoading={isLoading} rows={10} input={
             <DataTable headerItems={headerItems} current={currentPage} list={list}
                 onChange={(page, pageSize) => {
                     setCurrentPage(page);
@@ -107,13 +109,14 @@ const Events = ({ eventList, servicesList, btn_Click, btn_LogsClick, fromDate, s
                                 <Tooltip placement="top" title={'Edit'} >
                                     <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
                                 </Tooltip>
-                                <Tooltip placement="top" title={'Logs'} >
+                                {/*<Tooltip placement="top" title={'Logs'} >
                                     <Button type="link" icon={<ContainerOutlined />} onClick={() => btn_LogsClick(item.id)} />
-                                </Tooltip>
+                                </Tooltip>*/}
                             </td>
                         </tr>
                     ))
                 )} />
+            }/>
         </div>
     )
 }

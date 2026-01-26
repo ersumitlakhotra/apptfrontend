@@ -15,7 +15,7 @@ const CustomerDetail = ({ id, refresh, ref, customerList, saveData, setOpen }) =
 
     useEffect(() => {
         if (id === 0) {
-            setName(''); setEmail(''); setCell(''); 
+            setName(''); setEmail(''); setCell('');
         }
         else {
             const editList = customerList.find(item => item.id === id)
@@ -25,14 +25,20 @@ const CustomerDetail = ({ id, refresh, ref, customerList, saveData, setOpen }) =
         }
     }, [refresh])
 
-    const save = async () => {      
+    const save = async () => {
         if (name !== '' && email !== '' && cell !== '' && cell.length === 12 && isValidEmail(email)) {
             const Body = JSON.stringify({
                 name: name,
                 email: email,
                 cell: cell,
             });
-            saveData("Customer", id !== 0 ? 'PUT' : 'POST', "customer", id !== 0 ? id : null, Body);
+            saveData({
+                label: "Customers",
+                method: id !== 0 ? 'PUT' : 'POST',
+                endPoint: "customer",
+                id: id !== 0 ? id : null,
+                body: Body
+            });
             setOpen(false);
         }
     }
@@ -44,7 +50,7 @@ const CustomerDetail = ({ id, refresh, ref, customerList, saveData, setOpen }) =
         };
     })
 
- 
+
     return (
         <div class='flex flex-col font-normal gap-2 mt-2'>
             <p class="text-gray-400 mb-4">Customer Information</p>

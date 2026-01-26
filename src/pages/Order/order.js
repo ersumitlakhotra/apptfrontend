@@ -1,18 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Button, Drawer, Space, Tabs, Tag } from "antd";
-import {  PlusOutlined, SaveOutlined } from '@ant-design/icons';
+import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from "react";
 import OrderDetail from "../../components/Order/order_detail";
 import OrderView from "../../components/Order/order_view";
-import {  getTabItems } from "../../common/items.js";
+import { getTabItems } from "../../common/items.js";
 import OrderTabs from "../../components/Order/tab.js";
-import {  get_Date, LocalDate } from "../../common/localDate.js";
+import { get_Date, LocalDate } from "../../common/localDate.js";
 import IsLoading from "../../common/custom/isLoading.js";
 import LogsView from "../../components/Logs/logs_view.js";
 import ExportToExcel from "../../common/export.js";
 import { getStorage } from "../../common/localStorage.js";
 import FetchData from "../../hook/fetchData.js";
 import { useOutletContext } from "react-router-dom";
+import PageHeader from "../../common/pages/pageHeader.js";
 
 const customLabelTab = (label, tagColor, tagValue) => {
     return (
@@ -26,8 +27,8 @@ const customLabelTab = (label, tagColor, tagValue) => {
 const Order = () => {
     const ref = useRef();
     const ranOnce = useRef(false);
-  const headingLabel = 'Appointment'
-    const { saveData, refresh  } = useOutletContext();
+    const headingLabel = 'Appointment'
+    const { saveData, refresh } = useOutletContext();
 
     const [isLoading, setIsLoading] = useState(false);
     const [fromDate, setFromDate] = useState(LocalDate());
@@ -58,16 +59,16 @@ const Order = () => {
 
     useEffect(() => {
         if (ranOnce.current) return;
-         ranOnce.current = true;
+        ranOnce.current = true;
         Init();
     }, [])
 
-    useEffect(() => {  
+    useEffect(() => {
         getAppointments();
     }, [refresh])
 
     const Init = async () => {
-    
+
         const localStorage = await getStorage();
 
         const serviceResponse = await FetchData({
@@ -105,12 +106,9 @@ const Order = () => {
     }
 
     const getAppointments = async () => {
-       setIsLoading(true);
+        setIsLoading(true);
         const localStorage = await getStorage();
-        const logsResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'logs'
-        })
+
         const orderResponse = await FetchData({
             method: 'GET',
             endPoint: 'order'
@@ -120,7 +118,6 @@ const Order = () => {
         if (localStorage.role === 'Employee') {
             order = order.filter(item => item.assignedto === localStorage.uid)
         }
-        setLogsList(logsResponse.data);
         setOrderList(order);
         load(order);
         setIsLoading(false);
@@ -155,10 +152,10 @@ const Order = () => {
 
 
     const load = async (dataList) => {
-        let order = dataList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= fromDate && get_Date(a.trndate,'YYYY-MM-DD') <= toDate);
-        
+        let order = dataList.filter(a => get_Date(a.trndate, 'YYYY-MM-DD') >= fromDate && get_Date(a.trndate, 'YYYY-MM-DD') <= toDate);
+
         const localStorage = await getStorage();
-         if (localStorage.role === 'Employee') {
+        if (localStorage.role === 'Employee') {
             order = order.filter(item => item.assignedto === localStorage.uid)
         }
         const pending = order.filter(a => a.status.toUpperCase() === 'PENDING');
@@ -174,13 +171,13 @@ const Order = () => {
     }
 
     const tabItems = [
-        getTabItems('1', customLabelTab("All", "cyan", ordersList.length), null, <OrderTabs key={1} index={1} orderList={ordersList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} />),
-        getTabItems('2', customLabelTab("Pending", "yellow", pendingList.length), null, <OrderTabs key={2} index={2} orderList={pendingList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading}/>),
-        getTabItems('3', customLabelTab("InProgress", "blue", inprogressList.length), null, <OrderTabs key={3} index={3} orderList={inprogressList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading}/>),
-        getTabItems('4', customLabelTab("Completed", "green", completedList.length), null, <OrderTabs key={4} index={4} orderList={completedList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} />),
-        getTabItems('5', customLabelTab("Cancelled", "red", cancelledList.length), null, <OrderTabs key={5} index={5} orderList={cancelledList} servicesList={servicesList} userList={userList}  btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} />),
+        getTabItems('1', customLabelTab("All", "cyan", ordersList.length), null, <OrderTabs key={1} index={1} orderList={ordersList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} />),
+        getTabItems('2', customLabelTab("Pending", "yellow", pendingList.length), null, <OrderTabs key={2} index={2} orderList={pendingList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} />),
+        getTabItems('3', customLabelTab("InProgress", "blue", inprogressList.length), null, <OrderTabs key={3} index={3} orderList={inprogressList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} />),
+        getTabItems('4', customLabelTab("Completed", "green", completedList.length), null, <OrderTabs key={4} index={4} orderList={completedList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} />),
+        getTabItems('5', customLabelTab("Cancelled", "red", cancelledList.length), null, <OrderTabs key={5} index={5} orderList={cancelledList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} />),
     ];
-  
+
 
     const btnSave = async () => {
         await ref.current?.save();
@@ -189,32 +186,24 @@ const Order = () => {
 
     return (
         <div class="flex flex-col gap-4 px-7 py-4 mb-12 w-full">
+            <PageHeader label={headingLabel} isExport={true} exportList={exportList} exportName={headingLabel} isCreate={true} onClick={() => btn_Click(0)} servicesList={servicesList} userList={userList} />
+            <Tabs items={tabItems} defaultActiveKey={tabActiveKey} activeKey={tabActiveKey} onChange={(e) => { setTabActiveKey(e) }} />
 
-            <div class='flex items-center justify-between'>
-                <span class="text-lg font-semibold text-gray-800">Appointment</span>
-                <div class="flex gap-2">             
-                    <ExportToExcel data={exportList} fileName="Appointment" servicesList={servicesList} userList={userList} />
-                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create Appointment</Button>
-                </div>
-            </div>  
-           
-                <Tabs items={tabItems} defaultActiveKey={tabActiveKey} activeKey={tabActiveKey} onChange={(e) => { setTabActiveKey(e) }} />
-            
             {/* Drawer on Add/ Edit*/}
             <Drawer title={title} placement='right' width={600} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
-                <OrderDetail id={id} refresh={refresh} ref={ref} setOrderNo={setOrderNo} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} eventList={eventList} customerList={customerList} saveData={saveData} setOpen={setOpen} />
+                <OrderDetail id={id} refresh={reload} ref={ref} setOrderNo={setOrderNo} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} eventList={eventList} customerList={customerList} saveData={saveData} setOpen={setOpen} />
             </Drawer>
 
             {/* Drawer on View*/}
-            <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor:'#F9FAFB'}} onClose={() => setOpenView(false)} open={openView}>
-                <OrderView id={id} refresh={refresh} orderList={orderList} servicesList={servicesList} userList={userList} setOpenView={setOpenView} saveData={saveData} />
+            <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
+                <OrderView id={id} refresh={reload} orderList={orderList} servicesList={servicesList} userList={userList} setOpenView={setOpenView} saveData={saveData} />
             </Drawer>
 
             {/* Drawer on logs */}
             <Drawer title={"Logs Detail"} placement='right' width={500} onClose={() => setOpenLogs(false)} open={openLogs}>
-                <LogsView id={id} ltype={'Order'} logsList={logsList} orderList={orderList} userList={userList} servicesList={servicesList}/>
+                <LogsView id={id} ltype={'Order'} logsList={logsList} orderList={orderList} userList={userList} servicesList={servicesList} />
             </Drawer>
         </div>
     )

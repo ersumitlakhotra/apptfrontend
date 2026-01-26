@@ -52,18 +52,18 @@ const AppIconsPermission = () => {
 
     const apps = [
         getItem('Dashboard','', 1, <PieChartOutlined style={{ fontSize: '50px', color: 'white' }} />, dashboard, 'bg-blue-500'),
-        getItem('Calender','/calender', 2, <CalenderIcon size={54} color={'text-white'} position="top-6 left-5" />, tasks, 'bg-blue-900'),
+        getItem('Calender','/calender', 2, <CalenderIcon size={54} color={'text-white'} position="top-6 left-4" />, tasks, 'bg-blue-900'),
         getItem('Appointment','/appointment', 3, <ProductOutlined style={{ fontSize: '50px', color: 'white' }} />, order, 'bg-orange-300'),
-        getItem('Event', '',4, <NotificationOutlined style={{ fontSize: '50px', color: 'white' }} />, event),
-        getItem('Payment','', 5, <DollarOutlined style={{ fontSize: '50px', color: 'white' }} />, payment),
-        getItem('Customers','', 6, <ContactsOutlined style={{ fontSize: '50px', color: 'white' }} />, customer),
-        getItem('Services', '',7, <UnorderedListOutlined style={{ fontSize: '50px', color: 'white' }} />, services),
-        getItem('Users','', 8, <UserOutlined style={{ fontSize: '50px', color: 'white' }} />, users, 'bg-gradient-to-r from-red-900 to-purple-600'),
-        getItem('Schedule', '',9, <AiFillSchedule style={{ fontSize: '50px', color: 'white' }} />, schedule, 'bg-green-800'),
-        getItem('Sales', '',10, <FundOutlined style={{ fontSize: '50px', color: 'white' }} />, sales),
-        getItem('Collection', '',11, <FaHandHoldingUsd style={{ fontSize: '50px', color: 'white' }} />, collection),
+        getItem('Event', '/event',4, <NotificationOutlined style={{ fontSize: '50px', color: 'white' }} />, event,'bg-gradient-to-b from-[#8a2ce2] via-[#4a0080] to-[#1f8fff]'),
+        getItem('Payment','', 5, <DollarOutlined style={{ fontSize: '50px', color: 'white' }} />, false),
+        getItem('Customers','/customers', 6, <ContactsOutlined style={{ fontSize: '50px', color: 'white' }} />, customer,'bg-gradient-to-r from-red-400 to-pink-800 '),
+        getItem('Services', '/services',7, <UnorderedListOutlined style={{ fontSize: '50px', color: 'white' }} />, services,'bg-gradient-to-r from-[#D6B588] to-orange-600 '),
+        getItem('Users','/users', 8, <UserOutlined style={{ fontSize: '50px', color: 'white' }} />, users, 'bg-gradient-to-r from-red-900 to-purple-600'),
+        getItem('Schedule', '/schedule',9, <AiFillSchedule style={{ fontSize: '50px', color: 'white' }} />, schedule, 'bg-gradient-to-r from-green-500 to-green-900 '),
+        getItem('Sales', '',10, <FundOutlined style={{ fontSize: '50px', color: 'white' }} />, false),
+        getItem('Collection', '',11, <FaHandHoldingUsd style={{ fontSize: '50px', color: 'white' }} />, false),
         // getItem('Expenses','', 12, <FallOutlined style={{ fontSize: '50px', color: 'white' }} />),
-        getItem('Help','', 13, <CustomerServiceOutlined style={{ fontSize: '50px', color: 'white' }} />, true),
+        getItem('Help','/help', 13, <CustomerServiceOutlined style={{ fontSize: '50px', color: 'white' }} />, true,'bg-gradient-to-r from-cyan-400 to-cyan-900'),
         getItem('Setting','/setting', 14, <SettingOutlined style={{ fontSize: '50px', color: 'white' }} />, setting, 'bg-gray-500'),
     ]
 

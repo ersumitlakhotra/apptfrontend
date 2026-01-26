@@ -23,6 +23,12 @@ import ProtectedLayout from './auth/protectedLayout.js';
 import Setting from './pages/Setting/setting.js';
 import Tasks from './pages/Tasks/tasks.js';
 import Order from './pages/Order/order.js';
+import Event from './pages/Event/event.js';
+import Customer from './pages/Customer/customer.js';
+import Services from './pages/Services/services.js';
+import Users from './pages/Users/users.js';
+import Schedule from './pages/Schedule/schedule.js';
+import Dashboard from './pages/Dashboard/dashboard.js';
 
 function App() {
   return (
@@ -42,8 +48,15 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<ProtectedLayout />}>
               <Route path="/home" element={<Homepage />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/calender" element={<Tasks />} />
               <Route path="/appointment" element={<Order />} />
+              <Route path="/event" element={<Event />} />
+              <Route path="/customers" element={<Customer />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/users" element={<Users />} />
+              <Route path="/schedule" element={<Schedule />} />
+              <Route path="/help" element={<Support />} />
               <Route path="/setting" element={<Setting />} />
             </Route>
           </Route>

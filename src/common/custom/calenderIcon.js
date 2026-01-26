@@ -1,7 +1,7 @@
 
 import { IoIosCalendar } from "react-icons/io";
 import { getDay, LocalDate } from "../localDate";
-const CalenderIcon = ({ size, color, position ='top-4 left-3'}) => {
+const CalenderIcon = ({ size, color, position ='top-4 left-2'}) => {
     return (
         <div class={`relative ${color}`}>
             <IoIosCalendar size={size} />

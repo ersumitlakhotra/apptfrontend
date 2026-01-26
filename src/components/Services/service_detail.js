@@ -43,7 +43,13 @@ const ServiceDetail = ({ id, refresh, ref, servicesList, saveData, setOpen }) =>
                 status: status,
                 description: description,
             });
-           saveData("Services", id !== 0 ? 'PUT' : 'POST', "services", id !== 0 ? id : null, Body);
+             saveData({
+                label: "Services",
+                method: id !== 0 ? 'PUT' : 'POST',
+                endPoint: "services",
+                id: id !== 0 ? id : null,
+                body: Body
+            });
            setOpen(false);
         }
     }

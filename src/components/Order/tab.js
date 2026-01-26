@@ -39,10 +39,14 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
     }, [refresh, orderList])
 
     useEffect(() => {
+       
         let searchedList = orderList.filter(item =>
-            item.name.toLowerCase().includes(searchInput.toLowerCase()) ||
-            item.cell.toLowerCase().replace(/\D/g, "").includes(searchInput.toLowerCase().replace(/\D/g, "")) ||
-            item.order_no.toString().includes(searchInput.toLowerCase()));
+            item.name.toLowerCase().includes(searchInput.toLowerCase())
+            || item.order_no.toString().includes(searchInput.toLowerCase())
+            || item.cell.toString().includes(searchInput.toLowerCase())
+        );
+
+
         if (assigned_to !== '')
             searchedList = searchedList.filter(item => item.assignedto === assigned_to)
 
@@ -156,9 +160,10 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
                                     <Tooltip placement="top" title={'View'} >
                                         <Button type="link" icon={<EyeOutlined />} onClick={() => btn_ViewClick(item.id)} />
                                     </Tooltip>
+                                    {/*
                                     <Tooltip placement="top" title={'Logs'} >
                                         <Button type="link" icon={<ContainerOutlined />} onClick={() => btn_LogsClick(item.id)} />
-                                    </Tooltip>
+                                    </Tooltip>*/}
                                 </td>
                             </tr>
                         ))

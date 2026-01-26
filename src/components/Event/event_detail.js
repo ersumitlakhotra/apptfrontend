@@ -57,7 +57,13 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
                 total: total,
                 coupon:coupon
             });
-            saveData("Event", id !== 0 ? 'PUT' : 'POST', "event", id !== 0 ? id : null, Body);
+             saveData({
+                    label: "Event",
+                    method: id !== 0 ? 'PUT' : 'POST',
+                    endPoint: "event",
+                    id:id !== 0 ? id : null,
+                    body: Body
+                });
             setOpen(false);
         }
     }

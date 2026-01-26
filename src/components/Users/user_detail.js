@@ -156,7 +156,13 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
                 collection:collection,
                 setting: setting,
             }); 
-            saveData("Users", id !== 0 ? 'PUT' : 'POST', "user", id !== 0 ? id : null, Body);
+            saveData({
+                label: "Users",
+                method: id !== 0 ? 'PUT' : 'POST',
+                endPoint: "user",
+                id: id !== 0 ? id : null,
+                body: Body
+            });
             setOpen(false);
         }
         else{

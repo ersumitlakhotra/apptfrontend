@@ -1,24 +1,34 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import {  Button,  Select, Drawer, Space,  Tooltip, Popover, DatePicker } from "antd";
-import {  EditOutlined, PlusOutlined, SaveOutlined,  EyeOutlined } from '@ant-design/icons';
+import { Button, Select, Drawer, Space, Tooltip, Popover, DatePicker } from "antd";
+import { EditOutlined, PlusOutlined, SaveOutlined, EyeOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from "react";
 import DataTable from "../../common/datatable";
 import { getTableItem } from "../../common/items";
 import { Tags } from "../../common/tags";
 import ExportToExcel from "../../common/export.js";
-import {  get_Date, LocalDate, UTC_LocalDateTime } from "../../common/localDate.js";
-import { convertTo12Hour, calculateTime} from "../../common/general";
+import { get_Date, LocalDate, UTC_LocalDateTime } from "../../common/localDate.js";
+import { convertTo12Hour, calculateTime } from "../../common/general";
 import AssignedTo from "../../common/assigned_to.js";
 import dayjs from 'dayjs';
 import { Sort } from "../../common/sort.js";
 import ScheduleDetail from "../../components/Schedule/schedule_detail.js";
 import ScheduleView from "../../components/Schedule/schedule_view.js";
+import { useOutletContext } from "react-router-dom";
+import IsLoading from "../../common/custom/isLoading.js";
+import PageHeader from "../../common/pages/pageHeader.js";
+import FetchData from "../../hook/fetchData.js";
 
 
-const Schedule = ({ userList, scheduleList,saveData }) => {
-    const ref= useRef();
-    const [filteredList, setFilteredList] = useState(scheduleList);
-    const [list, setList] = useState(scheduleList);
+const Schedule = () => {
+    const ref = useRef();
+    const headingLabel = 'Schedule'
+    const { saveData, refresh } = useOutletContext();
+
+    const [isLoading, setIsLoading] = useState(false);
+    const [userList, setUserList] = useState([]);
+    const [scheduleList, setScheduleList] = useState([]);
+    const [filteredList, setFilteredList] = useState([]);
+    const [list, setList] = useState([]);
 
     const [fromDate, setFromDate] = useState(LocalDate());
     const [toDate, setToDate] = useState(LocalDate());
@@ -32,20 +42,40 @@ const Schedule = ({ userList, scheduleList,saveData }) => {
     const [title, setTitle] = useState('New')
     const [id, setId] = useState(0);
     const [uid, setUid] = useState(0);
-    const [refresh, setRefresh] = useState(0);
+    const [reload, setReload] = useState(0);
 
     const [assigned_to, setAssignedTo] = useState('');
 
     useEffect(() => {
-        setFilteredList(scheduleList);
-        setList(scheduleList);
-        setExportList(scheduleList);
-        setPage(1, 10, scheduleList);
-    }, [])
+        Init();
+    }, [refresh])
+
+    const Init = async () => {
+        setIsLoading(true)
+
+        const userResponse = await FetchData({
+            method: 'GET',
+            endPoint: 'user'
+        })
+        const scheduleResponse = await FetchData({
+            method: 'GET',
+            endPoint: 'schedule'
+        })
+
+        setScheduleList(scheduleResponse.data);
+        setUserList(userResponse.data);
+
+        setFilteredList(scheduleResponse.data);
+        setList(scheduleResponse.data);
+        setExportList(scheduleResponse.data);
+        setPage(1, 10, scheduleResponse.data);
+
+        setIsLoading(false)
+    }
 
     useEffect(() => {
         let searchedList = scheduleList.filter(item => get_Date(item.trndate, 'YYYY-MM-DD') >= fromDate && get_Date(item.trndate, 'YYYY-MM-DD') <= toDate);
-       
+
         if (assigned_to !== '')
             searchedList = searchedList.filter(item => item.uid === assigned_to)
 
@@ -76,13 +106,13 @@ const Schedule = ({ userList, scheduleList,saveData }) => {
     ];
 
     const btn_Click = (id) => {
-        setTitle(id === 0 ? "New TimeSheet" : "Edit TimeSheet");
-        setRefresh(refresh + 1);
+        setTitle(id === 0 ? `New ${headingLabel}` : `Edit ${headingLabel}`);
+        setReload(reload + 1);
         setId(id);
         setOpen(true);
     }
     const btn_ViewClick = (id) => {
-        setRefresh(refresh + 1);
+        setReload(reload + 1);
         setUid(id);
         setOpenView(true);
     }
@@ -91,15 +121,9 @@ const Schedule = ({ userList, scheduleList,saveData }) => {
     }
 
     return (
-        <div class="flex flex-col gap-4 mb-12">
+        <div class="flex flex-col gap-4 px-7 py-4  mb-12">
 
-            <div class='flex items-center justify-between'>
-                <span class="text-lg font-semibold text-gray-800">TimeSheet</span>
-                <div class="flex gap-2">
-                    <ExportToExcel data={exportList} fileName="Schedule" servicesList={[]} userList={userList} />
-                    <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => btn_Click(0)}>Create TimeSheet</Button>
-                </div>
-            </div>
+            <PageHeader label={headingLabel} isExport={true} exportList={exportList} exportName={headingLabel} isCreate={true} onClick={() => btn_Click(0)} servicesList={[]} userList={userList} />
 
             <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
                 <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
@@ -145,48 +169,50 @@ const Schedule = ({ userList, scheduleList,saveData }) => {
                     </div>
                 </div>
 
-                <DataTable headerItems={headerItems} current={currentPage} list={list}
-                    onChange={(page, pageSize) => {                     
-                        setCurrentPage(page);
-                        setItemsPerPage(pageSize);
-                        setPage(page, pageSize, list)
-                    }}
-                    body={(
-                        filteredList.map(item => {
-                            const result = calculateTime(item.startshift, item.endshift);
-                            return (
-                                <tr key={item.id} class="bg-white border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50 ">
-                                    <td class="p-3 font-bold ">{get_Date(item.trndate, 'DD MMM YYYY')}</td>
-                                    <td class="p-3"><AssignedTo userId={item.uid} userList={userList} /></td>
-                                    <td class="p-3 ">{convertTo12Hour(item.startshift)}</td>
-                                    <td class="p-3 ">{convertTo12Hour(item.endshift)}</td>
-                                    <td class="p-3 font-body ">{`${result.hours}h ${result.minutes}m`}</td>
-                                    <td class="p-3">{Tags(item.dayoff ? "Working" : "Day off")}</td>
-                                    <td class="p-3 ">{UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A')}</td>
-                                    <td class="p-3">
-                                        <Tooltip placement="top" title={'Edit'} >
-                                            <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
-                                        </Tooltip>
-                                        <Tooltip placement="top" title={'View'} >
-                                            <Button type="link" icon={<EyeOutlined />} onClick={() => btn_ViewClick(item.uid)} />
-                                        </Tooltip>
-                                    </td>
-                                </tr>
-                            )
-                        })
-                    )} />    
+                <IsLoading isLoading={isLoading} rows={10} input={
+                    <DataTable headerItems={headerItems} current={currentPage} list={list}
+                        onChange={(page, pageSize) => {
+                            setCurrentPage(page);
+                            setItemsPerPage(pageSize);
+                            setPage(page, pageSize, list)
+                        }}
+                        body={(
+                            filteredList.map(item => {
+                                const result = calculateTime(item.startshift, item.endshift);
+                                return (
+                                    <tr key={item.id} class="bg-white border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50 ">
+                                        <td class="p-3 font-bold ">{get_Date(item.trndate, 'DD MMM YYYY')}</td>
+                                        <td class="p-3"><AssignedTo userId={item.uid} userList={userList} /></td>
+                                        <td class="p-3 ">{convertTo12Hour(item.startshift)}</td>
+                                        <td class="p-3 ">{convertTo12Hour(item.endshift)}</td>
+                                        <td class="p-3 font-body ">{`${result.hours}h ${result.minutes}m`}</td>
+                                        <td class="p-3">{Tags(item.dayoff ? "Working" : "Day off")}</td>
+                                        <td class="p-3 ">{UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A')}</td>
+                                        <td class="p-3">
+                                            <Tooltip placement="top" title={'Edit'} >
+                                                <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
+                                            </Tooltip>
+                                            <Tooltip placement="top" title={'View'} >
+                                                <Button type="link" icon={<EyeOutlined />} onClick={() => btn_ViewClick(item.uid)} />
+                                            </Tooltip>
+                                        </td>
+                                    </tr>
+                                )
+                            })
+                        )} />
+                } />
             </div>
 
             {/* Drawer on right*/}
             <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
-                <ScheduleDetail id={id} refresh={refresh} ref={ref} scheduleList={scheduleList} userList={userList} saveData={saveData} setOpen={setOpen} />
+                <ScheduleDetail id={id} refresh={reload} ref={ref} scheduleList={scheduleList} userList={userList} saveData={saveData} setOpen={setOpen} />
             </Drawer>
 
             {/* Drawer on View*/}
             <Drawer title={""} placement='bottom' height={'95%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
-                <ScheduleView id={uid} refresh={refresh} userList={userList} scheduleListAll={scheduleList}  />
+                <ScheduleView id={uid} refresh={reload} userList={userList} scheduleListAll={scheduleList} />
             </Drawer>
         </div>
     )

@@ -14,6 +14,8 @@ import { AreaChartCard } from "../../components/Dashboard/Charts/charts.js";
 import Schedule from "../../components/Dashboard/Schedule/schedule.js";
 
 const Dashboard = ({refresh, orderList, expensesList, servicesList, userList, eventList, logsList, companyList, scheduleList, saveData, onSelected ,setFromDate,setToDate }) => {  
+    
+    
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
     const [orderChart, setOrderChart] = useState(null);
     const [totalOrders, setTotalOrders] = useState(0);

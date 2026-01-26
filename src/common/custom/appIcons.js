@@ -7,7 +7,7 @@ const AppIcons = ({ icon, size = 108, backgroundColor,label,onClick}) => {
                     onClick={onClick}>
                     <span class="group-hover:animate-spin">{icon}</span>
                 </div>
-                <span class='text-xs'>{label}</span>
+                <span class='text-xs font-medium'>{label}</span>
             </div>
         </div>
     )

@@ -4,7 +4,7 @@ import { IoCall } from "react-icons/io5";
 
 const Support = () => {
     return (
-        <section  >
+        <section class='px-7 py-4  mb-12'>
             <div class="relative w-full">
 
                 <img class="w-full object-cover h-96 opacity-60" src={pic} alt="Description" />
