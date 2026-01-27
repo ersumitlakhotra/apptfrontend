@@ -148,7 +148,7 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, uid }) =
         </Badge>
         <Dropdown menu={menuProps} overlayStyle={{ width: '250px', gap: 5 }}>
           <Space>
-            <AssignedTo userId={uid} userList={userList} imageWidth={30} imageHeight={30} AvatarSize={30} allowText={false} preview={false} />
+            <AssignedTo userId={90} userList={userList} imageWidth={30} imageHeight={30} AvatarSize={30} allowText={false} preview={false} />
           </Space>
         </Dropdown>
 

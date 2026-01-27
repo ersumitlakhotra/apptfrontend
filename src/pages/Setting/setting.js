@@ -60,7 +60,7 @@ const Setting = () => {
     ];
 
     return (
-        <div class="flex flex-col gap-4 px-7 py-4 mb-12">
+        <div class="flex flex-col gap-4 md:px-7 py-4 mb-12">
             <PageHeader label={'Settings'} isExport={false} isCreate={false} />
             <ProfileCard refresh={refresh} />
             <div class='w-full p-4'>

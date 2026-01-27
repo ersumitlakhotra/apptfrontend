@@ -30,6 +30,7 @@ const Users = () => {
 
     const [logsList, setLogsList] = useState([]);
     const [userList, setUserList] = useState([]);
+    const [companyList, setCompanyList] = useState([]);
     const [userPermissionList, setUserPermissionList] = useState([]);
     const [filteredList, setFilteredList] = useState([]);
     const [list, setList] = useState([]);
@@ -49,6 +50,10 @@ const Users = () => {
     const Init = async () => {
         setIsLoading(true)
 
+        const companyResponse = await FetchData({
+            method: 'GET',
+            endPoint: 'company'
+        })
         const userResponse = await FetchData({
             method: 'GET',
             endPoint: 'user'
@@ -57,7 +62,7 @@ const Users = () => {
             method: 'GET',
             endPoint: 'userpermission'
         })
-
+        setCompanyList(companyResponse.data)
         setUserPermissionList(userPermissionResponse.data);
         setUserList(userResponse.data);
 
@@ -115,7 +120,7 @@ const Users = () => {
         getTableItem('8', 'Action'),
     ];
     return (
-        <div class="flex flex-col gap-4 px-7 py-4 mb-12">
+        <div class="flex flex-col gap-4 md:px-7 py-4 mb-12">
 
             <PageHeader label={headingLabel} isExport={true} exportList={exportList} exportName={headingLabel} isCreate={true} onClick={() => btn_Click(0)} servicesList={[]} userList={userList} />
 
@@ -188,7 +193,7 @@ const Users = () => {
             <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
-                <UserDetail id={id} refresh={reload} ref={ref} userList={userList} userPermissionList={userPermissionList} saveData={saveData} setOpen={setOpen} />
+                <UserDetail id={id} refresh={reload} ref={ref} userList={userList} userPermissionList={userPermissionList} companyList={companyList} saveData={saveData} setOpen={setOpen} />
             </Drawer>
 
 

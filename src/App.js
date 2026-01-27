@@ -18,7 +18,7 @@ import logo from './Images/logo.png'
 import TermsCondition from './pages/TermsConditions/terms.js';
 import { AuthProvider } from './auth/authContext.js';
 import ProtectedRoute from './auth/protectedRoute.js';
-import { Homepage ,Profile,Settings} from './pages/HomePage/homepage.js';
+import Homepage  from './pages/HomePage/homepage.js';
 import ProtectedLayout from './auth/protectedLayout.js';
 import Setting from './pages/Setting/setting.js';
 import Tasks from './pages/Tasks/tasks.js';

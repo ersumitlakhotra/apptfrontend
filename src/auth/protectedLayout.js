@@ -17,7 +17,6 @@ const ProtectedLayout = () => {
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
-        console.log(pathname)
     }, [pathname]);
 
     const saveData = async ({ label, method, endPoint, id = null, body = null, notify = true, logs = true, email = false }) => {

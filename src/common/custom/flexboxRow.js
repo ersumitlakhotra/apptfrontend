@@ -1,9 +1,9 @@
-const FlexBoxRow = ({ icon, lable, value }) => {
+const FlexBoxRow = ({ icon, label, value }) => {
     return (
         <div class='flex flex-row items-center justify-between pb-2'>
             <div class='flex flex-row items-center gap-2'>
                 {icon}
-                {lable}
+                {label}
             </div>
             {value}
         </div>

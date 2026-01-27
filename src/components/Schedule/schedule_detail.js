@@ -1,163 +1,101 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { useEffect, useImperativeHandle, useState } from "react";
-import { Button, DatePicker, Popover, Radio, Select, Switch, TimePicker } from "antd";
-import { CloudUploadOutlined, EyeOutlined, UserOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { DatePicker,  Select, Switch, TimePicker } from "antd";
 import useAlert from "../../common/alert.js";
 import { TextboxFlex } from "../../common/textbox.js";
-import { get_Date, LocalDate } from "../../common/localDate.js";
+import { get_Date } from "../../common/localDate.js";
 import dayjs from 'dayjs';
-import { createDateSeries } from "../../common/general.js";
-import { apiCalls } from "../../hook/apiCall.js";
+import { userDefaultSchedule } from "../../common/general.js";
 import AssignedTo from "../../common/assigned_to.js";
 const { RangePicker } = TimePicker;
 
 
-const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList, saveData, setOpen, userId = null, frmDate = LocalDate() }) => {
-    const [fromDate, setFromDate] = useState(LocalDate());
-    const [toDate, setToDate] = useState(LocalDate());
-    const [startTime, setStartTime] = useState('09:00:00');
-    const [endTime, setEndTime] = useState('21:00:00');
+const ScheduleDetail = ({ id, refresh, ref, date, scheduleList, userList, saveData, setOpen, userId = null,userDisable=false,dateDisable=false }) => {
+    const [trnDate, setTrnDate] = useState(date);
+    const [startTime, setStartTime] = useState('00:00:00');
+    const [endTime, setEndTime] = useState('00:00:00');
+    const [breakStart, setBreakStart] = useState('00:00:00');
+    const [breakEnd, setBreakEnd] = useState('00:00:00');
     const [isWorking, setIsWorking] = useState(true);
-    const [value, setValue] = useState('Single');
     const [uid, setUid] = useState('');
     const { contextHolder, error, warning } = useAlert();
 
     useEffect(() => {
         if (id === 0) {
-            setFromDate(frmDate); setToDate(LocalDate());
-            setStartTime('09:00:00'); setEndTime('21:00:00');
-            setIsWorking(true); setValue('Single');
+            setTrnDate(date);   
             setUid(userId === null ? '' : userId);
+            userId !== null && setUserDefault(date, userId)
         }
         else {
             const editList = scheduleList.find(item => item.id === id)
-            setFromDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
-            setToDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
+            setTrnDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
             setStartTime(editList.startshift);
             setEndTime(editList.endshift);
             setIsWorking(editList.dayoff);
-            setValue('Single');
+            setBreakStart(editList.breakstart);
+            setBreakEnd(editList.breakend);
             setUid(editList.uid);
         }
     }, [refresh])
 
-    useEffect(() => {
-        if (isWorking) {
-            if (startTime === '00:00:00')
-                setStartTime('09:00:00');
-            if (endTime === '00:00:00')
-                setEndTime('21:00:00');
-        }
-    }, [isWorking])
-
-    const save = async () => {
-        if (id === 0) {
-            if (uid === '') {
-                warning('Please, fill out the required fields !')
-            }
-            else {
-                if (value === 'Single')
-                    createSingleSchedule();
-                else
-                    createMultipleSchedule();
-            }
-
+    const setUserDefault = (date, id) => {
+        const user = userList.find(item => item.id === id)
+        const defaultTimingEmployee = userDefaultSchedule(date, user.timinginfo[0]);
+        const res = scheduleList.find(item => item.uid === id && get_Date(item.trndate, 'YYYY-MM-DD') === get_Date(date, 'YYYY-MM-DD'))
+        if (res === undefined) {
+            setStartTime(defaultTimingEmployee[0].inTime);
+            setEndTime(defaultTimingEmployee[0].outTime);
+            setIsWorking(defaultTimingEmployee[0].isOpen);
+            setBreakStart(defaultTimingEmployee[0].breakStart);
+            setBreakEnd(defaultTimingEmployee[0].breakEnd);
         }
         else {
-            updateSchedule();
+            setStartTime(res.startshift);
+            setEndTime(res.startshift);
+            setIsWorking(res.dayoff);
+            setBreakStart(res.breakstart);
+            setBreakEnd(res.breakend);
         }
+
     }
 
-    const createSingleSchedule = async () => {
-        try {
-            const ScheduleBody = JSON.stringify({
-                cid: localStorage.getItem('cid'),
-                uid: uid,
-                trndate: fromDate
-            });
-            const isValid = await apiCalls("POST", 'app/schedule/date', null, null, ScheduleBody);
-            if (isValid.status === 500) {
+    useEffect(() => {
+        if(uid !== '')     
+            setUserDefault(trnDate, uid)
+    }, [trnDate, uid])
 
+    const save = async () => {
+        if (uid !== '') {
+            let res = undefined;
+            if (id === 0)
+                res = scheduleList.find(item => item.uid === uid && get_Date(item.trndate, 'YYYY-MM-DD') === get_Date(trnDate, 'YYYY-MM-DD'))
+            if (res === undefined) {
                 const Body = JSON.stringify({
                     uid: uid,
-                    trndate: fromDate,
-                    startshift: isWorking ? startTime : '00:00:00',
-                    endshift: isWorking ? endTime : '00:00:00',
+                    trndate: trnDate,
+                    startshift: startTime,
+                    endshift: endTime,
+                    breakstart: breakStart,
+                    breakend: breakEnd,
                     dayoff: isWorking
                 });
+
                 saveData({
                     label: "Schedule",
-                    method: 'POST',
+                    method: id !== 0 ? 'PUT' : 'POST',
                     endPoint: "schedule",
-                    id: null,
+                    id: id !== 0 ? id : null,
                     body: Body
                 });
                 setOpen(false);
             }
             else {
-                warning(`The TimeSheet for ${get_Date(fromDate, 'MMMM DD,YYYY')} already exists.`);
+                warning(`The Schedule for ${get_Date(trnDate, 'MMMM DD,YYYY')} already exists.`);
             }
         }
-        catch (err) {
-            error(err)
-        }
-    }
-    const createMultipleSchedule = async () => {
-        try {
-            const dates = createDateSeries(fromDate, toDate);
-            dates.map(async (date, index) => {
-                const ScheduleBody = JSON.stringify({
-                    cid: localStorage.getItem('cid'),
-                    uid: uid,
-                    trndate: date
-                });
-                const isValid = await apiCalls("POST", 'app/schedule/date', null, null, ScheduleBody);
-                if (isValid.status === 500) {
-
-                    const Body = JSON.stringify({
-                        uid: uid,
-                        trndate: date,
-                        startshift: isWorking ? startTime : '00:00:00',
-                        endshift: isWorking ? endTime : '00:00:00',
-                        dayoff: isWorking
-                    });
-                    saveData({
-                        label: "Schedule",
-                        method: 'POST',
-                        endPoint: "schedule",
-                        id: null,
-                        body: Body
-                    });
-                }
-            })
-            setOpen(false);
-        }
-        catch (err) {
-            error(err)
-        }
-    }
-    const updateSchedule = async () => {
-        try {
-
-            const Body = JSON.stringify({
-                uid: uid,
-                trndate: fromDate,
-                startshift: isWorking ? startTime : '00:00:00',
-                endshift: isWorking ? endTime : '00:00:00',
-                dayoff: isWorking
-            });
-            saveData({
-                label: "Schedule",
-                method: 'PUT',
-                endPoint: "schedule",
-                id: id,
-                body: Body
-            });
-            setOpen(false);
-        }
-        catch (err) {
-            error(err)
+        else {
+            warning('Please, fill out the required fields !')
         }
     }
 
@@ -166,19 +104,19 @@ const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList, saveData, se
             save,
         };
     })
-    const plainOptions = ['Single', 'Multiple'];
+    
     return (
         <div class='flex flex-col font-normal gap-3 mt-2'>
             <p class="text-gray-400 mb-4">TimeSheet Information</p>
 
-            <TextboxFlex label={'User'} mandatory={true} input={
+           <TextboxFlex label={'User'} mandatory={true} input={
                 <Select
                     value={uid}
                     placeholder="Select User"
                     status={uid === '' ? 'error' : ''}
                     style={{ width: 300 }}
                     size="large"
-                    disabled={id !== 0}
+                    disabled={userDisable || id !==0}
                     onChange={(value) => setUid(value)}
                     options={[{ value: '', label: '' }, ...userList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
                         value: item.id,
@@ -187,42 +125,17 @@ const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList, saveData, se
                 />
             } />
 
-            <TextboxFlex label={'Option'} mandatory={true} input={
-                <Radio.Group options={plainOptions} onChange={(e) => setValue(e.target.value)} value={value} disabled={id !== 0} />
+
+            <TextboxFlex label={'Date'} mandatory={true} input={       
+                <DatePicker
+                    disabled={dateDisable || id !== 0}
+                    allowClear={false}
+                    value={trnDate === '' ? trnDate : dayjs(trnDate, 'YYYY-MM-DD')}
+                    onChange={(date, dateString) => setTrnDate(dateString)} />     
             } />
+            
 
-            <TextboxFlex label={'Date'} mandatory={true} input={
-                <div class='flex flex-col md:flex-row md:justify-end gap-2 '>
-                    <Popover placement="bottom" title={"Filter by From Date"} content={
-                        <div>
-                            <DatePicker
-                                style={{ width: '100%' }}
-                                disabled={id !== 0}
-                                allowClear={false}
-                                value={fromDate === '' ? fromDate : dayjs(fromDate, 'YYYY-MM-DD')}
-                                onChange={(date, dateString) => setFromDate(dateString)} />
-                        </div>
-                    }>
-                        <Button className="text-xs"><span class='font-medium'> {value === 'Multiple' ? 'From' : 'Date'} :  </span><span class='text-blue-500'> {fromDate}  </span></Button>
-                    </Popover>
-                    {value === 'Multiple' &&
-                        <Popover placement="bottom" title={"Filter by To Date"} content={
-                            <div>
-                                <DatePicker
-                                    style={{ width: '100%' }}
-                                    allowClear={false}
-                                    value={toDate === '' ? toDate : dayjs(toDate, 'YYYY-MM-DD')}
-                                    onChange={(date, dateString) => setToDate(dateString)} />
-                            </div>
-                        }>
-                            <Button className="text-xs"><span class='font-medium'>To :   </span><span class='text-blue-500'> {toDate}  </span></Button>
-                        </Popover>
-                    }
-
-                </div>
-            } />
-
-            <TextboxFlex label={'Time'} mandatory={true} input={
+            <TextboxFlex label={'Timing'} mandatory={true} input={
                 <RangePicker placeholder={['Start', 'End']}
                     allowClear={false}
                     use12Hours
@@ -232,6 +145,18 @@ const ScheduleDetail = ({ id, refresh, ref, scheduleList, userList, saveData, se
                     onChange={(time, timeString) => {
                         setStartTime(dayjs(timeString[0], 'h:mm a').format('HH:mm:ss'));
                         setEndTime(dayjs(timeString[1], 'h:mm a').format('HH:mm:ss'));
+                    }} />
+            } />
+            <TextboxFlex label={'Break'} mandatory={true} input={
+                <RangePicker placeholder={['Start', 'End']}
+                    allowClear={false}
+                    use12Hours
+                    showSecond={false}
+                    format={"h:mm a"}
+                    value={[dayjs(breakStart, 'HH:mm'), dayjs(breakEnd, 'HH:mm')]}
+                    onChange={(time, timeString) => {
+                        setBreakStart(dayjs(timeString[0], 'h:mm a').format('HH:mm:ss'));
+                        setBreakEnd(dayjs(timeString[1], 'h:mm a').format('HH:mm:ss'));
                     }} />
             } />
 

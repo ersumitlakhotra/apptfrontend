@@ -119,7 +119,7 @@ const Services = () => {
         getTableItem('6', 'Action'),
     ];
     return (
-        <div class="flex flex-col gap-4  px-7 py-4  mb-12">
+        <div class="flex flex-col gap-4  md:px-7 py-4  mb-12">
 
             <PageHeader label={headingLabel} isExport={true} exportList={exportList} exportName={headingLabel} isCreate={true} onClick={() => btn_Click(0)} servicesList={servicesList} userList={userList} />
 

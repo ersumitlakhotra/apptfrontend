@@ -31,9 +31,9 @@ const AppointmentCards = ({ index, data, userList, servicesList }) => {
                     
                 </div>   
             </div>
-            <FlexBoxRow icon={<FiClock size={12} />} lable={`${getDay(data.trndate)} ${get_Date(data.trndate, 'MMMM DD, YYYY')} [ ${data.slot} ]`} />
-            <FlexBoxRow icon={<ContactsOutlined size={12} />} lable={`${data.name} : ${data.cell}`} />
-            <FlexBoxRow icon={<UnorderedListOutlined size={12} />} lable={<Services servicesItem={data.serviceinfo} servicesList={servicesList} />} />
+            <FlexBoxRow icon={<FiClock size={12} />} label={`${getDay(data.trndate)} ${get_Date(data.trndate, 'MMMM DD, YYYY')} [ ${data.slot} ]`} />
+            <FlexBoxRow icon={<ContactsOutlined size={12} />} label={`${data.name} : ${data.cell}`} />
+            <FlexBoxRow icon={<UnorderedListOutlined size={12} />} label={<Services servicesItem={data.serviceinfo} servicesList={servicesList} />} />
             
             <div class='flex flex-col gap-1'>
             {/*

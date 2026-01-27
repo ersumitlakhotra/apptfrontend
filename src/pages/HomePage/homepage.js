@@ -1,12 +1,10 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate,  useOutletContext } from "react-router-dom";
 import ProfileCard from "../Setting/profileCard";
 import CalenderCard from "./calenderCard";
 import {AppIcons} from "../../common/custom/appIcons";
 import WaitingApproval from "./waitingApproval";
 import UserSchedule from "./userSchedule";
-import { useEffect } from "react";
 import IsLoading from "../../common/custom/isLoading";
-import FetchData from "../../hook/fetchData";
 import AppIconsPermission from "../../common/custom/appIconsPermission";
 
 
@@ -38,12 +36,10 @@ const Homepage = () => {
                     })}
                 />
             </div>
+            
+
         </div>
     );
 };
 
 export default Homepage;
-
-const Profile = () => <h1>Profile</h1>;
-const Settings = () => <h1>Settings</h1>;
-export { Homepage, Profile, Settings }

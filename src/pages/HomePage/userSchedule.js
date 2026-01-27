@@ -1,24 +1,34 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FetchData from '../../hook/fetchData';
 import IsLoading from '../../common/custom/isLoading';
 import { getStorage } from '../../common/localStorage';
 import { AiFillSchedule } from "react-icons/ai";
-import { RightOutlined, LeftOutlined } from '@ant-design/icons';
-import { Button, DatePicker } from "antd";
+import { RightOutlined, LeftOutlined, SaveOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Button, DatePicker, Drawer, Popconfirm, Space, Tooltip } from "antd";
 import dayjs from 'dayjs';
 import { LocalDate } from "../../common/localDate";
 import ScheduleCard from "./scheduleCard";
+import ScheduleDetail from "../../components/Schedule/schedule_detail";
+import { useOutletContext } from "react-router-dom";
 
 const UserSchedule = () => {
+    const ref = useRef();
+    const { saveData, refresh } = useOutletContext();
     const [date, setDate] = useState(LocalDate());
+    const [uid, setUid] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [userList, setUserList] = useState([]);
     const [scheduleList, setScheduleList] = useState([]);
 
+    const [open, setOpen] = useState(false);
+    const title = 'Schedule';
+    const [id, setId] = useState(0);
+    const [reload, setReload] = useState(0);
+
     useEffect(() => {
         Init();
-    }, [])
+    }, [refresh])
 
     const Init = async () => {
         setIsLoading(true);
@@ -44,7 +54,25 @@ const UserSchedule = () => {
         setScheduleList(schedule);
         setIsLoading(false);
     }
-
+    const btn_Click = (id, uid) => {
+        setId(id);
+        setUid(uid)
+        setReload(reload + 1);
+        setOpen(true);
+    }
+    const deleted = (id) => {
+        saveData({
+            label: "Schedule",
+            method: 'DELETE',
+            endPoint: "schedule",
+            id: id,
+            body: []
+        });
+        setOpen(false);
+    }
+    const btnSave = async () => {
+        await ref.current?.save();
+    }
     return (
         <div class='w-full bg-white border rounded-3xl p-4 text-gray-500 flex gap-2  shadow-md hover:shadow-xl ' style={{height:'370px'}}>
             <IsLoading isLoading={isLoading} rows={9} input={
@@ -70,13 +98,34 @@ const UserSchedule = () => {
 
                         {userList.map((item,index) => {
                             return (
-                                <ScheduleCard key={index} index={index} data={item} userList={userList} />
+                                <ScheduleCard key={index} date={date} index={index} user={item} userList={userList} scheduleList={scheduleList} onClick={btn_Click} />
                             )
                         })}
                         
                     </div>
                 </>
             } />
+
+            {/* Drawer on right*/}
+            <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
+                extra={
+                    <Space>
+                        <Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button>
+                        {id !==0 && <Tooltip placement="top" title={'Delete'} >
+                            <Popconfirm
+                                title="Delete "
+                                description="Are you sure to delete?"
+                                onConfirm={(e) => deleted(id)}
+                                okText="Yes"
+                                cancelText="No"
+                            >
+                                <Button danger variant="outlined" icon={<DeleteOutlined />} > Delete</Button>
+                            </Popconfirm>
+                        </Tooltip>}
+                    </Space>}>
+
+                <ScheduleDetail id={id} refresh={reload} ref={ref} date={date} userId={uid} scheduleList={scheduleList} userList={userList} saveData={saveData} setOpen={setOpen} userDisable={true} dateDisable={true} />
+            </Drawer>
         </div>
     )
 }

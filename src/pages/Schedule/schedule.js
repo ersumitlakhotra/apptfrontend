@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Select, Drawer, Space, Tooltip, Popover, DatePicker } from "antd";
-import { EditOutlined, PlusOutlined, SaveOutlined, EyeOutlined } from '@ant-design/icons';
+import { Button, Select, Drawer, Space, Tooltip, Popover, DatePicker, Popconfirm } from "antd";
+import { EditOutlined, PlusOutlined, SaveOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from "react";
 import DataTable from "../../common/datatable";
 import { getTableItem } from "../../common/items";
@@ -116,12 +116,21 @@ const Schedule = () => {
         setUid(id);
         setOpenView(true);
     }
+    const deleted = (id) => {
+        saveData({
+            label: "Schedule",
+            method: 'DELETE',
+            endPoint: "schedule",
+            id: id ,
+            body:[]
+        });
+    }
     const btnSave = async () => {
         await ref.current?.save();
     }
 
     return (
-        <div class="flex flex-col gap-4 px-7 py-4  mb-12">
+        <div class="flex flex-col gap-4 md:px-7 py-4  mb-12">
 
             <PageHeader label={headingLabel} isExport={true} exportList={exportList} exportName={headingLabel} isCreate={true} onClick={() => btn_Click(0)} servicesList={[]} userList={userList} />
 
@@ -192,8 +201,19 @@ const Schedule = () => {
                                             <Tooltip placement="top" title={'Edit'} >
                                                 <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
                                             </Tooltip>
-                                            <Tooltip placement="top" title={'View'} >
+                                            {/*<Tooltip placement="top" title={'View'} >
                                                 <Button type="link" icon={<EyeOutlined />} onClick={() => btn_ViewClick(item.uid)} />
+                                            </Tooltip>*/}
+                                            <Tooltip placement="top" title={'Delete'} >
+                                                <Popconfirm
+                                                    title="Delete "
+                                                    description="Are you sure to delete?"
+                                                    onConfirm={(e) => deleted(item.id)}
+                                                    okText="Yes"
+                                                    cancelText="No"
+                                                >
+                                                    <Button danger type="link" icon={<DeleteOutlined />} />
+                                                </Popconfirm>
                                             </Tooltip>
                                         </td>
                                     </tr>
@@ -207,7 +227,7 @@ const Schedule = () => {
             <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
-                <ScheduleDetail id={id} refresh={reload} ref={ref} scheduleList={scheduleList} userList={userList} saveData={saveData} setOpen={setOpen} />
+                <ScheduleDetail id={id} refresh={reload} ref={ref} date={LocalDate()} scheduleList={scheduleList} userList={userList} saveData={saveData} setOpen={setOpen} />
             </Drawer>
 
             {/* Drawer on View*/}

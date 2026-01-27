@@ -185,7 +185,7 @@ const Order = () => {
 
 
     return (
-        <div class="flex flex-col gap-4 px-7 py-4 mb-12 w-full">
+        <div class="flex flex-col gap-4 md:px-7 py-4 mb-12 w-full">
             <PageHeader label={headingLabel} isExport={true} exportList={exportList} exportName={headingLabel} isCreate={true} onClick={() => btn_Click(0)} servicesList={servicesList} userList={userList} />
             <Tabs items={tabItems} defaultActiveKey={tabActiveKey} activeKey={tabActiveKey} onChange={(e) => { setTabActiveKey(e) }} />
 

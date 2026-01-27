@@ -10,9 +10,10 @@ import { BsCash } from "react-icons/bs";
 import useAlert from "../../common/alert";
 import { get_Date, LocalDate, LocalTime } from "../../common/localDate";
 import { generateTimeSlotsWithDate, toMinutes } from "../../common/generateTimeSlots";
-import { compareTimes, isOpenForWork } from "../../common/general";
+import { compareTimes, isOpenForWork, userDefaultSchedule } from "../../common/general";
 import { apiCalls } from "../../hook/apiCall";
 import { TbTransfer } from "react-icons/tb";
+import FetchData from "../../hook/fetchData";
 
 function disabledDate(current) {
   // Can not select days before today and today
@@ -276,6 +277,10 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     let inTimeEmployee = '00:00:00';
                     let outTimeEmployee = '00:00:00';
                     let isOpenEmployee = false;
+                    const defaultTimingEmployee = userDefaultSchedule(trndate, user.timinginfo[0]);
+                    let breakStartEmployee = defaultTimingEmployee[0].breakStart;
+                    let breakEndEmployee = defaultTimingEmployee[0].breakEnd;
+                   
                     //setIsLoading(true);
                     try {
                         const Body = JSON.stringify({
@@ -289,6 +294,12 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                             outTimeEmployee = res.data.data.endshift;
                             isOpenEmployee = Boolean(res.data.data.dayoff)
                         }
+                        else
+                        {
+                            inTimeEmployee = defaultTimingEmployee[0].inTime;
+                            outTimeEmployee = defaultTimingEmployee[0].outTime;
+                            isOpenEmployee = Boolean(defaultTimingEmployee[0].isOpen)
+                        }
                     }
                     catch {
                         inTimeEmployee = '00:00:00';
@@ -300,7 +311,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     if (isOpenEmployee) {
                         setUserWorking(true);
                         appointments = orderList.filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === assigned_to && a.status !== 'Cancelled' && a.id !== id));
-
+                        appointments = [...appointments, { start: breakStartEmployee ,end:breakEndEmployee}]
                         let minutes = 0;
                         servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item => { minutes += item.minutes; });
 

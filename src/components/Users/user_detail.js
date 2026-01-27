@@ -6,11 +6,12 @@ import { CloudUploadOutlined, EyeOutlined, UserOutlined } from '@ant-design/icon
 import UserAbout from "./about.js";
 import useAlert from "../../common/alert.js";
 import UserLoginPermissions from "./permissions.js";
+import ScheduleN from "./scheduleN.js";
 
 function getTabItems(key, label, icon, children) {
     return {key,label,children,icon,};
 }
-const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData ,setOpen}) => {
+const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyList, saveData ,setOpen}) => {
     const [tabActiveKey, setTabActiveKey] = useState("1");
     const [fullname, setFullname] = useState('');
     const [cell, setCell] = useState('');
@@ -39,6 +40,15 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
     const [sales, setSales] = useState(true);
     const [collection, setCollection] = useState(true);
     const [setting, setSetting] = useState(true);
+
+    const [monday, setMonday] = useState(['09:00:00', '21:00:00', true, '14:00:00', '14:30:00']);
+    const [tuesday, setTuesday] = useState(['09:00:00', '21:00:00', true, '14:00:00', '14:30:00']);
+    const [wednesday, setWednesday] = useState(['09:00:00', '21:00:00', true, '14:00:00', '14:30:00']);
+    const [thursday, setThursday] = useState(['09:00:00', '21:00:00', true, '14:00:00', '14:30:00']);
+    const [friday, setFriday] = useState(['09:00:00', '21:00:00', true, '14:00:00', '14:30:00']);
+    const [saturday, setSaturday] = useState(['09:00:00', '21:00:00', true, '14:00:00', '14:30:00']);
+    const [sunday, setSunday] = useState(['09:00:00', '21:00:00', true, '14:00:00', '14:30:00']);
+
     const { contextHolder, error, warning } = useAlert();
     let refimage=useRef();
 
@@ -53,7 +63,17 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
             setGender('Male'); setStatus('Active');setAppSchedule(true);
             setDashboard(false); setTasks(true); setOrder(true);
             setEvent(false); setPayment(false);
-            setCustomer(false); setServices(false); setUsers(false); setSchedule(false); setSales(false); setCollection(false); setSetting(false);   
+            setCustomer(false); setServices(false); setUsers(false); setSchedule(false); setSales(false); setCollection(false); setSetting(false); 
+            
+            if (companyList.timinginfo !== null) {
+                setMonday([...companyList.timinginfo[0].monday,'14:00:00', '14:30:00']);
+                setTuesday([...companyList.timinginfo[0].tuesday, '14:00:00', '14:30:00']);
+                setWednesday([...companyList.timinginfo[0].wednesday, '14:00:00', '14:30:00']);
+                setThursday([...companyList.timinginfo[0].thursday, '14:00:00', '14:30:00']);
+                setFriday([...companyList.timinginfo[0].friday, '14:00:00', '14:30:00']);
+                setSaturday([...companyList.timinginfo[0].saturday, '14:00:00', '14:30:00']);
+                setSunday([...companyList.timinginfo[0].sunday, '14:00:00', '14:30:00']);
+            }  
         }
         else {
             const editList = userList.find(item => item.id === id)
@@ -87,6 +107,17 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
                 setCollection(b.collection);
                 setSetting(b.setting);
             })
+            if (editList.timinginfo !== null) {
+                setMonday(editList.timinginfo[0].monday);
+                setTuesday(editList.timinginfo[0].tuesday);
+                setWednesday(editList.timinginfo[0].wednesday);
+                setThursday(editList.timinginfo[0].thursday);
+                setFriday(editList.timinginfo[0].friday);
+                setSaturday(editList.timinginfo[0].saturday);
+                setSunday(editList.timinginfo[0].sunday);
+            }  
+
+
         }
     }, [refresh])
 
@@ -155,6 +186,15 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
                 sales: sales,
                 collection:collection,
                 setting: setting,
+                timinginfo: [{
+                    monday: monday,
+                    tuesday: tuesday,
+                    wednesday: wednesday,
+                    thursday: thursday,
+                    friday: friday,
+                    saturday: saturday,
+                    sunday: sunday,
+                }]
             }); 
             saveData({
                 label: "Users",
@@ -224,7 +264,24 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList,  saveData 
             setCollection={setCollection}
             setting={setting}
             setSetting={setSetting}
-        />))
+        />)),
+        getTabItems('3', 'Schedule', <UserOutlined />, <ScheduleN
+            monday={monday}
+            setMonday={setMonday}
+            tuesday={tuesday}
+            setTuesday={setTuesday}
+            wednesday={wednesday}
+            setWednesday={setWednesday}
+            thursday={thursday}
+            setThursday={setThursday}
+            friday={friday}
+            setFriday={setFriday}
+            saturday={saturday}
+            setSaturday={setSaturday}
+            sunday={sunday}
+            setSunday={setSunday}
+           
+        />),
     ];
     const handleFileChange = (event) => {
         const file = event.target.files[0]; // Access the first selected file

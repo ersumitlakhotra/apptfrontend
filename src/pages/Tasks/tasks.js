@@ -131,7 +131,7 @@ const Tasks = () => {
     }
 
     return (
-        <div class="px-7 mb-12 min-h-screen">
+        <div class="md:px-7 mb-12 min-h-screen">
 
             <div class='flex flex-col gap-2 sticky top-14 z-50 bg-white'>
                 <div class='flex flex-row items-center  justify-between py-4 '>
