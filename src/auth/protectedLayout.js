@@ -6,6 +6,7 @@ import SaveData from "../hook/saveData";
 import { useEffect, useState } from "react";
 import { Spin } from "antd";
 import { LoadingOutlined } from '@ant-design/icons';
+import Footer from "../pages/HomePage/footer";
 
 const ProtectedLayout = () => {
     const { logout } = useAuth();
@@ -16,6 +17,7 @@ const ProtectedLayout = () => {
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
+        console.log(pathname)
     }, [pathname]);
 
     const saveData = async ({ label, method, endPoint, id = null, body = null, notify = true, logs = true, email = false }) => {
@@ -45,7 +47,7 @@ const ProtectedLayout = () => {
                 <Outlet context={{ saveData, isLoading, setIsLoading, refresh }} />
             </main>
 
-            <footer class="h-12 bg-gray-300 sticky z-50 bottom-0">Fotter</footer>
+            {pathname !== '/home' && <Footer/>}
 
             {isLoading &&
                 <div

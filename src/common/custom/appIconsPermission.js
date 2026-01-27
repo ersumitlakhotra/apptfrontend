@@ -10,17 +10,20 @@ import {
     FallOutlined,
     FundOutlined,
     DollarOutlined,
-    ContactsOutlined
+    ContactsOutlined,
+    HomeOutlined 
 } from '@ant-design/icons';
 
 import { FaHandHoldingUsd } from "react-icons/fa";
 import { AiFillSchedule } from "react-icons/ai";
 import CalenderIcon from "../../common/custom/calenderIcon";
+
+import { IoIosCalendar } from "react-icons/io";
 import IsLoading from "./isLoading";
 import FetchData from "../../hook/fetchData";
 import { getStorage } from "../localStorage";
 
-function getItem(label,navigate, key, icon, isVisible = false, color, badge, btn, children, dropdown) {
+function getItem(label, navigate, key, icon, isVisible = false, color, badge, btn, children, dropdown) {
     return {
         key,
         icon,
@@ -35,7 +38,7 @@ function getItem(label,navigate, key, icon, isVisible = false, color, badge, btn
     };
 }
 
-const AppIconsPermission = () => {
+const AppIconsPermission = (size='50px',iconSize=54) => {
     const [dashboard, setDashboard] = useState(false);
     const [tasks, setTasks] = useState(false);
     const [order, setOrder] = useState(false);
@@ -51,20 +54,21 @@ const AppIconsPermission = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const apps = [
-        getItem('Dashboard','', 1, <PieChartOutlined style={{ fontSize: '50px', color: 'white' }} />, dashboard, 'bg-blue-500'),
-        getItem('Calender','/calender', 2, <CalenderIcon size={54} color={'text-white'} position="top-6 left-4" />, tasks, 'bg-blue-900'),
-        getItem('Appointment','/appointment', 3, <ProductOutlined style={{ fontSize: '50px', color: 'white' }} />, order, 'bg-orange-300'),
-        getItem('Event', '/event',4, <NotificationOutlined style={{ fontSize: '50px', color: 'white' }} />, event,'bg-gradient-to-b from-[#8a2ce2] via-[#4a0080] to-[#1f8fff]'),
-        getItem('Payment','', 5, <DollarOutlined style={{ fontSize: '50px', color: 'white' }} />, false),
-        getItem('Customers','/customers', 6, <ContactsOutlined style={{ fontSize: '50px', color: 'white' }} />, customer,'bg-gradient-to-r from-red-400 to-pink-800 '),
-        getItem('Services', '/services',7, <UnorderedListOutlined style={{ fontSize: '50px', color: 'white' }} />, services,'bg-gradient-to-r from-[#D6B588] to-orange-600 '),
-        getItem('Users','/users', 8, <UserOutlined style={{ fontSize: '50px', color: 'white' }} />, users, 'bg-gradient-to-r from-red-900 to-purple-600'),
-        getItem('Schedule', '/schedule',9, <AiFillSchedule style={{ fontSize: '50px', color: 'white' }} />, schedule, 'bg-gradient-to-r from-green-500 to-green-900 '),
-        getItem('Sales', '',10, <FundOutlined style={{ fontSize: '50px', color: 'white' }} />, false),
-        getItem('Collection', '',11, <FaHandHoldingUsd style={{ fontSize: '50px', color: 'white' }} />, false),
-        // getItem('Expenses','', 12, <FallOutlined style={{ fontSize: '50px', color: 'white' }} />),
-        getItem('Help','/help', 13, <CustomerServiceOutlined style={{ fontSize: '50px', color: 'white' }} />, true,'bg-gradient-to-r from-cyan-400 to-cyan-900'),
-        getItem('Setting','/setting', 14, <SettingOutlined style={{ fontSize: '50px', color: 'white' }} />, setting, 'bg-gray-500'),
+        getItem('Home', '/home', 1, <HomeOutlined style={{ fontSize: size, color: 'white' }} />, true, 'bg-blue-500'),
+        getItem('Appointment', '/appointment', 2, <ProductOutlined style={{ fontSize: size, color: 'white' }} />, order, 'bg-orange-300'),
+        // getItem('Dashboard','', 1, <PieChartOutlined style={{ fontSize: size, color: 'white' }} />, dashboard, 'bg-blue-500'),
+        getItem('Calender', '/calender', 3, <IoIosCalendar style={{ fontSize: size, color: 'white' }}/>, tasks, 'bg-blue-900'),
+        getItem('Event', '/event', 4, <NotificationOutlined style={{ fontSize: size, color: 'white' }} />, event, 'bg-gradient-to-b from-[#8a2ce2] via-[#4a0080] to-[#1f8fff]'),
+        getItem('Payment', '', 5, <DollarOutlined style={{ fontSize: size, color: 'white' }} />, false),
+        getItem('Customers', '/customers', 6, <ContactsOutlined style={{ fontSize: size, color: 'white' }} />, customer, 'bg-gradient-to-r from-red-400 to-pink-800 '),
+        getItem('Services', '/services', 7, <UnorderedListOutlined style={{ fontSize: size, color: 'white' }} />, services, 'bg-gradient-to-r from-[#D6B588] to-orange-600 '),
+        getItem('Users', '/users', 8, <UserOutlined style={{ fontSize: size, color: 'white' }} />, users, 'bg-gradient-to-r from-red-900 to-purple-600'),
+        getItem('Schedule', '/schedule', 9, <AiFillSchedule style={{ fontSize: size, color: 'white' }} />, schedule, 'bg-gradient-to-r from-green-500 to-green-900 '),
+        getItem('Sales', '', 10, <FundOutlined style={{ fontSize: size, color: 'white' }} />, false),
+        getItem('Collection', '', 11, <FaHandHoldingUsd style={{ fontSize: size, color: 'white' }} />, false),
+        // getItem('Expenses','', 12, <FallOutlined style={{ fontSize: size, color: 'white' }} />),
+        getItem('Help', '/help', 13, <CustomerServiceOutlined style={{ fontSize: size, color: 'white' }} />, true, 'bg-gradient-to-r from-cyan-400 to-cyan-900'),
+        getItem('Setting', '/setting', 14, <SettingOutlined style={{ fontSize: size, color: 'white' }} />, setting, 'bg-gray-500'),
     ]
 
     useEffect(() => {
@@ -78,7 +82,7 @@ const AppIconsPermission = () => {
             method: 'GET',
             endPoint: 'userpermission'
         })
-         const localStorage =await getStorage();
+        const localStorage = await getStorage();
         const permissionList = userPermissionResponse.data;
         permissionList.filter(a => a.uid === localStorage.uid).map(b => {
             setDashboard(b.dashboard);
