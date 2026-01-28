@@ -54,9 +54,12 @@ const CalenderCard = () => {
         setIsLoading(false);
     }
 
-    const listItems = ({ icon, label, value }) => {
+    const listItems = ({ icon, label, value,filterBy }) => {
         return (
-            <div class='flex flex-row items-center justify-between text-white  p-1 rounded-lg cursor-pointer hover:bg-white hover:text-blue-900 duration-150  hover:shadow-md'>
+            <div class='flex flex-row items-center justify-between text-white  p-1 rounded-lg cursor-pointer hover:bg-white hover:text-blue-900 duration-150  hover:shadow-md'
+                onClick={() => navigate('/calender', {
+                    state: { searchParams: filterBy }
+                })}>
                 <div class={`flex flex-row items-center gap-2 text-xs`}  >
                     {icon}
                     {label}
@@ -78,11 +81,11 @@ const CalenderCard = () => {
                     </div>
 
                     <div class='w-2/3 flex flex-col text-xs font-semibold font-sans  '>
-                        {listItems({ icon: <IoMdWarning size={12} />, label: 'Awaiting Request', value: draftList.length })}
-                        {listItems({ icon: <MdPendingActions size={12} />, label: 'Pending', value: pendingList.length})}
-                        {listItems({ icon: <IoHourglassOutline size={12} />, label: 'In Progress', value: inprogressList.length })}
-                        {listItems({ icon: <MdDownloadDone size={12} />, label: 'Completed', value: completedList.length })}
-                        {listItems({ icon: <IoMdClose size={12} />, label: 'Cancelled', value: cancelledList.length })}
+                        {listItems({ icon: <IoMdWarning size={12} />, label: 'Awaiting Request', filterBy:'Draft', value: draftList.length })}
+                        {listItems({ icon: <MdPendingActions size={12} />, label: 'Pending', filterBy: 'Pending' ,value: pendingList.length})}
+                        {listItems({ icon: <IoHourglassOutline size={12} />, label: 'In Progress', filterBy: 'In progress', value: inprogressList.length })}
+                        {listItems({ icon: <MdDownloadDone size={12} />, label: 'Completed', filterBy: 'Completed', value: completedList.length })}
+                        {listItems({ icon: <IoMdClose size={12} />, label: 'Cancelled', filterBy: 'Cancelled', value: cancelledList.length })}
                     </div>
                 </>} />
         </div>

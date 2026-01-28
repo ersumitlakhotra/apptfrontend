@@ -4,7 +4,7 @@
 import { Button, Spin, Modal, Drawer, Image, Avatar, Input } from 'antd';
 import { LoadingOutlined, ArrowLeftOutlined, CloseOutlined, UpCircleOutlined, UserOutlined, CalendarOutlined, ContactsOutlined } from '@ant-design/icons';
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 import Services from '../../components/BookAppointment/services.js';
 import Employee from '../../components/BookAppointment/employee.js';
 import Slot from '../../components/BookAppointment/slot.js';
@@ -21,14 +21,15 @@ import { useIdleTimer } from 'react-idle-timer';
 import { compareTimes, isOpenForWork, userDefaultSchedule } from '../../common/general.js';
 import { generateTimeSlotsWithDate, toMinutes } from '../../common/generateTimeSlots.js';
 import AssignedTo from '../../common/assigned_to.js';
+import { useManualNotification } from '../../hook/notification.js';
 
 const BookAppointment = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const { contextHolder, warning, error } = useAlert();
     const [modal, contextHolderModal] = Modal.useModal();
     const [isLoading, setIsLoading] = useState(false);
-
     const [content, setContent] = useState(0);
+    const { showNotification, setShowNotification} = useManualNotification();
 
     const [cid, setCid] = useState(0);
     const [storeName, setStoreName] = useState('');
@@ -370,6 +371,7 @@ const BookAppointment = () => {
                 }
             case 2:
                 {
+                    setShowNotification(showNotification +1)
                     if (assigned_to === 0) {
                         isNext = false;
                         message = "Please select a professional from list. "

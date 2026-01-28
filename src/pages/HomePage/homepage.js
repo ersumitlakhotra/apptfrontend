@@ -1,4 +1,4 @@
-import { useNavigate,  useOutletContext } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ProfileCard from "../Setting/profileCard";
 import CalenderCard from "./calenderCard";
 import {AppIcons} from "../../common/custom/appIcons";
@@ -11,6 +11,7 @@ import AppIconsPermission from "../../common/custom/appIconsPermission";
 const Homepage = () => {
     const navigate = useNavigate();
     const { apps, isLoading} = AppIconsPermission();
+
     return (
         <div class='flex flex-col gap-8 p-4 '>
 

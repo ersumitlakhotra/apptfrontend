@@ -2,8 +2,8 @@
 import Search from '../../common/custom/search'
 import logo from '../../Images/logo.png'
 import { SlEarphonesAlt } from "react-icons/sl";
-import { Badge, Drawer, Dropdown, Space } from 'antd';
-import { BellFilled, LogoutOutlined } from '@ant-design/icons';
+import { Badge, Button, Drawer, Dropdown, Space } from 'antd';
+import { BellFilled, LogoutOutlined, DownOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import AssignedTo from '../../common/assigned_to';
@@ -11,6 +11,8 @@ import FetchData from '../../hook/fetchData';
 import NotificationDetail from '../../components/Main/Notification/notification_detail';
 import { getStorage } from '../../common/localStorage';
 import { useAuth } from '../../auth/authContext';
+import useNotification from 'antd/es/notification/useNotification';
+import { useManualNotification } from '../../hook/notification';
 
 function getItem(key, label, icon, extra, disabled, danger) {
     return {
@@ -31,11 +33,16 @@ const Header = () => {
     const [cell, setCell] = useState('');
     const [userList, setUserList] = useState([]);
     const [unread, setUnread] = useState([])
-    const [notificationList, setNotificationList] = useState([]);
+
+    const [notificationList, setNotificationList] = useState([]); 
+    const [openNotification, setOpenNotification] = useState(false);
+    const [tabActiveKey,setTabActiveKey]= useState(1)
+    const [unreadUpdate, setUnreadUpdate] = useState(false);
 
     useEffect(() => {
         Init();
     }, [])
+
 
     const Init = async () => {
         const localStorage = await getStorage();
@@ -95,6 +102,16 @@ const Header = () => {
         onClick: handleMenuClick
     };
 
+    const [currentOption, setCurrentOption] = useState('Today');
+    const itemsNotification = [
+        { key: 'Today', label: 'Today' },
+        { key: 'Last 7 Days', label: 'Last 7 Days' },
+        { key: 'This Month', label: 'This Month' },
+       // { key: 'This Year', label: 'This Year' },
+    ];
+
+    const onItemChanged = e => { setCurrentOption(e.key) };
+    const menuPropsNotification = { items: itemsNotification, onClick: onItemChanged };
     return (
         <header class="p-2 bg-blue-500 border-b shadow-sm flex flex-row gap-2 sticky  z-50 top-0">
 
@@ -112,7 +129,7 @@ const Header = () => {
             {/* notification and profile */}
             <div class='w-3/12 pr-4 flex flex-row gap-4 justify-end items-center '>
                 <Badge count={unread.length}>
-                    <BellFilled style={{ fontSize: '23px',  color: 'white', cursor: 'pointer' }} />
+                    <BellFilled style={{ fontSize: '23px', color: 'white', cursor: 'pointer' }} onClick={() => { setOpenNotification(true); setUnreadUpdate(false); setTabActiveKey('1'); }} />
                 </Badge>
 
                 <Dropdown menu={menuProps} overlayStyle={{ width: '200px', gap: 4, color: 'white',cursor:'pointer' }}>
@@ -122,13 +139,18 @@ const Header = () => {
                 </Dropdown>
             </div>
 
-            {/*
-            <Drawer title={"Notification"} placement='right' width={500} onClose={() => updateOnClose()} open={openNotification}
-                >
+            <Drawer title={"Notification"} placement='right' width={500} open={openNotification} onClose={() => setOpenNotification(false)} 
+                extra={<Dropdown menu={menuPropsNotification}>
+                    <Button>
+                        <Space>
+                            {currentOption}
+                            <DownOutlined />
+                        </Space>
+                    </Button>
+                </Dropdown>}>
 
-                <NotificationDetail refresh={refresh} currentOption={currentOption} notificationList={notificationList} setUnreadUpdate={setUnreadUpdate} tabActiveKey={tabActiveKey} setTabActiveKey={setTabActiveKey} />
+                <NotificationDetail refresh={1} currentOption={currentOption} notificationList={notificationList} setUnreadUpdate={setUnreadUpdate} tabActiveKey={tabActiveKey} setTabActiveKey={setTabActiveKey} />
             </Drawer>
-            */}
         </header>
     )
 }

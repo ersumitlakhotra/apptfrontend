@@ -5,7 +5,7 @@ import {  Tabs } from "antd";
 import { customLabelTab, getTabItems } from "../../../common/items";
 import NotificationTabs from "./notification_tabs";
 import dayjs from 'dayjs';
-import { firstDateOfMonth, get_Date, lastDateOfMonth, LocalDate, UTC_LocalDateTime } from "../../../common/localDate";
+import { firstDateOfMonth, lastDateOfMonth, LocalDate, UTC_LocalDateTime } from "../../../common/localDate";
 
 const NotificationDetail = ({ refresh, currentOption, notificationList, setUnreadUpdate, tabActiveKey, setTabActiveKey }) => {
     const [unreadNotification, setUnreadNotification] = useState([]);

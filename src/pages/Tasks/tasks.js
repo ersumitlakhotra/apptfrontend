@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, DatePicker, Drawer, Space } from "antd"
+import { Badge, Button, DatePicker, Drawer, Select, Space } from "antd"
 import { useEffect, useRef, useState } from "react";
 
 import { RightOutlined, LeftOutlined, SaveOutlined } from '@ant-design/icons';
@@ -8,7 +8,7 @@ import OrderView from "../../components/Order/order_view";
 import { get_Date, LocalDate } from "../../common/localDate";
 import FetchData from "../../hook/fetchData";
 import PageHeader from "../../common/pages/pageHeader";
-import { useOutletContext } from "react-router-dom";
+import { useLocation, useOutletContext } from "react-router-dom";
 import CalenderHeader from "./calenderHeader";
 import CalenderBody from "./calenderBody";
 import { isOpenForWork } from "../../common/general";
@@ -17,8 +17,9 @@ import OrderDetail from "../../components/Order/order_detail";
 import { getStorage } from "../../common/localStorage";
 
 const Tasks = () => {
-    const { saveData, isLoading, refresh, setIsLoading } = useOutletContext();
-
+    const { saveData, refresh, setIsLoading } = useOutletContext();
+    const location = useLocation();
+    const state = location.state;
     const ref = useRef();
     const leftRef = useRef(null);
     const rightRef = useRef(null);
@@ -27,7 +28,9 @@ const Tasks = () => {
         target.scrollTop = source.scrollTop;
         target.scrollLeft = source.scrollLeft;
     };
+
     const [date, setDate] = useState(LocalDate());
+    const [filter, setFilter] = useState('');
     const [orders, setOrders] = useState([]);
 
     const [open, setOpen] = useState(false);
@@ -46,8 +49,10 @@ const Tasks = () => {
     const [orderList, setOrderList] = useState([]);
     const [slots, setSlots] = useState([]);
 
-    useEffect(() => {
-        Init();
+    useEffect(() => {  
+       // const filterBy = searchParams.get("filterParams") === null ? '' : searchParams.get("filterParams");
+       // setFilter(filterBy)  
+       // Init();
     }, [])
 
     useEffect(() => {
@@ -96,13 +101,17 @@ const Tasks = () => {
         setCustomerList(customerResponse.data);
         setEventList(eventResponse.data);
         setOrderList(order);
-
-        handleCalender(order, companyResponse.data, date);
+        const filterValue = state?.searchParams === undefined ? '' : state?.searchParams;
+        setFilter(filterValue)
+        handleCalender(order, companyResponse.data, date, filterValue);
         setIsLoading(false);
     }
 
-    const handleCalender = (orderData, companyData, dateValue) => {
-        const order = orderData.filter(a => dayjs(dateValue).format('YYYY-MM-DD') === get_Date(a.trndate, 'YYYY-MM-DD'));
+    const handleCalender = (orderData, companyData, dateValue,filterBy) => {
+        let order = orderData.filter(a => dayjs(dateValue).format('YYYY-MM-DD') === get_Date(a.trndate, 'YYYY-MM-DD'));
+        if (filterBy !== '')
+            order = order.filter(a => a.status.toUpperCase() === filterBy.toString().toUpperCase());
+
         const business = isOpenForWork(dateValue, companyData.timinginfo[0]);
         let outTime = toMinutes(business[0].outTime) + 15;
         setSlots(generateTimeSlotsWithDate(dateValue, business[0].inTime, toHHMM(outTime), 15, []));
@@ -111,7 +120,11 @@ const Tasks = () => {
 
     const onDateChange = (dateValue) => {
         setDate(dateValue);
-        handleCalender(orderList, companyList, dateValue)
+        handleCalender(orderList, companyList, dateValue, filter)
+    }  
+    const onFilterChange = (value) => {
+        setFilter(value);
+        handleCalender(orderList, companyList, date, value)
     }
     const onEdit = (id, order_no) => {
         setOrderNo(order_no);
@@ -136,17 +149,34 @@ const Tasks = () => {
             <div class='flex flex-col gap-2 sticky top-14 z-50 bg-white'>
                 <div class='flex flex-row items-center  justify-between py-4 '>
                     <PageHeader label={'Calender'} isExport={false} isCreate={false} />
-                    <div class='flex flex-row items-start justify-end'>
-                        <Button color="default" variant="outlined" icon={<LeftOutlined />} style={{ borderRadius: 0, borderTopLeftRadius: 6, borderBottomLeftRadius: 6 }} onClick={() => onDateChange(dayjs(date).add(-1, 'day'))} />
-                        <DatePicker
-                            style={{ width: '60%' }}
-                            allowClear={false}
-                            format={dayjs(date).format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD') ? '[Today]' : 'ddd, MMM DD, YYYY'}
-                            value={date === '' ? date : dayjs(date, 'YYYY-MM-DD')}
-                            onChange={(date, dateString) => onDateChange(date)} />
 
-                        <Button color="default" variant="outlined" icon={<RightOutlined />} style={{ borderRadius: 0, borderTopRightRadius: 6, borderBottomRightRadius: 6 }} onClick={() => onDateChange(dayjs(date).add(1, 'day'))} />
-                    </div>
+                    <div class='flex flex-row gap-2 items-start justify-end'>
+                        <Select
+                            value={filter}
+                            style={{ width: '60%' }}
+                            onChange={(value) => onFilterChange(value)}
+                            options={[
+                                { value: '', label: <Badge color={'cyan'} text={'All'} /> },
+                                { value: 'Draft', label: <Badge color={'silver'} text={'Awaiting'} /> },
+                                { value: 'Pending', label: <Badge color={'yellow'} text={'Pending'} /> },
+                                { value: 'In progress', label: <Badge color={'blue'} text={'In progress'} /> },
+                                { value: 'Completed', label: <Badge color={'green'} text={'Completed'} /> },
+                                { value: 'Cancelled', label: <Badge color={'red'} text={'Cancelled'} /> }
+                            ]}
+                        />  
+                        <div class='flex flex-row items-start justify-end'>
+                            <Button color="default" variant="outlined" icon={<LeftOutlined />} style={{ borderRadius: 0, borderTopLeftRadius: 6, borderBottomLeftRadius: 6 }} onClick={() => onDateChange(dayjs(date).add(-1, 'day'))} />
+                            <DatePicker
+                                style={{ width: '60%' }}
+                                allowClear={false}
+                                format={dayjs(date).format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD') ? '[Today]' : 'ddd, MMM DD, YYYY'}
+                                value={date === '' ? date : dayjs(date, 'YYYY-MM-DD')}
+                                onChange={(date, dateString) => onDateChange(date)} />
+
+                            <Button color="default" variant="outlined" icon={<RightOutlined />} style={{ borderRadius: 0, borderTopRightRadius: 6, borderBottomRightRadius: 6 }} onClick={() => onDateChange(dayjs(date).add(1, 'day'))} />
+                        </div>
+
+                        </div>
                 </div>
                 <div class='overflow-auto w-full' ref={leftRef} onScroll={() => syncScroll(leftRef.current, rightRef.current)}>
                     <CalenderHeader userList={userList} />

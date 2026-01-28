@@ -34,7 +34,7 @@ const WaitingApproval = () => {
             endPoint: 'services'
         })
 
-        let order = (orderResponse.data).filter(a => a.status.toUpperCase() === 'PENDING');
+        let order = (orderResponse.data).filter(a => a.status.toUpperCase() === 'DRAFT');
         let user = userResponse.data;
         if (localStorage.role === 'Employee')
         {
@@ -58,8 +58,9 @@ const WaitingApproval = () => {
                             <span>Awaiting Request</span>
                         </div>
 
-                        {orderList.map(item => {
-                            return (
+                        {orderList.length === 0 ? <p class='text-left p-4 text-sm font-medium text-gray-500'> There aren't any pending requests .</p> :
+                            orderList.map(item => {
+                            return (           
                                 <AppointmentCards key={item.id} index={item.id} data={item} userList={userList} servicesList={servicesList} />
                             )
                         })}
