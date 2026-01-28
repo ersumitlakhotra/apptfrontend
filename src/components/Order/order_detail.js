@@ -277,9 +277,10 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     let inTimeEmployee = '00:00:00';
                     let outTimeEmployee = '00:00:00';
                     let isOpenEmployee = false;
+                    let breakStartEmployee = '00:00:00';
+                    let breakEndEmployee = '00:00:00';
                     const defaultTimingEmployee = userDefaultSchedule(trndate, user.timinginfo[0]);
-                    let breakStartEmployee = defaultTimingEmployee[0].breakStart;
-                    let breakEndEmployee = defaultTimingEmployee[0].breakEnd;
+                    
                    
                     //setIsLoading(true);
                     try {
@@ -293,18 +294,24 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                             inTimeEmployee = res.data.data.startshift;
                             outTimeEmployee = res.data.data.endshift;
                             isOpenEmployee = Boolean(res.data.data.dayoff)
+                            breakStartEmployee = res.data.data.breakstart;
+                            breakEndEmployee = res.data.data.breakend;
                         }
                         else
                         {
                             inTimeEmployee = defaultTimingEmployee[0].inTime;
                             outTimeEmployee = defaultTimingEmployee[0].outTime;
                             isOpenEmployee = Boolean(defaultTimingEmployee[0].isOpen)
+                            breakStartEmployee = defaultTimingEmployee[0].breakStart;
+                            breakEndEmployee = defaultTimingEmployee[0].breakEnd;
                         }
                     }
                     catch {
                         inTimeEmployee = '00:00:00';
                         outTimeEmployee = '00:00:00';
                         isOpenEmployee = false;
+                        breakStartEmployee = '00:00:00';
+                        breakEndEmployee = '00:00:00';
                     }
                     //setIsLoading(false);
 

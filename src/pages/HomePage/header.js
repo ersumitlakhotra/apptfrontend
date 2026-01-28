@@ -122,3 +122,5 @@ const Header = () => {
 }
 
 export default Header
+
+// npx update-browserslist-db@latest

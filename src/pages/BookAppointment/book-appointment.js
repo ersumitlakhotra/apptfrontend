@@ -18,7 +18,7 @@ import BookingOption from '../../components/BookAppointment/book_reschedule.js';
 import ViewBooking from '../../components/BookAppointment/view_booking.js';
 import { TextboxFlexCol } from '../../common/textbox.js';
 import { useIdleTimer } from 'react-idle-timer';
-import { compareTimes, isOpenForWork } from '../../common/general.js';
+import { compareTimes, isOpenForWork, userDefaultSchedule } from '../../common/general.js';
 import { generateTimeSlotsWithDate, toMinutes } from '../../common/generateTimeSlots.js';
 import AssignedTo from '../../common/assigned_to.js';
 
@@ -37,6 +37,7 @@ const BookAppointment = () => {
     const [emailUser, setEmailUser] = useState('');
     const [emailPass, setEmailPass] = useState('');
     const [daysAdvance, setDaysAdvance] = useState(0);
+    const [autoAccept, setAutoAccept] = useState(false);
     const [storeSchedule, setStoreSchedule] = useState(null);
 
     const [bookingType, setBookingType] = useState(0);
@@ -106,6 +107,7 @@ const BookAppointment = () => {
             setEmailUser(item.emailuser);
             setEmailPass(item.emailpass);
             setDaysAdvance(item.bookingdays);
+            setAutoAccept(item.autoaccept);
             setStoreSchedule(item.timinginfo[0]);
             if (item.addressinfo !== null) {
                 let address = `${item.addressinfo[0].street}, ${item.addressinfo[0].city}, ${item.addressinfo[0].province} ${item.addressinfo[0].postal} `;
@@ -123,13 +125,15 @@ const BookAppointment = () => {
         else if (assigned_to === -1) {
             let active = [];
             userList.map(async item => {
-                const employee = await getUserSchedule(item.id);
+                const employee = await getUserSchedule(item.id,item.timinginfo[0]);
                 if (employee[0].isOpen) {
                     active.push({
                         id: item.id,    // <-- date included here
                         inTime: employee[0].inTime,
                         outTime: employee[0].outTime,
                         isOpen: employee[0].isOpen,
+                        breakStart: employee[0].breakStart,
+                        breakEnd: employee[0].breakEnd
                     });
                 }
             })
@@ -182,13 +186,13 @@ const BookAppointment = () => {
                 setIsOpen(true);
                 if (assigned_to > 0) {
                     const user = userList.find(item => item.id === assigned_to);
-                    setEmployeeName(user.fullname);
-                    const employee =await getUserSchedule(assigned_to);            
+                    setEmployeeName(user.fullname);          
+                    const employee = await getUserSchedule(assigned_to,user.timinginfo[0]);   
                     if (employee[0].isOpen) {
                         setUserWorking(true);
                         let orderList =await getOrderList(assigned_to);
                         let appointments = orderList[0].filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === assigned_to && a.status !== 'Cancelled' && a.id !== order_id));
-                       
+                        appointments = [...appointments, { start: employee[0].breakStart ,end:employee[0].breakEnd}]
                         let minutes = 0;
                         servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item => { minutes += item.minutes; });
 
@@ -218,7 +222,8 @@ const BookAppointment = () => {
                     activeEmployee.map(async (employee,index) => {
                         orderList =await getOrderList(employee.id);
                         appointments = orderList[0].filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === employee.id && a.status !== 'Cancelled' && a.id !== order_id));
-                      
+                        appointments = [...appointments, { start: employee.breakStart ,end:employee.breakEnd}]
+                       
                         let loginTime = compareTimes(business[0].inTime, employee.inTime);
                         let logoutTime = compareTimes(business[0].outTime, employee.outTime);
                         let inTime = loginTime === -1 ? employee.inTime : (loginTime === 1 || loginTime === 0) && business[0].inTime;
@@ -251,12 +256,15 @@ const BookAppointment = () => {
 
     }
 
-    const getUserSchedule =async (uid) => {
+    const getUserSchedule =async (uid,timinginfo) => {
         const _result = [];
         let inTimeEmployee = '00:00:00';
         let outTimeEmployee = '00:00:00';
         let isOpenEmployee = false;
+        let breakStartEmployee = '00:00:00';
+        let breakEndEmployee = '00:00:00';
         setIsLoading(true);
+        const defaultTimingEmployee = userDefaultSchedule(trndate, timinginfo);
         try {
             const Body = JSON.stringify({
                 cid: cid,
@@ -268,12 +276,23 @@ const BookAppointment = () => {
                 inTimeEmployee = res.data.data.startshift;
                 outTimeEmployee = res.data.data.endshift;
                 isOpenEmployee = Boolean(res.data.data.dayoff)
+                breakStartEmployee = res.data.data.breakstart;
+                breakEndEmployee = res.data.data.breakend;
+            }
+            else {
+                inTimeEmployee = defaultTimingEmployee[0].inTime;
+                outTimeEmployee = defaultTimingEmployee[0].outTime;
+                isOpenEmployee = Boolean(defaultTimingEmployee[0].isOpen)
+                breakStartEmployee = defaultTimingEmployee[0].breakStart;
+                breakEndEmployee = defaultTimingEmployee[0].breakEnd;
             }
         }
         catch {
             inTimeEmployee = '00:00:00';
             outTimeEmployee = '00:00:00';
             isOpenEmployee = false;
+            breakStartEmployee = '00:00:00';
+            breakEndEmployee = '00:00:00';
         }
         setIsLoading(false);
         _result.push({    
@@ -281,6 +300,8 @@ const BookAppointment = () => {
             inTime: inTimeEmployee,
             outTime: outTimeEmployee,
             isOpen: isOpenEmployee,
+            breakStart:breakStartEmployee,
+            breakEnd:breakEndEmployee
         });
         return _result;
     }
@@ -461,7 +482,7 @@ const BookAppointment = () => {
                 taxamount: '0',
                 total: total,
                 coupon: coupon,
-                status: 'Pending',
+                status: autoAccept ? 'Pending':'Draft',
                 trndate: trndate,
                 assignedto: employeeId,
                 slot: slot,

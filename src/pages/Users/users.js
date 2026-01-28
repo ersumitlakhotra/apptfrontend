@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Badge, Button, Select, Drawer, Space, Input, Tooltip, Rate, Avatar, Image } from "antd";
-import { EditOutlined, PlusOutlined, SaveOutlined, UserOutlined, ContainerOutlined } from '@ant-design/icons';
+import { EditOutlined,  SaveOutlined, UserOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from "react";
 import UserDetail from "../../components/Users/user_detail";
 import { IoSearchOutline } from "react-icons/io5";
@@ -8,7 +8,6 @@ import DataTable from "../../common/datatable";
 import { getTableItem } from "../../common/items";
 import { Tags } from "../../common/tags";
 import LogsView from "../../components/Logs/logs_view.js";
-import ExportToExcel from "../../common/export.js";
 import { UTC_LocalDateTime } from "../../common/localDate.js";
 import { useOutletContext } from "react-router-dom";
 import PageHeader from "../../common/pages/pageHeader.js";
