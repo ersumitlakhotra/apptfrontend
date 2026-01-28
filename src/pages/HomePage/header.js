@@ -27,6 +27,8 @@ const Header = () => {
     const { logout } = useAuth();
     const [search, setSearch] = useState('');
     const [uid, setUid] = useState(0);
+    const [fullname, setFullname] = useState('');
+    const [cell, setCell] = useState('');
     const [userList, setUserList] = useState([]);
     const [unread, setUnread] = useState([])
     const [notificationList, setNotificationList] = useState([]);
@@ -37,7 +39,7 @@ const Header = () => {
 
     const Init = async () => {
         const localStorage = await getStorage();
-        setUid(localStorage.uid);
+       
 
         const notificationResponse = await FetchData({
             method: 'GET',
@@ -47,7 +49,12 @@ const Header = () => {
             method: 'GET',
             endPoint: 'users'
         })
+        setUid(localStorage.uid);
+        const userFind=userResponse.data.find(item => item.id ===localStorage.uid);
+        setFullname(userFind.fullname)
+        setCell(userFind.cell)
         setUserList(userResponse.data)
+
         const unread = notificationResponse.data.filter(a => a.read === '1');
         setUnread(unread.length > 0 ? unread : [])
         setNotificationList(notificationResponse.data);
@@ -57,6 +64,7 @@ const Header = () => {
         switch (e.key) {
             case '2': // Sign Out
                 {
+                     window.open('https://www.ischedule.ca/support', '_blank', 'noopener noreferrer');
                     //openExtendedLink('https://appointstack.com/support')
                     break;
                 }
@@ -74,6 +82,10 @@ const Header = () => {
             getItem('1',
                 <div class='flex flex-row gap-4'>
                     <AssignedTo userId={uid} userList={userList} imageWidth={40} imageHeight={40} AvatarSize={40} allowText={false} preview={false} />
+                    <div class='flex flex-col'>
+                        <p>{fullname} </p>
+                        <p>{cell} </p>
+                    </div>
                 </div>, null, null, true),
             { type: 'divider', },
             getItem('2', 'Help Center', <SlEarphonesAlt />),
@@ -98,15 +110,15 @@ const Header = () => {
             </div>
 
             {/* notification and profile */}
-            <div class='w-3/12 pr-4 flex flex-row gap-4 justify-end items-center'>
+            <div class='w-3/12 pr-4 flex flex-row gap-4 justify-end items-center '>
                 <Badge count={unread.length}>
-                    <BellFilled style={{ fontSize: '22px', marginTop: 6, color: 'white', cursor: 'pointer' }} />
+                    <BellFilled style={{ fontSize: '23px',  color: 'white', cursor: 'pointer' }} />
                 </Badge>
 
-                <Dropdown menu={menuProps} overlayStyle={{ width: '200px', gap: 5, color: 'white' }}>
-                    <Space>
-                        <AssignedTo userId={uid} userList={userList} imageWidth={30} imageHeight={30} AvatarSize={24} allowText={false} preview={false} />
-                    </Space>
+                <Dropdown menu={menuProps} overlayStyle={{ width: '200px', gap: 4, color: 'white',cursor:'pointer' }}>
+                    <Space style={{cursor:'pointer'}}>
+                  <AssignedTo userId={uid} userList={userList} imageWidth={28} imageHeight={28} AvatarSize={24} allowText={false} preview={false} />
+                </Space>
                 </Dropdown>
             </div>
 
