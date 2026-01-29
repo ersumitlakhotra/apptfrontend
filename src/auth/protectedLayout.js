@@ -6,21 +6,20 @@ import { useEffect, useState } from "react";
 import { Spin } from "antd";
 import { LoadingOutlined } from '@ant-design/icons';
 import Footer from "../pages/HomePage/footer";
-import { initNotification } from "../Firebase/requestPermission";
 
 const ProtectedLayout = () => {
     const { pathname } = useLocation();
     const { contextHolder, success, error } = useAlert();
     const [isLoading, setIsLoading] = useState(false);
     const [refresh, setRefresh] = useState(0);
-
-    useEffect(() => {
-        initNotification()
-    }, []);
-    
+   
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
-    }, [pathname]);
+    }, [pathname]);  
+
+    useEffect(() => {
+       
+    }, []);
 
     const saveData = async ({ label, method, endPoint, id = null, body = null, notify = true, logs = true, email = false }) => {
 

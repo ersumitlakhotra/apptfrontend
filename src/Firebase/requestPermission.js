@@ -3,19 +3,15 @@ import { getToken, onMessage } from "firebase/messaging";
 import { messaging} from "../firebase.js";
 
 // This function will request permission and get FCM token
-export async function initNotification() {
+export const initNotification=async (registration)=> {
     try {
+        
         if (requestPermission()) {
-            const token = await getToken(messaging, {
+         const token = await getToken(messaging, {
                 vapidKey: "BE0_FiNfC14nhWlVxNiG36JJKdXq2PquIaYVFiNQK06IDS83tP35_wpjW12cYHLyiqUGC0HCWU11hUBiLcvMxJ4",
-                // link SW
+                serviceWorkerRegistration: registration,
             });
-
             console.log("FCM Token:", token);
-        }
-        else
-        {
-            console.error("Permission Denied");
         }
         // 👉 Send this token to your backend
     } catch (err) {
