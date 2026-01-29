@@ -6,10 +6,12 @@ import { useEffect, useState } from "react";
 import { Spin } from "antd";
 import { LoadingOutlined } from '@ant-design/icons';
 import Footer from "../pages/HomePage/footer";
+import { useEmail } from "../email/email";
 
 const ProtectedLayout = () => {
     const { pathname } = useLocation();
     const { contextHolder, success, error } = useAlert();
+    const {sendEmail} = useEmail()
     const [isLoading, setIsLoading] = useState(false);
     const [refresh, setRefresh] = useState(0);
    
@@ -17,12 +19,7 @@ const ProtectedLayout = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     }, [pathname]);  
 
-    useEffect(() => {
-       
-    }, []);
-
-    const saveData = async ({ label, method, endPoint, id = null, body = null, notify = true, logs = true, email = false }) => {
-
+    const saveData = async ({ label, method, endPoint, id = null, body = null, notify = true, logs = true, email = false, status = null, userList = [], servicesList =[]}) => {
         setIsLoading(true)
         const res = await SaveData({
             label: label,
@@ -31,9 +28,10 @@ const ProtectedLayout = () => {
             id: id,
             body: body,
             notify: notify,
-            logs: logs,
-            email: email
+            logs: logs
         })
+        if (email)
+            sendEmail({ id: id, status: status, userList: userList, servicesList: servicesList })        
         setIsLoading(false)
 
         if (res.isSuccess) { success(res.message); setRefresh(refresh + 1); }

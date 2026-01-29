@@ -11,7 +11,7 @@ import ScheduleN from "./scheduleN.js";
 function getTabItems(key, label, icon, children) {
     return {key,label,children,icon,};
 }
-const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyList, saveData ,setOpen}) => {
+const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyList, saveData, setOpen, isAdmin }) => {
     const [tabActiveKey, setTabActiveKey] = useState("1");
     const [fullname, setFullname] = useState('');
     const [cell, setCell] = useState('');
@@ -28,18 +28,18 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyLis
     const [status, setStatus] = useState('Active');
 
 
-    const [dashboard, setDashboard] = useState(true);
-    const [tasks, setTasks] = useState(true);
-    const [order, setOrder] = useState(true);
-    const [event, setEvent] = useState(true);
-    const [payment, setPayment] = useState(true);
-    const [customer, setCustomer] = useState(true);
-    const [services, setServices] = useState(true);
-    const [users, setUsers] = useState(true);
-    const [schedule, setSchedule] = useState(true);
-    const [sales, setSales] = useState(true);
-    const [collection, setCollection] = useState(true);
-    const [setting, setSetting] = useState(true);
+    const [dashboard, setDashboard] = useState(false);
+    const [order, setOrder] = useState(false);
+    const [tasks, setTasks] = useState(false);
+    const [event, setEvent] = useState(false);
+    const [payment, setPayment] = useState(false);
+    const [customer, setCustomer] = useState(false);
+    const [services, setServices] = useState(false);
+    const [users, setUsers] = useState(false);
+    const [schedule, setSchedule] = useState(false);
+    const [sales, setSales] = useState(false);
+    const [collection, setCollection] = useState(false);
+    const [setting, setSetting] = useState(false);
 
     const [monday, setMonday] = useState(['09:00:00', '21:00:00', true, '14:00:00', '14:30:00']);
     const [tuesday, setTuesday] = useState(['09:00:00', '21:00:00', true, '14:00:00', '14:30:00']);
@@ -53,7 +53,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyLis
     let refimage=useRef();
 
     useEffect(() => {
-        setTabActiveKey("1");
+        setTabActiveKey("1"); 
         if (id === 0) {
             setFullname('');
             setCell(''); setEmail(''); setAddress('');
@@ -61,9 +61,8 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyLis
             setPassword(''); setRole('Employee'); setRating(0);
             setAccountType('Basic'); setProfile(null);
             setGender('Male'); setStatus('Active');setAppSchedule(true);
-            setDashboard(false); setTasks(true); setOrder(true);
-            setEvent(false); setPayment(false);
-            setCustomer(false); setServices(false); setUsers(false); setSchedule(false); setSales(false); setCollection(false); setSetting(false); 
+
+            setOrder(false); setTasks(false); setEvent(false);setCustomer(false); setServices(false); setUsers(false); setSchedule(false); setSetting(false); 
             
             if (companyList.timinginfo !== null) {
                 setMonday([...companyList.timinginfo[0].monday,'14:00:00', '14:30:00']);
@@ -91,7 +90,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyLis
             setStatus(editList.status);
             setAppSchedule(Boolean(editList.appschedule));
 
-            userPermissionList.filter(a => a.uid === id).map(b => {
+            userPermissionList.map(b => {
                 setDashboard(b.dashboard);
                 setTasks(b.tasks);
                 setOrder(b.order);
@@ -124,14 +123,11 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyLis
     useEffect(() => {
         if (role === 'Employee')
         {
-            setDashboard(false); setTasks(true); setOrder(true);
-            setEvent(false); setPayment(false);
-            setCustomer(false); setServices(false); setUsers(false); setSchedule(false); setSales(false); setCollection(false); setSetting(false);   
+            setOrder(true); setTasks(true); setEvent(false); setCustomer(false); setServices(false); setUsers(false); setSchedule(true); setSetting(false);
         }
         else if (role === 'User' && id === 0 )
         {
-            setDashboard(true); setTasks(true); setOrder(true); setEvent(true); setPayment(true);
-            setCustomer(true); setServices(true); setUsers(true); setSchedule(true); setSales(true); setCollection(true); setSetting(true);
+            setOrder(true); setTasks(true); setEvent(false); setCustomer(false); setServices(false); setUsers(false); setSchedule(true); setSetting(false);
         }
         else if (role === 'User' && id !== 0)
         {
@@ -155,8 +151,6 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyLis
 
     },[role])
   
- 
-
     
     const save = async () => {
         if (fullname !== '' &&  password !== ''  && cell.length === 12 && cell !== '' ) {
@@ -237,8 +231,9 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyLis
             setStatus={setStatus}
             appschedule={appschedule}
             setAppSchedule={setAppSchedule}
+            isAdmin={isAdmin}
             />),
-            (role === 'User' &&
+        ((role === 'User' && isAdmin) && 
         getTabItems('2', 'Permissions', <EyeOutlined />, <UserLoginPermissions
             dashboard={dashboard}
             setDashboard={setDashboard}

@@ -8,9 +8,13 @@ import { Button, Image, Avatar, Skeleton } from "antd"
 import Heading from "../../common/heading";
 import FetchData from '../../hook/fetchData';
 import IsLoading from '../../common/custom/isLoading';
+import { useNavigate, useOutletContext } from 'react-router-dom';
+import { getStorage } from '../../common/localStorage';
 
-const ProfileCard = ({onClick,refresh}) => {
-
+const ProfileCard = () => {
+    const navigate = useNavigate();
+    const { saveData, refresh } = useOutletContext();
+    const [isAdmin, setIsAdmin] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     const [name, setName] = useState('');
@@ -24,14 +28,14 @@ const ProfileCard = ({onClick,refresh}) => {
 
     useEffect(() => {
         Init()
-    }, []) 
-    
-    useEffect(() => {
-        Init()
     }, [refresh])
 
     const Init = async () => {
         setIsLoading(true);
+        const localStorage = await getStorage();
+        const isAdmin = localStorage.role === 'Administrator'
+        setIsAdmin(isAdmin)
+        
         const logoList = await FetchData({
             method: 'GET',
             endPoint: 'logo'
@@ -63,7 +67,7 @@ const ProfileCard = ({onClick,refresh}) => {
 
     return (
         <div class='w-full bg-white border rounded-3xl p-4 text-gray-500 flex gap-2 items-center cursor-pointer shadow-md hover:shadow-xl '
-        onClick={onClick}>
+            onClick={() => isAdmin ? navigate('/setting'): ''}>
             <IsLoading isLoading={isLoading} input={
                 <>
                     {logo !== null ?

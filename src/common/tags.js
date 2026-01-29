@@ -22,6 +22,7 @@ export function Tags(value) {
                 return <Tag color='green'>{value}</Tag>
             }
         case 'CANCELLED':
+        case 'REJECTED':
         case 'INACTIVE':
         case 'PAST':
         case 'UNPAID':

@@ -20,7 +20,7 @@ function disabledDate(current) {
   return current < dayjs().startOf('day');
 }
 
-const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, userList, companyList, eventList, customerList, saveData, setOpen }) => {
+const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, userList, companyList, eventList, customerList, saveData, setOpen, isAdmin ,uid}) => {
 
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
@@ -88,7 +88,10 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
         if (id === 0) {
             setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');
             setStatus('Pending'); setPrice('0'); setTax('0'); setTotal('0'); setDiscount('0'); setCoupon(''); setTaxAmount('0'); setTrnDate(LocalDate());
-            setAssignedTo('0'); setOrderNo(''); setServicesItem([]); setSlot(''); setPrevSlot(''); setPrevTrnDate(''); setPrevServicesItem([]);
+
+            setAssignedTo(!isAdmin ? uid :'0');
+            
+            setOrderNo(''); setServicesItem([]); setSlot(''); setPrevSlot(''); setPrevTrnDate(''); setPrevServicesItem([]);
             setStart(''); setEnd(''); setReceived(0); setMode('Cash'); setTip(0);
             
         }
@@ -206,7 +209,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
     }
 
     useEffect(() => {
-        if (status === 'Cancelled') {
+        if (status === 'Cancelled' || status === 'Rejected') {
             setPrice(0.00);
             setDiscount(0)
             setTax(0);
@@ -413,7 +416,8 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                         { value: 'Pending', label: <Badge color={'yellow'} text={'Pending'} /> },
                         { value: 'In progress', label: <Badge color={'blue'} text={'In progress'} /> },
                         { value: 'Completed', label: <Badge color={'green'} text={'Completed'} /> },
-                        { value: 'Cancelled', label: <Badge color={'red'} text={'Cancelled'} /> }
+                        { value: 'Cancelled', label: <Badge color={'red'} text={'Cancelled'} /> },
+                        { value: 'Rejected', label: <Badge color={'red'} text={'Rejected'} /> },
                     ]}
                 />
             } />
@@ -547,6 +551,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     value={assigned_to}
                     style={{ width: '100%' }}
                     onChange={(value) => setAssignedTo(value)}
+                    disabled={!isAdmin}
                     options={[{ value: '0', label: 'None' }, ...userList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
                         value: item.id,
                         label:

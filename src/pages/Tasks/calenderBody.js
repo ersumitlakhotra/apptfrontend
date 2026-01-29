@@ -25,7 +25,7 @@ const CalenderBody = ({slots, userList,orderList,servicesList, onView,onEdit }) 
                                 <div
                                     key={c.id}
                                     style={{ height: getHeight(c.start, c.end), cursor: 'pointer' }}
-                                    class={`flex flex-col gap-2 px-2 mt-4 border rounded-md text-xs border-s-4 ${getBorder(c.status)}`}>
+                                    class={`flex flex-col  px-2 mt-4 border rounded-md text-xs border-s-4 ${getBorder(c.status)}`}>
                                     <div class='flex items-center justify-between  font-medium'>
                                         <p class='underline' onClick={() => onView(c.id)}  ># {c.order_no}</p>
                                         <Tooltip placement="top" title={'Edit'} >

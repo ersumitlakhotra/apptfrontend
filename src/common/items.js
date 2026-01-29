@@ -40,6 +40,7 @@ export function getBorder (value) {
             return 'border-s-green-500 bg-green-100  text-green-600';
         case 'CANCELLED':
         case 'PAST':
+        case 'REJECTED':
             return 'border-s-red-500 bg-red-100 text-red-600';
         default:
             return 'border-s-gray-400 bg-grey-100 text-gray-600';
@@ -60,6 +61,7 @@ export function getTag  (value, name) {
         case 'CANCELLED':
         case 'PAST':
         case 'OFF':
+        case 'REJECTED':
             return <Tag key={index} color='red' bordered={false}>{name}</Tag>;
         default:
             return <Tag key={index} color='gray' bordered={false}>{name}</Tag>;

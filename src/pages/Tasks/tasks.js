@@ -18,6 +18,8 @@ import { getStorage } from "../../common/localStorage";
 
 const Tasks = () => {
     const { saveData, refresh, setIsLoading } = useOutletContext();
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [uid, setUid] = useState(0);
     const location = useLocation();
     const state = location.state;
     const ref = useRef();
@@ -49,12 +51,6 @@ const Tasks = () => {
     const [orderList, setOrderList] = useState([]);
     const [slots, setSlots] = useState([]);
 
-    useEffect(() => {  
-       // const filterBy = searchParams.get("filterParams") === null ? '' : searchParams.get("filterParams");
-       // setFilter(filterBy)  
-       // Init();
-    }, [])
-
     useEffect(() => {
         Init();
     }, [refresh])
@@ -62,13 +58,18 @@ const Tasks = () => {
     const Init = async () => {
         setIsLoading(true);
         const localStorage = await getStorage();
+        const isAdmin = localStorage.role === 'Administrator'
+        setIsAdmin(isAdmin)
+        setUid(localStorage.uid)
+
         const serviceResponse = await FetchData({
             method: 'GET',
             endPoint: 'services'
         })
         const userResponse = await FetchData({
             method: 'GET',
-            endPoint: 'user'
+            endPoint: 'user',
+            id: !isAdmin ? localStorage.uid : null
         })
         const companyResponse = await FetchData({
             method: 'GET',
@@ -85,25 +86,18 @@ const Tasks = () => {
         })
         const orderResponse = await FetchData({
             method: 'GET',
-            endPoint: 'order'
+            endPoint: !isAdmin ? 'orderPerUser' : 'order', //
+            id: !isAdmin ? localStorage.uid : null
         })
-
-        let order = orderResponse.data;
-        let user = userResponse.data;
-        if (localStorage.role === 'Employee')
-        {
-            order = order.filter(item => item.assignedto === localStorage.uid)
-            user = user.filter(item => item.id === localStorage.uid)
-        }
         setServiceList(serviceResponse.data);
-        setUserList(user);
+        setUserList(userResponse.data);
         setCompanyList(companyResponse.data);
         setCustomerList(customerResponse.data);
         setEventList(eventResponse.data);
-        setOrderList(order);
+        setOrderList(orderResponse.data);
         const filterValue = state?.searchParams === undefined ? '' : state?.searchParams;
         setFilter(filterValue)
-        handleCalender(order, companyResponse.data, date, filterValue);
+        handleCalender(orderResponse.data, companyResponse.data, date, filterValue);
         setIsLoading(false);
     }
 
@@ -150,7 +144,7 @@ const Tasks = () => {
                 <div class='flex flex-row items-center  justify-between py-4 '>
                     <PageHeader label={'Calender'} isExport={false} isCreate={false} />
 
-                    <div class='flex flex-row gap-2 items-start justify-end'>
+                    <div class='flex flex-row gap-2 items-start justify-end  w-80 md:w-96'>
                         <Select
                             value={filter}
                             style={{ width: '60%' }}
@@ -161,13 +155,14 @@ const Tasks = () => {
                                 { value: 'Pending', label: <Badge color={'yellow'} text={'Pending'} /> },
                                 { value: 'In progress', label: <Badge color={'blue'} text={'In progress'} /> },
                                 { value: 'Completed', label: <Badge color={'green'} text={'Completed'} /> },
-                                { value: 'Cancelled', label: <Badge color={'red'} text={'Cancelled'} /> }
+                                { value: 'Cancelled', label: <Badge color={'red'} text={'Cancelled'} /> },
+                                { value: 'Rejected', label: <Badge color={'red'} text={'Rejected'} /> }
                             ]}
                         />  
                         <div class='flex flex-row items-start justify-end'>
                             <Button color="default" variant="outlined" icon={<LeftOutlined />} style={{ borderRadius: 0, borderTopLeftRadius: 6, borderBottomLeftRadius: 6 }} onClick={() => onDateChange(dayjs(date).add(-1, 'day'))} />
                             <DatePicker
-                                style={{ width: '60%' }}
+                                style={{ width: '100%' }}
                                 allowClear={false}
                                 format={dayjs(date).format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD') ? '[Today]' : 'ddd, MMM DD, YYYY'}
                                 value={date === '' ? date : dayjs(date, 'YYYY-MM-DD')}
@@ -191,7 +186,7 @@ const Tasks = () => {
             <Drawer title={title} placement='right' width={600} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
-                <OrderDetail id={id} refresh={reload} ref={ref} setOrderNo={setOrderNo} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} eventList={eventList} customerList={customerList} saveData={saveData} setOpen={setOpen} />
+                <OrderDetail id={id} refresh={reload} ref={ref} setOrderNo={setOrderNo} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} eventList={eventList} customerList={customerList} saveData={saveData} setOpen={setOpen} isAdmin={isAdmin} uid={uid} />
             </Drawer>
 
             {/* Drawer on View*/}

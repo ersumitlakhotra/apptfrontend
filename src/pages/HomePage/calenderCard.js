@@ -9,47 +9,55 @@ import FetchData from "../../hook/fetchData";
 import { getStorage } from "../../common/localStorage";
 import IsLoading from "../../common/custom/isLoading";
 import CalenderIcon from "../../common/custom/calenderIcon"; 
-import { IoMdWarning } from "react-icons/io";
-import { useNavigate } from "react-router-dom";
+import { IoMdWarning } from "react-icons/io"; 
+import { AiOutlineStop } from "react-icons/ai";
+import { useNavigate, useOutletContext } from "react-router-dom";
 
 const CalenderCard = () => {
     const navigate = useNavigate();
+    const { saveData, refresh } = useOutletContext();
     const [ordersList, setOrdersList] = useState([]);
-    const [draftList, setDraftList] = useState([]);
+    const [awaitingList, setAwaitingList] = useState([]);
     const [pendingList, setPendingList] = useState([]);
     const [inprogressList, setInprogressList] = useState([]);
     const [completedList, setCompletedList] = useState([]);
-    const [cancelledList, setCancelledList] = useState([]);
+    const [cancelledList, setCancelledList] = useState([]); 
+    const [rejectedList, setRejectedList] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         Init();
-    }, [])
+    }, [refresh])
 
     const Init = async () => {
         setIsLoading(true);
+
         const localStorage = await getStorage();
-        const res = await FetchData({
+        const isAdmin = localStorage.role === 'Administrator'
+
+        const orderResponse = await FetchData({
             method: 'GET',
-            endPoint: 'order'
+            endPoint: !isAdmin ? 'orderPerUser' : 'order', //
+            id: !isAdmin ? localStorage.uid : null
         })
 
-        let order = (res.data).filter(a => get_Date(a.trndate, 'YYYY-MM-DD') === LocalDate());
-        if (localStorage.role === 'Employee')
-            order = order.filter(item => item.assignedto === localStorage.uid)
+
+        let order = (orderResponse.data).filter(a => get_Date(a.trndate, 'YYYY-MM-DD') === LocalDate());
 
         const pending = order.filter(a => a.status.toUpperCase() === 'PENDING');
-        const draft = order.filter(a => a.status.toUpperCase() === 'DRAFT');
+        const awaiting = order.filter(a => a.status.toUpperCase() === 'AWAITING');
         const inprogress = order.filter(a => a.status.toUpperCase() === 'IN PROGRESS');
         const completed = order.filter(a => a.status.toUpperCase() === 'COMPLETED');
         const cancelled = order.filter(a => a.status.toUpperCase() === 'CANCELLED');
+        const rejected = order.filter(a => a.status.toUpperCase() === 'REJECTED');
 
         setOrdersList(order.length > 0 ? order : [])
         setPendingList(pending.length > 0 ? pending : [])
-        setDraftList(draft.length > 0 ? draft : [])
+        setAwaitingList(awaiting.length > 0 ? awaiting : [])
         setInprogressList(inprogress.length > 0 ? inprogress : [])
         setCompletedList(completed.length > 0 ? completed : [])
         setCancelledList(cancelled.length > 0 ? cancelled : [])
+        setRejectedList(rejected.length > 0 ? rejected : [])
 
         setIsLoading(false);
     }
@@ -81,11 +89,12 @@ const CalenderCard = () => {
                     </div>
 
                     <div class='w-2/3 flex flex-col text-xs font-semibold font-sans  '>
-                        {listItems({ icon: <IoMdWarning size={12} />, label: 'Awaiting Request', filterBy:'Draft', value: draftList.length })}
+                        {listItems({ icon: <IoMdWarning size={12} />, label: 'Awaiting Request', filterBy:'Draft', value: awaitingList.length })}
                         {listItems({ icon: <MdPendingActions size={12} />, label: 'Pending', filterBy: 'Pending' ,value: pendingList.length})}
                         {listItems({ icon: <IoHourglassOutline size={12} />, label: 'In Progress', filterBy: 'In progress', value: inprogressList.length })}
                         {listItems({ icon: <MdDownloadDone size={12} />, label: 'Completed', filterBy: 'Completed', value: completedList.length })}
                         {listItems({ icon: <IoMdClose size={12} />, label: 'Cancelled', filterBy: 'Cancelled', value: cancelledList.length })}
+                        {listItems({ icon: <AiOutlineStop size={12} />, label: 'Rejected', filterBy: 'Rejected', value: rejectedList.length })}
                     </div>
                 </>} />
         </div>

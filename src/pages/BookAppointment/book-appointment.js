@@ -484,7 +484,7 @@ const BookAppointment = () => {
                 taxamount: '0',
                 total: total,
                 coupon: coupon,
-                status: autoAccept ? 'Pending':'Draft',
+                status: autoAccept ? 'Pending':'Awaiting',
                 trndate: trndate,
                 assignedto: employeeId,
                 slot: slot,

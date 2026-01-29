@@ -38,7 +38,7 @@ function App() {
           <Route path="/" element={<Login logo={logo} />} />
           <Route path="signup" element={<Signup logo={logo} />} />
           <Route path="resetpassword" element={<ResetPassword logo={logo} />} />
-          <Route path="main" element={<MasterPage />} />
+         {/*<Route path="main" element={<MasterPage />} />*/} 
           <Route path="book-appointment" element={<BookAppointment />} />
           <Route path="support" element={<Support />} />
           <Route path="privacy-policy" element={<Privacy />} />

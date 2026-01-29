@@ -1,11 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Button, Select, Drawer, Space, Tooltip, Popover, DatePicker, Popconfirm } from "antd";
-import { EditOutlined, PlusOutlined, SaveOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined,  SaveOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from "react";
 import DataTable from "../../common/datatable";
 import { getTableItem } from "../../common/items";
 import { Tags } from "../../common/tags";
-import ExportToExcel from "../../common/export.js";
 import { get_Date, LocalDate, UTC_LocalDateTime } from "../../common/localDate.js";
 import { convertTo12Hour, calculateTime } from "../../common/general";
 import AssignedTo from "../../common/assigned_to.js";
@@ -17,13 +16,14 @@ import { useOutletContext } from "react-router-dom";
 import IsLoading from "../../common/custom/isLoading.js";
 import PageHeader from "../../common/pages/pageHeader.js";
 import FetchData from "../../hook/fetchData.js";
+import { getStorage } from "../../common/localStorage.js";
 
 
 const Schedule = () => {
     const ref = useRef();
     const headingLabel = 'Schedule'
     const { saveData, refresh } = useOutletContext();
-
+    const [isAdmin, setIsAdmin] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [userList, setUserList] = useState([]);
     const [scheduleList, setScheduleList] = useState([]);
@@ -52,23 +52,32 @@ const Schedule = () => {
 
     const Init = async () => {
         setIsLoading(true)
-
+        const localStorage = await getStorage();
+        const isAdmin = localStorage.role === 'Administrator'
+        setIsAdmin(isAdmin)
         const userResponse = await FetchData({
             method: 'GET',
-            endPoint: 'user'
+            endPoint: 'user',
+            id: !isAdmin ? localStorage.uid : null
         })
         const scheduleResponse = await FetchData({
             method: 'GET',
             endPoint: 'schedule'
         })
-
-        setScheduleList(scheduleResponse.data);
         setUserList(userResponse.data);
 
-        setFilteredList(scheduleResponse.data);
-        setList(scheduleResponse.data);
-        setExportList(scheduleResponse.data);
-        setPage(1, 10, scheduleResponse.data);
+        let schedule = scheduleResponse.data;
+        if (!isAdmin) {
+            schedule = scheduleResponse.data.filter(item => item.uid === localStorage.uid);
+            setAssignedTo(localStorage.uid);
+        }
+
+        setScheduleList(schedule);
+
+        setFilteredList(schedule);
+        setList(schedule);
+        setExportList(schedule);
+        setPage(1, 10, schedule);
 
         setIsLoading(false)
     }
@@ -137,9 +146,10 @@ const Schedule = () => {
             <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
                 <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
                     <div class='w-full flex flex-row gap-2 items-center md:w-1/3'>
-                        <p class='text-sm text-gray-500 whitespace-nowrap'>Filter user</p>
+                      <p class='text-sm text-gray-500 whitespace-nowrap'>Filter user</p>
                         <Select
                             value={assigned_to}
+                            disabled={!isAdmin}
                             style={{ width: 300 }}
                             size="large"
                             onChange={(value) => setAssignedTo(value)}
@@ -227,7 +237,7 @@ const Schedule = () => {
             <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
-                <ScheduleDetail id={id} refresh={reload} ref={ref} date={LocalDate()} scheduleList={scheduleList} userList={userList} saveData={saveData} setOpen={setOpen} />
+                <ScheduleDetail id={id} refresh={reload} ref={ref} date={LocalDate()} scheduleList={scheduleList} userList={userList} userId={isAdmin ? null :assigned_to} saveData={saveData} setOpen={setOpen} isAdmin={isAdmin} />
             </Drawer>
 
             {/* Drawer on View*/}

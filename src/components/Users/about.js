@@ -2,9 +2,12 @@ import { Button, Input, Radio, Select, Switch } from "antd";
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { setCellFormat } from "../../common/cellformat";
 import { TextboxFlex } from "../../common/textbox";
+import { useEffect } from "react";
+import { getStorage } from "../../common/localStorage";
 
-const UserAbout = ({ fullname, setFullname, cell, setCell, email, setEmail, address, setAddress, gender, setGender, password, setPassword, role, setRole, status, setStatus, appschedule, setAppSchedule }) => {
+const UserAbout = ({ fullname, setFullname, cell, setCell, email, setEmail, address, setAddress, gender, setGender, password, setPassword, role, setRole, status, setStatus, appschedule, setAppSchedule, isAdmin }) => {
     const Checked = 'On'; const Unchecked = 'Off';
+    
     return (
         <div class='flex flex-col font-normal gap-2 mt-2'>
             <p class="text-gray-400 mb-4">Contact Information</p>
@@ -13,7 +16,7 @@ const UserAbout = ({ fullname, setFullname, cell, setCell, email, setEmail, addr
                 <Input placeholder="Full name" status={fullname === '' ? 'error' : ''} value={fullname} onChange={(e) => setFullname(e.target.value)} />
             } />
 
-            <TextboxFlex label={'Role'} input={
+            {isAdmin  && <TextboxFlex label={'Role'} input={
                 <Select
                     defaultValue={role}
                     value={role}
@@ -24,7 +27,7 @@ const UserAbout = ({ fullname, setFullname, cell, setCell, email, setEmail, addr
                         { value: 'Employee', label: 'Employee' }
                     ]}
                 />
-            } />
+            } />}
 
             <TextboxFlex label={'E-Mail'}  input={
                 <Input placeholder="abcd@company.com" value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -58,12 +61,12 @@ const UserAbout = ({ fullname, setFullname, cell, setCell, email, setEmail, addr
                 </Radio.Group>
             } />
 
-            <TextboxFlex label={'Status'} input={
+            {isAdmin &&  <TextboxFlex label={'Status'} input={
                 <div class='flex flex-row items-center gap-2 w-full'>
                     <Button color={`${status === 'Active' ? 'cyan' : 'default'}`} variant="outlined" icon={<CheckOutlined />} onClick={() => setStatus('Active')} >Active</Button>
                     <Button color={`${status === 'Inactive' ? 'danger' : 'default'}`} variant="outlined" icon={<CloseOutlined />} onClick={() => setStatus('Inactive')} >Inactive</Button>
                 </div>
-            } />
+            } />}
 
 
 

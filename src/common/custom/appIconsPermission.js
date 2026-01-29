@@ -78,13 +78,15 @@ const AppIconsPermission = (size='50px',iconSize=54) => {
     const Init = async () => {
         setIsLoading(true);
 
+        const localStorage = await getStorage();
+
         const userPermissionResponse = await FetchData({
             method: 'GET',
-            endPoint: 'userpermission'
+            endPoint: 'userpermission',
+            id: localStorage.uid 
         })
-        const localStorage = await getStorage();
-        const permissionList = userPermissionResponse.data;
-        permissionList.filter(a => a.uid === localStorage.uid).map(b => {
+        
+         userPermissionResponse.data.map(b => {
             setDashboard(b.dashboard);
             setTasks(b.tasks);
             setOrder(b.order);

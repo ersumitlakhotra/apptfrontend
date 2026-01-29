@@ -15,6 +15,7 @@ import { useOutletContext } from "react-router-dom";
 const UserSchedule = () => {
     const ref = useRef();
     const { saveData, refresh } = useOutletContext();
+    const [isAdmin, setIsAdmin] = useState(false);
     const [date, setDate] = useState(LocalDate());
     const [uid, setUid] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
@@ -33,24 +34,25 @@ const UserSchedule = () => {
     const Init = async () => {
         setIsLoading(true);
         const localStorage = await getStorage();
-
+        const isAdmin = localStorage.role === 'Administrator'
+        setIsAdmin(isAdmin)
         const userResponse = await FetchData({
             method: 'GET',
-            endPoint: 'user'
+            endPoint: 'user',
+            id: !isAdmin ? localStorage.uid : null
         })
+
         const scheduleResponse = await FetchData({
             method: 'GET',
             endPoint: 'schedule'
         })
 
-        let user = userResponse.data;
         let schedule = scheduleResponse.data;
-        if (localStorage.role === 'Employee')
-        {
-            user = user.filter(item => item.id === localStorage.uid)
+        if (!isAdmin) {
+            schedule = scheduleResponse.data.filter(item => item.uid === localStorage.uid);
         }
 
-        setUserList(user);
+        setUserList(userResponse.data);
         setScheduleList(schedule);
         setIsLoading(false);
     }
@@ -74,7 +76,7 @@ const UserSchedule = () => {
         await ref.current?.save();
     }
     return (
-        <div class='w-full bg-white border rounded-3xl p-4 text-gray-500 flex gap-2  shadow-md hover:shadow-xl ' style={{height:'370px'}}>
+        <div class='w-full bg-white border rounded-3xl p-4 text-gray-500 flex gap-2  shadow-md hover:shadow-xl ' style={{height:'390px'}}>
             <IsLoading isLoading={isLoading} rows={9} input={
                 <>
                     <div class=' flex-1 overflow-auto w-full scroll-auto '>
@@ -124,7 +126,7 @@ const UserSchedule = () => {
                         </Tooltip>}
                     </Space>}>
 
-                <ScheduleDetail id={id} refresh={reload} ref={ref} date={date} userId={uid} scheduleList={scheduleList} userList={userList} saveData={saveData} setOpen={setOpen} userDisable={true} dateDisable={true} />
+                <ScheduleDetail id={id} refresh={reload} ref={ref} date={date} userId={uid} scheduleList={scheduleList} userList={userList} saveData={saveData} setOpen={setOpen} userDisable={true} dateDisable={true} isAdmin={isAdmin} />
             </Drawer>
         </div>
     )

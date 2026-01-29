@@ -13,12 +13,14 @@ import { useOutletContext } from "react-router-dom";
 import PageHeader from "../../common/pages/pageHeader.js";
 import IsLoading from "../../common/custom/isLoading.js";
 import FetchData from "../../hook/fetchData.js";
+import { getStorage } from "../../common/localStorage.js";
 
 
 const Users = () => {
     const ref = useRef();
     const headingLabel = 'Users'
     const { saveData, refresh } = useOutletContext();
+    const [isAdmin, setIsAdmin] = useState(false);
 
     const [isLoading, setIsLoading] = useState(false);
     const [open, setOpen] = useState(false);
@@ -49,17 +51,23 @@ const Users = () => {
     const Init = async () => {
         setIsLoading(true)
 
+        const localStorage = await getStorage();
+        const isAdmin = localStorage.role === 'Administrator'
+        setIsAdmin(isAdmin)
+
         const companyResponse = await FetchData({
             method: 'GET',
             endPoint: 'company'
         })
         const userResponse = await FetchData({
             method: 'GET',
-            endPoint: 'user'
+            endPoint: 'user',
+            id: !isAdmin ? localStorage.uid : null
         })
         const userPermissionResponse = await FetchData({
             method: 'GET',
-            endPoint: 'userpermission'
+            endPoint: 'userpermission',
+            id: localStorage.uid
         })
         setCompanyList(companyResponse.data)
         setUserPermissionList(userPermissionResponse.data);
@@ -121,7 +129,7 @@ const Users = () => {
     return (
         <div class="flex flex-col gap-4 md:px-7 py-4 mb-12">
 
-            <PageHeader label={headingLabel} isExport={true} exportList={exportList} exportName={headingLabel} isCreate={true} onClick={() => btn_Click(0)} servicesList={[]} userList={userList} />
+            <PageHeader label={headingLabel} isExport={true} exportList={exportList} exportName={headingLabel} isCreate={isAdmin} onClick={() => btn_Click(0)} servicesList={[]} userList={userList} />
 
             <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
                 <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
@@ -192,7 +200,7 @@ const Users = () => {
             <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
-                <UserDetail id={id} refresh={reload} ref={ref} userList={userList} userPermissionList={userPermissionList} companyList={companyList} saveData={saveData} setOpen={setOpen} />
+                <UserDetail id={id} refresh={reload} ref={ref} userList={userList} userPermissionList={userPermissionList} companyList={companyList} saveData={saveData} setOpen={setOpen} isAdmin={isAdmin} />
             </Drawer>
 
 

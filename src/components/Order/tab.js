@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, DatePicker, Input, Popover, Select, Skeleton, Tooltip } from "antd"
+import { Button, DatePicker, Input, Popconfirm, Popover, Select, Skeleton, Tooltip } from "antd"
 import { IoSearchOutline } from "react-icons/io5";
 import { getTableItem } from "../../common/items";
 import DataTable from "../../common/datatable";
@@ -11,13 +11,20 @@ import Services from "../../common/services";
 import AssignedTo from "../../common/assigned_to";
 import { UTC_LocalDateTime, get_Date } from "../../common/localDate";
 import IsLoading from "../../common/custom/isLoading.js";
+import { MdDownloadDone } from "react-icons/md";
+import { IoMdClose } from "react-icons/io";
+import { useEmail } from "../../email/email.js";
+import { useOutletContext } from "react-router-dom";
 
 
-const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_ViewClick, btn_LogsClick, refresh, fromDate, setFromDate, toDate, setToDate, setExportList ,isLoading}) => {
+const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_ViewClick, btn_LogsClick, refresh, fromDate, setFromDate, toDate, setToDate, setExportList ,isLoading,isAdmin}) => {
 
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(orderList);
     const [list, setList] = useState(orderList);
+
+    const { saveData } = useOutletContext();
+    const {AppointmentStatus} = useEmail();
 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -31,10 +38,7 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
         setList(orderList);
         setExportList(orderList);
         setSearchInput('');
-        const role = localStorage.getItem('role');
-        const userid = localStorage.getItem('uid');
-        setAssignedTo(role === 'Employee' ? userid : '');
-        setDropDownVisible(role === 'Employee' ? false : true);
+        setDropDownVisible(isAdmin);
         setPage(1, 10, orderList);
     }, [refresh, orderList])
 
@@ -47,7 +51,7 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
         );
 
 
-        if (assigned_to !== '')
+        if (assigned_to !== '' && isAdmin)
             searchedList = searchedList.filter(item => item.assignedto === assigned_to)
 
         setExportList(searchedList);
@@ -75,6 +79,21 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
         getTableItem('8', 'Last Modified'),
         getTableItem('9', 'Action'),
     ];
+
+    const onSave =(id,status) => {
+        saveData({
+            label: "Appointment",
+            method: 'POST',
+            endPoint: status === AppointmentStatus.CONFIRMED ? "order/confirmed" : "order/rejected",
+            id: id,
+            logs: true,
+            email: true,
+            body: [],
+            status: status, 
+            userList: userList, 
+            servicesList: servicesList 
+        })
+    }
     return (
         <div key={index} class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
             <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
@@ -154,12 +173,34 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
                                 <td class="p-3"><AssignedTo userId={item.assignedto} userList={userList} /></td>
                                 <td class="p-3 ">{UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A')}</td>
                                 <td class="p-3">
-                                    <Tooltip placement="top" title={'Edit'} >
-                                        <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
-                                    </Tooltip>
-                                    <Tooltip placement="top" title={'View'} >
-                                        <Button type="link" icon={<EyeOutlined />} onClick={() => btn_ViewClick(item.id)} />
-                                    </Tooltip>
+                                    {item.status !== 'Awaiting' ?
+                                        <>
+                                            <Tooltip placement="top" title={'Edit'} >
+                                                <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
+                                            </Tooltip>
+                                            <Tooltip placement="top" title={'View'} >
+                                                <Button type="link" icon={<EyeOutlined />} onClick={() => btn_ViewClick(item.id)} />
+                                            </Tooltip>
+                                        </>
+                                    :
+                                        <div class='flex flex-row gap-2 items-center '>
+                                            <Tooltip placement="top" title={'Accept'} >
+                                                <Button color="cyan" variant="solid" icon={<MdDownloadDone size={12} />} size="middle" onClick={() => onSave(item.id, AppointmentStatus.CONFIRMED)} />
+                                            </Tooltip>
+                                            <Tooltip placement="top" title={'Reject'} >
+                                                <Popconfirm
+                                                    title="Reject"
+                                                    description="Are you sure to Reject ? "
+                                                    onConfirm={() => onSave(item.id, AppointmentStatus.REJECTED)}
+                                                    okText="Yes"
+                                                    cancelText="No"
+                                                >
+                                                    <Button color="red" variant="solid" icon={<IoMdClose size={12} />} size="middle" />
+                                                </Popconfirm>
+                                            </Tooltip>
+
+                                        </div> 
+                                    }
                                     {/*
                                     <Tooltip placement="top" title={'Logs'} >
                                         <Button type="link" icon={<ContainerOutlined />} onClick={() => btn_LogsClick(item.id)} />

@@ -11,7 +11,7 @@ import AssignedTo from "../../common/assigned_to.js";
 const { RangePicker } = TimePicker;
 
 
-const ScheduleDetail = ({ id, refresh, ref, date, scheduleList, userList, saveData, setOpen, userId = null,userDisable=false,dateDisable=false }) => {
+const ScheduleDetail = ({ id, refresh, ref, date, scheduleList, userList, saveData, setOpen, userId = null,userDisable=false,dateDisable=false,isAdmin }) => {
     const [trnDate, setTrnDate] = useState(date);
     const [startTime, setStartTime] = useState('00:00:00');
     const [endTime, setEndTime] = useState('00:00:00');
@@ -116,7 +116,7 @@ const ScheduleDetail = ({ id, refresh, ref, date, scheduleList, userList, saveDa
                     status={uid === '' ? 'error' : ''}
                     style={{ width: 300 }}
                     size="large"
-                    disabled={userDisable || id !==0}
+                    disabled={userDisable || id !==0 || !isAdmin}
                     onChange={(value) => setUid(value)}
                     options={[{ value: '', label: '' }, ...userList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
                         value: item.id,

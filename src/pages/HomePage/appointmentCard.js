@@ -7,21 +7,23 @@ import Services from "../../common/services";
 import FlexBoxRow from "../../common/custom/flexboxRow";
 import { get_Date, getDay } from "../../common/localDate"; 
 import { UnorderedListOutlined, ContactsOutlined } from '@ant-design/icons';
+import { useEmail } from "../../email/email";
 
-const AppointmentCards = ({ index, data, userList, servicesList }) => {  
+const AppointmentCards = ({ index, data, userList, servicesList, onSave }) => {  
+     const {AppointmentStatus} = useEmail();
     return (
         <div key={index} class={`border p-4  text-xs bg-gray-50 rounded-lg  mb-2 cursor-pointer hover:bg-gray-100 hover:shadow`}>
             <div class='flex flex-row justify-between items-center mb-2'>
                 <AssignedTo key={data.id} userId={data.assignedto} userList={userList} />
                 <div class='flex flex-row gap-2 items-center justify-end'>
                     <Tooltip placement="top" title={'Accept'} >
-                        <Button color="cyan" variant="solid" icon={<MdDownloadDone size={12} />} size="middle" />
+                        <Button color="cyan" variant="solid" icon={<MdDownloadDone size={12} />} size="middle" onClick={() => onSave(index, AppointmentStatus.CONFIRMED)} />
                     </Tooltip>
-                    <Tooltip placement="top" title={'Decline'} >
+                    <Tooltip placement="top" title={'Reject'} >
                     <Popconfirm
-                        title="Decline"
-                        description="Are you sure to decline ? "
-                        //onConfirm={() => onDeactivate()}
+                        title="Reject"
+                            description="Are you sure to Reject ? "
+                        onConfirm={() => onSave(index, AppointmentStatus.REJECTED)}
                         okText="Yes"
                         cancelText="No"
                     >
