@@ -7,43 +7,23 @@ import Services from "../../common/services";
 import FlexBoxRow from "../../common/custom/flexboxRow";
 import { get_Date, getDay } from "../../common/localDate"; 
 import { UnorderedListOutlined, ContactsOutlined } from '@ant-design/icons';
-import { useEmail } from "../../email/email";
+import { useResponseButtons } from "../../components/Order/responseButton";
 
-const AppointmentCards = ({ index, data, userList, servicesList, onSave }) => {  
-     const {AppointmentStatus} = useEmail();
+const AppointmentCards = ({ index, data, userList, servicesList,onClick }) => {  
+     const {Accept,Reject} = useResponseButtons();
     return (
-        <div key={index} class={`border p-4  text-xs bg-gray-50 rounded-lg  mb-2 cursor-pointer hover:bg-gray-100 hover:shadow`}>
+        <div key={index} class={`border p-4 text-xs bg-gray-50 rounded-lg  mb-2 cursor-pointer hover:bg-gray-100 hover:shadow`}
+        onClick={() => onClick(index)}>
             <div class='flex flex-row justify-between items-center mb-2'>
                 <AssignedTo key={data.id} userId={data.assignedto} userList={userList} />
-                <div class='flex flex-row gap-2 items-center justify-end'>
-                    <Tooltip placement="top" title={'Accept'} >
-                        <Button color="cyan" variant="solid" icon={<MdDownloadDone size={12} />} size="middle" onClick={() => onSave(index, AppointmentStatus.CONFIRMED)} />
-                    </Tooltip>
-                    <Tooltip placement="top" title={'Reject'} >
-                    <Popconfirm
-                        title="Reject"
-                            description="Are you sure to Reject ? "
-                        onConfirm={() => onSave(index, AppointmentStatus.REJECTED)}
-                        okText="Yes"
-                        cancelText="No"
-                    >
-                        <Button color="red" variant="solid" icon={<IoMdClose size={12} />} size="middle" />
-                    </Popconfirm>
-                    </Tooltip>
-                    
+                <div class='flex flex-row gap-2 items-center justify-end sticky z-30'>
+                    <Accept id={index} userList={userList} servicesList={servicesList} />
+                    <Reject id={index} userList={userList} servicesList={servicesList} />
                 </div>   
             </div>
             <FlexBoxRow icon={<FiClock size={12} />} label={`${getDay(data.trndate)} ${get_Date(data.trndate, 'MMMM DD, YYYY')} [ ${data.slot} ]`} />
             <FlexBoxRow icon={<ContactsOutlined size={12} />} label={`${data.name} : ${data.cell}`} />
             <FlexBoxRow icon={<UnorderedListOutlined size={12} />} label={<Services servicesItem={data.serviceinfo} servicesList={servicesList} />} />
-            
-            <div class='flex flex-col gap-1'>
-            {/*
-                <FlexBoxRow icon={<Octicons name='clock' size={16} />} text={<Text className='font-semibold'>{orderList.slot}</Text>} />
-                <FlexBoxRow icon={<AntDesign name='user-add' size={16} />} text={<Text className='font-medium'>{orderList.customername}</Text>} />
-                <FlexBoxRow icon={<Feather name='phone-call' size={16} />} text={<Text className='font-medium'>{orderList.customercell}</Text>} />
-                */}
-            </div>
 
         </div>
     )

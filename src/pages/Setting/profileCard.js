@@ -78,11 +78,11 @@ const ProfileCard = () => {
                     <div class='flex-col flex gap-2'>
                         <Heading label={name} desc={address} labelColor={'bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent'} />
                         <div class='flex flex-row ml-1'>
-                            <Button color="default" variant="link" icon={<TbWorldWww size={16} style={{ color: '#1877F2' }} />} onClick={() => openExtendedLink(website)} />
-                            <Button color="default" variant="link" icon={<ImFacebook size={16} style={{ color: '#1877F2' }} />} onClick={() => openExtendedLink(facebook)} />
-                            <Button color="default" variant="link" icon={<FaInstagram size={16} style={{ color: '#E1306C' }} />} onClick={() => openExtendedLink(instagram)} />
-                            <Button color="default" variant="link" icon={<BsTwitterX size={16} style={{ color: 'black' }} />} onClick={() => openExtendedLink(twitter)} />
-                            <Button color="default" variant="link" icon={<FaLinkedinIn size={16} style={{ color: '#1877F2' }} onClick={() => openExtendedLink(linkedin)} />} />
+                            <Button color="default" variant="link" icon={<TbWorldWww size={16} style={{ color: '#1877F2' }} />} onClick={(e) =>{e.stopPropagation(); openExtendedLink(website)}} />
+                            <Button color="default" variant="link" icon={<ImFacebook size={16} style={{ color: '#1877F2' }} />} onClick={(e) => {e.stopPropagation();openExtendedLink(facebook)}} />
+                            <Button color="default" variant="link" icon={<FaInstagram size={16} style={{ color: '#E1306C' }} />} onClick={(e) => {e.stopPropagation();openExtendedLink(instagram)}} />
+                            <Button color="default" variant="link" icon={<BsTwitterX size={16} style={{ color: 'black' }} />} onClick={(e) => {e.stopPropagation();openExtendedLink(twitter)}} />
+                            <Button color="default" variant="link" icon={<FaLinkedinIn size={16} style={{ color: '#1877F2' }} onClick={(e) => {e.stopPropagation();openExtendedLink(linkedin)}} />} />
                         </div>
                     </div>
                 </>

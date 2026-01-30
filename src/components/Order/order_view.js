@@ -9,9 +9,14 @@ import { BsCash } from "react-icons/bs";
 import { setNumberAndDot } from "../../common/cellformat";
 import useAlert from "../../common/alert";
 import { TbTransfer } from "react-icons/tb";
+import { useOutletContext } from "react-router-dom";
+import { useResponseButtons } from "./responseButton";
 
-const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView, saveData }) => {
+const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView }) => {
     const { contextHolder, warning } = useAlert();
+    
+    const { saveData } = useOutletContext();
+    const { Accept,Reject} = useResponseButtons();
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
@@ -103,12 +108,18 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
         else
             setTip(0);
     }
-
+   
     return (
         <div class="flex flex-col gap-2 mb-12  w-full">
             <div class='flex items-center justify-between'>
                 <span class="text-2xl font-bold text-gray-800">Appointment #{order_no}</span>
-                {(status === 'Pending' || status === 'In progress') &&
+                {status ==='Awaiting' ? 
+                    <div class='flex gap-2 '>
+                        <Accept id={id} userList={userList} servicesList={servicesList} labelVisible={true} />
+                        <Reject id={id} userList={userList} servicesList={servicesList} labelVisible={true}/>
+                    </div>
+                    :
+                (status === 'Pending' || status === 'In progress') &&
                     <div class="flex gap-2">
                         <Button color="cyan" variant="solid" icon={<CheckOutlined />} size="large" onClick={() => setIsModalOpen(true)}>Completed</Button>
                         <Button color="danger" variant="solid" icon={<CloseOutlined />} size="large" onClick={() => {
@@ -139,15 +150,17 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
                         <span class="text-xs text-gray-400">Current Order Status</span>
                         <div class='mt-4'>
                             <Steps
-                                current={status === 'Pending' ? 0 : (status === 'In progress' ? 1 : 2)}
+                                current={ ( status === 'Awaiting' || status === 'Rejected')? 0 :  status === 'Pending' ? 1 : (status === 'In progress' ? 2 : 3)}
                                 percent={60}
                                 labelPlacement="vertical"
                                 size="small"
-                                status={status === 'Cancelled' ? "error" : (status === 'Completed' ? "finish" : "process")}
+                                status={status === 'Cancelled' || status === 'Rejected' ? "error" : (status === 'Completed' ? "finish" : "process")}
                                 items={[
-                                    { title: 'Pending' }, { title: 'In Progress' }, { title: status === 'Cancelled' ? 'Cancelled' : 'Completed' }
+                                    { title: status === 'Awaiting'? 'Awaiting' : status === 'Rejected' ? 'Rejected':'Accepted'}, 
+                                    { title: 'Pending' }, 
+                                    { title: 'In Progress' }, 
+                                    { title: status === 'Cancelled' ? 'Cancelled' : 'Completed' }
                                 ]} />
-
                         </div>
                     </div>
 

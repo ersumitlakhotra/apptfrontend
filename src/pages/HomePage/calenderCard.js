@@ -89,7 +89,7 @@ const CalenderCard = () => {
                     </div>
 
                     <div class='w-2/3 flex flex-col text-xs font-semibold font-sans  '>
-                        {listItems({ icon: <IoMdWarning size={12} />, label: 'Awaiting Request', filterBy:'Draft', value: awaitingList.length })}
+                        {listItems({ icon: <IoMdWarning size={12} />, label: 'Awaiting Request', filterBy:'Awaiting', value: awaitingList.length })}
                         {listItems({ icon: <MdPendingActions size={12} />, label: 'Pending', filterBy: 'Pending' ,value: pendingList.length})}
                         {listItems({ icon: <IoHourglassOutline size={12} />, label: 'In Progress', filterBy: 'In progress', value: inprogressList.length })}
                         {listItems({ icon: <MdDownloadDone size={12} />, label: 'Completed', filterBy: 'Completed', value: completedList.length })}

@@ -151,7 +151,7 @@ const Tasks = () => {
                             onChange={(value) => onFilterChange(value)}
                             options={[
                                 { value: '', label: <Badge color={'cyan'} text={'All'} /> },
-                                { value: 'Draft', label: <Badge color={'silver'} text={'Awaiting'} /> },
+                                { value: 'Awaiting', label: <Badge color={'silver'} text={'Awaiting'} /> },
                                 { value: 'Pending', label: <Badge color={'yellow'} text={'Pending'} /> },
                                 { value: 'In progress', label: <Badge color={'blue'} text={'In progress'} /> },
                                 { value: 'Completed', label: <Badge color={'green'} text={'Completed'} /> },

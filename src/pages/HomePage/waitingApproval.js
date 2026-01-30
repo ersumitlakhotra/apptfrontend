@@ -7,7 +7,8 @@ import { SortUpcomingAppointments } from '../../common/general';
 import AppointmentCards from "./appointmentCard";
 import { IoMdWarning } from "react-icons/io";
 import { useOutletContext } from "react-router-dom";
-import { useEmail } from "../../email/email";
+import { Drawer } from "antd";
+import OrderView from "../../components/Order/order_view";
 
 const WaitingApproval = () => {
     const { saveData, refresh } = useOutletContext();
@@ -15,7 +16,10 @@ const WaitingApproval = () => {
     const [orderList, setOrderList] = useState([]);
     const [userList, setUserList] = useState([]);
     const [servicesList, setServicesList] = useState([]);
-    const {AppointmentStatus} = useEmail();
+
+     const [openView, setOpenView] = useState(false);
+    const [id, setId] = useState(0);
+    const [reload, setReload] = useState(0);
 
     useEffect(() => {
         Init();
@@ -49,21 +53,11 @@ const WaitingApproval = () => {
         setIsLoading(false);
     }
 
-    const onSave = (id, status) => {
-        saveData({
-            label: "Appointment",
-            method: 'POST',
-            endPoint: status === AppointmentStatus.CONFIRMED ? "order/confirmed" : "order/rejected",
-            id: id,
-            logs: true,
-            email: true,
-            body: [],
-            status: status,
-            userList: userList,
-            servicesList: servicesList
-        })
+    const btn_Click = (id) => {
+        setReload(reload + 1);
+        setId(id);
+        setOpenView(true);
     }
-
     return (
         <div class='w-full bg-white border rounded-3xl p-4 text-gray-500 flex gap-2  shadow-md hover:shadow-xl ' style={{height:'390px'}}>
             <IsLoading isLoading={isLoading} rows={9} input={
@@ -77,13 +71,16 @@ const WaitingApproval = () => {
                         {orderList.length === 0 ? <p class='text-left p-4 text-sm font-medium text-gray-500'> There aren't any pending requests .</p> :
                             orderList.map(item => {
                             return (           
-                                <AppointmentCards key={item.id} index={item.id} data={item} userList={userList} servicesList={servicesList} onSave={onSave} AppointmentStatus={AppointmentStatus} />
+                                <AppointmentCards key={item.id} index={item.id} data={item} userList={userList} servicesList={servicesList} onClick={btn_Click} />
                             )
                         })}
                         
                     </div>
                 </>
             } />
+            <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
+                <OrderView id={id} refresh={reload} orderList={orderList} servicesList={servicesList} userList={userList} setOpenView={setOpenView} saveData={saveData} />
+            </Drawer>
         </div>
     )
 }

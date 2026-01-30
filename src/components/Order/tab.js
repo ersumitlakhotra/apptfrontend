@@ -15,6 +15,7 @@ import { MdDownloadDone } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
 import { useEmail } from "../../email/email.js";
 import { useOutletContext } from "react-router-dom";
+import { useResponseButtons } from './responseButton.js'
 
 
 const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_ViewClick, btn_LogsClick, refresh, fromDate, setFromDate, toDate, setToDate, setExportList ,isLoading,isAdmin}) => {
@@ -22,9 +23,7 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(orderList);
     const [list, setList] = useState(orderList);
-
-    const { saveData } = useOutletContext();
-    const {AppointmentStatus} = useEmail();
+    const { Accept,Reject} = useResponseButtons();
 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -80,20 +79,7 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
         getTableItem('9', 'Action'),
     ];
 
-    const onSave =(id,status) => {
-        saveData({
-            label: "Appointment",
-            method: 'POST',
-            endPoint: status === AppointmentStatus.CONFIRMED ? "order/confirmed" : "order/rejected",
-            id: id,
-            logs: true,
-            email: true,
-            body: [],
-            status: status, 
-            userList: userList, 
-            servicesList: servicesList 
-        })
-    }
+
     return (
         <div key={index} class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
             <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
@@ -184,21 +170,8 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
                                         </>
                                     :
                                         <div class='flex flex-row gap-2 items-center '>
-                                            <Tooltip placement="top" title={'Accept'} >
-                                                <Button color="cyan" variant="solid" icon={<MdDownloadDone size={12} />} size="middle" onClick={() => onSave(item.id, AppointmentStatus.CONFIRMED)} />
-                                            </Tooltip>
-                                            <Tooltip placement="top" title={'Reject'} >
-                                                <Popconfirm
-                                                    title="Reject"
-                                                    description="Are you sure to Reject ? "
-                                                    onConfirm={() => onSave(item.id, AppointmentStatus.REJECTED)}
-                                                    okText="Yes"
-                                                    cancelText="No"
-                                                >
-                                                    <Button color="red" variant="solid" icon={<IoMdClose size={12} />} size="middle" />
-                                                </Popconfirm>
-                                            </Tooltip>
-
+                                            <Accept id={item.id} userList={userList} servicesList={servicesList}/>
+                                            <Reject id={item.id} userList={userList} servicesList={servicesList}/>
                                         </div> 
                                     }
                                     {/*

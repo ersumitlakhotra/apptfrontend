@@ -42,8 +42,10 @@ export function getBorder (value) {
         case 'PAST':
         case 'REJECTED':
             return 'border-s-red-500 bg-red-100 text-red-600';
+        case 'AWAITING':
+            return 'border-s-gray-400 bg-gray-300 text-black';
         default:
-            return 'border-s-gray-400 bg-grey-100 text-gray-600';
+            return 'border-s-gray-400 bg-grey-300 text-gray-600';
     }
 }
 export function getTag  (value, name) {

@@ -320,7 +320,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
 
                     if (isOpenEmployee) {
                         setUserWorking(true);
-                        appointments = orderList.filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === assigned_to && a.status !== 'Cancelled' && a.id !== id));
+                        appointments = orderList.filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === assigned_to && a.status !== 'Cancelled' && a.status !== 'Rejected' && a.id !== id));
                         appointments = [...appointments, { start: breakStartEmployee ,end:breakEndEmployee}]
                         let minutes = 0;
                         servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item => { minutes += item.minutes; });
