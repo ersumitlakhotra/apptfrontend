@@ -41,7 +41,7 @@ export const generateTimeSlotsWithDate=(date, startTime, endTime, interval, appo
             const endString = toHHMM(slotEnd);
 
             slots.push({
-                uid:uid,
+                uid: uid,
                 date,               // <-- date included here
                 start: startString,
                 end: endString,

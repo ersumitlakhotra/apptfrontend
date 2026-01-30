@@ -50,6 +50,7 @@ const Order = () => {
     const [customerList, setCustomerList] = useState([]);
     const [eventList, setEventList] = useState([]);
     const [logsList, setLogsList] = useState([]);
+    const [scheduleList, setScheduleList] = useState([]);
     const [orderList, setOrderList] = useState([]);
 
     const [ordersList, setOrdersList] = useState([]);
@@ -100,7 +101,16 @@ const Order = () => {
             endPoint: 'event',
             eventDate: true
         })
+        const scheduleResponse = await FetchData({
+            method: 'GET',
+            endPoint: 'schedule'
+        })
+        let schedule = scheduleResponse.data;
+        if (!isAdmin) {
+            schedule = scheduleResponse.data.filter(item => item.uid === localStorage.uid);     
+        }
 
+        setScheduleList(schedule);
         setServiceList(serviceResponse.data);
         setUserList(userResponse.data);
         setCompanyList(companyResponse.data);
@@ -196,7 +206,7 @@ const Order = () => {
             <Drawer title={title} placement='right' width={600} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
-                <OrderDetail id={id} refresh={reload} ref={ref} setOrderNo={setOrderNo} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} eventList={eventList} customerList={customerList} saveData={saveData} setOpen={setOpen} isAdmin={isAdmin} uid={uid} />
+                <OrderDetail id={id} refresh={reload} ref={ref} setOrderNo={setOrderNo} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} eventList={eventList} customerList={customerList} scheduleList={scheduleList} saveData={saveData} setOpen={setOpen} isAdmin={isAdmin} uid={uid} />
             </Drawer>
 
             {/* Drawer on View*/}

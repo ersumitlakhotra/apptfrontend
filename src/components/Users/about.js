@@ -5,7 +5,7 @@ import { TextboxFlex } from "../../common/textbox";
 import { useEffect } from "react";
 import { getStorage } from "../../common/localStorage";
 
-const UserAbout = ({ fullname, setFullname, cell, setCell, email, setEmail, address, setAddress, gender, setGender, password, setPassword, role, setRole, status, setStatus, appschedule, setAppSchedule, isAdmin }) => {
+const UserAbout = ({ fullname, setFullname, cell, setCell, email, setEmail, address, setAddress, gender, setGender, password, setPassword, role, setRole, status, setStatus, appschedule, setAppSchedule, isAdmin, adminEmail }) => {
     const Checked = 'On'; const Unchecked = 'Off';
     
     return (
@@ -30,7 +30,7 @@ const UserAbout = ({ fullname, setFullname, cell, setCell, email, setEmail, addr
             } />}
 
             <TextboxFlex label={'E-Mail'}  input={
-                <Input placeholder="abcd@company.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Input placeholder="abcd@company.com" value={email} disabled={adminEmail} onChange={(e) => setEmail(e.target.value)} />
             } />
 
             <TextboxFlex label={'Cell #'} mandatory={true} input={

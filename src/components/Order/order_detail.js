@@ -10,18 +10,18 @@ import { BsCash } from "react-icons/bs";
 import useAlert from "../../common/alert";
 import { get_Date, LocalDate, LocalTime } from "../../common/localDate";
 import { generateTimeSlotsWithDate, toMinutes } from "../../common/generateTimeSlots";
-import { compareTimes, isOpenForWork, userDefaultSchedule } from "../../common/general";
+import { compareTimes, isOpenForWork, userSchedule } from "../../common/general";
 import { apiCalls } from "../../hook/apiCall";
 import { TbTransfer } from "react-icons/tb";
-import FetchData from "../../hook/fetchData";
+import { useEmail } from "../../email/email";
 
 function disabledDate(current) {
   // Can not select days before today and today
   return current < dayjs().startOf('day');
 }
 
-const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, userList, companyList, eventList, customerList, saveData, setOpen, isAdmin ,uid}) => {
-
+const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, userList, companyList, eventList, customerList, scheduleList, saveData, setOpen, isAdmin ,uid}) => {
+    const {AppointmentStatus} = useEmail()
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
@@ -178,7 +178,10 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     id:id !== 0 ? id : null,
                     logs:true,
                     email:sendEmail === 'yes',
-                    body: Body
+                    status: id !== 0 ? status ==='Cancelled'? AppointmentStatus.CANCELLED : AppointmentStatus.RESCHEDULED : AppointmentStatus.CONFIRMED,
+                    body: Body,
+                    userList:userList,
+                    servicesList:servicesList
                 });
                 setOpen(false);
             }
@@ -275,60 +278,19 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 setIsOpen(true);
                 if (assigned_to !== "0") {
                     const user = userList.find(item => item.id === assigned_to);
-                    // const employee = isOpenForWork(trndate, user.scheduleinfo[0]);
-                    setEmployeeName(user.fullname);
-                    let inTimeEmployee = '00:00:00';
-                    let outTimeEmployee = '00:00:00';
-                    let isOpenEmployee = false;
-                    let breakStartEmployee = '00:00:00';
-                    let breakEndEmployee = '00:00:00';
-                    const defaultTimingEmployee = userDefaultSchedule(trndate, user.timinginfo[0]);
-                    
-                   
-                    //setIsLoading(true);
-                    try {
-                        const Body = JSON.stringify({
-                            cid: localStorage.getItem('cid'),
-                            uid: assigned_to,
-                            trndate: trndate
-                        });
-                        const res = await apiCalls("POST", 'app/schedule/date', null, null, Body);
-                        if (res.status === 200) {
-                            inTimeEmployee = res.data.data.startshift;
-                            outTimeEmployee = res.data.data.endshift;
-                            isOpenEmployee = Boolean(res.data.data.dayoff)
-                            breakStartEmployee = res.data.data.breakstart;
-                            breakEndEmployee = res.data.data.breakend;
-                        }
-                        else
-                        {
-                            inTimeEmployee = defaultTimingEmployee[0].inTime;
-                            outTimeEmployee = defaultTimingEmployee[0].outTime;
-                            isOpenEmployee = Boolean(defaultTimingEmployee[0].isOpen)
-                            breakStartEmployee = defaultTimingEmployee[0].breakStart;
-                            breakEndEmployee = defaultTimingEmployee[0].breakEnd;
-                        }
-                    }
-                    catch {
-                        inTimeEmployee = '00:00:00';
-                        outTimeEmployee = '00:00:00';
-                        isOpenEmployee = false;
-                        breakStartEmployee = '00:00:00';
-                        breakEndEmployee = '00:00:00';
-                    }
-                    //setIsLoading(false);
-
-                    if (isOpenEmployee) {
+                    setEmployeeName(user.fullname);                  
+                    const timing = userSchedule(trndate, user.timinginfo[0], user.id, scheduleList);
+                    if (timing[0].isOpen) {
                         setUserWorking(true);
                         appointments = orderList.filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === assigned_to && a.status !== 'Cancelled' && a.status !== 'Rejected' && a.id !== id));
-                        appointments = [...appointments, { start: breakStartEmployee ,end:breakEndEmployee}]
+                        appointments = [...appointments, { start: timing[0].breakStart, end: timing[0].breakEnd }]
                         let minutes = 0;
                         servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item => { minutes += item.minutes; });
 
-                        let loginTime = compareTimes(business[0].inTime, inTimeEmployee);
-                        let logoutTime = compareTimes(business[0].outTime, outTimeEmployee);
-                        let inTime = loginTime === -1 ? inTimeEmployee : (loginTime === 1 || loginTime === 0) && business[0].inTime;
-                        let outTime = logoutTime === -1 ? business[0].outTime : (logoutTime === 1 || logoutTime === 0) && outTimeEmployee;
+                        let loginTime = compareTimes(business[0].inTime, timing[0].inTime);
+                        let logoutTime = compareTimes(business[0].outTime, timing[0].outTime);
+                        let inTime = loginTime === -1 ? timing[0].inTime : (loginTime === 1 || loginTime === 0) && business[0].inTime;
+                        let outTime = logoutTime === -1 ? business[0].outTime : (logoutTime === 1 || logoutTime === 0) && timing[0].outTime;
 
                         let availableSlots = generateTimeSlotsWithDate(trndate, inTime, outTime, minutes === 0 ? 30 : minutes, appointments, assigned_to);
                         let localTime = toMinutes(LocalTime('HH:mm'));

@@ -3,14 +3,15 @@ import Search from '../../common/custom/search'
 import logo from '../../Images/logo.png'
 import { SlEarphonesAlt } from "react-icons/sl";
 import { Badge, Button, Card, Drawer, Dropdown, Input, Space } from 'antd';
-import { BellFilled, LogoutOutlined, DownOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { BellFilled, LogoutOutlined, DownOutlined, UserOutlined, BellOutlined, SaveOutlined } from '@ant-design/icons';
+import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
 import AssignedTo from '../../common/assigned_to';
 import FetchData from '../../hook/fetchData';
 import NotificationDetail from '../../components/Main/Notification/notification_detail';
 import { getStorage } from '../../common/localStorage';
 import { useAuth } from '../../auth/authContext';
+import UserDetail from '../../components/Users/user_detail';
 
 function getItem(key, label, icon, extra, disabled, danger) {
     return {
@@ -22,29 +23,35 @@ function getItem(key, label, icon, extra, disabled, danger) {
         danger,
     };
 }
-const Header = () => {
+const Header = ({ saveData, refresh }) => {
     const navigate = useNavigate();
+    const ref = useRef();
     const { logout } = useAuth();
     const [search, setSearch] = useState('');
     const [uid, setUid] = useState(0);
     const [fullname, setFullname] = useState('');
-    const [cell, setCell] = useState('');
+    const [username, setUsername] = useState('');
     const [userList, setUserList] = useState([]);
-    const [unread, setUnread] = useState([])
-
+    const [unread, setUnread] = useState([])  
+    const [isAdmin, setIsAdmin] = useState(false);
     const [notificationList, setNotificationList] = useState([]); 
     const [openNotification, setOpenNotification] = useState(false);
     const [tabActiveKey,setTabActiveKey]= useState(1)
-    const [unreadUpdate, setUnreadUpdate] = useState(false);
+    const [unreadUpdate, setUnreadUpdate] = useState(false); 
+    
+    const [companyList, setCompanyList] = useState([]);
+    const [userPermissionList, setUserPermissionList] = useState([]);
+
+    const [open, setOpen] = useState(false);
 
     useEffect(() => {
         Init();
-    }, [])
-
+    }, [refresh])
 
     const Init = async () => {
         const localStorage = await getStorage();
-       
+        const isAdmin = localStorage.role === 'Administrator'
+        setIsAdmin(isAdmin)
 
         const notificationResponse = await FetchData({
             method: 'GET',
@@ -54,10 +61,24 @@ const Header = () => {
             method: 'GET',
             endPoint: 'users'
         })
+
+
+        const companyResponse = await FetchData({
+            method: 'GET',
+            endPoint: 'company'
+        })
+        const userPermissionResponse = await FetchData({
+            method: 'GET',
+            endPoint: 'userpermission',
+            id: localStorage.uid
+        })
+        setCompanyList(companyResponse.data)
+        setUserPermissionList(userPermissionResponse.data);
+
         setUid(localStorage.uid);
         const userFind=userResponse.data.find(item => item.id ===localStorage.uid);
         setFullname(userFind.fullname)
-        setCell(userFind.cell)
+        setUsername(userFind.username)
         setUserList(userResponse.data)
 
         const unread = notificationResponse.data.filter(a => a.read === '1');
@@ -67,10 +88,21 @@ const Header = () => {
 
     const handleMenuClick = e => {
         switch (e.key) {
-            case '2': // Sign Out
+            case '1':
+            case '2': // Account
                 {
-                     window.open('https://www.ischedule.ca/support', '_blank', 'noopener noreferrer');
-                    //openExtendedLink('https://appointstack.com/support')
+                    setOpen(true);
+                    break;
+                }
+            case '3': // Notifications
+                {
+                    setTabActiveKey('1');
+                    setOpenNotification(true);           
+                    break;
+                }
+            case '4': // Help
+                {
+                    navigate('/help');
                     break;
                 }
             case '9': // Sign Out
@@ -85,15 +117,17 @@ const Header = () => {
     const menuProps = {
         items: [
             getItem('1',
-                <div class='flex flex-row gap-4'>
-                    <AssignedTo userId={uid} userList={userList} imageWidth={40} imageHeight={40} AvatarSize={40} allowText={false} preview={false} />
-                    <div class='flex flex-col'>
+                <div class='flex flex-row gap-4 p-2 bg-blue-50 border rounded-lg'>
+                    <AssignedTo userId={uid} userList={userList} imageWidth={34} imageHeight={34} AvatarSize={34} allowText={false} preview={false} />
+                    <div class='flex flex-col text-xs text-blue-800 font-medium'>
                         <p>{fullname} </p>
-                        <p>{cell} </p>
+                        <p>{username} </p>
                     </div>
-                </div>, null, null, true),
-            { type: 'divider', },
-            getItem('2', 'Help Center', <SlEarphonesAlt />),
+                </div>, null, null,true),
+            { type: 'divider', }, 
+            getItem('2', 'Account', <UserOutlined />, '⌘A'),
+            getItem('3', 'Notifications', <BellOutlined />),
+            getItem('4', 'Help Center', <SlEarphonesAlt />),
             { type: 'divider', },
             getItem('9', 'Sign Out', <LogoutOutlined />, null, null, true),
         ],
@@ -110,42 +144,10 @@ const Header = () => {
 
     const onItemChanged = e => { setCurrentOption(e.key) };
     const menuPropsNotification = { items: itemsNotification, onClick: onItemChanged };
+    const btnSave = async () => {
+        await ref.current?.save();
+    }
 
-    const notificationProps = {
-        items: [         
-            {
-                key:'1',
-                label: <Button
-                    type="link"
-                    onClick={(e) => {
-                        e.stopPropagation(); // Prevents menu closure
-                        console.log('Clicked Button 1');
-                    }}
-                >
-                    Action 1
-                </Button>,
-                disabled:true
-            },   
-            {
-                key:2,
-                label:<div class='flex flex-col gap-4'> notification</div>
-            },   
-            { type: 'divider', },
-            getItem('2', 'Help Center', <SlEarphonesAlt />),
-            { type: 'divider', },
-            getItem('9', 'Sign Out', <LogoutOutlined />, null, null, true),
-        ],
-        onClick: handleMenuClick
-    };
-  const customOverlay = (
-    <div style={{ padding: '12px', backgroundColor: '#fff', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)', borderRadius: '4px' }}>
-      <h4>Custom Content Area</h4>
-      <p>You can put any React component here, like an input field or a form.</p>
-      <Button type="primary" onClick={() => console.log('Button clicked')}>
-        Action Button
-      </Button>
-    </div>
-  );
     return (
         <header class="p-2 bg-blue-500 border-b shadow-sm flex flex-row gap-2 sticky  z-50 top-0">
 
@@ -167,7 +169,7 @@ const Header = () => {
                     <BellFilled style={{ fontSize: '23px', color: 'white', cursor: 'pointer' }} onClick={() => { setOpenNotification(true); setUnreadUpdate(false); setTabActiveKey('1'); }} />
                 </Badge>
 
-                <Dropdown menu={menuProps} trigger={['click']} overlayStyle={{ width: '200px', gap: 4, color: 'white', cursor: 'pointer' }}>
+                <Dropdown menu={menuProps} trigger={['click']} overlayClassName="bg-blue-800" overlayStyle={{ width: '200px', gap: 4, color: 'white', cursor: 'pointer' }}>
                     <Space style={{ cursor: 'pointer' }}>
                         <AssignedTo userId={uid} userList={userList} imageWidth={28} imageHeight={28} AvatarSize={24} allowText={false} preview={false} />
                     </Space>
@@ -187,6 +189,12 @@ const Header = () => {
                 </Dropdown>}>
 
                 <NotificationDetail refresh={1} currentOption={currentOption} notificationList={notificationList} setUnreadUpdate={setUnreadUpdate} tabActiveKey={tabActiveKey} setTabActiveKey={setTabActiveKey} />
+            </Drawer>
+
+            <Drawer title={'Account'} placement='right' width={500} onClose={() => setOpen(false)} open={open}
+                extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
+
+                <UserDetail id={uid} refresh={refresh} ref={ref} userList={userList} userPermissionList={userPermissionList} companyList={companyList} saveData={saveData} setOpen={setOpen} isAdmin={isAdmin} adminEmail={isAdmin} />
             </Drawer>
         </header>
     )

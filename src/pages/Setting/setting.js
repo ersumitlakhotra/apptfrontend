@@ -19,11 +19,7 @@ const Setting = () => {
     const [companyList, setCompanyList] = useState([]);
     const [logoList, setLogoList] = useState([]);
     const [billingList, setBillingList] = useState([]);
-
-    useEffect(() => {
-        Init();
-    }, [])   
-    
+ 
     useEffect(() => {
         Init();
     }, [refresh])
@@ -56,7 +52,7 @@ const Setting = () => {
         // getTabItems('3', 'Notifications', <NotificationOutlined />, <Notification />),
         getTabItems('4', 'Security', <LockOutlined />, <Security companyList={companyList} saveData={saveData} />),
         getTabItems('5', 'Social links', <ShareAltOutlined />, <SocialLink companyList={companyList} saveData={saveData} />),
-        getTabItems('6', 'QR Code', <QrcodeOutlined />, <QRcode companyList={companyList} />),
+        getTabItems('6', 'QR Code', <QrcodeOutlined />, <QRcode />),
     ];
 
     return (

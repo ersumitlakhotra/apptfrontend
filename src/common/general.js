@@ -76,7 +76,7 @@ export const isOpenForWork = (date, info ) => {
     return _result;
 } 
 
-export const userDefaultSchedule = (date, info) => {
+export const userSchedule = (date, info,id, scheduleList) => {
     const _result = [];
     let inTimeString = '00:00:00';
     let outTimeString = '00:00:00';
@@ -149,6 +149,14 @@ export const userDefaultSchedule = (date, info) => {
                  breakEnd = '00:00:00';
                 break;
             }
+    }
+    const res = scheduleList.find(item => item.uid === id && get_Date(item.trndate, 'YYYY-MM-DD') === get_Date(date, 'YYYY-MM-DD'))
+    if (res !== undefined) {
+        inTimeString = res.startshift;
+        outTimeString = res.endshift;
+        isOpenString = Boolean(res.dayoff);
+        breakStart = res.breakstart;
+        breakEnd = res.breakend;
     }
 
     _result.push({

@@ -1,4 +1,4 @@
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ProfileCard from "../Setting/profileCard";
 import CalenderCard from "./calenderCard";
 import {AppIcons} from "../../common/custom/appIcons";

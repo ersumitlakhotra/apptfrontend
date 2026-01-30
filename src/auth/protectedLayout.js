@@ -40,7 +40,7 @@ const ProtectedLayout = () => {
 
     return (
         <div class='min-h-screen w-full flex flex-col  '>
-            <Header />
+            <Header saveData={saveData} refresh={refresh}  />
 
             <main class="flex-1 px-8 scroll-auto">
                 <Outlet context={{ saveData, isLoading, setIsLoading, refresh }} />

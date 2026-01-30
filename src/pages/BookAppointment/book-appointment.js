@@ -1,15 +1,14 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import { Button, Spin, Modal, Drawer, Image, Avatar, Input } from 'antd';
+import { Button, Spin,  Drawer, Input, Modal } from 'antd';
 import { LoadingOutlined, ArrowLeftOutlined, CloseOutlined, UpCircleOutlined, UserOutlined, CalendarOutlined, ContactsOutlined } from '@ant-design/icons';
-import { useEffect, useMemo, useState } from 'react';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { useEffect,  useState } from 'react';
+import {  useSearchParams } from 'react-router-dom';
 import Services from '../../components/BookAppointment/services.js';
 import Employee from '../../components/BookAppointment/employee.js';
 import Slot from '../../components/BookAppointment/slot.js';
 import Details from '../../components/BookAppointment/detail.js';
-import { apiCalls } from '../../hook/apiCall';
 import { get_Date, LocalDate, LocalTime } from '../../common/localDate.js';
 import useAlert from '../../common/alert.js';
 import { isValidEmail, setCellFormat } from '../../common/cellformat.js';
@@ -18,25 +17,28 @@ import BookingOption from '../../components/BookAppointment/book_reschedule.js';
 import ViewBooking from '../../components/BookAppointment/view_booking.js';
 import { TextboxFlexCol } from '../../common/textbox.js';
 import { useIdleTimer } from 'react-idle-timer';
-import { compareTimes, isOpenForWork, userDefaultSchedule } from '../../common/general.js';
+import { compareTimes, isOpenForWork, userSchedule } from '../../common/general.js';
 import { generateTimeSlotsWithDate, toMinutes } from '../../common/generateTimeSlots.js';
 import AssignedTo from '../../common/assigned_to.js';
-import { useManualNotification } from '../../hook/notification.js';
+import FetchData from '../../hook/fetchData.js';
+import SaveData from '../../hook/saveData.js'
+import { useEmail } from '../../email/email.js';
 
 const BookAppointment = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const { contextHolder, warning, error } = useAlert();
     const [modal, contextHolderModal] = Modal.useModal();
+   
     const [isLoading, setIsLoading] = useState(false);
     const [content, setContent] = useState(0);
-    const { showNotification, setShowNotification} = useManualNotification();
+    const { sendEmail,AppointmentStatus} = useEmail();
+    
+    const [scheduleList, setScheduleList] = useState([]);
 
     const [cid, setCid] = useState(0);
     const [storeName, setStoreName] = useState('');
     const [storeCell, setStoreCell] = useState('');
     const [storeAddress, setStoreAddress] = useState('');
-    const [emailUser, setEmailUser] = useState('');
-    const [emailPass, setEmailPass] = useState('');
     const [daysAdvance, setDaysAdvance] = useState(0);
     const [autoAccept, setAutoAccept] = useState(false);
     const [storeSchedule, setStoreSchedule] = useState(null);
@@ -98,48 +100,67 @@ const BookAppointment = () => {
     });
 
     useEffect(() => {
-        getLocations(setCompanyList, "company/booking", storeId);
+        const init = async () => {
+            setIsLoading(true)
+            const locationsResponse = await FetchData({
+                method: 'GET',
+                endPoint: 'company/booking',
+                cid: storeId
+            })
+            setIsURL(locationsResponse.data.length > 0);
+            setCompanyList(locationsResponse.data);
+            setIsLoading(false)
+        };
+          init(); 
     }, []);
 
     useEffect(() => {
-        companyList.filter(a => a.id === cid).map(item => {
-            setStoreName(item.name);
-            setStoreCell(item.cell);
-            setEmailUser(item.emailuser);
-            setEmailPass(item.emailpass);
-            setDaysAdvance(item.bookingdays);
-            setAutoAccept(item.autoaccept);
-            setStoreSchedule(item.timinginfo[0]);
-            if (item.addressinfo !== null) {
-                let address = `${item.addressinfo[0].street}, ${item.addressinfo[0].city}, ${item.addressinfo[0].province} ${item.addressinfo[0].postal} `;
-                setStoreAddress(address);
-            }
-        });
-        getData(setEventList, "GET", "event",null,[], true);
-        getData(setServicesList, "GET", "services");
-        getData(setUserList, "GET", "user");
+        const init = async () => {
+            setIsLoading(true)
+            const serviceResponse = await FetchData({ method: 'GET', endPoint: 'services', cid: cid })
+            const userResponse = await FetchData({ method: 'GET', endPoint: 'user', cid: cid })
+            const eventResponse = await FetchData({ method: 'GET', endPoint: 'event', eventDate: true, cid: cid })
+            const scheduleResponse = await FetchData({ method: 'GET', endPoint: 'schedule', cid: cid })
+            companyList.filter(a => a.id === cid).map(item => {
+                setStoreName(item.name);
+                setStoreCell(item.cell);
+                setDaysAdvance(item.bookingdays);
+                setAutoAccept(item.autoaccept);
+                setStoreSchedule(item.timinginfo[0]);
+                if (item.addressinfo !== null) {
+                    let address = `${item.addressinfo[0].street}, ${item.addressinfo[0].city}, ${item.addressinfo[0].province} ${item.addressinfo[0].postal} `;
+                    setStoreAddress(address);
+                }
+            });
+            setScheduleList(scheduleResponse.data);
+            setServicesList(serviceResponse.data);
+            setUserList(userResponse.data);
+            setEventList(eventResponse.data);
+            setIsLoading(false)
+        };  
+        init(); 
     }, [cid]);
 
     useEffect(() => {
-        if (assigned_to > 0)
-            userList.filter(a => a.id === assigned_to).map(item => setEmployeeName(item.fullname))
-        else if (assigned_to === -1) {
-            let active = [];
-            userList.map(async item => {
-                const employee = await getUserSchedule(item.id,item.timinginfo[0]);
-                if (employee[0].isOpen) {
-                    active.push({
-                        id: item.id,    // <-- date included here
-                        inTime: employee[0].inTime,
-                        outTime: employee[0].outTime,
-                        isOpen: employee[0].isOpen,
-                        breakStart: employee[0].breakStart,
-                        breakEnd: employee[0].breakEnd
-                    });
-                }
-            })
-            setActiveEmployee(active);
-        }
+        setIsLoading(true)
+        let active = [];
+        const user = assigned_to > 0 ? userList.filter(item => item.id === assigned_to) : userList;
+        user.map(item => {
+            const timing = userSchedule(trndate, item.timinginfo[0], item.id,scheduleList);
+            if (timing[0].isOpen) {
+                active.push({
+                    id: item.id,
+                    name: item.fullname,   // <-- date included here
+                    inTime: timing[0].inTime,
+                    outTime: timing[0].outTime,
+                    isOpen: timing[0].isOpen,
+                    breakStart: timing[0].breakStart,
+                    breakEnd: timing[0].breakEnd
+                });
+            }
+        })
+        setActiveEmployee(active);
+        setIsLoading(false)
     }, [assigned_to]);
 
     useEffect(() => {
@@ -182,17 +203,18 @@ const BookAppointment = () => {
     const onTrnDateChange = async () => {
         //setSlot(prevTrnDate === trndate && bookingType > 1 ? prevSlot :'' );
         setSlot('');
-        const business = isOpenForWork(trndate, storeSchedule);
+        const business = isOpenForWork(trndate, storeSchedule); 
          if (business[0].isOpen) {
                 setIsOpen(true);
                 if (assigned_to > 0) {
                     const user = userList.find(item => item.id === assigned_to);
                     setEmployeeName(user.fullname);          
-                    const employee = await getUserSchedule(assigned_to,user.timinginfo[0]);   
+                    const employee = userSchedule(trndate, user.timinginfo[0],assigned_to,scheduleList);   
+                   
                     if (employee[0].isOpen) {
                         setUserWorking(true);
                         let orderList =await getOrderList(assigned_to);
-                        let appointments = orderList[0].filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === assigned_to && a.status !== 'Cancelled' && a.id !== order_id));
+                        let appointments = orderList.filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === assigned_to && a.status !== 'Cancelled' && a.status !== 'Rejected' && a.id !== order_id));
                         appointments = [...appointments, { start: employee[0].breakStart ,end:employee[0].breakEnd}]
                         let minutes = 0;
                         servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item => { minutes += item.minutes; });
@@ -222,7 +244,7 @@ const BookAppointment = () => {
                     let data = [];
                     activeEmployee.map(async (employee,index) => {
                         orderList =await getOrderList(employee.id);
-                        appointments = orderList[0].filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === employee.id && a.status !== 'Cancelled' && a.id !== order_id));
+                        appointments = orderList.filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === employee.id && a.status !== 'Cancelled' && a.status !== 'Rejected' && a.id !== order_id));
                         appointments = [...appointments, { start: employee.breakStart ,end:employee.breakEnd}]
                        
                         let loginTime = compareTimes(business[0].inTime, employee.inTime);
@@ -257,222 +279,33 @@ const BookAppointment = () => {
 
     }
 
-    const getUserSchedule =async (uid,timinginfo) => {
-        const _result = [];
-        let inTimeEmployee = '00:00:00';
-        let outTimeEmployee = '00:00:00';
-        let isOpenEmployee = false;
-        let breakStartEmployee = '00:00:00';
-        let breakEndEmployee = '00:00:00';
-        setIsLoading(true);
-        const defaultTimingEmployee = userDefaultSchedule(trndate, timinginfo);
-        try {
-            const Body = JSON.stringify({
-                cid: cid,
-                uid: uid,
-                trndate: trndate
-            });
-            const res = await apiCalls("POST", 'app/schedule/date', null, null, Body);
-            if (res.status === 200) {
-                inTimeEmployee = res.data.data.startshift;
-                outTimeEmployee = res.data.data.endshift;
-                isOpenEmployee = Boolean(res.data.data.dayoff)
-                breakStartEmployee = res.data.data.breakstart;
-                breakEndEmployee = res.data.data.breakend;
-            }
-            else {
-                inTimeEmployee = defaultTimingEmployee[0].inTime;
-                outTimeEmployee = defaultTimingEmployee[0].outTime;
-                isOpenEmployee = Boolean(defaultTimingEmployee[0].isOpen)
-                breakStartEmployee = defaultTimingEmployee[0].breakStart;
-                breakEndEmployee = defaultTimingEmployee[0].breakEnd;
-            }
-        }
-        catch {
-            inTimeEmployee = '00:00:00';
-            outTimeEmployee = '00:00:00';
-            isOpenEmployee = false;
-            breakStartEmployee = '00:00:00';
-            breakEndEmployee = '00:00:00';
-        }
-        setIsLoading(false);
-        _result.push({    
-            uid: uid,    // <-- date included here
-            inTime: inTimeEmployee,
-            outTime: outTimeEmployee,
-            isOpen: isOpenEmployee,
-            breakStart:breakStartEmployee,
-            breakEnd:breakEndEmployee
-        });
-        return _result;
-    }
-
     const getOrderList = async (uid) => {
-        let orderList = [];
         setIsLoading(true);
-        const body = JSON.stringify({ 
-            date: get_Date(trndate, 'YYYY-MM-DD').toString(), 
-            uid: parseInt(uid) 
-        });
-        try {
-            const res = await apiCalls("POST", "order/booking", cid, null, body, false);
-            orderList.push(res.data.data);
-        }
-        catch (e) {
-            orderList = [];
-            //error(error.message)
-        }
+        const body = JSON.stringify({  date: get_Date(trndate, 'YYYY-MM-DD').toString(), uid: parseInt(uid) }); 
+        const orderResponse = await FetchData({ method: 'POST', endPoint: 'order/booking',cid:cid,body:body })
         setIsLoading(false);
-        return orderList;
+        return orderResponse.data;
     }
-    const getData = async (setList, method, endPoint, id = null, body = [], eventDate = false) => {
+   
+ 
+    const isSlotAvailable = async () => {
+        if (bookingType === 3)
+            return true
 
         setIsLoading(true);
-        try {
-            const res = await apiCalls(method, endPoint, cid, id, body, eventDate);
-            setList(res.data.data);
-        }
-        catch (e) {
-            setList([])
-            //error(error.message)
-        }
-        setIsLoading(false);
-    }    
-    
-    const getLocations = async (setList, endPoint, store) => {
-        setIsLoading(true);
-        try {
-            const res = await apiCalls("GET", endPoint, store);
-            if (res.data.data.length > 0)
-                setIsURL(true);
-            setList(res.data.data);
-        }
-        catch (e) {
-            setList([])
-            setIsURL(false)
+        const body = JSON.stringify({ date: get_Date(trndate, 'YYYY-MM-DD').toString(), uid: parseInt(employeeId) });
+        const orderResponse = await FetchData({ method: 'POST', endPoint: 'order/booking', cid: cid, body: body });
+        let orderList = orderResponse.data.filter(a => a.status !== "Cancelled" && a.slot === slot);
+        if (bookingType === 2 && orderList.length === 1) {
+            if (orderList[0].slot === prevSlot)
+                orderList = [];
         }
         setIsLoading(false);
+        return orderList.length === 0;
     }
-
-
-    const next = () => {
-        let isNext = true;
-        let message = '';
-        switch (content) {
-            case 1:
-                {
-                    if (bookingType > 1 && order_id === 0) {
-                        isNext = false;
-                        setOpenSearch(true);
-                    }
-                    if(bookingType === 0)
-                        setTrnDate(LocalDate())
-                    break;
-                }
-            case 2:
-                {
-                    setShowNotification(showNotification +1)
-                    if (assigned_to === 0) {
-                        isNext = false;
-                        message = "Please select a professional from list. "
-                    }
-                    break;
-                }
-            case 3:
-                {
-
-                    if (servicesItem.length === 0) {
-                        isNext = false;
-                        message = "Minimum one service is required to book an appointment. "
-                    }
-                    onTrnDateChange();
-                    break;
-                }
-            case 4:
-                {
-                    
-                    if (slot === '') {
-                        isNext = false;
-                        message = "Please select a slot as per professional availability. "
-                    }
-                    break;
-                }
-            case 5:
-                {
-                    isNext = false;
-                    if (customerName === '' || customerPhone === '' || customerPhone.length !== 12 || customerEmail === '' || !isValidEmail(customerEmail))
-                        message = "Please fill the contact details. "
-                    else
-                        save();
-                    break;
-                }
-            default: { break }
-        }
-        if (isNext)
-            setContent(content + 1);
-        else if (message !== '')
-            warning(message);
-
-    };
-
-    const prev = () => {
-        setContent(content - 1);
-    };
-
-
-    const successModal = (order_no) => {
-        modal.success({
-            title: (<span class='font-semibold'>{storeName}</span>),
-            content: (
-                <div class='flex flex-col gap-4 p-4'>
-                    <p class='font-bold'>Hi {customerName}</p>
-                    <p>Your booking at <span class='font-semibold'>{storeName}</span> has been {bookingType === 2 && 'rescheduled and'} <span class='text-green-700'>Confirmed!</span></p>
-                    <div class='w-full flex flex-col gap-2 p-2 bg-white rounded-lg shadow border border-green-700 border-s-green-700 border-s-8'>
-                        <p class='font-bold'>Appointment Details</p>
-                        <p>Booking #: <span class='font-semibold'>{order_no}</span></p>
-                        <p>Booked with: <span class='font-semibold'>{employeeName}</span></p>
-                        <p>Date: <span class='font-semibold'>{`${get_Date(trndate, 'DD MMM YYYY')} at ${slot}`}</span></p>
-                    </div>
-
-                    <p>You will shortly receive an email regarding booking confirmation.</p>
-                </div>
-            ),
-            onOk() { window.location.reload() },
-        });
-    };
-    const errorModal = () => {
-        modal.error({
-            title: (<span class='font-semibold'>{storeName}</span>),
-            content: (<div class='flex flex-col gap-4 p-4'>
-                <p class='font-bold'>We sincerely apologize, but something went wrong with your booking!</p>
-                <p class='text-xs'>We invite you to try again, or to contact the store at {`( ${storeCell} ) `} to get help</p>
-            </div>),
-            onOk() { window.location.reload() },
-        });
-    };
-    const cancelModal = (order_no) => {
-        modal.success({
-            title: (<span class='font-semibold'>{storeName}</span>),
-            content: (
-                <div class='flex flex-col gap-4 p-4'>
-                    <p class='font-bold'>Hi {customerName}</p>
-                    <p>Your booking at <span class='font-semibold'>{storeName}</span> has been  <span class='text-red-700'>Cancelled!</span></p>
-                    <div class='w-full flex flex-col gap-2 p-2 bg-white rounded-lg shadow border border-red-700 border-s-red-700 border-s-8'>
-                        <p class='font-bold'>Appointment Details</p>
-                        <p>Booking #: <span class='font-semibold'>{order_no}</span></p>
-                        <p>Booked with: <span class='font-semibold'>{employeeName}</span></p>
-                        <p>Date: <span class='font-semibold'>{`${get_Date(trndate, 'DD MMM YYYY')} at ${slot}`}</span></p>
-                    </div>
-                    <p>You will shortly receive an email regarding booking cancellation.</p>
-                </div>
-            ),
-            onOk() { window.location.reload() },
-        });
-    };
-
 
     const save = async () => {
-        if (customerName !== '' && customerPhone !== '' && customerPhone.length === 12 && customerEmail !== '' && isValidEmail(customerEmail)) {
+        if (customerName !== '' && customerPhone !== '' && customerPhone.length === 12 && customerEmail !== '' && isValidEmail(customerEmail) ) {
             const Body = JSON.stringify({
                 customerName: customerName,
                 customerPhone: customerPhone,
@@ -496,107 +329,65 @@ const BookAppointment = () => {
                 bookedvia: 'Appointment',
             });
 
-            if (bookingType === 1 || bookingType === 2) {
-                const bodyOrderCheck = JSON.stringify({ date: get_Date(trndate, 'YYYY-MM-DD').toString(), uid: parseInt(employeeId) });
-                 let orderList=[];
-                setIsLoading(true);
-                try {
-                    const res = await apiCalls("POST", "order/booking", cid, null, bodyOrderCheck, false);
-                    orderList = res.data.data.filter(a => a.status !== "Cancelled" && a.slot === slot);
+            if (isSlotAvailable())
+            {
+                const res=await SaveData({
+                    label: "Appointment",
+                    method: bookingType === 2 ? 'PUT' : 'POST',
+                    endPoint: bookingType === 3 ? 'order/cancel' :"order",
+                    id: bookingType === 1 ? null : order_id ,  
+                    cid:cid,
+                    body: Body // [] on cancel
+                }); 
+                
+                if (res.isSuccess) {
+                    const id = res.data.id;
+                    const order_no = res.data.order_no;
 
-                    if (bookingType === 2 && orderList.length === 1 )
-                    {
-                        if (orderList[0].slot === prevSlot)
-                            orderList=[];
-                    }
+                    sendEmail({
+                        id: id,
+                        cid:cid,
+                        status: autoAccept ?
+                            bookingType === 1 ? AppointmentStatus.CONFIRMED : bookingType === 2 ? AppointmentStatus.RESCHEDULED : AppointmentStatus.CANCELLED
+                            : AppointmentStatus.AWAITING,
+                        userList: userList, 
+                        servicesList: servicesList
+                    })
+                    
+                    modal.success({
+                        title:(<span class='font-semibold'>{storeName}</span>),
+                        onOk() { window.location.reload()},
+                        content: (
+                            <div class='flex flex-col gap-4 p-4'>
+                                <p class='font-bold'>Hi {customerName}</p>
+                                <p>Your appointment at <span class='font-semibold'>{storeName}</span> has been 
+                                    <strong>
+                                        {autoAccept ? ' ' +
+                                            bookingType === 1 ? AppointmentStatus.CONFIRMED : bookingType === 2 ? AppointmentStatus.RESCHEDULED : AppointmentStatus.CANCELLED
+                                            : ' Waiting for approval.'}
+                                    </strong>
+                                </p>
+                                <div class='w-full flex flex-col gap-2 p-2 bg-white rounded-lg shadow border border-green-700 border-s-green-700 border-s-8'>
+                                    <p class='font-bold'>Appointment Details</p>
+                                    <p>Booking #: <span class='font-semibold'>{order_no}</span></p>
+                                    <p>Booked with: <span class='font-semibold'>{employeeName}</span></p>
+                                    <p>Date: <span class='font-semibold'>{`${get_Date(trndate, 'DD MMM YYYY')} at ${slot}`}</span></p>
+                                </div>
+                                <p>You will shortly receive an email shortly.</p>
+                            </div>
+                        ),
+                    })
 
-                    if(orderList.length === 0)
-                    {
-                        if (bookingType === 1) {
-                            saveData("POST", "order", Body, null);
-                        }
-                        if (bookingType === 2) {
-                            saveData("PUT", "order", Body, order_id);
-                        }
-                    }
-                    else
-                    {
-                        warning(`The time slot (${slot}) on ${trndate} has been reserved by another party and is no longer available`);
-                    }
                 }
-                catch (e) {
-                    orderList = [];
-                    //error(error.message)
-                }
-             setIsLoading(false);
+                else 
+                    error(`We sincerely apologize, but something went wrong with your appointment. We invite you to try again, or to contact the store at ${storeCell} to get help!`)    
             }
-           
-            if (bookingType === 3) {//message, read, cancelled             
-                saveData("POST", "order/cancel", [], order_id);
-            }
+            else
+                warning(`The time slot (${slot}) on ${trndate} has been reserved by another party and is no longer available`);          
         }
         else {
             warning('Please, fill out the required fields !');
         }
-    }
-    const saveData = async (method, endPoint, body, id) => {
-        setIsLoading(true);
-        try {
-            const result = await apiCalls(method, endPoint, cid, id, body, null);
-            if (result.status === 201 || result.status === 200) {
-                const order_no = result.data.data.order_no;
-                sendEmail(id, order_no, false);
-                successModal(order_no);
-            }
-            else if (result.status === 203) {
-                const order_no = result.data.data.order_no;
-                sendEmail(id, order_no, true);
-                const notifyBody = JSON.stringify({
-                    message: '# ' + order_no + ' is cancelled by ' + customerName + ' : ' + customerPhone,
-                    cancelled: '1',
-                });
-                await apiCalls("POST", "notification", cid, null, notifyBody, null);
-                cancelModal(order_no);
-            }
-            else
-                errorModal();
-        }
-        catch (e) {
-            errorModal();
-        }
-        setIsLoading(false);
-    }
-
-    const sendEmail = async (id, order_no, isCancelled) => {
-        const Subject = isCancelled ? 'Booking Cancellation' : id === null ? "Booking Confirmation" : "Re-Schedule Confirmation";
-        const link = `${process.env.REACT_APP_DOMAIN}/book-appointment?store=` + storeId;
-        let serviceNames = '';
-        servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item =>
-            serviceNames += item.name + ', '
-        )
-
-        let message = '<p>Hi ' + customerName + '</p>';
-        message += `<p>This is a ${isCancelled ? 'cancellation' : 'confirmation'} of your <b>` + serviceNames + ' </b> booking on ' + get_Date(trndate, 'DD MMM YYYY') + ' at ' + slot + '.</p>';
-        message += '<p>Your <b>Booking# :</b> ' + order_no + ' and <b>Booked With : </b>' + employeeName + '</p>';
-        message += '<p>If you have any questions, please contact the business at ( ' + storeCell + ' )</p>';
-        message += '<p>In case for New booking/Rescheduling/Cancellation, please click on this link:</p><a href="' + link + '">' + link + '</a>';
-
-        const Body = JSON.stringify({
-            emailUser: emailUser,
-            emailPass: emailPass,
-            storeName: storeName,
-            to: customerEmail,
-            subject: Subject,
-            message: message,
-        });
-        setIsLoading(true);
-        try {
-            await apiCalls("POST", "sendmail", cid, null, Body);
-        }
-        catch (e) {
-
-        }
-        setIsLoading(false);
     }
 
     const searchOrder = async () => {
@@ -606,12 +397,11 @@ const BookAppointment = () => {
             let result = false;
             let message = 'Either Booking# or Cell # is incorrect!';
             try {
-                const Body = JSON.stringify({
-                    order_no: order_no
-                });
-                const res = await apiCalls("POST", "order/reschedule", cid, null, Body);
-                if (res.data.data.length > 0) {
-                    const editList = res.data.data[0];
+                const Body = JSON.stringify({order_no: order_no});
+                const orderResponse = await FetchData({ method: 'POST', endPoint: 'order/reschedule', cid: cid ,body:Body})
+                console.log(orderResponse.data[0])
+                if (orderResponse.data.length > 0) {
+                    const editList = orderResponse.data[0];
                     if (editList.cell === customerPhone) {
 
                         const date1 = new Date(editList.trndate);
@@ -620,7 +410,7 @@ const BookAppointment = () => {
                             result = false;
                             message = `Past order can't be rescheduled or cancel.`;
                         }
-                        else if (editList.status !== 'Pending') {
+                        else if (editList.status === 'Completed' || editList.status === 'Cancelled' || editList.status === 'Rejected' ) {
                             result = false;
                             message = `Order is already marked as ${editList.status}.`;
                         }
@@ -669,6 +459,69 @@ const BookAppointment = () => {
         else
             warning('Please, fill out the required fields !');
     }
+
+    const next = () => {
+        let isNext = true;
+        let message = '';
+        switch (content) {
+            case 1:
+                {
+                    if (bookingType > 1 && order_id === 0) {
+                        isNext = false;
+                        setOpenSearch(true);
+                    }
+                    if (bookingType === 0)
+                        setTrnDate(LocalDate())
+                    break;
+                }
+            case 2:
+                {
+                    if (assigned_to === 0) {
+                        isNext = false;
+                        message = "Please select a professional from list. "
+                    }
+                    break;
+                }
+            case 3:
+                {
+
+                    if (servicesItem.length === 0) {
+                        isNext = false;
+                        message = "Minimum one service is required to book an appointment. "
+                    }
+                    onTrnDateChange();
+                    break;
+                }
+            case 4:
+                {
+
+                    if (slot === '') {
+                        isNext = false;
+                        message = "Please select a slot as per professional availability. "
+                    }
+                    break;
+                }
+            case 5:
+                {
+                    isNext = false;
+                    if (customerName === '' || customerPhone === '' || customerPhone.length !== 12 || customerEmail === '' || !isValidEmail(customerEmail))
+                        message = "Please fill the contact details. "
+                    else
+                        save();
+                    break;
+                }
+            default: { break }
+        }
+        if (isNext)
+            setContent(content + 1);
+        else if (message !== '')
+            warning(message);
+
+    };
+
+    const prev = () => {
+        setContent(content - 1);
+    };
 
     let displayedContent;
     if (content === 0) {

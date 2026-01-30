@@ -59,7 +59,8 @@ const Template = ({ heading, name, order_no, professional, date, slot, services,
                                                 </h2>
 
                                                 <p style={{ marginTop: 0 }}>
-                                                    Your appointment has been <strong>{heading}</strong>. Here are
+                                                
+                                                    Your appointment has been <strong>{heading ==='Awaiting'? 'Waiting for approval. Once your appointment has been reviewed, you will receive an email. ' :heading}</strong>. Here are
                                                     the details:
                                                 </p>
 

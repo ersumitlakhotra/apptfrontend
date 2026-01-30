@@ -6,7 +6,7 @@ import useAlert from "../../common/alert.js";
 import { TextboxFlex } from "../../common/textbox.js";
 import { get_Date } from "../../common/localDate.js";
 import dayjs from 'dayjs';
-import { userDefaultSchedule } from "../../common/general.js";
+import { userSchedule } from "../../common/general.js";
 import AssignedTo from "../../common/assigned_to.js";
 const { RangePicker } = TimePicker;
 
@@ -41,23 +41,12 @@ const ScheduleDetail = ({ id, refresh, ref, date, scheduleList, userList, saveDa
 
     const setUserDefault = (date, id) => {
         const user = userList.find(item => item.id === id)
-        const defaultTimingEmployee = userDefaultSchedule(date, user.timinginfo[0]);
-        const res = scheduleList.find(item => item.uid === id && get_Date(item.trndate, 'YYYY-MM-DD') === get_Date(date, 'YYYY-MM-DD'))
-        if (res === undefined) {
-            setStartTime(defaultTimingEmployee[0].inTime);
-            setEndTime(defaultTimingEmployee[0].outTime);
-            setIsWorking(defaultTimingEmployee[0].isOpen);
-            setBreakStart(defaultTimingEmployee[0].breakStart);
-            setBreakEnd(defaultTimingEmployee[0].breakEnd);
-        }
-        else {
-            setStartTime(res.startshift);
-            setEndTime(res.startshift);
-            setIsWorking(res.dayoff);
-            setBreakStart(res.breakstart);
-            setBreakEnd(res.breakend);
-        }
-
+        const timing = userSchedule(date, user.timinginfo[0], id, scheduleList);
+        setStartTime(timing[0].inTime);
+        setEndTime(timing[0].outTime);
+        setIsWorking(timing[0].isOpen);
+        setBreakStart(timing[0].breakStart);
+        setBreakEnd(timing[0].breakEnd);
     }
 
     useEffect(() => {

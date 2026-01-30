@@ -11,15 +11,14 @@ import {
     FundOutlined,
     DollarOutlined,
     ContactsOutlined,
-    HomeOutlined 
+    HomeOutlined ,
+    QrcodeOutlined
 } from '@ant-design/icons';
 
 import { FaHandHoldingUsd } from "react-icons/fa";
 import { AiFillSchedule } from "react-icons/ai";
-import CalenderIcon from "../../common/custom/calenderIcon";
 
 import { IoIosCalendar } from "react-icons/io";
-import IsLoading from "./isLoading";
 import FetchData from "../../hook/fetchData";
 import { getStorage } from "../localStorage";
 
@@ -68,7 +67,8 @@ const AppIconsPermission = (size='50px',iconSize=54) => {
         getItem('Collection', '', 11, <FaHandHoldingUsd style={{ fontSize: size, color: 'white' }} />, false),
         // getItem('Expenses','', 12, <FallOutlined style={{ fontSize: size, color: 'white' }} />),
         getItem('Help', '/help', 13, <CustomerServiceOutlined style={{ fontSize: size, color: 'white' }} />, true, 'bg-gradient-to-r from-cyan-400 to-cyan-900'),
-        getItem('Setting', '/setting', 14, <SettingOutlined style={{ fontSize: size, color: 'white' }} />, setting, 'bg-gray-500'),
+        getItem('QR Code', '/scanQR', 14, <QrcodeOutlined style={{ fontSize: size, color: 'white' }} />, true, 'bg-gradient-to-b from-red-900 to-[#D6B588]'),
+        getItem('Setting', '/setting', 15, <SettingOutlined style={{ fontSize: size, color: 'white' }} />, setting, 'bg-gray-500'),
     ]
 
     useEffect(() => {

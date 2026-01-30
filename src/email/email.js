@@ -10,16 +10,19 @@ export const useEmail = () => {
         CANCELLED: "Cancelled",
         RESCHEDULED: "Rescheduled",
         REJECTED: "Rejected",
+        AWAITING: "Awaiting",
     } 
-    const getDetail = async (id, userList, servicesList) => {
+    const getDetail = async (id,cid, userList, servicesList) => {
         const orderResponse = await FetchData({
             method: 'GET',
             endPoint: 'order', //
-            id: id
+            id: id,
+            cid: cid
         })
         const companyResponse = await FetchData({
             method: 'GET',
-            endPoint: 'company'
+            endPoint: 'company',
+            cid: cid
         })
 
         const bookedWith = userList.find(items => items.id === orderResponse.data.assignedto).fullname;
@@ -45,8 +48,8 @@ export const useEmail = () => {
         }
     }
 
-    const sendEmail = async ({ id,status,userList,servicesList }) => {
-        const order = await getDetail(id, userList, servicesList);
+    const sendEmail = async ({ id,status,userList,servicesList,cid=null }) => {
+        const order = await getDetail(id,cid, userList, servicesList);
    
         const Body = JSON.stringify({
             emailUser: order.sendFrom,

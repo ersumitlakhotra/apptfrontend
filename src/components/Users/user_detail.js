@@ -11,7 +11,7 @@ import ScheduleN from "./scheduleN.js";
 function getTabItems(key, label, icon, children) {
     return {key,label,children,icon,};
 }
-const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyList, saveData, setOpen, isAdmin }) => {
+const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyList, saveData, setOpen, isAdmin,adminEmail =false }) => {
     const [tabActiveKey, setTabActiveKey] = useState("1");
     const [fullname, setFullname] = useState('');
     const [cell, setCell] = useState('');
@@ -232,6 +232,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyLis
             appschedule={appschedule}
             setAppSchedule={setAppSchedule}
             isAdmin={isAdmin}
+            adminEmail={adminEmail}
             />),
         ((role === 'User' && isAdmin) && 
         getTabItems('2', 'Permissions', <EyeOutlined />, <UserLoginPermissions

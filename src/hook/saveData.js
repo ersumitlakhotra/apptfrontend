@@ -2,10 +2,10 @@
 import { getStorage } from "../common/localStorage";
 import { apiCalls } from "./apiCall";
 
-const SaveData = async ({ label, method, endPoint, id = null, body = null, logs = true }) => {
+const SaveData = async ({ label, method, endPoint, id = null, body = null, logs = true,cid=null }) => {
     const localStorage = await getStorage();
     try {
-        const res = await apiCalls(method, endPoint, localStorage.cid, id, body);
+        const res = await apiCalls(method, endPoint, cid === null ? localStorage.cid : cid , id, body);
         const message = res.status === 201 ? `The ${label} has been Created successfully.` :
             res.status === 200 ? `The ${label} has been Modified successfully.` :
                 res.status === 203 ? `The ${label} has been Deleted successfully.` :
