@@ -7,17 +7,32 @@ import { Spin } from "antd";
 import { LoadingOutlined } from '@ant-design/icons';
 import Footer from "../pages/HomePage/footer";
 import { useEmail } from "../email/email";
+import { initNotification } from "../Firebase/requestPermission";
 
 const ProtectedLayout = () => {
     const { pathname } = useLocation();
-    const { contextHolder, success, error } = useAlert();
+    const { contextHolder, success, error, notifications } = useAlert();
     const {sendEmail} = useEmail()
     const [isLoading, setIsLoading] = useState(false);
     const [refresh, setRefresh] = useState(0);
+    const [refreshNotifications, setRefreshNotifications] = useState(0);
    
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
-    }, [pathname]);  
+    }, [pathname]);     
+    
+    useEffect(() => {
+         if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/firebase-messaging-sw.js")
+                .then(registration => initNotification(registration,saveData,onNotification))
+            .catch(console.error);
+         };
+    }, []);
+    
+    const onNotification = ({ title, body }) => {
+         setRefresh(refresh + 1);
+        notifications({ title: `${title} Appointment`, description: body })
+    }
 
     const saveData = async ({ label, method, endPoint, id = null, body = null, notify = true, logs = true, email = false, status = null, userList = [], servicesList =[]}) => {
         setIsLoading(true)
@@ -26,23 +41,24 @@ const ProtectedLayout = () => {
             method: method,
             endPoint: endPoint,
             id: id,
-            body: body,
-            notify: notify,
-            logs: logs
+            body: body
         })
         if (email)
             sendEmail({ id: id, status: status, userList: userList, servicesList: servicesList })        
         setIsLoading(false)
 
-        if (res.isSuccess) { success(res.message); setRefresh(refresh + 1); }
-        else error(res.message)
+        if (res.isSuccess) { 
+           notify && success(res.message); 
+            setRefresh(refresh + 1); }
+        else 
+             notify && error(res.message)
     }
 
     return (
         <div class='min-h-screen w-full flex flex-col  '>
             <Header saveData={saveData} refresh={refresh}  />
 
-            <main class="flex-1 px-8 scroll-auto">
+            <main class="flex-1 px-2 md:px-8 scroll-auto">
                 <Outlet context={{ saveData, isLoading, setIsLoading, refresh }} />
             </main>
 

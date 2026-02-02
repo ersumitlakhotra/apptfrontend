@@ -55,7 +55,8 @@ const Header = ({ saveData, refresh }) => {
 
         const notificationResponse = await FetchData({
             method: 'GET',
-            endPoint: 'notification'
+            endPoint: 'notification',
+            id: !isAdmin ? localStorage.uid : null
         })
         const userResponse = await FetchData({
             method: 'GET',
@@ -81,7 +82,7 @@ const Header = ({ saveData, refresh }) => {
         setUsername(userFind.username)
         setUserList(userResponse.data)
 
-        const unread = notificationResponse.data.filter(a => a.read === '1');
+        const unread = notificationResponse.data.filter(a => a.read === '0');
         setUnread(unread.length > 0 ? unread : [])
         setNotificationList(notificationResponse.data);
     }
@@ -117,9 +118,9 @@ const Header = ({ saveData, refresh }) => {
     const menuProps = {
         items: [
             getItem('1',
-                <div class='flex flex-row gap-4 p-2 bg-blue-50 border rounded-lg'>
+                <div class='flex flex-row gap-2 p-2 bg-blue-50 border rounded-lg overflow-auto'>
                     <AssignedTo userId={uid} userList={userList} imageWidth={34} imageHeight={34} AvatarSize={34} allowText={false} preview={false} />
-                    <div class='flex flex-col text-xs text-blue-800 font-medium'>
+                    <div class='flex flex-col text-xs px-3 text-blue-800 font-medium'>
                         <p>{fullname} </p>
                         <p>{username} </p>
                     </div>
@@ -169,7 +170,7 @@ const Header = ({ saveData, refresh }) => {
                     <BellFilled style={{ fontSize: '23px', color: 'white', cursor: 'pointer' }} onClick={() => { setOpenNotification(true); setUnreadUpdate(false); setTabActiveKey('1'); }} />
                 </Badge>
 
-                <Dropdown menu={menuProps} trigger={['click']} overlayClassName="bg-blue-800" overlayStyle={{ width: '200px', gap: 4, color: 'white', cursor: 'pointer' }}>
+                <Dropdown menu={menuProps} trigger={['click']} overlayStyle={{  gap: 4, color: 'white', cursor: 'pointer' }}>
                     <Space style={{ cursor: 'pointer' }}>
                         <AssignedTo userId={uid} userList={userList} imageWidth={28} imageHeight={28} AvatarSize={24} allowText={false} preview={false} />
                     </Space>
@@ -188,7 +189,7 @@ const Header = ({ saveData, refresh }) => {
                     </Button>
                 </Dropdown>}>
 
-                <NotificationDetail refresh={1} currentOption={currentOption} notificationList={notificationList} setUnreadUpdate={setUnreadUpdate} tabActiveKey={tabActiveKey} setTabActiveKey={setTabActiveKey} />
+                <NotificationDetail refresh={refresh} currentOption={currentOption} notificationList={notificationList} tabActiveKey={tabActiveKey} setTabActiveKey={setTabActiveKey} />
             </Drawer>
 
             <Drawer title={'Account'} placement='right' width={500} onClose={() => setOpen(false)} open={open}

@@ -7,7 +7,7 @@ import { SortUpcomingAppointments } from '../../common/general';
 import AppointmentCards from "./appointmentCard";
 import { IoMdWarning } from "react-icons/io";
 import { useOutletContext } from "react-router-dom";
-import { Drawer } from "antd";
+import { Badge, Drawer } from "antd";
 import OrderView from "../../components/Order/order_view";
 
 const WaitingApproval = () => {
@@ -66,6 +66,7 @@ const WaitingApproval = () => {
                         <div class='flex flex-row gap-2 bg-white items-center text-gray-800  font-medium font-sans pb-4 sticky top-0 z-40'>
                             <IoMdWarning  style={{ fontSize: '28px',color:'orange' }} />
                             <span>Awaiting Request</span>
+                            <Badge count={orderList.length}/>
                         </div>
 
                         {orderList.length === 0 ? <p class='text-left p-4 text-sm font-medium text-gray-500'> There aren't any pending requests .</p> :

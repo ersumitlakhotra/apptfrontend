@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import { Button, Spin,  Drawer, Input, Modal } from 'antd';
+import { Button, Spin,  Drawer, Input, Modal, notification } from 'antd';
 import { LoadingOutlined, ArrowLeftOutlined, CloseOutlined, UpCircleOutlined, UserOutlined, CalendarOutlined, ContactsOutlined } from '@ant-design/icons';
 import { useEffect,  useState } from 'react';
 import {  useSearchParams } from 'react-router-dom';
@@ -327,6 +327,7 @@ const BookAppointment = () => {
                 mode: 'Cash',
                 tip: '0',
                 bookedvia: 'Appointment',
+                sendnotification:true
             });
 
             if (isSlotAvailable())
@@ -399,7 +400,7 @@ const BookAppointment = () => {
             try {
                 const Body = JSON.stringify({order_no: order_no});
                 const orderResponse = await FetchData({ method: 'POST', endPoint: 'order/reschedule', cid: cid ,body:Body})
-                console.log(orderResponse.data[0])
+               
                 if (orderResponse.data.length > 0) {
                     const editList = orderResponse.data[0];
                     if (editList.cell === customerPhone) {
@@ -419,6 +420,7 @@ const BookAppointment = () => {
                             message = '';
                             setOrder_Id(editList.id)
                             setAssignedTo(editList.assignedto);
+                            setEmployeeId(editList.assignedto);
                             setPrevAssigned_To(editList.assignedto);
                             setServicesItem(editList.serviceinfo);
                             setPrevServicesItem(editList.serviceinfo);
@@ -470,7 +472,7 @@ const BookAppointment = () => {
                         isNext = false;
                         setOpenSearch(true);
                     }
-                    if (bookingType === 0)
+                    if (bookingType < 2)
                         setTrnDate(LocalDate())
                     break;
                 }

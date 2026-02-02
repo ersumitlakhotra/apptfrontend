@@ -20,11 +20,11 @@ export function getExcelItem(header, width) {
 export function getDate(dateTime) {
     return dayjs(dateTime).format('DD MMM YYYY h:mm A')
 }
-export function customLabelTab (label, tagColor, tagValue) {
+export function customLabelTab (label, tagColor, tagValue,isVisible=true) {
     return (
         <div class='flex flex-row gap-2 items-center'>
             <p>{label}</p>
-            <Tag color={tagColor}>{tagValue}</Tag>
+            {isVisible && <Tag color={tagColor}>{tagValue}</Tag>}
         </div>
     )
 }

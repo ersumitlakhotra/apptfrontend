@@ -170,6 +170,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     mode: mode,
                     tip: status === 'Completed' ? tip : '0' ,// received > total ? parseFloat(received - total).toFixed(2) : '0',
                     bookedvia: 'Walk-In',
+                    sendnotification:false
                 });
                 saveData({
                     label: "Appointment",
