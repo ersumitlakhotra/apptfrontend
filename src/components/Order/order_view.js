@@ -11,12 +11,15 @@ import useAlert from "../../common/alert";
 import { TbTransfer } from "react-icons/tb";
 import { useOutletContext } from "react-router-dom";
 import { useResponseButtons } from "./responseButton";
+import FetchData from "../../hook/fetchData";
+import IsLoading from "../../common/custom/isLoading";
 
-const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView }) => {
+const OrderView = ({ id, servicesList, userList, setOpenView, saveData }) => {
     const { contextHolder, warning } = useAlert();
-    
-    const { saveData } = useOutletContext();
-    const { Accept,Reject} = useResponseButtons();
+
+
+    const [isLoading, setIsLoading] = useState(false);
+    const { Accept, Reject } = useResponseButtons(saveData);
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
@@ -78,26 +81,39 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
             setAssignedTo(''); setOrderNo(''); setServicesItem([]); setSlot(''); setBookedVia('Walk-In')
         }
         else {
-            const editList = orderList.find(item => item.id === id)
-            setCustomerName(editList.name);
-            setCustomerPhone(editList.cell);
-            setCustomerEmail(editList.email);
-            setOrderNo(editList.order_no);
-            setStatus(editList.status);
-            setTrnDate(editList.trndate);
-            setServicesItem(editList.serviceinfo);
-            setCreatedat(editList.createdat);
-            setAssignedTo(editList.assignedto);
-            setPrice(editList.price);
-            setTax(editList.tax);
-            setTaxAmount(editList.taxamount);
-            setTotal(editList.total);
-            setCoupon(editList.coupon);
-            setDiscount(editList.discount);
-            setSlot(editList.slot);
-            setBookedVia(editList.bookedvia);
+            loadOrder();
         }
-    }, [refresh])
+    }, [id])
+
+    const loadOrder = async () => {
+
+        setIsLoading(true)
+        const orderResponse = await FetchData({
+            method: 'GET',
+            endPoint: 'order', //
+            id: id
+        })
+        const editList = orderResponse.data
+        setCustomerName(editList.name);
+        setCustomerPhone(editList.cell);
+        setCustomerEmail(editList.email);
+        setOrderNo(editList.order_no);
+        setStatus(editList.status);
+        setTrnDate(editList.trndate);
+        setServicesItem(editList.serviceinfo);
+        setCreatedat(editList.createdat);
+        setAssignedTo(editList.assignedto);
+        setPrice(editList.price);
+        setTax(editList.tax);
+        setTaxAmount(editList.taxamount);
+        setTotal(editList.total);
+        setCoupon(editList.coupon);
+        setDiscount(editList.discount);
+        setSlot(editList.slot);
+        setBookedVia(editList.bookedvia);
+
+        setIsLoading(false)
+    }
 
     const calculateTip = (value) => {
         let _value = setNumberAndDot(value) // _tax > 0 ? parseFloat((_subTotal * _tax) + _subTotal).toFixed(2) : _subTotal;
@@ -108,160 +124,164 @@ const OrderView = ({ id, refresh, orderList, servicesList, userList, setOpenView
         else
             setTip(0);
     }
-   
+
     return (
         <div class="flex flex-col gap-2 mb-12  w-full">
-            <div class='flex items-center justify-between'>
-                <span class="text-2xl font-bold text-gray-800">Appointment #{order_no}</span>
-                {status ==='Awaiting' ? 
-                    <div class='flex gap-2 '>
-                        <Accept id={id} userList={userList} servicesList={servicesList} labelVisible={true} />
-                        <Reject id={id} userList={userList} servicesList={servicesList} labelVisible={true}/>
+            <IsLoading isLoading={isLoading} rows={10} input={
+                <>
+                    <div class='flex items-center justify-between'>
+                        <span class="text-2xl font-bold text-gray-800">Appointment #{order_no}</span>
+                        {status === 'Awaiting' ?
+                            <div class='flex gap-2 '>
+                                <Accept id={id} userList={userList} servicesList={servicesList} labelVisible={true} />
+                                <Reject id={id} userList={userList} servicesList={servicesList} labelVisible={true} />
+                            </div>
+                            :
+                            (status === 'Pending' || status === 'In progress') &&
+                            <div class="flex gap-2">
+                                <Button color="cyan" variant="solid" icon={<CheckOutlined />} size="large" onClick={() => setIsModalOpen(true)}>Completed</Button>
+                                <Button color="danger" variant="solid" icon={<CloseOutlined />} size="large" onClick={() => {
+                                    saveData({
+                                        label: "Appointment",
+                                        method: 'POST',
+                                        endPoint: "order/cancel",
+                                        id: id,
+                                        body: []
+                                    });
+                                    setOpenView(false);
+                                }}>Cancelled</Button>
+
+                                {/*<Button type='default' icon={<PrinterOutlined />} size="middle">Print</Button>*/}
+                            </div>
+                        }
                     </div>
-                    :
-                (status === 'Pending' || status === 'In progress') &&
-                    <div class="flex gap-2">
-                        <Button color="cyan" variant="solid" icon={<CheckOutlined />} size="large" onClick={() => setIsModalOpen(true)}>Completed</Button>
-                        <Button color="danger" variant="solid" icon={<CloseOutlined />} size="large" onClick={() => {
-                            saveData({
-                                label: "Appointment",
-                                method: 'POST',
-                                endPoint: "order/cancel",
-                                id: id,
-                                body: []
-                            });
-                            setOpenView(false);
-                        }}>Cancelled</Button>
-
-                        {/*<Button type='default' icon={<PrinterOutlined />} size="middle">Print</Button>*/}
-                    </div>
-                }
-            </div>
-            <div class='flex text-xs text-gray-500'>
-                <p>Order History / Via {bookedvia} / #{order_no} - {UTC_LocalDateTime(createdat, 'MMMM, DD YYYY - hh:mm A ')}</p>
-            </div>
-
-            <div class='flex flex-col md:flex-row gap-4 mt-6'>
-
-                <div class='w-full md:w-9/12  flex flex-col gap-4 '>
-
-                    <div class='border rounded bg-white p-4 flex flex-col '>
-                        <span class="text-lg font-bold text-gray-800">Progress</span>
-                        <span class="text-xs text-gray-400">Current Order Status</span>
-                        <div class='mt-4'>
-                            <Steps
-                                current={ ( status === 'Awaiting' || status === 'Rejected')? 0 :  status === 'Pending' ? 1 : (status === 'In progress' ? 2 : 3)}
-                                percent={60}
-                                labelPlacement="vertical"
-                                size="small"
-                                status={status === 'Cancelled' || status === 'Rejected' ? "error" : (status === 'Completed' ? "finish" : "process")}
-                                items={[
-                                    { title: status === 'Awaiting'? 'Awaiting' : status === 'Rejected' ? 'Rejected':'Accepted'}, 
-                                    { title: 'Pending' }, 
-                                    { title: 'In Progress' }, 
-                                    { title: status === 'Cancelled' ? 'Cancelled' : 'Completed' }
-                                ]} />
-                        </div>
+                    <div class='flex text-xs text-gray-500'>
+                        <p>Order History / Via {bookedvia} / #{order_no} - {UTC_LocalDateTime(createdat, 'MMMM, DD YYYY - hh:mm A ')}</p>
                     </div>
 
-                    <div class='border rounded bg-white p-4 flex flex-col '>
-                        <div>
-                            {assigned_to === '0' ? '' :
-                                userList.filter(user => user.id === assigned_to).map(a =>
-                                    <div key={a.id} class='flex flex-row gap-4 '>
-                                        {a.profilepic !== null ?
-                                            <Image width={50} height={50} src={a.profilepic} style={{ borderRadius: 15 }} /> :
-                                            <Avatar size={50} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
-                                        }
-                                        <div class='flex flex-col '>
-                                            <span class="text-lg font-semibold text-gray-800 ps-1">{a.fullname}</span>
-                                            <Rate disabled value={a.rating} />
+                    <div class='flex flex-col md:flex-row gap-4 mt-6'>
+
+                        <div class='w-full md:w-9/12  flex flex-col gap-4 '>
+
+                            <div class='border rounded bg-white p-4 flex flex-col '>
+                                <span class="text-lg font-bold text-gray-800">Progress</span>
+                                <span class="text-xs text-gray-400">Current Order Status</span>
+                                <div class='mt-4'>
+                                    <Steps
+                                        current={(status === 'Awaiting' || status === 'Rejected') ? 0 : status === 'Pending' ? 1 : (status === 'In progress' ? 2 : 3)}
+                                        percent={60}
+                                        labelPlacement="vertical"
+                                        size="small"
+                                        status={status === 'Cancelled' || status === 'Rejected' ? "error" : (status === 'Completed' ? "finish" : "process")}
+                                        items={[
+                                            { title: status === 'Awaiting' ? 'Awaiting' : status === 'Rejected' ? 'Rejected' : 'Accepted' },
+                                            { title: 'Pending' },
+                                            { title: 'In Progress' },
+                                            { title: status === 'Cancelled' ? 'Cancelled' : 'Completed' }
+                                        ]} />
+                                </div>
+                            </div>
+
+                            <div class='border rounded bg-white p-4 flex flex-col '>
+                                <div>
+                                    {assigned_to === '0' ? '' :
+                                        userList.filter(user => user.id === assigned_to).map(a =>
+                                            <div key={a.id} class='flex flex-row gap-4 '>
+                                                {a.profilepic !== null ?
+                                                    <Image width={50} height={50} src={a.profilepic} style={{ borderRadius: 15 }} /> :
+                                                    <Avatar size={50} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
+                                                }
+                                                <div class='flex flex-col '>
+                                                    <span class="text-lg font-semibold text-gray-800 ps-1">{a.fullname}</span>
+                                                    <Rate disabled value={a.rating} />
+                                                </div>
+
+                                            </div>
+                                        )}
+                                </div>
+                                <div class='mt-4 p-4'>
+                                    <div class='border border-s-4 border-s-cyan-600 p-4 flex flex-col gap-3'>
+                                        <span class="text-xs text-gray-400">Working info</span>
+                                        {/* <Progress percent={50} size='small' status="active" strokeColor={{ from: '#108ee9', to: '#87d068' }} />*/}
+                                        <div class='flex flex-row gap-2'>
+                                            <CalendarOutlined />
+                                            <span class="text-xs font-medium text-black">Appointment - {UTC_LocalDateTime(trndate, 'MMMM, DD YYYY')}</span>
                                         </div>
-
+                                        <div class='flex flex-row gap-2'>
+                                            <ClockCircleOutlined />
+                                            <span class="text-xs font-medium text-black">Slot - {slot}</span>
+                                        </div>
+                                        <div class='flex flex-row gap-2'>
+                                            <UnorderedListOutlined />
+                                            <Services servicesItem={servicesItem} servicesList={servicesList} />
+                                        </div>
                                     </div>
-                                )}
+                                </div>
+                            </div>
                         </div>
-                        <div class='mt-4 p-4'>
-                            <div class='border border-s-4 border-s-cyan-600 p-4 flex flex-col gap-3'>
-                                <span class="text-xs text-gray-400">Working info</span>
-                                {/* <Progress percent={50} size='small' status="active" strokeColor={{ from: '#108ee9', to: '#87d068' }} />*/}
-                                <div class='flex flex-row gap-2'>
-                                    <CalendarOutlined />
-                                    <span class="text-xs font-medium text-black">Appointment - {UTC_LocalDateTime(trndate, 'MMMM, DD YYYY')}</span>
+
+                        <div class='w-full md:w-3/12  flex flex-col gap-4 '>
+                            <div class='border rounded bg-white p-4 flex flex-col gap-4'>
+                                <div class='flex flex-row items-center justify-between'>
+                                    <div class='flex flex-col'>
+                                        <span class="text-lg font-bold text-gray-800">Payment</span>
+                                        <span class="text-xs text-gray-400">Final Payment Amount</span>
+                                    </div>
+                                    {/*<Button type='default' icon={<DownloadOutlined />} size="middle">Download Invoice</Button>*/}
                                 </div>
-                                <div class='flex flex-row gap-2'>
-                                    <ClockCircleOutlined />
-                                    <span class="text-xs font-medium text-black">Slot - {slot}</span>
+
+                                <div class='border rounded bg-gray-100 flex flex-col gap-2 p-4 px-8'>
+                                    <div class='flex items-start justify-between text-xs'>
+                                        <span class=" text-gray-600">Subtotal</span>
+                                        <span class="font-semibold text-black">${price}</span>
+                                    </div>
+                                    <div class='flex items-start justify-between  text-xs'>
+                                        <span class="  text-gray-600">Discount {coupon !== '' && `- ${coupon}`}</span>
+                                        <span class={`font-semibold text-black ${parseFloat(discount).toFixed(2) > 0 && "text-red-400"} `}>
+                                            {parseFloat(discount).toFixed(2) <= 0 ? '$0' : `-$${discount}`}
+                                        </span>
+                                    </div>
+                                    <div class='flex items-start justify-between  text-xs'>
+                                        <span class=" text-gray-600">Tax ({tax}%)</span>
+                                        <span class="font-semibold text-black">${taxamount}</span>
+                                    </div>
+                                    <Divider className="my-2" />
+
+                                    <div class='flex items-start justify-between text-xs font-semibold text-black'>
+                                        <span >Total</span>
+                                        <span>${total}</span>
+                                    </div>
                                 </div>
-                                <div class='flex flex-row gap-2'>
-                                    <UnorderedListOutlined />
-                                    <Services servicesItem={servicesItem} servicesList={servicesList} />
+                            </div>
+
+                            <div class='border rounded bg-white p-4 flex flex-col gap-4'>
+                                <div class='flex flex-row items-center justify-between'>
+                                    <div class='flex flex-col'>
+                                        <span class="text-lg font-bold text-gray-800">Customer</span>
+                                        <span class="text-xs text-gray-400">Information Detail</span>
+                                    </div>
+                                    {/*<Button type='default' icon={<DownloadOutlined />} size="middle">Download Invoice</Button>*/}
+                                </div>
+
+                                <div class='border rounded bg-gray-100 flex flex-col gap-2 p-4 px-8'>
+                                    <div class='flex items-start justify-between text-xs'>
+                                        <span class=" text-gray-600">Name</span>
+                                        <span class="font-semibold text-black">{customerName}</span>
+                                    </div>
+                                    <div class='flex items-start justify-between text-xs'>
+                                        <span class=" text-gray-600">Cell</span>
+                                        <span class="font-semibold text-black">{customerPhone}</span>
+                                    </div>
+                                    <div class='flex items-start justify-between text-xs'>
+                                        <span class=" text-gray-600">E-mail</span>
+                                        <span class="font-semibold text-black">{customerEmail}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class='w-full md:w-3/12  flex flex-col gap-4 '>
-                    <div class='border rounded bg-white p-4 flex flex-col gap-4'>
-                        <div class='flex flex-row items-center justify-between'>
-                            <div class='flex flex-col'>
-                                <span class="text-lg font-bold text-gray-800">Payment</span>
-                                <span class="text-xs text-gray-400">Final Payment Amount</span>
-                            </div>
-                            {/*<Button type='default' icon={<DownloadOutlined />} size="middle">Download Invoice</Button>*/}
-                        </div>
-
-                        <div class='border rounded bg-gray-100 flex flex-col gap-2 p-4 px-8'>
-                            <div class='flex items-start justify-between text-xs'>
-                                <span class=" text-gray-600">Subtotal</span>
-                                <span class="font-semibold text-black">${price}</span>
-                            </div>
-                            <div class='flex items-start justify-between  text-xs'>
-                                <span class="  text-gray-600">Discount {coupon !== '' && `- ${coupon}`}</span>
-                                <span class={`font-semibold text-black ${parseFloat(discount).toFixed(2) > 0 && "text-red-400"} `}>
-                                    {parseFloat(discount).toFixed(2) <= 0 ? '$0' : `-$${discount}`}
-                                </span>
-                            </div>
-                            <div class='flex items-start justify-between  text-xs'>
-                                <span class=" text-gray-600">Tax ({tax}%)</span>
-                                <span class="font-semibold text-black">${taxamount}</span>
-                            </div>
-                            <Divider className="my-2" />
-
-                            <div class='flex items-start justify-between text-xs font-semibold text-black'>
-                                <span >Total</span>
-                                <span>${total}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class='border rounded bg-white p-4 flex flex-col gap-4'>
-                        <div class='flex flex-row items-center justify-between'>
-                            <div class='flex flex-col'>
-                                <span class="text-lg font-bold text-gray-800">Customer</span>
-                                <span class="text-xs text-gray-400">Information Detail</span>
-                            </div>
-                            {/*<Button type='default' icon={<DownloadOutlined />} size="middle">Download Invoice</Button>*/}
-                        </div>
-
-                        <div class='border rounded bg-gray-100 flex flex-col gap-2 p-4 px-8'>
-                            <div class='flex items-start justify-between text-xs'>
-                                <span class=" text-gray-600">Name</span>
-                                <span class="font-semibold text-black">{customerName}</span>
-                            </div>
-                            <div class='flex items-start justify-between text-xs'>
-                                <span class=" text-gray-600">Cell</span>
-                                <span class="font-semibold text-black">{customerPhone}</span>
-                            </div>
-                            <div class='flex items-start justify-between text-xs'>
-                                <span class=" text-gray-600">E-mail</span>
-                                <span class="font-semibold text-black">{customerEmail}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                </>
+            } />
 
             <Modal
                 title="Payment Detail"

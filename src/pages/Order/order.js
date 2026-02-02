@@ -28,7 +28,7 @@ const Order = () => {
     const ref = useRef();
     const ranOnce = useRef(false);
     const headingLabel = 'Appointment'
-    const { saveData, refresh } = useOutletContext();
+    const { saveData, refresh,viewOrder } = useOutletContext();
     const [isAdmin, setIsAdmin] = useState(false);
     const [uid, setUid] = useState(0);
 
@@ -36,7 +36,6 @@ const Order = () => {
     const [fromDate, setFromDate] = useState(LocalDate());
     const [toDate, setToDate] = useState(LocalDate());
     const [open, setOpen] = useState(false);
-    const [openView, setOpenView] = useState(false);
     const [openLogs, setOpenLogs] = useState(false);
     const [title, setTitle] = useState('New');
     const [id, setId] = useState(0);
@@ -145,11 +144,6 @@ const Order = () => {
         setOpen(true);
     }
 
-    const btn_ViewClick = (id) => {
-        setReload(reload + 1);
-        setId(id);
-        setOpenView(true);
-    }
     const btn_LogsClick = (id) => {
         setId(id);
         setOpenLogs(true);
@@ -182,13 +176,13 @@ const Order = () => {
     }
 
     const tabItems = [
-        getTabItems('1', customLabelTab("All", "cyan", ordersList.length), null, <OrderTabs key={1} index={1} orderList={ordersList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} isAdmin={isAdmin}/>),
-        getTabItems('2', customLabelTab("Awaiting", "silver", awaitingList.length), null, <OrderTabs key={2} index={2} orderList={awaitingList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} isAdmin={isAdmin} />),
-        getTabItems('3', customLabelTab("Pending", "yellow", pendingList.length), null, <OrderTabs key={3} index={3} orderList={pendingList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} isAdmin={isAdmin} />),
-        getTabItems('4', customLabelTab("InProgress", "blue", inprogressList.length), null, <OrderTabs key={4} index={4} orderList={inprogressList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} isAdmin={isAdmin} />),
-        getTabItems('5', customLabelTab("Completed", "green", completedList.length), null, <OrderTabs key={5} index={5} orderList={completedList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} isAdmin={isAdmin} />),
-        getTabItems('6', customLabelTab("Cancelled", "red", cancelledList.length), null, <OrderTabs key={6} index={6} orderList={cancelledList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} isAdmin={isAdmin} />),
-        getTabItems('7', customLabelTab("Rejected", "red", rejectedList.length), null, <OrderTabs key={7} index={7} orderList={rejectedList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={btn_ViewClick} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} isAdmin={isAdmin} />),
+        getTabItems('1', customLabelTab("All", "cyan", ordersList.length), null, <OrderTabs key={1} index={1} orderList={ordersList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={viewOrder} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} isAdmin={isAdmin}/>),
+        getTabItems('2', customLabelTab("Awaiting", "silver", awaitingList.length), null, <OrderTabs key={2} index={2} orderList={awaitingList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={viewOrder} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} isAdmin={isAdmin} />),
+        getTabItems('3', customLabelTab("Pending", "yellow", pendingList.length), null, <OrderTabs key={3} index={3} orderList={pendingList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={viewOrder} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} isAdmin={isAdmin} />),
+        getTabItems('4', customLabelTab("InProgress", "blue", inprogressList.length), null, <OrderTabs key={4} index={4} orderList={inprogressList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={viewOrder} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} isAdmin={isAdmin} />),
+        getTabItems('5', customLabelTab("Completed", "green", completedList.length), null, <OrderTabs key={5} index={5} orderList={completedList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={viewOrder} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} isAdmin={isAdmin} />),
+        getTabItems('6', customLabelTab("Cancelled", "red", cancelledList.length), null, <OrderTabs key={6} index={6} orderList={cancelledList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={viewOrder} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} isAdmin={isAdmin} />),
+        getTabItems('7', customLabelTab("Rejected", "red", rejectedList.length), null, <OrderTabs key={7} index={7} orderList={rejectedList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={viewOrder} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} isAdmin={isAdmin} />),
     ];
 
 
@@ -207,11 +201,6 @@ const Order = () => {
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
                 <OrderDetail id={id} refresh={reload} ref={ref} setOrderNo={setOrderNo} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} eventList={eventList} customerList={customerList} scheduleList={scheduleList} saveData={saveData} setOpen={setOpen} isAdmin={isAdmin} uid={uid} />
-            </Drawer>
-
-            {/* Drawer on View*/}
-            <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
-                <OrderView id={id} refresh={reload} orderList={orderList} servicesList={servicesList} userList={userList} setOpenView={setOpenView} saveData={saveData} />
             </Drawer>
 
             {/* Drawer on logs */}

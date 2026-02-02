@@ -17,7 +17,7 @@ import OrderDetail from "../../components/Order/order_detail";
 import { getStorage } from "../../common/localStorage";
 
 const Tasks = () => {
-    const { saveData, refresh, setIsLoading } = useOutletContext();
+    const { saveData, refresh, setIsLoading, viewOrder } = useOutletContext();
     const [isAdmin, setIsAdmin] = useState(false);
     const [uid, setUid] = useState(0);
     const location = useLocation();
@@ -39,7 +39,6 @@ const Tasks = () => {
     const [title, setTitle] = useState('New');
 
     const [order_no, setOrderNo] = useState('');
-    const [openView, setOpenView] = useState(false);
     const [id, setId] = useState(0);
     const [reload, setReload] = useState(0);
 
@@ -112,7 +111,7 @@ const Tasks = () => {
         setIsLoading(false);
     }
 
-    const handleCalender = (orderData, companyData, dateValue,filterBy) => {
+    const handleCalender = (orderData, companyData, dateValue, filterBy) => {
         let order = orderData.filter(a => dayjs(dateValue).format('YYYY-MM-DD') === get_Date(a.trndate, 'YYYY-MM-DD'));
         if (filterBy !== '')
             order = order.filter(a => a.status.toUpperCase() === filterBy.toString().toUpperCase());
@@ -126,25 +125,21 @@ const Tasks = () => {
     const onDateChange = (dateValue) => {
         setDate(dateValue);
         handleCalender(orderList, companyList, dateValue, filter)
-    }  
+    }
     const onFilterChange = (value) => {
         setFilter(value);
         handleCalender(orderList, companyList, date, value)
     }
     const onEdit = (id, order_no) => {
         setOrderNo(order_no);
-        setTitle(id === 0 ? "New Order" : `Edit Order - ${order_no}`);  
+        setTitle(id === 0 ? "New Order" : `Edit Order - ${order_no}`);
         setReload(reload + 1);
         setId(id);
         setOpen(true);
     }
-    const onView = (id) => {
-        setReload(reload + 1);
-        setId(id);
-        setOpenView(true);
-    }
 
- const btnSave = async () => {
+
+    const btnSave = async () => {
         await ref.current?.save();
     }
 
@@ -169,7 +164,7 @@ const Tasks = () => {
                                 { value: 'Cancelled', label: <Badge color={'red'} text={'Cancelled'} /> },
                                 { value: 'Rejected', label: <Badge color={'red'} text={'Rejected'} /> }
                             ]}
-                        />  
+                        />
                         <div class='flex flex-row items-start justify-end'>
                             <Button color="default" variant="outlined" icon={<LeftOutlined />} style={{ borderRadius: 0, borderTopLeftRadius: 6, borderBottomLeftRadius: 6 }} onClick={() => onDateChange(dayjs(date).add(-1, 'day'))} />
                             <DatePicker
@@ -182,7 +177,7 @@ const Tasks = () => {
                             <Button color="default" variant="outlined" icon={<RightOutlined />} style={{ borderRadius: 0, borderTopRightRadius: 6, borderBottomRightRadius: 6 }} onClick={() => onDateChange(dayjs(date).add(1, 'day'))} />
                         </div>
 
-                        </div>
+                    </div>
                 </div>
                 <div class='overflow-auto w-full' ref={leftRef} onScroll={() => syncScroll(leftRef.current, rightRef.current)}>
                     <CalenderHeader userList={userList} />
@@ -190,7 +185,7 @@ const Tasks = () => {
             </div>
 
             <div class='overflow-auto w-full' ref={rightRef} onScroll={() => syncScroll(rightRef.current, leftRef.current)}>
-                <CalenderBody slots={slots} orderList={orders} servicesList={servicesList} userList={userList} onView={onView} onEdit={onEdit} />
+                <CalenderBody slots={slots} orderList={orders} servicesList={servicesList} userList={userList} onView={viewOrder} onEdit={onEdit} saveData={saveData} />
             </div>
 
             {/* Drawer on Edit*/}
@@ -198,11 +193,6 @@ const Tasks = () => {
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
                 <OrderDetail id={id} refresh={reload} ref={ref} setOrderNo={setOrderNo} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} eventList={eventList} customerList={customerList} scheduleList={scheduleList} saveData={saveData} setOpen={setOpen} isAdmin={isAdmin} uid={uid} />
-            </Drawer>
-
-            {/* Drawer on View*/}
-            <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
-                <OrderView id={id} refresh={reload} orderList={orderList} servicesList={servicesList} userList={userList} setOpenView={setOpenView} saveData={saveData} />
             </Drawer>
 
         </div>

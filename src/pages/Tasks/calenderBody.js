@@ -13,8 +13,8 @@ function getHeight(start, end) {
     return setHeight;
 };
 
-const CalenderBody = ({ slots, userList, orderList, servicesList, onView, onEdit }) => {
-    const { Accept,Reject} = useResponseButtons()
+const CalenderBody = ({ slots, userList, orderList, servicesList, onView, onEdit,saveData }) => {
+    const { Accept,Reject} = useResponseButtons(saveData)
 const Card = ({ id, startTime }) => {
     let order = orderList.filter(b => b.assignedto === id && b.start === startTime);
     if (order.length > 1) {

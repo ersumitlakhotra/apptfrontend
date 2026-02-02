@@ -72,7 +72,7 @@ const WaitingApproval = () => {
                         {orderList.length === 0 ? <p class='text-left p-4 text-sm font-medium text-gray-500'> There aren't any pending requests .</p> :
                             orderList.map(item => {
                             return (           
-                                <AppointmentCards key={item.id} index={item.id} data={item} userList={userList} servicesList={servicesList} onClick={btn_Click} />
+                                <AppointmentCards key={item.id} index={item.id} data={item} userList={userList} servicesList={servicesList} onClick={btn_Click} saveData={saveData} />
                             )
                         })}
                         

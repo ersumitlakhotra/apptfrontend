@@ -11,7 +11,6 @@ import useAlert from "../../common/alert";
 import { get_Date, LocalDate, LocalTime } from "../../common/localDate";
 import { generateTimeSlotsWithDate, toMinutes } from "../../common/generateTimeSlots";
 import { compareTimes, isOpenForWork, userSchedule } from "../../common/general";
-import { apiCalls } from "../../hook/apiCall";
 import { TbTransfer } from "react-icons/tb";
 import { useEmail } from "../../email/email";
 

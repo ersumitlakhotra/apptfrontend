@@ -9,8 +9,8 @@ import { get_Date, getDay } from "../../common/localDate";
 import { UnorderedListOutlined, ContactsOutlined } from '@ant-design/icons';
 import { useResponseButtons } from "../../components/Order/responseButton";
 
-const AppointmentCards = ({ index, data, userList, servicesList,onClick }) => {  
-     const {Accept,Reject} = useResponseButtons();
+const AppointmentCards = ({ index, data, userList, servicesList,onClick ,saveData}) => {  
+     const {Accept,Reject} = useResponseButtons(saveData);
     return (
         <div key={index} class={`border p-4 text-xs bg-gray-50 rounded-lg  mb-2 cursor-pointer hover:bg-gray-100 hover:shadow`}
         onClick={() => onClick(index)}>

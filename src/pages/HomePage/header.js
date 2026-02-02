@@ -12,6 +12,7 @@ import NotificationDetail from '../../components/Main/Notification/notification_
 import { getStorage } from '../../common/localStorage';
 import { useAuth } from '../../auth/authContext';
 import UserDetail from '../../components/Users/user_detail';
+import OrderView from '../../components/Order/order_view';
 
 function getItem(key, label, icon, extra, disabled, danger) {
     return {
@@ -23,7 +24,7 @@ function getItem(key, label, icon, extra, disabled, danger) {
         danger,
     };
 }
-const Header = ({ saveData, refresh }) => {
+const Header = ({ saveData, refresh,setRefresh ,viewOrder}) => {
     const navigate = useNavigate();
     const ref = useRef();
     const { logout } = useAuth();
@@ -35,6 +36,8 @@ const Header = ({ saveData, refresh }) => {
     const [unread, setUnread] = useState([])  
     const [isAdmin, setIsAdmin] = useState(false);
     const [notificationList, setNotificationList] = useState([]); 
+    const [servicesList, setServicesList] = useState([]);
+    const [orderList, setOrderList] = useState([]);
     const [openNotification, setOpenNotification] = useState(false);
     const [tabActiveKey,setTabActiveKey]= useState(1)
     const [unreadUpdate, setUnreadUpdate] = useState(false); 
@@ -43,6 +46,7 @@ const Header = ({ saveData, refresh }) => {
     const [userPermissionList, setUserPermissionList] = useState([]);
 
     const [open, setOpen] = useState(false);
+    
 
     useEffect(() => {
         Init();
@@ -62,7 +66,10 @@ const Header = ({ saveData, refresh }) => {
             method: 'GET',
             endPoint: 'users'
         })
-
+        const serviceResponse = await FetchData({
+            method: 'GET',
+            endPoint: 'services'
+        })
 
         const companyResponse = await FetchData({
             method: 'GET',
@@ -73,6 +80,13 @@ const Header = ({ saveData, refresh }) => {
             endPoint: 'userpermission',
             id: localStorage.uid
         })
+          const orderResponse = await FetchData({
+            method: 'GET',
+            endPoint: !isAdmin ? 'orderPerUser' :  'order', //
+            id: !isAdmin ? localStorage.uid : null
+        })
+
+        setOrderList(orderResponse.data);
         setCompanyList(companyResponse.data)
         setUserPermissionList(userPermissionResponse.data);
 
@@ -81,6 +95,7 @@ const Header = ({ saveData, refresh }) => {
         setFullname(userFind.fullname)
         setUsername(userFind.username)
         setUserList(userResponse.data)
+        setServicesList(serviceResponse.data)
 
         const unread = notificationResponse.data.filter(a => a.read === '0');
         setUnread(unread.length > 0 ? unread : [])
@@ -135,7 +150,7 @@ const Header = ({ saveData, refresh }) => {
         onClick: handleMenuClick
     };
 
-    const [currentOption, setCurrentOption] = useState('Today');
+    const [currentOption, setCurrentOption] = useState('Last 7 Days');
     const itemsNotification = [
         { key: 'Today', label: 'Today' },
         { key: 'Last 7 Days', label: 'Last 7 Days' },
@@ -179,7 +194,7 @@ const Header = ({ saveData, refresh }) => {
 
             </div>
 
-            <Drawer title={"Notification"} placement='right' width={500} open={openNotification} onClose={() => setOpenNotification(false)} 
+            <Drawer title={"Notification"} placement='right' width={500} open={openNotification} onClose={() => {setOpenNotification(false); setRefresh(refresh+1)}} 
                 extra={<Dropdown menu={menuPropsNotification}>
                     <Button>
                         <Space>
@@ -189,7 +204,7 @@ const Header = ({ saveData, refresh }) => {
                     </Button>
                 </Dropdown>}>
 
-                <NotificationDetail refresh={refresh} currentOption={currentOption} notificationList={notificationList} tabActiveKey={tabActiveKey} setTabActiveKey={setTabActiveKey} />
+                <NotificationDetail refresh={refresh} currentOption={currentOption} notificationList={notificationList} tabActiveKey={tabActiveKey} setTabActiveKey={setTabActiveKey}  userList={userList} servicesList={servicesList} saveData={saveData} viewOrder={viewOrder}/>
             </Drawer>
 
             <Drawer title={'Account'} placement='right' width={500} onClose={() => setOpen(false)} open={open}
@@ -197,6 +212,7 @@ const Header = ({ saveData, refresh }) => {
 
                 <UserDetail id={uid} refresh={refresh} ref={ref} userList={userList} userPermissionList={userPermissionList} companyList={companyList} saveData={saveData} setOpen={setOpen} isAdmin={isAdmin} adminEmail={isAdmin} />
             </Drawer>
+
         </header>
     )
 }

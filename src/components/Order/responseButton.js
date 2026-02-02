@@ -5,9 +5,9 @@ import { IoMdClose } from "react-icons/io";
 import { useEmail } from "../../email/email";
 import { useOutletContext } from "react-router-dom";
 
-export const useResponseButtons = () => {
+export const useResponseButtons = (saveData) => {
     const { AppointmentStatus } = useEmail();
-    const { saveData } = useOutletContext();
+   // const { saveData } = useOutletContext();
 
     const onSave = (id, status, userList, servicesList) => {
         saveData({

@@ -3,38 +3,69 @@ import Header from "../pages/HomePage/header";
 import useAlert from "../common/alert";
 import SaveData from "../hook/saveData";
 import { useEffect, useState } from "react";
-import { Spin } from "antd";
+import { Drawer, Spin } from "antd";
 import { LoadingOutlined } from '@ant-design/icons';
 import Footer from "../pages/HomePage/footer";
 import { useEmail } from "../email/email";
 import { initNotification } from "../Firebase/requestPermission";
+import OrderView from "../components/Order/order_view";
+import { getStorage } from "../common/localStorage";
+import FetchData from "../hook/fetchData";
 
 const ProtectedLayout = () => {
     const { pathname } = useLocation();
     const { contextHolder, success, error, notifications } = useAlert();
-    const {sendEmail} = useEmail()
+    const { sendEmail } = useEmail()
     const [isLoading, setIsLoading] = useState(false);
     const [refresh, setRefresh] = useState(0);
-    const [refreshNotifications, setRefreshNotifications] = useState(0);
-   
+
+    const [servicesList, setServiceList] = useState([]);
+    const [userList, setUserList] = useState([]);
+
+    const [openView, setOpenView] = useState(false);
+    const [id, setId] = useState(0);
+
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
-    }, [pathname]);     
-    
+    }, [pathname]);
+
     useEffect(() => {
-         if ("serviceWorker" in navigator) {
+        if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("/firebase-messaging-sw.js")
-                .then(registration => initNotification(registration,saveData,onNotification))
-            .catch(console.error);
-         };
+                .then(registration => initNotification(registration, saveData, onNotification))
+                .catch(console.error);
+        };
     }, []);
-    
+
+    useEffect(() => {
+        Init();
+    }, [refresh])
+
+    const Init = async () => {
+
+        const localStorage = await getStorage();
+        const isAdmin = localStorage.role === 'Administrator'
+
+        const serviceResponse = await FetchData({
+            method: 'GET',
+            endPoint: 'services'
+        })
+        const userResponse = await FetchData({
+            method: 'GET',
+            endPoint: 'user',
+            id: !isAdmin ? localStorage.uid : null
+        })
+
+        setServiceList(serviceResponse.data);
+        setUserList(userResponse.data);
+    }
+
     const onNotification = ({ title, body }) => {
-         setRefresh(refresh + 1);
+        setRefresh(refresh + 1);
         notifications({ title: `${title} Appointment`, description: body })
     }
 
-    const saveData = async ({ label, method, endPoint, id = null, body = null, notify = true, logs = true, email = false, status = null, userList = [], servicesList =[]}) => {
+    const saveData = async ({ label, method, endPoint, id = null, body = null, notify = true, logs = true, email = false, status = null, userList = [], servicesList = [] }) => {
         setIsLoading(true)
         const res = await SaveData({
             label: label,
@@ -44,25 +75,30 @@ const ProtectedLayout = () => {
             body: body
         })
         if (email)
-            sendEmail({ id: id, status: status, userList: userList, servicesList: servicesList })        
+            sendEmail({ id: id, status: status, userList: userList, servicesList: servicesList })
         setIsLoading(false)
 
-        if (res.isSuccess) { 
-           notify && success(res.message); 
-            setRefresh(refresh + 1); }
-        else 
-             notify && error(res.message)
+        if (res.isSuccess) {
+            notify && success(res.message);
+            setRefresh(refresh + 1);
+        }
+        else
+            notify && error(res.message)
     }
 
+    const viewOrder = (id) => {
+        setId(id);
+        setOpenView(true);
+    }
     return (
         <div class='min-h-screen w-full flex flex-col  '>
-            <Header saveData={saveData} refresh={refresh}  />
+            <Header saveData={saveData} refresh={refresh} setRefresh={setRefresh} viewOrder={viewOrder} />
 
             <main class="flex-1 px-2 md:px-8 scroll-auto">
-                <Outlet context={{ saveData, isLoading, setIsLoading, refresh }} />
+                <Outlet context={{ saveData, isLoading, setIsLoading, refresh,viewOrder }} />
             </main>
 
-            {pathname !== '/home' && <Footer/>}
+            {pathname !== '/home' && <Footer />}
 
             {isLoading &&
                 <div
@@ -83,6 +119,10 @@ const ProtectedLayout = () => {
                 </div>
             }
 
+            {/* Drawer on View*/}
+            <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
+                <OrderView id={id} orderList={[]} servicesList={servicesList} userList={userList} setOpenView={setOpenView} saveData={saveData} />
+            </Drawer>
             {contextHolder}
         </div>
     );

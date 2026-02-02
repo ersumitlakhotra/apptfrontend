@@ -4,7 +4,7 @@ import { messaging} from "../firebase.js";
 import { getStorage, setLocalStorageWithExpiry } from "../common/localStorage.js";
 
 // This function will request permission and get FCM token
-export const initNotification=async (registration,saveData,notifications)=> {
+export const initNotification=async (registration,saveData,onNotification)=> {
     try {
         
         if (requestPermission()) {
@@ -32,7 +32,7 @@ export const initNotification=async (registration,saveData,notifications)=> {
     onMessage(messaging,(payload) => {
         const title =payload.notification.title;
         const body =payload.notification.body;
-       notifications({title:`${title} Appointment`, description:body})
+       onNotification({title:`${title} Appointment`, description:body})
 
        // console.log("Foreground message received:", payload);
     });
