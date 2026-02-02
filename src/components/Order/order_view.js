@@ -14,7 +14,7 @@ import { useResponseButtons } from "./responseButton";
 import FetchData from "../../hook/fetchData";
 import IsLoading from "../../common/custom/isLoading";
 
-const OrderView = ({ id, servicesList, userList, setOpenView, saveData }) => {
+const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }) => {
     const { contextHolder, warning } = useAlert();
 
 
@@ -81,11 +81,11 @@ const OrderView = ({ id, servicesList, userList, setOpenView, saveData }) => {
             setAssignedTo(''); setOrderNo(''); setServicesItem([]); setSlot(''); setBookedVia('Walk-In')
         }
         else {
-            loadOrder();
+            load();
         }
-    }, [id])
+    }, [refresh])
 
-    const loadOrder = async () => {
+    const load = async () => {
 
         setIsLoading(true)
         const orderResponse = await FetchData({

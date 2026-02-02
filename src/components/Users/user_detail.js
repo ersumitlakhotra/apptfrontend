@@ -74,7 +74,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyLis
                 setSunday([...companyList.timinginfo[0].sunday, '14:00:00', '14:30:00']);
             }  
         }
-        else {
+        else {       
             const editList = userList.find(item => item.id === id)
             setFullname(editList.fullname);
             setCell(editList.cell);

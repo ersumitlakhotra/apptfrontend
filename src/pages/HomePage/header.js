@@ -46,7 +46,7 @@ const Header = ({ saveData, refresh,setRefresh ,viewOrder}) => {
     const [userPermissionList, setUserPermissionList] = useState([]);
 
     const [open, setOpen] = useState(false);
-    
+    const [reload, setReload] = useState(0);
 
     useEffect(() => {
         Init();
@@ -113,6 +113,7 @@ const Header = ({ saveData, refresh,setRefresh ,viewOrder}) => {
             case '3': // Notifications
                 {
                     setTabActiveKey('1');
+                    setReload(reload + 1);
                     setOpenNotification(true);           
                     break;
                 }
@@ -210,7 +211,7 @@ const Header = ({ saveData, refresh,setRefresh ,viewOrder}) => {
             <Drawer title={'Account'} placement='right' width={500} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
-                <UserDetail id={uid} refresh={refresh} ref={ref} userList={userList} userPermissionList={userPermissionList} companyList={companyList} saveData={saveData} setOpen={setOpen} isAdmin={isAdmin} adminEmail={isAdmin} />
+                <UserDetail id={uid} refresh={reload} ref={ref} userList={userList} userPermissionList={userPermissionList} companyList={companyList} saveData={saveData} setOpen={setOpen} isAdmin={isAdmin} adminEmail={isAdmin} />
             </Drawer>
 
         </header>

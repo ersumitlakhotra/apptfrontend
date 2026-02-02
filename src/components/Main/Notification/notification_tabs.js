@@ -43,7 +43,7 @@ const NotificationTabs = ({ notificationList,  unread,userList,servicesList,save
                             <span> {UTC_LocalDateTime(item.createdat, "dddd MMM, DD YYYY - hh:mm A ")}</span>
                             <span >{UTC_LocalDateTime_relative(item.createdat, "MMM, DD YYYY - hh:mm A ")}</span>
                         </div>
-                        {item.status === 'Awaiting' &&
+                        {item.status === 'Awaiting' && // item.is_latest &&
                             <div class='flex gap-2 mt-2'>
                                 <Accept id={item.oid} userList={userList} servicesList={servicesList} labelVisible={true} />
                                 <Reject id={item.oid} userList={userList} servicesList={servicesList} labelVisible={true} />

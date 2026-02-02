@@ -17,6 +17,7 @@ const ProtectedLayout = () => {
     const { contextHolder, success, error, notifications } = useAlert();
     const { sendEmail } = useEmail()
     const [isLoading, setIsLoading] = useState(false);
+    const [reload, setReload] = useState(0);
     const [refresh, setRefresh] = useState(0);
 
     const [servicesList, setServiceList] = useState([]);
@@ -60,9 +61,9 @@ const ProtectedLayout = () => {
         setUserList(userResponse.data);
     }
 
-    const onNotification = ({ title, body }) => {
+    const onNotification = ({ title, description }) => {
         setRefresh(refresh + 1);
-        notifications({ title: `${title} Appointment`, description: body })
+        notifications({ title: `${title} Appointment`, description: description, cancel: title === 'Cancel' })
     }
 
     const saveData = async ({ label, method, endPoint, id = null, body = null, notify = true, logs = true, email = false, status = null, userList = [], servicesList = [] }) => {
@@ -87,6 +88,7 @@ const ProtectedLayout = () => {
     }
 
     const viewOrder = (id) => {
+        setReload(reload +1);
         setId(id);
         setOpenView(true);
     }
@@ -95,7 +97,11 @@ const ProtectedLayout = () => {
             <Header saveData={saveData} refresh={refresh} setRefresh={setRefresh} viewOrder={viewOrder} />
 
             <main class="flex-1 px-2 md:px-8 scroll-auto">
-                <Outlet context={{ saveData, isLoading, setIsLoading, refresh,viewOrder }} />
+                <Outlet context={{ 
+                    saveData, 
+                    isLoading, setIsLoading, 
+                    refresh, 
+                    viewOrder }} />
             </main>
 
             {pathname !== '/home' && <Footer />}
@@ -121,7 +127,7 @@ const ProtectedLayout = () => {
 
             {/* Drawer on View*/}
             <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
-                <OrderView id={id} orderList={[]} servicesList={servicesList} userList={userList} setOpenView={setOpenView} saveData={saveData} />
+                <OrderView id={id} refresh={reload} servicesList={servicesList} userList={userList} setOpenView={setOpenView} saveData={saveData} />
             </Drawer>
             {contextHolder}
         </div>

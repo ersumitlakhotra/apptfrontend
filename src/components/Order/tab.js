@@ -23,7 +23,8 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(orderList);
     const [list, setList] = useState(orderList);
-    const { Accept,Reject} = useResponseButtons();
+    const {saveData} = useOutletContext()
+    const { Accept, Reject } = useResponseButtons(saveData);
 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);

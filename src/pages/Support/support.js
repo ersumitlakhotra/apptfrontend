@@ -19,7 +19,7 @@ const Support = () => {
                     </p>
                 </div>
             </div>
-            <div class='flex flex-row gap-4 justify-center items-center mt-2'>
+            <div class='flex flex-col md:flex-row gap-4 justify-center items-center mt-2'>
                 <div class='bg-gray-50 p-8 h-72 border-2 border-gray-200 rounded-md w-96 flex flex-col justify-center items-center '>
                     <MdOutlineSupportAgent size={48} />
                     <p class='font-semibold'>Customer Support</p>

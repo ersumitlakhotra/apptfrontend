@@ -1,7 +1,7 @@
 
 import { getToken, onMessage } from "firebase/messaging";
 import { messaging} from "../firebase.js";
-import { getStorage, setLocalStorageWithExpiry } from "../common/localStorage.js";
+import { getStorage } from "../common/localStorage.js";
 
 // This function will request permission and get FCM token
 export const initNotification=async (registration,saveData,onNotification)=> {
@@ -32,7 +32,7 @@ export const initNotification=async (registration,saveData,onNotification)=> {
     onMessage(messaging,(payload) => {
         const title =payload.notification.title;
         const body =payload.notification.body;
-       onNotification({title:`${title} Appointment`, description:body})
+       onNotification({title:title, description:body})
 
        // console.log("Foreground message received:", payload);
     });

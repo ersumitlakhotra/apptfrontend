@@ -98,7 +98,8 @@ const UserSchedule = () => {
                             </div>
                         </div>
 
-                        {userList.map((item,index) => {
+                        {userList.length === 0 ? <p class='text-left p-4 text-sm font-medium text-gray-500'> There aren't any active users .</p> :
+                         userList.map((item,index) => {
                             return (
                                 <ScheduleCard key={index} date={date} index={index} user={item} userList={userList} scheduleList={scheduleList} onClick={btn_Click} />
                             )

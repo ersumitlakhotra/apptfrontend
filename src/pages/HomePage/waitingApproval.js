@@ -44,7 +44,6 @@ const WaitingApproval = () => {
             method: 'GET',
             endPoint: 'services'
         })
-
         let order = (orderResponse.data).filter(a => a.status.toUpperCase() === 'AWAITING');
     
         setUserList(userResponse.data);

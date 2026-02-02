@@ -317,7 +317,7 @@ const BookAppointment = () => {
                 taxamount: '0',
                 total: total,
                 coupon: coupon,
-                status: autoAccept ? 'Pending':'Awaiting',
+                status: bookingType === 3 ? 'Cancelled' : autoAccept ? 'Pending':'Awaiting',
                 trndate: trndate,
                 assignedto: employeeId,
                 slot: slot,
@@ -342,6 +342,7 @@ const BookAppointment = () => {
                 }); 
                 
                 if (res.isSuccess) {
+                    console.log(res)
                     const id = res.data.id;
                     const order_no = res.data.order_no;
 

@@ -1,15 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Button, Drawer, Space, Tabs, Tag } from "antd";
-import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
+import {  SaveOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from "react";
 import OrderDetail from "../../components/Order/order_detail";
-import OrderView from "../../components/Order/order_view";
 import { getTabItems } from "../../common/items.js";
 import OrderTabs from "../../components/Order/tab.js";
 import { get_Date, LocalDate } from "../../common/localDate.js";
-import IsLoading from "../../common/custom/isLoading.js";
 import LogsView from "../../components/Logs/logs_view.js";
-import ExportToExcel from "../../common/export.js";
 import { getStorage } from "../../common/localStorage.js";
 import FetchData from "../../hook/fetchData.js";
 import { useOutletContext } from "react-router-dom";
@@ -28,7 +25,7 @@ const Order = () => {
     const ref = useRef();
     const ranOnce = useRef(false);
     const headingLabel = 'Appointment'
-    const { saveData, refresh,viewOrder } = useOutletContext();
+    const { saveData, refresh, viewOrder } = useOutletContext();
     const [isAdmin, setIsAdmin] = useState(false);
     const [uid, setUid] = useState(0);
 
@@ -106,7 +103,7 @@ const Order = () => {
         })
         let schedule = scheduleResponse.data;
         if (!isAdmin) {
-            schedule = scheduleResponse.data.filter(item => item.uid === localStorage.uid);     
+            schedule = scheduleResponse.data.filter(item => item.uid === localStorage.uid);
         }
 
         setScheduleList(schedule);
@@ -124,7 +121,7 @@ const Order = () => {
 
         const orderResponse = await FetchData({
             method: 'GET',
-            endPoint: !isAdmin ? 'orderPerUser' :  'order', //
+            endPoint: !isAdmin ? 'orderPerUser' : 'order', //
             id: !isAdmin ? localStorage.uid : null
         })
 
@@ -176,7 +173,7 @@ const Order = () => {
     }
 
     const tabItems = [
-        getTabItems('1', customLabelTab("All", "cyan", ordersList.length), null, <OrderTabs key={1} index={1} orderList={ordersList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={viewOrder} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} isAdmin={isAdmin}/>),
+        getTabItems('1', customLabelTab("All", "cyan", ordersList.length), null, <OrderTabs key={1} index={1} orderList={ordersList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={viewOrder} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} isAdmin={isAdmin} />),
         getTabItems('2', customLabelTab("Awaiting", "silver", awaitingList.length), null, <OrderTabs key={2} index={2} orderList={awaitingList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={viewOrder} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} isAdmin={isAdmin} />),
         getTabItems('3', customLabelTab("Pending", "yellow", pendingList.length), null, <OrderTabs key={3} index={3} orderList={pendingList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={viewOrder} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} isAdmin={isAdmin} />),
         getTabItems('4', customLabelTab("InProgress", "blue", inprogressList.length), null, <OrderTabs key={4} index={4} orderList={inprogressList} servicesList={servicesList} userList={userList} btn_Click={btn_Click} btn_ViewClick={viewOrder} btn_LogsClick={btn_LogsClick} refresh={reload} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} isAdmin={isAdmin} />),

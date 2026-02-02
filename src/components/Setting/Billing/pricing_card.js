@@ -14,7 +14,7 @@ const PricingCard = ({index, title, price,current }) => {
             <ul class='list-disc ps-4 text-sm'>
                 <li>Appointment Records</li>
                 <li>Data Management</li>
-                <li>Reporting</li>
+                
                 <li>Inventory Management</li>
                 <li>Employee Performance</li>
                 <li>Portal and Mobile Application</li>

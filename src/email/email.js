@@ -30,7 +30,7 @@ export const useEmail = () => {
         servicesList.filter(a => orderResponse.data.serviceinfo.some(b => b === a.id)).map(item =>
             serviceNames += item.name + ', '
         )
-        let address = companyResponse.data.addressinfo[0] !== null ? companyResponse.data.addressinfo[0].street + ', ' + companyResponse.data.addressinfo[0].city : '';
+        let address = companyResponse.data.addressinfo !== null ? companyResponse.data.addressinfo[0].street + ', ' + companyResponse.data.addressinfo[0].city : '';
         return {
             order_no: orderResponse.data.order_no,
             date: orderResponse.data.trndate,
