@@ -83,6 +83,7 @@ export const userSchedule = (date, info,id, scheduleList) => {
     let isOpenString = false;
     let breakStart = '00:00:00';
     let breakEnd = '00:00:00';
+    let scheduleId= 0;
     switch (getDay(date).toLowerCase()) {
         case 'sunday':
             {
@@ -152,6 +153,7 @@ export const userSchedule = (date, info,id, scheduleList) => {
     }
     const res = scheduleList.find(item => item.uid === id && get_Date(item.trndate, 'YYYY-MM-DD') === get_Date(date, 'YYYY-MM-DD'))
     if (res !== undefined) {
+        scheduleId=res.id;
         inTimeString = res.startshift;
         outTimeString = res.endshift;
         isOpenString = Boolean(res.dayoff);
@@ -165,7 +167,8 @@ export const userSchedule = (date, info,id, scheduleList) => {
         outTime: outTimeString,
         isOpen: isOpenString,
         breakStart:breakStart,
-        breakEnd:breakEnd
+        breakEnd:breakEnd,
+        scheduleId: scheduleId
     });
     return _result;
 }

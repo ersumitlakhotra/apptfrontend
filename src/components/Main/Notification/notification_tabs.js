@@ -1,6 +1,7 @@
+/* eslint-disable array-callback-return */
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import { Avatar, Badge } from "antd"
+import { Avatar } from "antd"
 import { UTC_LocalDateTime_relative, UTC_LocalDateTime } from "../../../common/localDate"
 import { useResponseButtons } from "../../Order/responseButton";
 import { useEffect } from "react";
@@ -43,7 +44,7 @@ const NotificationTabs = ({ notificationList,  unread,userList,servicesList,save
                             <span> {UTC_LocalDateTime(item.createdat, "dddd MMM, DD YYYY - hh:mm A ")}</span>
                             <span >{UTC_LocalDateTime_relative(item.createdat, "MMM, DD YYYY - hh:mm A ")}</span>
                         </div>
-                        {item.status === 'Awaiting' && // item.is_latest &&
+                        {item.status === 'Awaiting' &&  item.is_latest &&
                             <div class='flex gap-2 mt-2'>
                                 <Accept id={item.oid} userList={userList} servicesList={servicesList} labelVisible={true} />
                                 <Reject id={item.oid} userList={userList} servicesList={servicesList} labelVisible={true} />

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {  Tabs } from "antd"
 import { getTabItems } from "../../common/items.js"
 import { ContainerOutlined, IdcardOutlined, ShareAltOutlined,  LockOutlined, QrcodeOutlined } from '@ant-design/icons';

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Select, Drawer, Space, Tooltip, Popover, DatePicker, Popconfirm } from "antd";
-import { EditOutlined,  SaveOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useEffect, useRef, useState } from "react";
+import { Button, Select,  Tooltip, Popover, DatePicker, Popconfirm } from "antd";
+import { EditOutlined,  DeleteOutlined } from '@ant-design/icons';
+import { useEffect,  useState } from "react";
 import DataTable from "../../common/datatable";
 import { getTableItem } from "../../common/items";
 import { Tags } from "../../common/tags";
@@ -10,23 +10,16 @@ import { convertTo12Hour, calculateTime } from "../../common/general";
 import AssignedTo from "../../common/assigned_to.js";
 import dayjs from 'dayjs';
 import { Sort } from "../../common/sort.js";
-import ScheduleDetail from "../../components/Schedule/schedule_detail.js";
-import ScheduleView from "../../components/Schedule/schedule_view.js";
 import { useOutletContext } from "react-router-dom";
 import IsLoading from "../../common/custom/isLoading.js";
 import PageHeader from "../../common/pages/pageHeader.js";
-import FetchData from "../../hook/fetchData.js";
-import { getStorage } from "../../common/localStorage.js";
 
 
 const Schedule = () => {
-    const ref = useRef();
     const headingLabel = 'Schedule'
-    const { saveData, refresh } = useOutletContext();
-    const [isAdmin, setIsAdmin] = useState(false);
+    const { saveData, refresh,  userList, getUser, scheduleList, getSchedule, editSchedule, isAdmin } = useOutletContext();
     const [isLoading, setIsLoading] = useState(false);
-    const [userList, setUserList] = useState([]);
-    const [scheduleList, setScheduleList] = useState([]);
+   
     const [filteredList, setFilteredList] = useState([]);
     const [list, setList] = useState([]);
 
@@ -37,13 +30,6 @@ const Schedule = () => {
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [exportList, setExportList] = useState([]);
 
-    const [open, setOpen] = useState(false);
-    const [openView, setOpenView] = useState(false);
-    const [title, setTitle] = useState('New')
-    const [id, setId] = useState(0);
-    const [uid, setUid] = useState(0);
-    const [reload, setReload] = useState(0);
-
     const [assigned_to, setAssignedTo] = useState('');
 
     useEffect(() => {
@@ -52,32 +38,12 @@ const Schedule = () => {
 
     const Init = async () => {
         setIsLoading(true)
-        const localStorage = await getStorage();
-        const isAdmin = localStorage.role === 'Administrator'
-        setIsAdmin(isAdmin)
-        const userResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'user',
-            id: !isAdmin ? localStorage.uid : null
-        })
-        const scheduleResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'schedule'
-        })
-        setUserList(userResponse.data);
-
-        let schedule = scheduleResponse.data;
-        if (!isAdmin) {
-            schedule = scheduleResponse.data.filter(item => item.uid === localStorage.uid);
-            setAssignedTo(localStorage.uid);
-        }
-
-        setScheduleList(schedule);
-
-        setFilteredList(schedule);
-        setList(schedule);
-        setExportList(schedule);
-        setPage(1, 10, schedule);
+        await getUser();
+        const scheduleResponse = await getSchedule();
+        setFilteredList(scheduleResponse);
+        setList(scheduleResponse);
+        setExportList(scheduleResponse);
+        setPage(1, 10, scheduleResponse);
 
         setIsLoading(false)
     }
@@ -114,40 +80,17 @@ const Schedule = () => {
         getTableItem('8', 'Action'),
     ];
 
-    const btn_Click = (id) => {
-        setTitle(id === 0 ? `New ${headingLabel}` : `Edit ${headingLabel}`);
-        setReload(reload + 1);
-        setId(id);
-        setOpen(true);
-    }
-    const btn_ViewClick = (id) => {
-        setReload(reload + 1);
-        setUid(id);
-        setOpenView(true);
-    }
-    const deleted = (id) => {
-        saveData({
-            label: "Schedule",
-            method: 'DELETE',
-            endPoint: "schedule",
-            id: id ,
-            body:[]
-        });
-    }
-    const btnSave = async () => {
-        await ref.current?.save();
-    }
 
     return (
         <div class="flex flex-col gap-4 md:px-7 py-4  mb-12">
 
-            <PageHeader label={headingLabel} isExport={true} exportList={exportList} exportName={headingLabel} isCreate={true} onClick={() => btn_Click(0)} servicesList={[]} userList={userList} />
+            <PageHeader label={headingLabel} isExport={true} exportList={exportList} exportName={headingLabel} isCreate={true} onClick={() => editSchedule(0,LocalDate())} servicesList={[]} userList={userList} />
 
             <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
                 <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
                     <div class='w-full flex flex-row gap-2 items-center md:w-1/3'>
                       <p class='text-sm text-gray-500 whitespace-nowrap'>Filter user</p>
-                        <Select
+                       {isAdmin && <Select
                             value={assigned_to}
                             disabled={!isAdmin}
                             style={{ width: 300 }}
@@ -157,7 +100,7 @@ const Schedule = () => {
                                 value: item.id,
                                 label: <AssignedTo key={item.id} userId={item.id} userList={userList} />
                             }))]}
-                        />
+                        />}
                     </div>
                     <div class='w-full md:w-2/3'>
                         <div class='flex flex-col md:flex-row md:justify-end gap-4 '>
@@ -209,7 +152,7 @@ const Schedule = () => {
                                         <td class="p-3 ">{UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A')}</td>
                                         <td class="p-3">
                                             <Tooltip placement="top" title={'Edit'} >
-                                                <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
+                                                <Button type="link" icon={<EditOutlined />} onClick={() => editSchedule(item.id,item.trndate)} />
                                             </Tooltip>
                                             {/*<Tooltip placement="top" title={'View'} >
                                                 <Button type="link" icon={<EyeOutlined />} onClick={() => btn_ViewClick(item.uid)} />
@@ -218,7 +161,13 @@ const Schedule = () => {
                                                 <Popconfirm
                                                     title="Delete "
                                                     description="Are you sure to delete?"
-                                                    onConfirm={(e) => deleted(item.id)}
+                                                    onConfirm={(e) => saveData({
+                                                        label: "Schedule",
+                                                        method: 'DELETE',
+                                                        endPoint: "schedule",
+                                                        id: item.id,
+                                                        body: []
+                                                    })}
                                                     okText="Yes"
                                                     cancelText="No"
                                                 >
@@ -233,17 +182,9 @@ const Schedule = () => {
                 } />
             </div>
 
-            {/* Drawer on right*/}
-            <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
-                extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
-
-                <ScheduleDetail id={id} refresh={reload} ref={ref} date={LocalDate()} scheduleList={scheduleList} userList={userList} userId={isAdmin ? null :assigned_to} saveData={saveData} setOpen={setOpen} isAdmin={isAdmin} />
-            </Drawer>
-
-            {/* Drawer on View*/}
-            <Drawer title={""} placement='bottom' height={'95%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
-                <ScheduleView id={uid} refresh={reload} userList={userList} scheduleListAll={scheduleList} />
-            </Drawer>
+           
+           
+        
         </div>
     )
 }

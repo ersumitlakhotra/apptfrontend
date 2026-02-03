@@ -1,4 +1,3 @@
-import { Tooltip } from "antd";
 
 const AppIcons = ({ icon, size = 108, backgroundColor, label, onClick }) => {
     return (

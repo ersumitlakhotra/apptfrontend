@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Button, Input, Tooltip,  Popover, DatePicker } from "antd";
-import { EditOutlined, ContainerOutlined } from '@ant-design/icons';
+import { EditOutlined } from '@ant-design/icons';
 import { IoSearchOutline } from "react-icons/io5";
 import { Tags } from "../../common/tags";
 import dayjs from 'dayjs';
@@ -11,7 +11,7 @@ import Services from "../../common/services";
 import { get_Date, UTC_LocalDateTime } from "../../common/localDate";
 import IsLoading from "../../common/custom/isLoading";
 
-const Events = ({ eventList, servicesList, btn_Click, btn_LogsClick, fromDate, setFromDate, toDate, setToDate, setExportList,isLoading }) => {
+const Events = ({ eventList, servicesList, btn_Click,  fromDate, setFromDate, toDate, setToDate, setExportList,isLoading }) => {
     const [searchInput, setSearchInput] = useState('');
 
     const [filteredList, setFilteredList] = useState(eventList);

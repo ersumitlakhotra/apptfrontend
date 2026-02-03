@@ -1,18 +1,16 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import Search from '../../common/custom/search'
 import logo from '../../Images/logo.png'
 import { SlEarphonesAlt } from "react-icons/sl";
-import { Badge, Button, Card, Drawer, Dropdown, Input, Space } from 'antd';
-import { BellFilled, LogoutOutlined, DownOutlined, UserOutlined, BellOutlined, SaveOutlined } from '@ant-design/icons';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { Badge, Button,  Drawer, Dropdown,  Space } from 'antd';
+import { BellFilled, LogoutOutlined, DownOutlined, UserOutlined, BellOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import AssignedTo from '../../common/assigned_to';
-import FetchData from '../../hook/fetchData';
 import NotificationDetail from '../../components/Main/Notification/notification_detail';
 import { getStorage } from '../../common/localStorage';
 import { useAuth } from '../../auth/authContext';
-import UserDetail from '../../components/Users/user_detail';
-import OrderView from '../../components/Order/order_view';
 
 function getItem(key, label, icon, extra, disabled, danger) {
     return {
@@ -24,82 +22,43 @@ function getItem(key, label, icon, extra, disabled, danger) {
         danger,
     };
 }
-const Header = ({ saveData, refresh,setRefresh ,viewOrder}) => {
+const Header = ({ saveData, refresh, setRefresh, viewOrder, editUser, uid, notificationList, getNotification, getUserListWithAdmin,servicesList
+ }) => {
     const navigate = useNavigate();
-    const ref = useRef();
+    const ranOnce = useRef(false);
     const { logout } = useAuth();
     const [search, setSearch] = useState('');
-    const [uid, setUid] = useState(0);
     const [fullname, setFullname] = useState('');
     const [username, setUsername] = useState('');
     const [userList, setUserList] = useState([]);
     const [unread, setUnread] = useState([])  
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [notificationList, setNotificationList] = useState([]); 
-    const [servicesList, setServicesList] = useState([]);
-    const [orderList, setOrderList] = useState([]);
     const [openNotification, setOpenNotification] = useState(false);
     const [tabActiveKey,setTabActiveKey]= useState(1)
-    const [unreadUpdate, setUnreadUpdate] = useState(false); 
-    
-    const [companyList, setCompanyList] = useState([]);
-    const [userPermissionList, setUserPermissionList] = useState([]);
-
-    const [open, setOpen] = useState(false);
     const [reload, setReload] = useState(0);
 
     useEffect(() => {
+        if (ranOnce.current) return;
+        ranOnce.current = true;
         Init();
+    }, [])
+
+    useEffect(() => {
+        refreshNotification();
     }, [refresh])
 
     const Init = async () => {
         const localStorage = await getStorage();
-        const isAdmin = localStorage.role === 'Administrator'
-        setIsAdmin(isAdmin)
-
-        const notificationResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'notification',
-            id: !isAdmin ? localStorage.uid : null
-        })
-        const userResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'users'
-        })
-        const serviceResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'services'
-        })
-
-        const companyResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'company'
-        })
-        const userPermissionResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'userpermission',
-            id: localStorage.uid
-        })
-          const orderResponse = await FetchData({
-            method: 'GET',
-            endPoint: !isAdmin ? 'orderPerUser' :  'order', //
-            id: !isAdmin ? localStorage.uid : null
-        })
-
-        setOrderList(orderResponse.data);
-        setCompanyList(companyResponse.data)
-        setUserPermissionList(userPermissionResponse.data);
-
-        setUid(localStorage.uid);
-        const userFind=userResponse.data.find(item => item.id ===localStorage.uid);
+        const userListWithAdminResponse = await getUserListWithAdmin();
+        setUserList(userListWithAdminResponse)
+        const userFind = userListWithAdminResponse.find(item => item.id === localStorage.uid);
         setFullname(userFind.fullname)
         setUsername(userFind.username)
-        setUserList(userResponse.data)
-        setServicesList(serviceResponse.data)
+    }
 
-        const unread = notificationResponse.data.filter(a => a.read === '0');
+    const refreshNotification = async () => {
+        const notificationResponse = await getNotification();
+        const unread = notificationResponse.filter(a => a.read === '0');
         setUnread(unread.length > 0 ? unread : [])
-        setNotificationList(notificationResponse.data);
     }
 
     const handleMenuClick = e => {
@@ -107,7 +66,7 @@ const Header = ({ saveData, refresh,setRefresh ,viewOrder}) => {
             case '1':
             case '2': // Account
                 {
-                    setOpen(true);
+                    editUser(uid,true)
                     break;
                 }
             case '3': // Notifications
@@ -161,9 +120,7 @@ const Header = ({ saveData, refresh,setRefresh ,viewOrder}) => {
 
     const onItemChanged = e => { setCurrentOption(e.key) };
     const menuPropsNotification = { items: itemsNotification, onClick: onItemChanged };
-    const btnSave = async () => {
-        await ref.current?.save();
-    }
+
 
     return (
         <header class="p-2 bg-blue-500 border-b shadow-sm flex flex-row gap-2 sticky  z-50 top-0">
@@ -183,7 +140,7 @@ const Header = ({ saveData, refresh,setRefresh ,viewOrder}) => {
             <div class='w-3/12 pr-4 flex flex-row gap-4 justify-end items-center '>
 
                 <Badge count={unread.length}>
-                    <BellFilled style={{ fontSize: '23px', color: 'white', cursor: 'pointer' }} onClick={() => { setOpenNotification(true); setUnreadUpdate(false); setTabActiveKey('1'); }} />
+                    <BellFilled style={{ fontSize: '23px', color: 'white', cursor: 'pointer' }} onClick={() => { setOpenNotification(true); setTabActiveKey('1'); }} />
                 </Badge>
 
                 <Dropdown menu={menuProps} trigger={['click']} overlayStyle={{  gap: 4, color: 'white', cursor: 'pointer' }}>
@@ -206,12 +163,6 @@ const Header = ({ saveData, refresh,setRefresh ,viewOrder}) => {
                 </Dropdown>}>
 
                 <NotificationDetail refresh={refresh} currentOption={currentOption} notificationList={notificationList} tabActiveKey={tabActiveKey} setTabActiveKey={setTabActiveKey}  userList={userList} servicesList={servicesList} saveData={saveData} viewOrder={viewOrder}/>
-            </Drawer>
-
-            <Drawer title={'Account'} placement='right' width={500} onClose={() => setOpen(false)} open={open}
-                extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
-
-                <UserDetail id={uid} refresh={reload} ref={ref} userList={userList} userPermissionList={userPermissionList} companyList={companyList} saveData={saveData} setOpen={setOpen} isAdmin={isAdmin} adminEmail={isAdmin} />
             </Drawer>
 
         </header>

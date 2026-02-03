@@ -1,7 +1,9 @@
 import { Avatar, Image } from "antd"
 import { UserOutlined } from '@ant-design/icons';
+import { useOutletContext } from "react-router-dom";
 
-const CalenderHeader = ({userList}) => {
+const CalenderHeader = () => {
+    const {userList}= useOutletContext();
     return (
         <div class='w-max min-w-full h-16 p-2 border-b font-medium bg-blue-900 text-white inline-flex gap-3'>
                 <p class='w-20 text-sm p-4 sticky left-0 z-50 bg-blue-900 '>Slots</p>

@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
@@ -18,7 +19,6 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyLis
     const [email, setEmail] = useState('');
     const [address, setAddress] = useState('');
     const [gender, setGender] = useState('Male');
-    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [role, setRole] = useState('Employee');
     const [rating, setRating] = useState(0);
@@ -57,7 +57,6 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyLis
         if (id === 0) {
             setFullname('');
             setCell(''); setEmail(''); setAddress('');
-            setUsername(''); 
             setPassword(''); setRole('Employee'); setRating(0);
             setAccountType('Basic'); setProfile(null);
             setGender('Male'); setStatus('Active');setAppSchedule(true);
@@ -81,7 +80,6 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyLis
             setEmail(editList.email);
             setAddress(editList.address);
             setGender(editList.gender);
-            setUsername(editList.username);
             setPassword(editList.password);
             setRole(editList.role);
             setRating(editList.rating);
