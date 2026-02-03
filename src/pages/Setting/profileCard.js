@@ -1,20 +1,19 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { UserOutlined } from '@ant-design/icons';
 import { ImFacebook } from "react-icons/im";
 import { FaInstagram, FaLinkedinIn } from "react-icons/fa";
 import { BsTwitterX } from "react-icons/bs";
 import { TbWorldWww } from "react-icons/tb";
 import { useEffect, useState } from "react";
-import { Button, Image, Avatar, Skeleton } from "antd"
+import { Button, Image, Avatar } from "antd"
 import Heading from "../../common/heading";
 import FetchData from '../../hook/fetchData';
 import IsLoading from '../../common/custom/isLoading';
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import { getStorage } from '../../common/localStorage';
 
 const ProfileCard = () => {
     const navigate = useNavigate();
-    const { saveData, refresh } = useOutletContext();
-    const [isAdmin, setIsAdmin] = useState(false);
+    const { refresh,getCompany,isAdmin } = useOutletContext();
     const [isLoading, setIsLoading] = useState(false);
 
     const [name, setName] = useState('');
@@ -32,32 +31,24 @@ const ProfileCard = () => {
 
     const Init = async () => {
         setIsLoading(true);
-        const localStorage = await getStorage();
-        const isAdmin = localStorage.role === 'Administrator'
-        setIsAdmin(isAdmin)
-        
         const logoList = await FetchData({
             method: 'GET',
             endPoint: 'logo'
         })
         setLogo((logoList.data).length !== 0 ? (logoList.data).logo : null);
 
-        const companyList = await FetchData({
-            method: 'GET',
-            endPoint: 'company'
-        })
-        setName(companyList.data.name);
-        if (companyList.data.addressinfo !== null) {
-            setAddress((companyList.data).addressinfo[0].street);
+        const companyResponse = await getCompany();
+        setName(companyResponse.name);
+        if (companyResponse.addressinfo !== null) {
+            setAddress((companyResponse).addressinfo[0].street);
         }
-        if (companyList.data.socialinfo !== null) {
-            setWebsite((companyList.data).socialinfo[0].website);
-            setFacebook((companyList.data).socialinfo[0].facebook);
-            setInstagram((companyList.data).socialinfo[0].instagram);
-            setTwitter((companyList.data).socialinfo[0].twitter);
-            setLinkedin((companyList.data).socialinfo[0].linkedin);
+        if (companyResponse.socialinfo !== null) {
+            setWebsite((companyResponse).socialinfo[0].website);
+            setFacebook((companyResponse).socialinfo[0].facebook);
+            setInstagram((companyResponse).socialinfo[0].instagram);
+            setTwitter((companyResponse).socialinfo[0].twitter);
+            setLinkedin((companyResponse).socialinfo[0].linkedin);
         }
-
         setIsLoading(false);
     }
 

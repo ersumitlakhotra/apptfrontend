@@ -1,31 +1,35 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Badge, Button, DatePicker, Drawer, Select, Space } from "antd"
+import { Badge, Button, DatePicker,  Select } from "antd"
 import { useEffect, useRef, useState } from "react";
 
-import { RightOutlined, LeftOutlined, SaveOutlined } from '@ant-design/icons';
+import { RightOutlined, LeftOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import OrderView from "../../components/Order/order_view";
 import { get_Date, LocalDate } from "../../common/localDate";
-import FetchData from "../../hook/fetchData";
 import PageHeader from "../../common/pages/pageHeader";
 import { useLocation, useOutletContext } from "react-router-dom";
 import CalenderHeader from "./calenderHeader";
 import CalenderBody from "./calenderBody";
 import { isOpenForWork } from "../../common/general";
 import { generateTimeSlotsWithDate, toHHMM, toMinutes } from "../../common/generateTimeSlots";
-import OrderDetail from "../../components/Order/order_detail";
-import { getStorage } from "../../common/localStorage";
 
 const Tasks = () => {
-    const { saveData, refresh, setIsLoading, viewOrder } = useOutletContext();
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [uid, setUid] = useState(0);
-    const location = useLocation();
-    const state = location.state;
-    const ref = useRef();
+    const ranOnce = useRef(false); 
     const leftRef = useRef(null);
     const rightRef = useRef(null);
 
+    const { refresh,
+        orderList, getOrder,
+        getEvent,
+        getCustomer,
+        getService,
+        getUser,
+        getSchedule,
+        companyList, getCompany } = useOutletContext();
+
+    const [isLoading, setIsLoading] = useState(false);
+
+    const location = useLocation();
+    const state = location.state;
     const syncScroll = (source, target) => {
         target.scrollTop = source.scrollTop;
         target.scrollLeft = source.scrollLeft;
@@ -34,83 +38,37 @@ const Tasks = () => {
     const [date, setDate] = useState(LocalDate());
     const [filter, setFilter] = useState('');
     const [orders, setOrders] = useState([]);
-
-    const [open, setOpen] = useState(false);
-    const [title, setTitle] = useState('New');
-
-    const [order_no, setOrderNo] = useState('');
-    const [id, setId] = useState(0);
-    const [reload, setReload] = useState(0);
-
-    const [servicesList, setServiceList] = useState([]);
-    const [userList, setUserList] = useState([]);
-    const [companyList, setCompanyList] = useState([]);
-    const [customerList, setCustomerList] = useState([]);
-    const [eventList, setEventList] = useState([]);
-    const [orderList, setOrderList] = useState([]);
-    const [scheduleList, setScheduleList] = useState([]);
     const [slots, setSlots] = useState([]);
 
     useEffect(() => {
+        if (ranOnce.current) return;
+        ranOnce.current = true;
         Init();
+    }, [])
+
+    useEffect(() => {
+        getAppointments();
     }, [refresh])
 
     const Init = async () => {
         setIsLoading(true);
-        const localStorage = await getStorage();
-        const isAdmin = localStorage.role === 'Administrator'
-        setIsAdmin(isAdmin)
-        setUid(localStorage.uid)
-
-        const serviceResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'services'
-        })
-        const userResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'user',
-            id: !isAdmin ? localStorage.uid : null
-        })
-        const companyResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'company'
-        })
-        const customerResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'customer'
-        })
-        const eventResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'event',
-            eventDate: true
-        })
-        const orderResponse = await FetchData({
-            method: 'GET',
-            endPoint: !isAdmin ? 'orderPerUser' : 'order', //
-            id: !isAdmin ? localStorage.uid : null
-        })
-        const scheduleResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'schedule'
-        })
-        let schedule = scheduleResponse.data;
-        if (!isAdmin) {
-            schedule = scheduleResponse.data.filter(item => item.uid === localStorage.uid);
-        }
-
-        setScheduleList(schedule);
-        setServiceList(serviceResponse.data);
-        setUserList(userResponse.data);
-        setCompanyList(companyResponse.data);
-        setCustomerList(customerResponse.data);
-        setEventList(eventResponse.data);
-        setOrderList(orderResponse.data);
-        const filterValue = state?.searchParams === undefined ? '' : state?.searchParams;
-        setFilter(filterValue)
-        handleCalender(orderResponse.data, companyResponse.data, date, filterValue);
+        await getService();
+        await getUser();    
+        await getCustomer();
+        await getEvent();
+        await getSchedule();    
         setIsLoading(false);
     }
-
+    const getAppointments = async () => {
+        setIsLoading(true);
+        const orderResponse = await getOrder();
+        const companyResponse = await getCompany();
+        const filterValue = state?.searchParams === undefined ? '' : state?.searchParams;
+        setFilter(filterValue)
+        handleCalender(orderResponse, companyResponse, date, filterValue);
+        setIsLoading(false);
+    }
+   
     const handleCalender = (orderData, companyData, dateValue, filterBy) => {
         let order = orderData.filter(a => dayjs(dateValue).format('YYYY-MM-DD') === get_Date(a.trndate, 'YYYY-MM-DD'));
         if (filterBy !== '')
@@ -130,19 +88,7 @@ const Tasks = () => {
         setFilter(value);
         handleCalender(orderList, companyList, date, value)
     }
-    const onEdit = (id, order_no) => {
-        setOrderNo(order_no);
-        setTitle(id === 0 ? "New Order" : `Edit Order - ${order_no}`);
-        setReload(reload + 1);
-        setId(id);
-        setOpen(true);
-    }
-
-
-    const btnSave = async () => {
-        await ref.current?.save();
-    }
-
+ 
     return (
         <div class="md:px-7 mb-12 min-h-screen">
 
@@ -180,20 +126,13 @@ const Tasks = () => {
                     </div>
                 </div>
                 <div class='overflow-auto w-full' ref={leftRef} onScroll={() => syncScroll(leftRef.current, rightRef.current)}>
-                    <CalenderHeader userList={userList} />
+                    <CalenderHeader/>
                 </div>
             </div>
 
             <div class='overflow-auto w-full' ref={rightRef} onScroll={() => syncScroll(rightRef.current, leftRef.current)}>
-                <CalenderBody slots={slots} orderList={orders} servicesList={servicesList} userList={userList} onView={viewOrder} onEdit={onEdit} saveData={saveData} />
-            </div>
-
-            {/* Drawer on Edit*/}
-            <Drawer title={title} placement='right' width={600} onClose={() => setOpen(false)} open={open}
-                extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
-
-                <OrderDetail id={id} refresh={reload} ref={ref} setOrderNo={setOrderNo} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} eventList={eventList} customerList={customerList} scheduleList={scheduleList} saveData={saveData} setOpen={setOpen} isAdmin={isAdmin} uid={uid} />
-            </Drawer>
+                <CalenderBody slots={slots} orderList={orders} isLoading={isLoading} />
+            </div>    
 
         </div>
     )

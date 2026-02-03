@@ -1,38 +1,33 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useState } from "react";
-import { EditOutlined, ReloadOutlined } from '@ant-design/icons';
+import { EditOutlined } from '@ant-design/icons';
 import { IoSearchOutline } from "react-icons/io5";
 import { Badge, Button, Drawer, Input, Select, Space, Tooltip } from "antd";
-import { PlusOutlined, SaveOutlined, ContainerOutlined } from '@ant-design/icons';
+import {  SaveOutlined } from '@ant-design/icons';
 import ServiceDetail from "../../components/Services/service_detail";
 import DataTable from "../../common/datatable";
 import { getTableItem } from "../../common/items";
 import { Tags } from "../../common/tags";
 import { Sort } from '../../common/sort.js'
 import { FaSortAlphaDown, FaSortAlphaUp } from "react-icons/fa";
-import LogsView from "../../components/Logs/logs_view.js";
-import ExportToExcel from "../../common/export.js";
 import { UTC_LocalDateTime } from "../../common/localDate.js";
 import PageHeader from "../../common/pages/pageHeader.js";
 import IsLoading from "../../common/custom/isLoading.js";
-import FetchData from "../../hook/fetchData.js";
 import { useOutletContext } from "react-router-dom";
 
 const Services = () => {
     const ref = useRef();
     const headingLabel = 'Services'
-    const { saveData, refresh } = useOutletContext();
+    const { saveData, refresh, 
+        servicesList, getService, setServiceList,
+        userList, getUser, } = useOutletContext();
 
     const [isLoading, setIsLoading] = useState(false);
     const [open, setOpen] = useState(false);
-    const [openLogs, setOpenLogs] = useState(false);
     const [title, setTitle] = useState('New');
     const [id, setId] = useState(0);
     const [reload, setReload] = useState(0);
 
-    const [servicesList, setServicesList] = useState([]);
-    const [logsList, setLogsList] = useState([]);
-    const [userList, setUserList] = useState([]);
     const [filteredList, setFilteredList] = useState([]);
     const [list, setList] = useState([]);
 
@@ -49,27 +44,15 @@ const Services = () => {
     }, [refresh])
 
     const Init = async () => {
-        setIsLoading(true)
-        const serviceResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'services'
-        })
-        const userResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'user'
-        })
-
-
-        setServicesList(serviceResponse.data);
-        setUserList(userResponse.data);
-
-        setFilteredList(serviceResponse.data);
-        setList(serviceResponse.data);
-        setExportList(serviceResponse.data);
-        setPage(1, 10, serviceResponse.data);
-
-        setIsLoading(false)
-    }
+        setIsLoading(true);
+        const serviceResponse=await getService();
+        await getUser();
+        setFilteredList(serviceResponse);
+        setList(serviceResponse);
+        setExportList(serviceResponse);
+        setPage(1, 10, serviceResponse);
+        setIsLoading(false);
+    }   
 
     const btn_Click = (id) => {
          setTitle(id === 0 ? `New ${headingLabel}` : `Edit ${headingLabel}`);
@@ -77,10 +60,7 @@ const Services = () => {
         setId(id);
         setOpen(true);
     }
-    const btn_LogsClick = (id) => {
-        setId(id);
-        setOpenLogs(true);
-    }
+   
     const btnSave = async () => {
         await ref.current?.save();
     }
@@ -106,7 +86,7 @@ const Services = () => {
 
     const setSort = (value) => {
         const getValue = value.split(' ');
-        setServicesList(Sort(getValue[0], getValue[1], servicesList))
+        setServiceList(Sort(getValue[0], getValue[1], servicesList))
         setSortAscDesc(value);
     }
 
@@ -208,11 +188,7 @@ const Services = () => {
 
                 <ServiceDetail id={id} refresh={reload} ref={ref} servicesList={servicesList} saveData={saveData} setOpen={setOpen} />
             </Drawer>
-
-            {/* Drawer on logs */}
-            <Drawer title={"Logs Detail"} placement='right' width={500} onClose={() => setOpenLogs(false)} open={openLogs}>
-                <LogsView id={id} ltype={'Services'} logsList={logsList} userList={userList} servicesList={servicesList} />
-            </Drawer>
+     
         </div>
     )
 }

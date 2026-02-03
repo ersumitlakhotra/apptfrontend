@@ -10,8 +10,7 @@ import { userSchedule } from "../../common/general.js";
 import AssignedTo from "../../common/assigned_to.js";
 const { RangePicker } = TimePicker;
 
-
-const ScheduleDetail = ({ id, refresh, ref, date, scheduleList, userList, saveData, setOpen, userId = null,userDisable=false,dateDisable=false,isAdmin }) => {
+const ScheduleDetail = ({ id, refresh, ref, date, scheduleList, userList, saveData, setOpen, userId = '',isAdmin }) => {
     const [trnDate, setTrnDate] = useState(date);
     const [startTime, setStartTime] = useState('00:00:00');
     const [endTime, setEndTime] = useState('00:00:00');
@@ -19,13 +18,13 @@ const ScheduleDetail = ({ id, refresh, ref, date, scheduleList, userList, saveDa
     const [breakEnd, setBreakEnd] = useState('00:00:00');
     const [isWorking, setIsWorking] = useState(true);
     const [uid, setUid] = useState('');
-    const { contextHolder, error, warning } = useAlert();
+    const { contextHolder, warning } = useAlert();
 
     useEffect(() => {
         if (id === 0) {
             setTrnDate(date);   
-            setUid(userId === null ? '' : userId);
-            userId !== null && setUserDefault(date, userId)
+            setUid(userId);
+            userId !== '' && setUserDefault(date, userId)
         }
         else {
             const editList = scheduleList.find(item => item.id === id)
@@ -105,7 +104,6 @@ const ScheduleDetail = ({ id, refresh, ref, date, scheduleList, userList, saveDa
                     status={uid === '' ? 'error' : ''}
                     style={{ width: 300 }}
                     size="large"
-                    disabled={userDisable || id !==0 || !isAdmin}
                     onChange={(value) => setUid(value)}
                     options={[{ value: '', label: '' }, ...userList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
                         value: item.id,
@@ -117,7 +115,6 @@ const ScheduleDetail = ({ id, refresh, ref, date, scheduleList, userList, saveDa
 
             <TextboxFlex label={'Date'} mandatory={true} input={       
                 <DatePicker
-                    disabled={dateDisable || id !== 0}
                     allowClear={false}
                     value={trnDate === '' ? trnDate : dayjs(trnDate, 'YYYY-MM-DD')}
                     onChange={(date, dateString) => setTrnDate(dateString)} />     

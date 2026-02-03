@@ -373,7 +373,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 <Select
                     value={status}
                     style={{ width: '100%' }}
-                    onChange={(value) => { CalculatePrice(servicesItem) ;setStatus(value);}}
+                    onChange={(value) => { CalculatePrice(servicesItem); calculateDiscount(servicesItem, trndate) ;setStatus(value);}}
                     options={[
                         { value: 'Pending', label: <Badge color={'yellow'} text={'Pending'} /> },
                         { value: 'In progress', label: <Badge color={'blue'} text={'In progress'} /> },

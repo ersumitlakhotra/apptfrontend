@@ -3,23 +3,21 @@ import { useEffect, useRef, useState } from "react";
 import { EditOutlined } from '@ant-design/icons';
 import { IoSearchOutline } from "react-icons/io5";
 import { Button, Drawer, Input, Select, Space, Tooltip } from "antd";
-import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
+import { SaveOutlined } from '@ant-design/icons';
 import DataTable from "../../common/datatable";
 import { getTableItem } from "../../common/items";
 import { Sort } from '../../common/sort.js'
 import { FaSortAlphaDown, FaSortAlphaUp } from "react-icons/fa";
-import ExportToExcel from "../../common/export.js";
 import { UTC_LocalDateTime } from "../../common/localDate.js";
 import CustomerDetail from "../../components/Customer/customer_detail.js";
 import { useOutletContext } from "react-router-dom";
 import IsLoading from "../../common/custom/isLoading.js";
-import FetchData from "../../hook/fetchData.js";
 import PageHeader from "../../common/pages/pageHeader.js";
 
 const Customer = () => {
     const ref = useRef();
     const headingLabel = 'Customers'
-    const { saveData, refresh } = useOutletContext();
+    const { refresh, customerList, setCustomerList,getCustomer} = useOutletContext();
 
     const [isLoading, setIsLoading] = useState(false);
     const [open, setOpen] = useState(false);
@@ -27,7 +25,6 @@ const Customer = () => {
     const [id, setId] = useState(0);
     const [reload, setReload] = useState(0);
 
-    const [customerList, setCustomerList] = useState([]);
     const [filteredList, setFilteredList] = useState([]);
     const [list, setList] = useState([]);
 
@@ -44,17 +41,11 @@ const Customer = () => {
 
     const Init = async () => {
         setIsLoading(true)
-        const customerResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'customer'
-        })
-
-        setCustomerList(customerResponse.data);
-        setFilteredList(customerResponse.data);
-        setList(customerResponse.data);
-        setExportList(customerResponse.data);
-        setPage(1, 10, customerResponse.data);
-
+        const response = await getCustomer();
+        setFilteredList(response);
+        setList(response);
+        setExportList(response);
+        setPage(1, 10, response);
         setIsLoading(false)
     }
 
@@ -69,10 +60,12 @@ const Customer = () => {
     }
 
     useEffect(() => {
+        const query = (searchInput || "").toLowerCase();
         const searchedList = customerList.filter(item =>
-        (item.name.toLowerCase().includes(searchInput.toLowerCase()) ||
-            item.email.toLowerCase().includes(searchInput.toLowerCase()) ||
-            item.cell.toLowerCase().includes(searchInput.toLowerCase())
+        (
+            (item.name || "").toLowerCase().includes(query) ||
+            (item.email || "").toLowerCase().includes(query) ||
+            (item.cell || "").toLowerCase().includes(query)
         ));
 
         setExportList(searchedList);
@@ -166,7 +159,7 @@ const Customer = () => {
             <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
 
-                <CustomerDetail id={id} refresh={reload} ref={ref} customerList={customerList} saveData={saveData} setOpen={setOpen} />
+                <CustomerDetail id={id} refresh={reload} ref={ref} setOpen={setOpen} />
             </Drawer>
         </div>
     )

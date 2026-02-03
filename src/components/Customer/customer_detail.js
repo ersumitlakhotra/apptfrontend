@@ -4,20 +4,20 @@ import { useEffect, useImperativeHandle, useState } from "react";
 import { Input } from "antd";
 import { TextboxFlex } from "../../common/textbox";
 import { isValidEmail, setCellFormat } from "../../common/cellformat";
+import { useOutletContext } from "react-router-dom";
 
-const CustomerDetail = ({ id, refresh, ref, customerList, saveData, setOpen }) => {
+const CustomerDetail = ({ id, refresh, ref, setOpen }) => {
+    const { saveData, customerList} = useOutletContext();
 
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
-
     const [cell, setCell] = useState('');
-
 
     useEffect(() => {
         if (id === 0) {
             setName(''); setEmail(''); setCell('');
         }
-        else {
+        else {       
             const editList = customerList.find(item => item.id === id)
             setName(editList.name);
             setEmail(editList.email);

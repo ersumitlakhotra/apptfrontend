@@ -1,29 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, DatePicker, Input, Popconfirm, Popover, Select, Skeleton, Tooltip } from "antd"
+import { Button, DatePicker, Input,  Popover, Select,  Tooltip } from "antd"
 import { IoSearchOutline } from "react-icons/io5";
 import { getTableItem } from "../../common/items";
 import DataTable from "../../common/datatable";
 import { useEffect, useState } from "react";
-import { ContainerOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
+import {  EditOutlined, EyeOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { Tags } from "../../common/tags";
 import Services from "../../common/services";
 import AssignedTo from "../../common/assigned_to";
 import { UTC_LocalDateTime, get_Date } from "../../common/localDate";
 import IsLoading from "../../common/custom/isLoading.js";
-import { MdDownloadDone } from "react-icons/md";
-import { IoMdClose } from "react-icons/io";
-import { useEmail } from "../../email/email.js";
 import { useOutletContext } from "react-router-dom";
 import { useResponseButtons } from './responseButton.js'
 
-
-const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_ViewClick, btn_LogsClick, refresh, fromDate, setFromDate, toDate, setToDate, setExportList ,isLoading,isAdmin}) => {
-
+const OrderTabs = ({ index, orderList, fromDate, setFromDate, toDate, setToDate, setExportList ,isLoading}) => {
+    const { saveData,viewOrder, editOrder,servicesList, userList,isAdmin } = useOutletContext();
     const [searchInput, setSearchInput] = useState('');
     const [filteredList, setFilteredList] = useState(orderList);
     const [list, setList] = useState(orderList);
-    const { Accept,Reject} = useResponseButtons();
+    const { Accept, Reject } = useResponseButtons(saveData);
 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -39,14 +35,14 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
         setSearchInput('');
         setDropDownVisible(isAdmin);
         setPage(1, 10, orderList);
-    }, [refresh, orderList])
+    }, [orderList])
 
     useEffect(() => {
        
         let searchedList = orderList.filter(item =>
-            item.name.toLowerCase().includes(searchInput.toLowerCase())
-            || item.order_no.toString().includes(searchInput.toLowerCase())
-            || item.cell.toString().includes(searchInput.toLowerCase())
+            (item.name || "").toLowerCase().includes(searchInput.toLowerCase()) ||
+            (item.order_no || "").toString().includes(searchInput.toLowerCase()) ||
+            (item.cell || "").toString().includes(searchInput.toLowerCase())
         );
 
 
@@ -137,7 +133,7 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
                     body={(
                         filteredList.map(item => (
                             <tr key={item.id} class="bg-white border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50 ">
-                                <td class="p-3 text-blue-500 italic hover:underline cursor-pointer" onClick={() => btn_ViewClick(item.id)} ># {item.order_no}</td>
+                                <td class="p-3 text-blue-500 italic hover:underline cursor-pointer" onClick={() => viewOrder(item.id)} ># {item.order_no}</td>
 
                                 <td class="p-3">
                                     <>
@@ -162,10 +158,10 @@ const OrderTabs = ({ index, orderList, servicesList, userList, btn_Click, btn_Vi
                                     {item.status !== 'Awaiting' ?
                                         <>
                                             <Tooltip placement="top" title={'Edit'} >
-                                                <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
+                                                <Button type="link" icon={<EditOutlined />} onClick={() => editOrder(item.id)} />
                                             </Tooltip>
                                             <Tooltip placement="top" title={'View'} >
-                                                <Button type="link" icon={<EyeOutlined />} onClick={() => btn_ViewClick(item.id)} />
+                                                <Button type="link" icon={<EyeOutlined />} onClick={() => viewOrder(item.id)} />
                                             </Tooltip>
                                         </>
                                     :

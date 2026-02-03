@@ -9,12 +9,11 @@ import { BsCash } from "react-icons/bs";
 import { setNumberAndDot } from "../../common/cellformat";
 import useAlert from "../../common/alert";
 import { TbTransfer } from "react-icons/tb";
-import { useOutletContext } from "react-router-dom";
 import { useResponseButtons } from "./responseButton";
 import FetchData from "../../hook/fetchData";
 import IsLoading from "../../common/custom/isLoading";
 
-const OrderView = ({ id, servicesList, userList, setOpenView, saveData }) => {
+const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }) => {
     const { contextHolder, warning } = useAlert();
 
 
@@ -81,11 +80,11 @@ const OrderView = ({ id, servicesList, userList, setOpenView, saveData }) => {
             setAssignedTo(''); setOrderNo(''); setServicesItem([]); setSlot(''); setBookedVia('Walk-In')
         }
         else {
-            loadOrder();
+            load();
         }
-    }, [id])
+    }, [refresh])
 
-    const loadOrder = async () => {
+    const load = async () => {
 
         setIsLoading(true)
         const orderResponse = await FetchData({
@@ -133,8 +132,8 @@ const OrderView = ({ id, servicesList, userList, setOpenView, saveData }) => {
                         <span class="text-2xl font-bold text-gray-800">Appointment #{order_no}</span>
                         {status === 'Awaiting' ?
                             <div class='flex gap-2 '>
-                                <Accept id={id} userList={userList} servicesList={servicesList} labelVisible={true} />
-                                <Reject id={id} userList={userList} servicesList={servicesList} labelVisible={true} />
+                                <Accept id={id} userList={userList} servicesList={servicesList} labelVisible={true} setOpenView={setOpenView}  />
+                                <Reject id={id} userList={userList} servicesList={servicesList} labelVisible={true} setOpenView={setOpenView} />
                             </div>
                             :
                             (status === 'Pending' || status === 'In progress') &&

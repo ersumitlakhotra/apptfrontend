@@ -3,11 +3,9 @@ import { Button, Popconfirm, Tooltip } from "antd"
 import { MdDownloadDone } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
 import { useEmail } from "../../email/email";
-import { useOutletContext } from "react-router-dom";
 
 export const useResponseButtons = (saveData) => {
     const { AppointmentStatus } = useEmail();
-   // const { saveData } = useOutletContext();
 
     const onSave = (id, status, userList, servicesList) => {
         saveData({
@@ -23,22 +21,22 @@ export const useResponseButtons = (saveData) => {
             servicesList: servicesList
         })
     }
-    const Accept = ({ id, userList, servicesList,labelVisible=false ,size="middle"}) => {
+    const Accept = ({ id, userList, servicesList, labelVisible = false, size = "middle", setOpenView =null}) => {
         return (
             <Tooltip placement="top" title={'Accept'} >
-                <Button color="cyan" variant="solid" icon={<MdDownloadDone size={12} />} size={size} onClick={(e) => {e.stopPropagation(); onSave(id, AppointmentStatus.CONFIRMED, userList, servicesList)}} >
+                <Button color="cyan" variant="solid" icon={<MdDownloadDone size={12} />} size={size} onClick={(e) => { e.stopPropagation(); onSave(id, AppointmentStatus.CONFIRMED, userList, servicesList); setOpenView !== null && setOpenView(false)  }} >
                 {labelVisible && 'Accept'}</Button>
             </Tooltip>
         )
     }
 
-    const Reject = ({ id, userList, servicesList,labelVisible=false,size="middle" }) => {
+    const Reject = ({ id, userList, servicesList, labelVisible = false, size = "middle", setOpenView = null }) => {
         return (
             <Tooltip placement="top" title={'Reject'} >
                 <Popconfirm
                     title="Reject"
                     description="Are you sure to Reject ? "
-                    onConfirm={(e) =>{e?.stopPropagation();  onSave(id, AppointmentStatus.REJECTED,userList, servicesList)}}
+                    onConfirm={(e) => { e?.stopPropagation(); onSave(id, AppointmentStatus.REJECTED, userList, servicesList); setOpenView !== null && setOpenView(false) ;}}
                     onCancel={(e) =>{e?.stopPropagation();}}
                     okText="Yes"
                     cancelText="No"

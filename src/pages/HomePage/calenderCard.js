@@ -1,12 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import { Tag } from "antd";
 import { get_Date, LocalDate } from "../../common/localDate"
 import { IoMdClose } from "react-icons/io";
 import { IoHourglassOutline } from "react-icons/io5";
-import { MdOutlineQuestionMark, MdDownloadDone, MdPendingActions } from "react-icons/md";
+import {  MdDownloadDone, MdPendingActions } from "react-icons/md";
 import { useEffect, useState } from "react";
-import FetchData from "../../hook/fetchData";
-import { getStorage } from "../../common/localStorage";
 import IsLoading from "../../common/custom/isLoading";
 import CalenderIcon from "../../common/custom/calenderIcon"; 
 import { IoMdWarning } from "react-icons/io"; 
@@ -15,7 +14,7 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 
 const CalenderCard = () => {
     const navigate = useNavigate();
-    const { saveData, refresh } = useOutletContext();
+    const { refresh, getOrder } = useOutletContext();
     const [ordersList, setOrdersList] = useState([]);
     const [awaitingList, setAwaitingList] = useState([]);
     const [pendingList, setPendingList] = useState([]);
@@ -31,18 +30,8 @@ const CalenderCard = () => {
 
     const Init = async () => {
         setIsLoading(true);
-
-        const localStorage = await getStorage();
-        const isAdmin = localStorage.role === 'Administrator'
-
-        const orderResponse = await FetchData({
-            method: 'GET',
-            endPoint: !isAdmin ? 'orderPerUser' : 'order', //
-            id: !isAdmin ? localStorage.uid : null
-        })
-
-
-        let order = (orderResponse.data).filter(a => get_Date(a.trndate, 'YYYY-MM-DD') === LocalDate());
+        const orderResponse = await getOrder();
+        let order = orderResponse.filter(a => get_Date(a.trndate, 'YYYY-MM-DD') === LocalDate());
 
         const pending = order.filter(a => a.status.toUpperCase() === 'PENDING');
         const awaiting = order.filter(a => a.status.toUpperCase() === 'AWAITING');

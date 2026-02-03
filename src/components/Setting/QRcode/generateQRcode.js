@@ -1,21 +1,19 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useState } from "react";
-import FetchData from "../../../hook/fetchData";
+import { useOutletContext } from "react-router-dom";
 
 const GenerateQR = () => {
     const [link, setLink] = useState('');
     const [urlImage, setUrlImage] = useState('');
     const qrCodeRef = useRef(null);
-
+    const {getCompany } = useOutletContext();
     useEffect(() => {
         Init();
     }, [])
 
     const Init = async () => {
-        const companyResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'company'
-        }) 
-        setLink(`${process.env.REACT_APP_DOMAIN}/book-appointment?store=` + companyResponse.data.store);    
+        const companyResponse = await getCompany();
+        setLink(`${process.env.REACT_APP_DOMAIN}/book-appointment?store=` + companyResponse.store);    
     }
 
     useEffect(() => {

@@ -98,6 +98,8 @@ export const Signup = ({ logo }) => {
           cell: cell,
           password: password,
           slot: 30,
+          pricing: pricing,
+          plan: plan,
           timinginfo: [{
             monday: ['09:00:00', '21:00:00', true],
             tuesday: ['09:00:00', '21:00:00', true],
@@ -124,8 +126,6 @@ export const Signup = ({ logo }) => {
               rating: '5',
               status: 'Active',
               accounttype: 'Basic',
-              pricing:pricing,
-              plan:plan,
             });
             const resUser = await apiCalls('POST', 'user', cid, null, userBody);
             if (resUser.status === 201) {

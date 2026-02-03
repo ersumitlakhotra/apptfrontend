@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
@@ -317,7 +318,7 @@ const BookAppointment = () => {
                 taxamount: '0',
                 total: total,
                 coupon: coupon,
-                status: autoAccept ? 'Pending':'Awaiting',
+                status: bookingType === 3 ? 'Cancelled' : autoAccept ? 'Pending':'Awaiting',
                 trndate: trndate,
                 assignedto: employeeId,
                 slot: slot,
@@ -348,9 +349,10 @@ const BookAppointment = () => {
                     sendEmail({
                         id: id,
                         cid:cid,
-                        status: autoAccept ?
-                            bookingType === 1 ? AppointmentStatus.CONFIRMED : bookingType === 2 ? AppointmentStatus.RESCHEDULED : AppointmentStatus.CANCELLED
-                            : AppointmentStatus.AWAITING,
+                        status: bookingType === 3 ? AppointmentStatus.CANCELLED :
+                                    autoAccept ?
+                                        bookingType === 1 ? AppointmentStatus.CONFIRMED : AppointmentStatus.RESCHEDULED 
+                                        : AppointmentStatus.AWAITING,
                         userList: userList, 
                         servicesList: servicesList
                     })
@@ -363,9 +365,12 @@ const BookAppointment = () => {
                                 <p class='font-bold'>Hi {customerName}</p>
                                 <p>Your appointment at <span class='font-semibold'>{storeName}</span> has been 
                                     <strong>
-                                        {autoAccept ? ' ' +
-                                            bookingType === 1 ? AppointmentStatus.CONFIRMED : bookingType === 2 ? AppointmentStatus.RESCHEDULED : AppointmentStatus.CANCELLED
-                                            : ' Waiting for approval.'}
+                                        {
+                                            bookingType === 3 ? AppointmentStatus.CANCELLED :
+                                                autoAccept ?
+                                                    bookingType === 1 ? AppointmentStatus.CONFIRMED : AppointmentStatus.RESCHEDULED
+                                                    : ' Waiting for approval.'
+                                        }
                                     </strong>
                                 </p>
                                 <div class='w-full flex flex-col gap-2 p-2 bg-white rounded-lg shadow border border-green-700 border-s-green-700 border-s-8'>
