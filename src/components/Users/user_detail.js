@@ -8,11 +8,13 @@ import UserAbout from "./about.js";
 import useAlert from "../../common/alert.js";
 import UserLoginPermissions from "./permissions.js";
 import ScheduleN from "./scheduleN.js";
+import FetchData from "../../hook/fetchData.js";
+import IsLoading from "../../common/custom/isLoading.js";
 
 function getTabItems(key, label, icon, children) {
     return {key,label,children,icon,};
 }
-const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyList, saveData, setOpen, isAdmin,adminEmail =false }) => {
+const UserDetail = ({ id, refresh, ref, userPermissionList, companyList, saveData, setOpen, isAdmin,adminEmail =false }) => {
     const [tabActiveKey, setTabActiveKey] = useState("1");
     const [fullname, setFullname] = useState('');
     const [cell, setCell] = useState('');
@@ -26,7 +28,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyLis
     const [profilepic, setProfile] = useState(null);
     const [appschedule, setAppSchedule] = useState(true);
     const [status, setStatus] = useState('Active');
-
+    const [isLoading, setIsLoading] = useState(false);
 
     const [dashboard, setDashboard] = useState(false);
     const [order, setOrder] = useState(false);
@@ -74,50 +76,61 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyLis
             }  
         }
         else {       
-            const editList = userList.find(item => item.id === id)
-            setFullname(editList.fullname);
-            setCell(editList.cell);
-            setEmail(editList.email);
-            setAddress(editList.address);
-            setGender(editList.gender);
-            setPassword(editList.password);
-            setRole(editList.role);
-            setRating(editList.rating);
-            setAccountType(editList.accounttype);
-            setProfile(editList.profilepic);
-            setStatus(editList.status);
-            setAppSchedule(Boolean(editList.appschedule));
-
-            userPermissionList.map(b => {
-                setDashboard(b.dashboard);
-                setTasks(b.tasks);
-                setOrder(b.order);
-                setEvent(b.event);
-                setPayment(b.payment);
-
-                setCustomer(b.customer);
-                setServices(b.services);
-                setUsers(b.users);
-                setSchedule(b.schedule)
-
-                setSales(b.sales);
-                setCollection(b.collection);
-                setSetting(b.setting);
-            })
-            if (editList.timinginfo !== null) {
-                setMonday(editList.timinginfo[0].monday);
-                setTuesday(editList.timinginfo[0].tuesday);
-                setWednesday(editList.timinginfo[0].wednesday);
-                setThursday(editList.timinginfo[0].thursday);
-                setFriday(editList.timinginfo[0].friday);
-                setSaturday(editList.timinginfo[0].saturday);
-                setSunday(editList.timinginfo[0].sunday);
-            }  
-
-
+            load();
         }
     }, [refresh])
 
+    const load = async () => {
+
+        setIsLoading(true)
+        const userResponse = await FetchData({
+            method: 'GET',
+            endPoint: 'user', //
+            id: id
+        })
+        const editList = userResponse.data[0];
+        setFullname(editList.fullname);
+        setCell(editList.cell);
+        setEmail(editList.email);
+        setAddress(editList.address);
+        setGender(editList.gender);
+        setPassword(editList.password);
+        setRole(editList.role);
+        setRating(editList.rating);
+        setAccountType(editList.accounttype);
+        setProfile(editList.profilepic);
+        setStatus(editList.status);
+        setAppSchedule(Boolean(editList.appschedule));
+
+        userPermissionList.map(b => {
+            setDashboard(b.dashboard);
+            setTasks(b.tasks);
+            setOrder(b.order);
+            setEvent(b.event);
+            setPayment(b.payment);
+
+            setCustomer(b.customer);
+            setServices(b.services);
+            setUsers(b.users);
+            setSchedule(b.schedule)
+
+            setSales(b.sales);
+            setCollection(b.collection);
+            setSetting(b.setting);
+        })
+        console.log(editList)
+        if (editList.timinginfo !== null) {
+            setMonday(editList.timinginfo[0].monday);
+            setTuesday(editList.timinginfo[0].tuesday);
+            setWednesday(editList.timinginfo[0].wednesday);
+            setThursday(editList.timinginfo[0].thursday);
+            setFriday(editList.timinginfo[0].friday);
+            setSaturday(editList.timinginfo[0].saturday);
+            setSunday(editList.timinginfo[0].sunday);
+        }  
+
+        setIsLoading(false)
+    }
     useEffect(() => {
         if (role === 'Employee')
         {
@@ -307,6 +320,7 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyLis
     };
     return (
         <div class='p-2'>
+            <IsLoading isLoading={isLoading} rows={20} input={<>
             <div class='w-full flex mb-6'>     
                 <div class='flex flex-col gap-2'>
                     {profilepic !== null ?
@@ -321,9 +335,9 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyLis
                 </div>
                 <div class='flex flex-col'>
                     <p class='text-2xl font-semibold text-gray-600'>{fullname}</p>
-                    <p class="font-normal text-blue-500 ">{userList.role}</p>
+                    <p class="font-normal text-blue-500 ">{role}</p>
                     <p class="font-normal text-gray-400 mt-5 mb-2">Rating</p>
-                    <Rate disabled value={userList.rating} />
+                    <Rate disabled value={rating} />
                     
                 </div>
             </div>
@@ -334,6 +348,8 @@ const UserDetail = ({ id, refresh, ref, userList, userPermissionList, companyLis
                 activeKey={tabActiveKey}
                 onChange={(e) => { setTabActiveKey(e)}}
             />
+           </>
+        }/>
             {contextHolder}
         </div>
     )

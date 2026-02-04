@@ -38,11 +38,11 @@ const OrderTabs = ({ index, orderList, fromDate, setFromDate, toDate, setToDate,
     }, [orderList])
 
     useEffect(() => {
-       
+        const query = (searchInput || "").toLowerCase();
         let searchedList = orderList.filter(item =>
-            (item.name || "").toLowerCase().includes(searchInput.toLowerCase()) ||
-            (item.order_no || "").toString().includes(searchInput.toLowerCase()) ||
-            (item.cell || "").toString().includes(searchInput.toLowerCase())
+            (item.name || "").toLowerCase().includes(query) ||
+            (item.order_no || "").toString().includes(query) ||
+            (item.cell || "").toString().replace(/-/g, "").includes(query)
         );
 
 

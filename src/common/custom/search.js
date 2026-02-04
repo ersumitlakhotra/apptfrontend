@@ -11,6 +11,7 @@ const Search = ({ value, onChange }) => {
             prefix={<IoSearchOutline color="silver" />}
             value={value}
             onChange={(e) => onChange(e.target.value)} 
+            allowClear
             />
     )
 }

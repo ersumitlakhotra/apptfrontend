@@ -18,9 +18,21 @@ const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage(async  function (payload) {
   console.log("Received background message: ", payload);
-
-  self.registration.showNotification(payload.notification.title, {
-    body: payload.notification.body,
-    icon: "/icon192.png",
+  self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+    .then((clients) => {
+      for (const client of clients) {
+        client.postMessage({
+          type: 'DATA_REFRESH',
+          entity: payload.data.entity // optional
+        });
+      }
+    });
+    
+  self.registration.showNotification(payload.data.title, {
+    body: payload.data.body,
+    icon: "/icon192.png", 
+    tag: 'updates',             
+    renotify: true,
+    requireInteraction: true
   });
 });

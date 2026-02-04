@@ -30,11 +30,10 @@ export const initNotification=async (registration,saveData,onNotification)=> {
 
     // Optional: Listen to messages in foreground
     onMessage(messaging,(payload) => {
-        const title =payload.notification.title;
-        const body =payload.notification.body;
+        const title = payload.data.title;
+        const body = payload.data.body;
        onNotification({title:title, description:body})
-
-       // console.log("Foreground message received:", payload);
+        //console.log("Foreground message received:", payload);
     });
 }
 

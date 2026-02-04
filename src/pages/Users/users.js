@@ -14,7 +14,7 @@ import IsLoading from "../../common/custom/isLoading.js";
 
 const Users = () => {
     const headingLabel = 'Users'
-    const { refresh,editUser,userList, getUser, getUserPermission,getCompany,isAdmin } = useOutletContext();
+    const { refresh, editUser, userList, getUser,  getUserPermission,getCompany,isAdmin } = useOutletContext();
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -34,7 +34,7 @@ const Users = () => {
 
     const Init = async () => {
         setIsLoading(true);
-        const userResponse=  await getUser();
+        const userResponse = await getUser();
         await getUserPermission();
         await getCompany();
         setFilteredList(userResponse);

@@ -1,7 +1,8 @@
+/* eslint-disable array-callback-return */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { useState } from "react";
 import { DownOutlined, LoadingOutlined, MailFilled } from '@ant-design/icons';
-import { Drawer, Spin, Input, Button, Dropdown, Space } from 'antd';
+import { Drawer, Spin, Input, Button, Dropdown } from 'antd';
 import { apiCalls } from "../../hook/apiCall.js";
 import useAlert from "../../common/alert.js";
 import { isValidEmail, setCellFormat } from "../../common/cellformat.js";
