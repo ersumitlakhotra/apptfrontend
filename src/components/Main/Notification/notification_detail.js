@@ -7,7 +7,7 @@ import NotificationTabs from "./notification_tabs";
 import dayjs from 'dayjs';
 import { firstDateOfMonth, lastDateOfMonth, LocalDate, UTC_LocalDateTime } from "../../../common/localDate";
 
-const NotificationDetail = ({ refresh, currentOption, notificationList, setUnreadUpdate, tabActiveKey, setTabActiveKey, userList,servicesList,saveData,viewOrder }) => {
+const NotificationDetail = ({ refresh, currentOption, notificationList, tabActiveKey, setTabActiveKey, userList,servicesList,saveData,viewOrder }) => {
 
     const [allNotification, setAllNotification] = useState([]);
     const [newNotification, setNewNotification] = useState([]);

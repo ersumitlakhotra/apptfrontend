@@ -72,6 +72,13 @@ const ProtectedLayout = () => {
                 .then(registration => initNotification(registration, saveData, onNotification))
                 .catch(console.error);
         };
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                if (event.data?.type === 'DATA_REFRESH') {
+                    setRefresh(refresh+1);
+                }
+            });
+        }
         Init();
     }, []);
 
@@ -188,8 +195,8 @@ const ProtectedLayout = () => {
     }
 
     const onNotification = ({ title, description }) => {
+        notifications({ title: `${title} Appointment`, description: description, cancel: title === 'Cancel' });
         setRefresh(refresh + 1);
-        notifications({ title: `${title} Appointment`, description: description, cancel: title === 'Cancel' })
     }
 
     const saveData = async ({ label, method, endPoint, id = null, body = null, notify = true, logs = true, email = false, status = null, userList = [], servicesList = [] }) => {
@@ -254,15 +261,17 @@ const ProtectedLayout = () => {
                 saveData={saveData}
                 refresh={refresh}
                 setRefresh={setRefresh}
+                orderList={orderList}
                 notificationList={notificationList}
                 getNotification={getNotification}
                 getUserListWithAdmin={getUserListWithAdmin}
                 servicesList={servicesList}
+                editOrder={editOrder}
                 viewOrder={viewOrder}
                 editUser={editUser}
                 uid={uid} />
 
-            <main class="flex-1 px-2 md:px-8 scroll-auto">
+            <main class="flex-1 px-3 md:px-8 scroll-auto">
                 <Outlet context={{
                     saveData, refresh,
                     isLoading, setIsLoading,
@@ -272,6 +281,7 @@ const ProtectedLayout = () => {
                     servicesList, setServiceList, getService,
                     userList, getUser,
                     userPermissionList, getUserPermission,
+                    userListWithAdmin, getUserListWithAdmin,
                     scheduleList, getSchedule,
                     companyList, getCompany,
                     viewOrder, editOrder, editUser, editSchedule,
@@ -314,7 +324,7 @@ const ProtectedLayout = () => {
             {/* Drawer on user edit*/}
             <Drawer title={userTitle} placement='right' width={500} onClose={() => setOpenUser(false)} open={openUser}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
-                <UserDetail id={userId} refresh={reload} ref={ref} userList={userListWithAdmin} userPermissionList={userPermissionList} companyList={companyList} saveData={saveData} setOpen={setOpenUser} isAdmin={isAdmin} adminEmail={userId === uid && isAdmin} />
+                <UserDetail id={userId} refresh={reload} ref={ref} userPermissionList={userPermissionList} companyList={companyList} saveData={saveData} setOpen={setOpenUser} isAdmin={isAdmin} adminEmail={userId === uid && isAdmin} />
             </Drawer>
 
             {/* Drawer on schedule edit*/}

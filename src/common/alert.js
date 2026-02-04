@@ -51,7 +51,7 @@ const notifications = ({title,description,cancel =false}) => {
     placement:"top",
     showProgress: true,
     pauseOnHover:'true',
-    duration: 20,
+    duration: 12,
     style:{ backgroundColor: cancel ?'#fecdd3':'#fdba74'}
   });
 };

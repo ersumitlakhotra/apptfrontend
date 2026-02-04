@@ -4,7 +4,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import useAlert from "../../common/alert.js";
 import { Spin } from 'antd';
 import { useNavigate } from "react-router-dom";
-import { clearLocalStorage, handleAuth } from "../../auth/auth.js";
+import { clearLocalStorage } from "../../auth/auth.js";
 import { useAuth } from "../../auth/authContext.js";
 
 export const Login = ({ logo }) => {
@@ -43,7 +43,7 @@ export const Login = ({ logo }) => {
               Sign in to your account
             </h1>
               <div>
-              <label for="text" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Admin Email or Cell #</label>
+              <label for="text" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Admin Email or Username</label>
               <input type="text" name="text" id="text" onChange={(e) => setUsername(e.target.value)} value={username}
                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="name@company.com" required />

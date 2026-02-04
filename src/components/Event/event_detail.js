@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useImperativeHandle, useState } from "react";
 import {  DatePicker,  Input,  Select } from "antd";
 import dayjs from 'dayjs';
@@ -87,7 +88,8 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
 
 
     useEffect(() => {
-        setTotal(parseFloat(parseFloat(price) - parseFloat(discount)).toFixed(2) )
+        let _discount = (discount === '' || discount === '.') ? 0 : discount ; 
+        setTotal(parseFloat(parseFloat(price) - parseFloat(_discount)).toFixed(2) )
     }, [price,discount])
 
     return (

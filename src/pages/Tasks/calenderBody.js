@@ -63,7 +63,7 @@ const CalenderBody = ({ slots, orderList,isLoading }) => {
             slots.map((item, index) =>
             (
                 <div key={index} class='border-b h-12  text-sm  w-max min-w-full inline-flex gap-3  hover:bg-gray-50 '   >
-                    <div class='w-20 whitespace-nowrap p-3 sticky left-0 z-40 bg-white'>{convertTo12Hour(item.start)}</div>
+                    <div class='w-20 whitespace-nowrap p-3 sticky left-0 z-30 bg-white'>{convertTo12Hour(item.start)}</div>
                     {userList.map(a => (
                         <div key={a.id} class=' w-44  p-2'>
                             <Card id={a.id} startTime={item.start} />

@@ -1,7 +1,5 @@
-import { Button, Tooltip, Popconfirm } from "antd"
+
 import AssignedTo from "../../common/assigned_to"
-import { MdDownloadDone } from "react-icons/md";
-import { IoMdClose } from "react-icons/io";
 import { FiClock } from "react-icons/fi";
 import Services from "../../common/services";
 import FlexBoxRow from "../../common/custom/flexboxRow";

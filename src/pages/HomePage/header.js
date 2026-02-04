@@ -3,14 +3,19 @@
 import Search from '../../common/custom/search'
 import logo from '../../Images/logo.png'
 import { SlEarphonesAlt } from "react-icons/sl";
-import { Badge, Button,  Drawer, Dropdown,  Space } from 'antd';
-import { BellFilled, LogoutOutlined, DownOutlined, UserOutlined, BellOutlined } from '@ant-design/icons';
+import { Avatar, Badge, Button, Drawer, Dropdown,  Space, Tooltip } from 'antd';
+import { BellFilled, LogoutOutlined, DownOutlined, UserOutlined, BellOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import AssignedTo from '../../common/assigned_to';
 import NotificationDetail from '../../components/Main/Notification/notification_detail';
 import { getStorage } from '../../common/localStorage';
 import { useAuth } from '../../auth/authContext';
+import IsLoading from '../../common/custom/isLoading';
+import { get_Date } from '../../common/localDate';
+import { Sort } from '../../common/sort';
+import { useResponseButtons } from '../../components/Order/responseButton';
+import { Tags } from '../../common/tags';
 
 function getItem(key, label, icon, extra, disabled, danger) {
     return {
@@ -22,19 +27,23 @@ function getItem(key, label, icon, extra, disabled, danger) {
         danger,
     };
 }
-const Header = ({ saveData, refresh, setRefresh, viewOrder, editUser, uid, notificationList, getNotification, getUserListWithAdmin,servicesList
- }) => {
+const Header = ({ saveData, refresh, setRefresh, editOrder,viewOrder, editUser, uid, orderList, notificationList, getNotification, getUserListWithAdmin, servicesList
+}) => {
     const navigate = useNavigate();
     const ranOnce = useRef(false);
-    const { logout } = useAuth();
+    const { logout } = useAuth(); 
+    const [isLoading, setIsLoading] = useState(false);
     const [search, setSearch] = useState('');
     const [fullname, setFullname] = useState('');
     const [username, setUsername] = useState('');
     const [userList, setUserList] = useState([]);
-    const [unread, setUnread] = useState([])  
+    const [filteredList, setFilteredList] = useState([]);
+    const [unread, setUnread] = useState([])
     const [openNotification, setOpenNotification] = useState(false);
-    const [tabActiveKey,setTabActiveKey]= useState(1)
+    const [tabActiveKey, setTabActiveKey] = useState(1)
     const [reload, setReload] = useState(0);
+     const { Accept, Reject } = useResponseButtons(saveData);
+    
 
     useEffect(() => {
         if (ranOnce.current) return;
@@ -59,6 +68,7 @@ const Header = ({ saveData, refresh, setRefresh, viewOrder, editUser, uid, notif
         const notificationResponse = await getNotification();
         const unread = notificationResponse.filter(a => a.read === '0');
         setUnread(unread.length > 0 ? unread : [])
+        await onSearch();
     }
 
     const handleMenuClick = e => {
@@ -66,14 +76,14 @@ const Header = ({ saveData, refresh, setRefresh, viewOrder, editUser, uid, notif
             case '1':
             case '2': // Account
                 {
-                    editUser(uid,true)
+                    editUser(uid, true)
                     break;
                 }
             case '3': // Notifications
                 {
                     setTabActiveKey('1');
                     setReload(reload + 1);
-                    setOpenNotification(true);           
+                    setOpenNotification(true);
                     break;
                 }
             case '4': // Help
@@ -99,8 +109,8 @@ const Header = ({ saveData, refresh, setRefresh, viewOrder, editUser, uid, notif
                         <p>{fullname} </p>
                         <p>{username} </p>
                     </div>
-                </div>, null, null,true),
-            { type: 'divider', }, 
+                </div>, null, null, true),
+            { type: 'divider', },
             getItem('2', 'Account', <UserOutlined />, '⌘A'),
             getItem('3', 'Notifications', <BellOutlined />),
             getItem('4', 'Help Center', <SlEarphonesAlt />),
@@ -115,12 +125,43 @@ const Header = ({ saveData, refresh, setRefresh, viewOrder, editUser, uid, notif
         { key: 'Today', label: 'Today' },
         { key: 'Last 7 Days', label: 'Last 7 Days' },
         { key: 'This Month', label: 'This Month' },
-       // { key: 'This Year', label: 'This Year' },
+        // { key: 'This Year', label: 'This Year' },
     ];
 
     const onItemChanged = e => { setCurrentOption(e.key) };
     const menuPropsNotification = { items: itemsNotification, onClick: onItemChanged };
 
+    useEffect(() => {
+        const handler = setTimeout(async () => {
+            setIsLoading(true)
+            await onSearch();
+            setIsLoading(false)
+        }, 500); // 500ms after user stops typing
+
+        // Cleanup if user types again before timeout
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [search]);
+
+    const onSearch = async () => {
+        const query = (search || "").toLowerCase(); 
+        if (search !== '') {
+            const res=await orderSearch(query);
+            setFilteredList(res)
+        }
+        else
+            setFilteredList([])  
+    }
+
+    const orderSearch = async(query) => {
+        let searchedList =await orderList.filter(item =>
+            (item.name || "").toLowerCase().includes(query) ||
+            (item.order_no || "").toString().includes(query) ||
+            (item.cell || "").toString().replace(/-/g, "").includes(query)
+        );    
+        return Sort("trndate","desc",searchedList.slice(0,10))
+    }
 
     return (
         <header class="p-2 bg-blue-500 border-b shadow-sm flex flex-row gap-2 sticky  z-50 top-0">
@@ -132,8 +173,47 @@ const Header = ({ saveData, refresh, setRefresh, viewOrder, editUser, uid, notif
             </div>
 
             {/* Search */}
-            <div class='w-8/12 md:w-6/12 flex flex-row items-center'>
-                <Search value={search} onChange={setSearch} />
+            <div class='w-8/12 md:w-6/12 flex flex-row items-center relative'> 
+                <Search value={search} onChange={(e) => setSearch(e)} />
+                <div class={`w-full min-h-[350px] max-h-[350px] overflow-y-scroll border border-gray-400 z-50 bg-white rounded-lg shadow absolute top-10 ${search === '' && 'hidden'} `}>
+                   <IsLoading isLoading={isLoading} rows={8} input=
+                    {
+                        filteredList.length === 0 ? <p class='text-left p-4 text-sm font-medium text-gray-400'> No match found </p> : 
+                        filteredList.map(item =>  (
+                            <div key={item.id} class={`w-full flex flex-row p-2 gap-2 border-b-2 cursor-pointer hover:bg-gray-100  hover:shadow `} onClick={() => viewOrder(item.id)}>
+                                <Avatar style={{ backgroundColor: '#60a5fa'}} size="large">
+                                    {"Appointment".charAt(0)}
+                                </Avatar>
+                                <div class='flex flex-col gap-1 md:gap-0 w-11/12 '>
+                                    <p class='text-xs text-gray-600 flex flex-col md:flex-row md:items-center gap-1'>
+                                        <span class='text-blue-500  hover:underline cursor-pointer'>{item.order_no} {Tags(item.status)}</span> 
+                                        <span> {item.name} ( {item.cell} )</span> 
+                                    </p>
+                                    <div class='flex flex-row text-xs text-gray-500 items-center justify-between'>
+                                        <span> {`${get_Date(item.trndate, "dddd MMM, DD YYYY")} [${item.slot}] `}</span>
+                                        {item.status !== 'Awaiting' ?
+                                            <div class='flex flex-row gap-2 items-center '>
+                                                <Tooltip placement="top" title={'Edit'} >
+                                                    <Button type="link" icon={<EditOutlined />} onClick={(e) => { e.stopPropagation();  editOrder(item.id);}} />
+                                                </Tooltip>
+                                                <Tooltip placement="top" title={'View'} >
+                                                    <Button type="link" icon={<EyeOutlined />} onClick={(e) => { e.stopPropagation(); viewOrder(item.id)}} />
+                                                </Tooltip>
+                                            </div>
+                                            :
+                                            <div class='flex flex-row gap-2 items-center '>
+                                                <Accept id={item.id} userList={userList} servicesList={servicesList} />
+                                                <Reject id={item.id} userList={userList} servicesList={servicesList} />
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                            </div>
+                    ))
+                    }
+                    />
+                </div>
             </div>
 
             {/* notification and profile */}
@@ -143,7 +223,7 @@ const Header = ({ saveData, refresh, setRefresh, viewOrder, editUser, uid, notif
                     <BellFilled style={{ fontSize: '23px', color: 'white', cursor: 'pointer' }} onClick={() => { setOpenNotification(true); setTabActiveKey('1'); }} />
                 </Badge>
 
-                <Dropdown menu={menuProps} trigger={['click']} overlayStyle={{  gap: 4, color: 'white', cursor: 'pointer' }}>
+                <Dropdown menu={menuProps} trigger={['click']} overlayStyle={{ gap: 4, color: 'white', cursor: 'pointer' }}>
                     <Space style={{ cursor: 'pointer' }}>
                         <AssignedTo userId={uid} userList={userList} imageWidth={28} imageHeight={28} AvatarSize={24} allowText={false} preview={false} />
                     </Space>
@@ -152,7 +232,7 @@ const Header = ({ saveData, refresh, setRefresh, viewOrder, editUser, uid, notif
 
             </div>
 
-            <Drawer title={"Notification"} placement='right' width={500} open={openNotification} onClose={() => {setOpenNotification(false); setRefresh(refresh+1)}} 
+            <Drawer title={"Notification"} placement='right' width={500} open={openNotification} onClose={() => { setOpenNotification(false); setRefresh(refresh + 1) }}
                 extra={<Dropdown menu={menuPropsNotification}>
                     <Button>
                         <Space>
@@ -162,7 +242,7 @@ const Header = ({ saveData, refresh, setRefresh, viewOrder, editUser, uid, notif
                     </Button>
                 </Dropdown>}>
 
-                <NotificationDetail refresh={refresh} currentOption={currentOption} notificationList={notificationList} tabActiveKey={tabActiveKey} setTabActiveKey={setTabActiveKey}  userList={userList} servicesList={servicesList} saveData={saveData} viewOrder={viewOrder}/>
+                <NotificationDetail refresh={refresh} currentOption={currentOption} notificationList={notificationList} tabActiveKey={tabActiveKey} setTabActiveKey={setTabActiveKey} userList={userList} servicesList={servicesList} saveData={saveData} viewOrder={viewOrder} />
             </Drawer>
 
         </header>
