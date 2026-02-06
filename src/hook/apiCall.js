@@ -37,7 +37,7 @@ export const loginAuth = async (username, password) => {
     // api calls
 };
 
-export const userLoginAuth = async ( username, password) => {
+export const userLoginAuth = async (username, password) => {
     const options = {
         method: "GET",
         url: API_ENDPOINT + `userLogin/auth/${username}/${password}`,
@@ -52,6 +52,22 @@ export const userLoginAuth = async ( username, password) => {
     }
     // api calls
 };
+export const connectToGoogle = async () => {
+    const options = {
+        method: "GET",
+        url: API_ENDPOINT + `google/auth`,
+        headers: {
+            //'content-Type': 'application/json'
+        },
+    };
+    try {
+        return await axios.request(options);
+    } catch (error) {
+        return error;
+    }
+    // api calls
+};
+
 
 
 
