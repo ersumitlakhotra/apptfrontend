@@ -169,7 +169,7 @@ const UserDetail = ({ id, refresh, ref, userPermissionList, companyList, saveDat
                 fullname: fullname,
                 cell: cell,
                 email: email,
-                username: cell.replace(/\D/g, ""),
+                username: adminEmail ? email: cell.replace(/\D/g, ""),
                 address: address,
                 gender: gender,
                 password: password,
