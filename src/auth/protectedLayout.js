@@ -271,7 +271,7 @@ const ProtectedLayout = () => {
                 editUser={editUser}
                 uid={uid} />
 
-            <main class="flex-1 px-3 md:px-8 scroll-auto">
+            <main class="flex-1 p-3 md:px-8 scroll-auto">
                 <Outlet context={{
                     saveData, refresh,
                     isLoading, setIsLoading,
