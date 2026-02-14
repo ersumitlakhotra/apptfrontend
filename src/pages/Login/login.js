@@ -1,10 +1,9 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { LoadingOutlined } from '@ant-design/icons';
 import useAlert from "../../common/alert.js";
 import { Spin } from 'antd';
 import { useNavigate } from "react-router-dom";
-import { clearLocalStorage } from "../../auth/auth.js";
 import { useAuth } from "../../auth/authContext.js";
 
 export const Login = ({ logo }) => {
@@ -13,11 +12,11 @@ export const Login = ({ logo }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { contextHolder, error } = useAlert();
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
 
-  useEffect(() => {
-    clearLocalStorage();
-  }, [])
+ if (isAuthenticated) {
+   navigate("/home");
+ }
 
   const onSubmit = async () => {
     setLoading(true);

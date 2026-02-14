@@ -1,8 +1,6 @@
 import { Button, Popconfirm, Modal } from "antd";
 import Heading from "../../../common/heading";
 import { WarningFilled } from '@ant-design/icons';
-import { apiCalls } from "../../../hook/apiCall";
-import { useEffect, useState } from "react";
 import SaveData from "../../../hook/saveData";
 import { useAuth } from "../../../auth/authContext";
 

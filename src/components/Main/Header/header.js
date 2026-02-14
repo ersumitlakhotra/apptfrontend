@@ -1,7 +1,7 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Space, Dropdown, Drawer,  Badge, Button } from 'antd';
-import { MenuUnfoldOutlined, LogoutOutlined, BellFilled, DownOutlined, BookOutlined } from '@ant-design/icons';
+import { MenuUnfoldOutlined, LogoutOutlined, BellFilled, DownOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import AssignedTo from '../../../common/assigned_to.js';
 import NotificationDetail from '../Notification/notification_detail.js';
