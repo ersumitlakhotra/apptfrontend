@@ -69,7 +69,7 @@ const Invoice = ({ id, refresh, billingList, companyList }) => {
                             <Text style={{ fontSize: 12 }}>Invoice #{invoice}</Text>
                         </View>
                         <View style={{ flexDirection: "column", columnGap: 10 }}>
-                            <Text style={[{ fontSize: 16, marginBottom: 10 }, styles.textBold]}>Appointee</Text>
+                            <Text style={[{ fontSize: 16, marginBottom: 10 }, styles.textBold]}>iSchedule</Text>
                             <Text style={styles.text}>199 Kingknoll Drive</Text>
                             <Text style={styles.text}>Brampton, Ontario, CA L6Y4N2</Text>
                         </View>

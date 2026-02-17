@@ -21,8 +21,8 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, uid }) =
   const [userList, setUserList] = useState([]);
   const [notificationList, setNotificationList] = useState([]);
  
-  const [fullname, setFullname] = useState('');
-  const [profilepic, setProfile] = useState(null);
+  //const [fullname, setFullname] = useState('');
+  //const [profilepic, setProfile] = useState(null);
   const [openNotification, setOpenNotification] = useState(false);
   const [unread, setUnread] = useState([]);
   const [unreadUpdate, setUnreadUpdate] = useState(false);
@@ -55,8 +55,8 @@ const Header = ({ onSignout, open, setOpen, getData, saveData, refresh, uid }) =
   useEffect(() => {
     if (userList.length > 0) {
       userList.filter(a => a.id === uid).map(b => {
-        setFullname(b.fullname);
-        setProfile(b.profilepic);
+       // setFullname(b.fullname);
+        //setProfile(b.profilepic);
         setItems([
           getItem('1',
             <div class='flex flex-row gap-4'>

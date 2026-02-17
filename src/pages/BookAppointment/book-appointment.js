@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import { Button, Spin,  Drawer, Input, Modal, notification } from 'antd';
+import { Button, Spin,  Drawer, Input, Modal } from 'antd';
 import { LoadingOutlined, ArrowLeftOutlined, CloseOutlined, UpCircleOutlined, UserOutlined, CalendarOutlined, ContactsOutlined } from '@ant-design/icons';
 import { useEffect,  useState } from 'react';
 import {  useSearchParams } from 'react-router-dom';
@@ -615,25 +615,36 @@ const BookAppointment = () => {
                                             <p class='text-gray-600'>Services : {servicesItem.length} </p>
                                         </div>
                                     </div>
-                                    <Button
-                                        color={bookingType === 3 && content === 5 ? "danger" : "default"}
-                                        variant="outlined"
-                                        style={{ fontWeight: 'bold' }}
-                                        onClick={() => next()}>
-                                        {content === 5 ? (bookingType === 3 ? "Cancel Booking" : "Complete") : 'Next'}
-                                    </Button>
+                                        { !(content === 5 && bookingType === 2 && prevAssigned_To === assigned_to && prevTrnDate === trndate && prevSlot === slot) &&
+                                            <Button
+                                                color={bookingType === 3 && content === 5 ? "danger" : "default"}
+                                                variant="outlined"
+                                                style={{ fontWeight: 'bold' }}
+                                                onClick={() => next()}>
+                                                {content === 5 ? (bookingType === 3 ? "Cancel Booking" : bookingType === 2 ? "Reschedule" : "Complete") : 'Next'}
+                                            </Button>
+                                        }
 
                                 </div>
                             </div>
 
                         }
+
+                        {
+                            content === 0 &&
+                            <div class="fixed bottom-2 left-6 right-6 z-20 flex flex-row justify-center items-center text-xs text-gray-500 ">
+                                © 2026 iSchedule Inc. · All rights reserved
+                            </div>
+                        }
                     </> :
                     <div class='flex flex-row justify-center items-center'>
                         <div class='flex flex-col gap-3 items-start'>
-                            <p class='text-4xl font-sans font-semibold'> Page not found</p>
-                            <p >Uh oh, we can't seem to find the page you're looking for.</p>
-                            <p >Are you sure the website URL is correct ?</p>
-                            <p >Get in touch with the site owner.</p>
+                            {isLoading ? <p class='text-4xl font-sans font-semibold'> Loading . . .</p> : <>
+                                <p class='text-4xl font-sans font-semibold'> Page not found</p>
+                                <p >Uh oh, we can't seem to find the page you're looking for.</p>
+                                <p >Are you sure the website URL is correct ?</p>
+                                <p >Get in touch with the site owner.</p>
+                            </>}
                         </div>
                     </div>
 

@@ -209,7 +209,7 @@ const ProtectedLayout = () => {
             body: body
         })
         if (email)
-            sendEmail({ id: id, status: status, userList: userList, servicesList: servicesList })
+            sendEmail({ id: res.data.id, status: status, userList: userList, servicesList: servicesList })
         setIsLoading(false)
 
         if (res.isSuccess) {
@@ -310,7 +310,7 @@ const ProtectedLayout = () => {
                 </div>
             }
 
-            {/* Drawer on Add/ Edit*/}
+            {/* Drawer on Add/ Edit order*/}
             <Drawer title={title} placement='right' width={600} onClose={() => setOpenEdit(false)} open={openEdit}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
                 <OrderDetail id={id} refresh={reload} ref={ref} setOrderNo={setOrderNo} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} eventList={eventList} customerList={customerList} scheduleList={scheduleList} saveData={saveData} setOpen={setOpenEdit} isAdmin={isAdmin} uid={uid} />
