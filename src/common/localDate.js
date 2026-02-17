@@ -81,8 +81,9 @@ function UTC_LocalDateTime(value,format=null) {
 
 function UTC_LocalDateTime_relative(value) {
     var relativeTime = require("dayjs/plugin/relativeTime");
+    var utc = require("dayjs/plugin/utc");
     dayjs.extend(relativeTime);   
-     
+    dayjs.extend(utc);
     return dayjs(UTC_LocalDateTime(value)).fromNow(); //2019-03-06T17:11:55+08:00
 };
 

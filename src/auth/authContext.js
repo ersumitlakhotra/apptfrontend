@@ -19,6 +19,21 @@ export const AuthProvider = ({ children }) => {
         setIsLoading(false)
     }, []);
 
+    useEffect(() => {
+        const handleStorageChange = (event) => {
+            if (event.key === "cid" && !event.newValue) {
+                // Token removed in another tab
+                logout();   // your logout function
+            }
+        };
+
+        window.addEventListener("storage", handleStorageChange);
+
+        return () => {
+            window.removeEventListener("storage", handleStorageChange);
+        };
+    }, []);
+
     const login = async (username, password) => {
         // 🔁 replace with real API call
         setIsLoading(true)

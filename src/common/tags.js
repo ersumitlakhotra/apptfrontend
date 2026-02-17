@@ -10,6 +10,7 @@ export function Tags(value) {
         case 'IN PROCESS':
         case 'IN PROGRESS':
         case 'ADD SCHEDULE':
+        case 'RESCHEDULED':
             {
                 return <Tag color='blue'>{value}</Tag>
             }
@@ -18,6 +19,7 @@ export function Tags(value) {
         case 'LIVE':
         case 'PAID':
         case 'WORKING':
+        case 'CONFIRMED':
             {
                 return <Tag color='green'>{value}</Tag>
             }

@@ -1,12 +1,10 @@
-import { Button, Input, Radio, Select, Switch } from "antd";
+import { Button, Input, Radio, Select } from "antd";
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { setCellFormat } from "../../common/cellformat";
 import { TextboxFlex } from "../../common/textbox";
-import { useEffect } from "react";
-import { getStorage } from "../../common/localStorage";
 
 const UserAbout = ({ fullname, setFullname, cell, setCell, email, setEmail, address, setAddress, gender, setGender, password, setPassword, role, setRole, status, setStatus, appschedule, setAppSchedule, isAdmin, adminEmail }) => {
-    const Checked = 'On'; const Unchecked = 'Off';
+    //const Checked = 'On'; const Unchecked = 'Off';
     
     return (
         <div class='flex flex-col font-normal gap-2 mt-2'>

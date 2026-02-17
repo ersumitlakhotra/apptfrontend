@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable array-callback-return */
 import { useEffect, useImperativeHandle, useState } from "react";
-import { Avatar, Badge, Button, DatePicker, Divider, Dropdown, Flex, Image, Input, Radio, Select, Tag } from "antd";
+import { Avatar, Badge, Button, DatePicker, Divider, Dropdown, Flex, Image, Input, Radio, Select, Tag,Modal } from "antd";
 import dayjs from 'dayjs';
 import { TextboxFlex } from "../../common/textbox";
 import { isValidEmail, setCellFormat, setNumberAndDot } from "../../common/cellformat";
-import { UserOutlined,  CreditCardOutlined, DownOutlined } from '@ant-design/icons';
+import { UserOutlined,  CreditCardOutlined, DownOutlined,ExclamationCircleOutlined } from '@ant-design/icons';
 import { BsCash } from "react-icons/bs";
 import useAlert from "../../common/alert";
 import { get_Date, LocalDate, LocalTime } from "../../common/localDate";
@@ -13,6 +13,7 @@ import { generateTimeSlotsWithDate, toMinutes } from "../../common/generateTimeS
 import { compareTimes, isOpenForWork, userSchedule } from "../../common/general";
 import { TbTransfer } from "react-icons/tb";
 import { useEmail } from "../../email/email";
+import { Tags } from "../../common/tags";
 
 function disabledDate(current) {
   // Can not select days before today and today
@@ -20,7 +21,9 @@ function disabledDate(current) {
 }
 
 const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, userList, companyList, eventList, customerList, scheduleList, saveData, setOpen, isAdmin ,uid}) => {
-    const {AppointmentStatus} = useEmail()
+    const {AppointmentStatus} = useEmail();
+    const {contextHolder, warning } = useAlert();
+    const [modal, contextHolderModal] = Modal.useModal();
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
@@ -56,7 +59,6 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
     const [isOpen, setIsOpen] = useState(false);
     const [isUserWorking, setUserWorking] = useState(false);
 
-    const {contextHolder, warning } = useAlert();
     const [morningSlot, setMorningSlot] = useState([]);
     const [afternoonSlot, setAfternoonSlot] = useState([]);
     const [eveningSlot, setEveningSlot] = useState([]);
@@ -82,6 +84,25 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
     ];
     const onItemChanged = e => {  setSendEmail(e.key)  };
     const menuProps = { items, onClick: onItemChanged };
+
+    const confirmEmail = (status) => {
+        return new Promise((resolve) => {
+            modal.confirm({
+                title: "E-Mail Confirmation ?",
+                icon: <ExclamationCircleOutlined />,
+                content:
+                    <span>Would you like to send an {Tags(status)} e-mail to {customerEmail} ?</span>,
+                okText: "Yes",
+                cancelText: "No",
+                onOk() {
+                    resolve(true);   // Yes clicked
+                },
+                onCancel() {
+                    resolve(false);  // No clicked
+                },
+            });
+        });
+    };
 
     useEffect(() => {
         if (id === 0) {
@@ -171,19 +192,38 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     bookedvia: 'Walk-In',
                     sendnotification:false
                 });
+
+               let sendEmail_To_Customer= false; 
+               let statusAppoint=AppointmentStatus.CONFIRMED;
+                if (id === 0) {
+                    statusAppoint = AppointmentStatus.CONFIRMED;
+                    sendEmail_To_Customer = await confirmEmail(AppointmentStatus.CONFIRMED);
+                }
+                else {
+                    if (status === 'Cancelled') {
+                        statusAppoint = AppointmentStatus.CANCELLED;
+                        sendEmail_To_Customer = await confirmEmail(AppointmentStatus.CANCELLED);
+                    }
+                    else if (prevTrnDate !== trndate || prevSlot !== slot) {
+                        statusAppoint = AppointmentStatus.RESCHEDULED;
+                        sendEmail_To_Customer = await confirmEmail(AppointmentStatus.RESCHEDULED);
+                    }
+                }
+                
                 saveData({
                     label: "Appointment",
                     method: id !== 0 ? 'PUT' : 'POST',
                     endPoint: "order",
                     id:id !== 0 ? id : null,
                     logs:true,
-                    email:sendEmail === 'yes',
-                    status: id !== 0 ? status ==='Cancelled'? AppointmentStatus.CANCELLED : AppointmentStatus.RESCHEDULED : AppointmentStatus.CONFIRMED,
+                    email:sendEmail_To_Customer, //sendEmail === 'yes',
+                    status: statusAppoint,//id !== 0 ? (status ==='Cancelled'? AppointmentStatus.CANCELLED : AppointmentStatus.RESCHEDULED) : AppointmentStatus.CONFIRMED,
                     body: Body,
                     userList:userList,
                     servicesList:servicesList
                 });
                 setOpen(false);
+                
             }
         }
         else {
@@ -355,7 +395,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 <Input placeholder="abcd@company.com" status={customerEmail === '' || !isValidEmail(customerEmail) ? 'error' : ''} value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} />
             } /> 
             
-            <TextboxFlex label={'Notification'}  input={
+           {false && <TextboxFlex label={'Notification'}  input={
                <Dropdown menu={menuProps} className="flex flex-row items-center justify-start" >
                     <Button size="large" style={{width:'100%'}} >
                         <div class="w-full text-sm flex flex-row items-center justify-between">
@@ -364,7 +404,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                         </div>
                     </Button>
               </Dropdown>
-            } />
+            } />}
 
             <Divider />
             <p class="text-gray-400 mb-4">Information</p>
@@ -559,6 +599,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             } />
 
             {contextHolder}
+            {contextHolderModal}
         </div>
     )
 

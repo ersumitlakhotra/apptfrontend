@@ -21,7 +21,6 @@ import Payment from "../Payment/payment.js";
 import Customer from "../Customer/customer.js";
 import Schedule from "../Schedule/schedule.js";
 import Collection from "../Collection/collection.js";
-import { clearLocalStorage, isAuthenticated } from "../../auth/auth.js";
 
 const MasterPage = () => {
   const navigate = useNavigate();
@@ -113,13 +112,12 @@ const MasterPage = () => {
   }, []);
 
   const handleAuth = async() => {
-    const res=await isAuthenticated()
-    if (!res) 
-      navigate("/");
+   // const res=await isAuthenticated()
+    //if (!res) 
+     // navigate("/");
   }
 
   const onSetSignout = () => {
-    clearLocalStorage();
     navigate("/");
   }
  
