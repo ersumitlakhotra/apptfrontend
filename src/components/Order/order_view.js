@@ -110,7 +110,9 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
         setDiscount(editList.discount);
         setSlot(editList.slot);
         setBookedVia(editList.bookedvia);
-
+        setReceived(editList.received);
+        setMode(editList.mode);
+        setTip(editList.tip);
         setIsLoading(false)
     }
 
