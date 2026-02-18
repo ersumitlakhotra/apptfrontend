@@ -1,8 +1,12 @@
-import {  notification } from 'antd';
+import {  notification,Modal } from 'antd';
 import logo from '../Images/logo.png'
+import { Tags } from './tags';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 const useAlert = () => {
 const [api, contextHolder] = notification.useNotification();
+const [modal, contextHolderModal] = Modal.useModal();
+
 const info = (header,description) => {
   api.info({
     message: header,
@@ -56,7 +60,25 @@ const notifications = ({title,description,cancel =false}) => {
   });
 };
 
-return {contextHolder,info,success,error, warning, notifications}
+  const confirmEmail = (status,customerEmail) => {
+    return new Promise((resolve) => {
+      modal.confirm({
+        title: "E-Mail Confirmation ?",
+        icon: <ExclamationCircleOutlined />,
+        content:
+          <span>Would you like to send an {Tags(status)} e-mail to {customerEmail} ?</span>,
+        okText: "Yes",
+        cancelText: "No",
+        onOk() {
+          resolve(true);   // Yes clicked
+        },
+        onCancel() {
+          resolve(false);  // No clicked
+        },
+      });
+    });
+  };
+return {contextHolder,contextHolderModal, info,success,error, warning, notifications,confirmEmail}
 };
 
 export default useAlert;

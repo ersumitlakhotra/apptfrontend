@@ -22,7 +22,7 @@ const GmailSetup = ({ companyList, saveData }) => {
     const save = async () => {
         const Body = JSON.stringify({
             emailuser: emailUser,
-            emailpass: emailPass,
+            emailpass: emailPass.trim(),
         });
           saveData({
             label:headingLabel,

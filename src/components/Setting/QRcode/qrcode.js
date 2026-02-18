@@ -35,7 +35,7 @@ const QRcode = () => {
                 }
             </PDFDownloadLink>  
             <QRCode ref={res.qrCodeRef} value={res.link || '-'} size={200}  />  
-            {true && <Button type='default' icon={<DownloadOutlined />} size="middle" onClick={() => connect()}>Connect To Google</Button>}
+            {false && <Button type='default' icon={<DownloadOutlined />} size="middle" onClick={() => connect()}>Connect To Google</Button>}
         </div>
     )
 

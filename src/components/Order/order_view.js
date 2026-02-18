@@ -12,10 +12,11 @@ import { TbTransfer } from "react-icons/tb";
 import { useResponseButtons } from "./responseButton";
 import FetchData from "../../hook/fetchData";
 import IsLoading from "../../common/custom/isLoading";
+import { useEmail } from "../../email/email";
 
 const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }) => {
-    const { contextHolder, warning } = useAlert();
-
+    const { contextHolder,contextHolderModal, warning,confirmEmail } = useAlert();
+    const {AppointmentStatus} = useEmail();
 
     const [isLoading, setIsLoading] = useState(false);
     const { Accept, Reject } = useResponseButtons(saveData);
@@ -56,7 +57,7 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
         }
         else {
             const Body = JSON.stringify({
-                received: received,
+                received: String(parseFloat(received).toFixed(2)) ,
                 mode: mode,
                 tip: tip,
             });
@@ -72,6 +73,20 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
             setOpenView(false);
         }
     };
+
+    const cancelOrder = async () => {
+        const sendEmail_To_Customer = await confirmEmail(AppointmentStatus.CANCELLED,customerEmail);
+        saveData({
+            label: "Appointment",
+            method: 'POST',
+            endPoint: "order/cancel",
+            id: id,
+            email:sendEmail_To_Customer,
+            status: AppointmentStatus.CANCELLED,
+            body: []
+        });
+        setOpenView(false);
+    }
 
     useEffect(() => {
         if (id === 0) {
@@ -105,14 +120,14 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
         setPrice(editList.price);
         setTax(editList.tax);
         setTaxAmount(editList.taxamount);
-        setTotal(editList.total);
+        setTotal(String(parseFloat(editList.total).toFixed(2)) );
         setCoupon(editList.coupon);
         setDiscount(editList.discount);
         setSlot(editList.slot);
         setBookedVia(editList.bookedvia);
-        setReceived(editList.received);
+        setReceived(String(parseFloat(editList.received).toFixed(2)) );
         setMode(editList.mode);
-        setTip(editList.tip);
+        setTip(String(parseFloat(editList.tip).toFixed(2)));
         setIsLoading(false)
     }
 
@@ -141,16 +156,7 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
                             (status === 'Pending' || status === 'In progress') &&
                             <div class="flex gap-2">
                                 <Button color="cyan" variant="solid" icon={<CheckOutlined />} size="large" onClick={() => setIsModalOpen(true)}>Completed</Button>
-                                <Button color="danger" variant="solid" icon={<CloseOutlined />} size="large" onClick={() => {
-                                    saveData({
-                                        label: "Appointment",
-                                        method: 'POST',
-                                        endPoint: "order/cancel",
-                                        id: id,
-                                        body: []
-                                    });
-                                    setOpenView(false);
-                                }}>Cancelled</Button>
+                                <Button color="danger" variant="solid" icon={<CloseOutlined />} size="large" onClick={() => cancelOrder()}>Cancelled</Button>
 
                                 {/*<Button type='default' icon={<PrinterOutlined />} size="middle">Print</Button>*/}
                             </div>
@@ -252,6 +258,12 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
                                         <span >Total</span>
                                         <span>${total}</span>
                                     </div>
+                                    
+                                    {status === 'Completed' && <div class='flex items-start justify-between text-xs font-semibold text-green-600'>
+                                        <span >Received  {parseFloat(tip).toFixed(2) > 0 && `(Tip $${tip})`} </span>
+                                        <span>${received}</span>
+                                    </div>
+                                    }
                                 </div>
                             </div>
 
@@ -329,6 +341,7 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
                 </div>
             </Modal>
             {contextHolder}
+            {contextHolderModal}
         </div>
     )
 }

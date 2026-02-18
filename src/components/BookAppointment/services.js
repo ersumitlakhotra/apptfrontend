@@ -48,7 +48,8 @@ const Services = ({ servicesList, eventList, servicesItem, setServicesItem}) => 
                 }
                
             return(      
-                <div key={item.id} class={`w-full border-t p-2 flex flex-row justify-between items-center`}>
+                <div key={item.id} class='w-full border-t p-2 flex flex-row justify-between items-center cursor-pointer hover:bg-gray-100' 
+                onClick={() =>  servicesItem.filter(b => b === item.id).length > 0 ?removeService(item.id):addService(item.id) }>
                     <div class='flex flex-col items-start gap-1 w-9/12 '>
                         <p class="text-sm font-semibold">{item.name}</p>
                         <p class='text-xs text-gray-400  '>{item.description}</p>

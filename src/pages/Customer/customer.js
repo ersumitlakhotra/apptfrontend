@@ -65,7 +65,7 @@ const Customer = () => {
         (
             (item.name || "").toLowerCase().includes(query) ||
             (item.email || "").toLowerCase().includes(query) ||
-            (item.cell || "").toLowerCase().includes(query)
+            (item.cell || "").toString().replace(/-/g, "").includes(query)
         ));
 
         setExportList(searchedList);
