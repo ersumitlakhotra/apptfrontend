@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable array-callback-return */
 import { useEffect, useImperativeHandle, useState } from "react";
-import { Avatar, Badge, Button, DatePicker, Divider, Dropdown, Flex, Image, Input, Radio, Select, Tag,Modal } from "antd";
+import { Avatar, Badge, Button, DatePicker, Divider, Dropdown, Flex, Image, Input, Radio, Select, Tag } from "antd";
 import dayjs from 'dayjs';
 import { TextboxFlex } from "../../common/textbox";
 import { isValidEmail, setCellFormat, setNumberAndDot } from "../../common/cellformat";
@@ -22,8 +22,7 @@ function disabledDate(current) {
 
 const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, userList, companyList, eventList, customerList, scheduleList, saveData, setOpen, isAdmin ,uid}) => {
     const {AppointmentStatus} = useEmail();
-    const {contextHolder, warning } = useAlert();
-    const [modal, contextHolderModal] = Modal.useModal();
+    const {contextHolder,contextHolderModal, warning, confirmEmail } = useAlert();
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
@@ -84,25 +83,6 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
     ];
     const onItemChanged = e => {  setSendEmail(e.key)  };
     const menuProps = { items, onClick: onItemChanged };
-
-    const confirmEmail = (status) => {
-        return new Promise((resolve) => {
-            modal.confirm({
-                title: "E-Mail Confirmation ?",
-                icon: <ExclamationCircleOutlined />,
-                content:
-                    <span>Would you like to send an {Tags(status)} e-mail to {customerEmail} ?</span>,
-                okText: "Yes",
-                cancelText: "No",
-                onOk() {
-                    resolve(true);   // Yes clicked
-                },
-                onCancel() {
-                    resolve(false);  // No clicked
-                },
-            });
-        });
-    };
 
     useEffect(() => {
         if (id === 0) {
@@ -175,7 +155,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     customerEmail: customerEmail,
                     serviceinfo: servicesItem,
                     price: price,
-                    discount: discount,
+                    discount: String(parseFloat(discount).toFixed(2)),
                     tax: tax,
                     taxamount: taxamount,
                     total: total,
@@ -186,7 +166,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     slot: slot,
                     start: start,
                     end: end,
-                    received: status ==='Completed' ? received : '0',
+                    received: status ==='Completed' ? String(parseFloat(received).toFixed(2)) : '0',
                     mode: mode,
                     tip: status === 'Completed' ? tip : '0' ,// received > total ? parseFloat(received - total).toFixed(2) : '0',
                     bookedvia: 'Walk-In',
@@ -197,16 +177,16 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                let statusAppoint=AppointmentStatus.CONFIRMED;
                 if (id === 0) {
                     statusAppoint = AppointmentStatus.CONFIRMED;
-                    sendEmail_To_Customer = await confirmEmail(AppointmentStatus.CONFIRMED);
+                    sendEmail_To_Customer = await confirmEmail(AppointmentStatus.CONFIRMED,customerEmail);
                 }
                 else {
                     if (status === 'Cancelled') {
                         statusAppoint = AppointmentStatus.CANCELLED;
-                        sendEmail_To_Customer = await confirmEmail(AppointmentStatus.CANCELLED);
+                        sendEmail_To_Customer = await confirmEmail(AppointmentStatus.CANCELLED,customerEmail);
                     }
                     else if (prevTrnDate !== trndate || prevSlot !== slot) {
                         statusAppoint = AppointmentStatus.RESCHEDULED;
-                        sendEmail_To_Customer = await confirmEmail(AppointmentStatus.RESCHEDULED);
+                        sendEmail_To_Customer = await confirmEmail(AppointmentStatus.RESCHEDULED,customerEmail);
                     }
                 }
                 
@@ -372,10 +352,10 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     onChange={(value) => onSearch(value)}
                     options={customerList.map(item => ({
                         value: item.cell,
-                        label: item.cell + ' ( ' + item.name + ' )'
+                        label: `${(item.cell || "").toString().replace(/-/g, "")} : ${item.name}`
                     }))}
                     optionFilterProp="label"
-                    filterSort={(optionA, optionB) =>
+                   filterSort={(optionA, optionB) =>
                         (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                     } />
             } />

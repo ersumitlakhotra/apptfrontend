@@ -11,10 +11,11 @@ const BookingOption = ({ bookingType, setBookingType, setCid, next }) => {
     ]
 
     return (
-        <div class='flex flex-col font-normal gap-3 mt-2 w-full' >
+        <div class='flex flex-col font-normal gap-3 mt-2 w-full  mb-4' >
             <p class='text-2xl font-sans font-bold mb-4'> Choose an option</p>
             { option.map(item => (
-                    <div key={item.key} class='w-full border rounded-md border-gray-200 p-4 flex flex-row justify-between items-center gap-2 shadow-md' >
+                    <div key={item.key} class='w-full border rounded-md border-gray-200 p-4 flex flex-row justify-between items-center gap-2 shadow-md cursor-pointer hover:bg-gray-100' 
+                    onClick={() => setBookingType(item.key)} >
                         <p class='text-sm font-medium text-gray-700'>{item.label}</p>
                         <div class='flex flex-row justify-center items-center w-20'>
                             {

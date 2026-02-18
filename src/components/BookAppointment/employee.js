@@ -15,7 +15,7 @@ const Employee = ({ userList, user, setUser }) => {
             <p class='text-2xl font-sans font-bold mb-4'> Choose professional</p>
 
             {filteredList.filter(f => !f.status.toLowerCase().includes('inactive')).map(item => (
-                <div key={item.id} class={`w-full border-b p-4 flex flex-row justify-between items-center`}>
+                <div key={item.id} class='w-full border-b p-4 flex flex-row justify-between items-center cursor-pointer hover:bg-gray-100' onClick={() => setUser(item.id)} >
                     <div class='flex flex-row gap-4 items-center'>
                         {item.profilepic !== null ?
                             <Image width={40} height={40} src={item.profilepic} style={{ borderRadius: 20 }} /> :

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     Page,
     Text,
@@ -6,26 +6,29 @@ import {
     Document,
     StyleSheet,
 } from "@react-pdf/renderer";
+import { get_Date } from "../../../common/localDate";
 
 const styles = StyleSheet.create({
     page: {
-        padding: 30,
+        //padding: 30,
         fontSize: 10,
         fontFamily: "Helvetica",
-        backgroundColor: "#f5f5f5",
+      //  backgroundColor: "#f5f5f5",
     },
 
     /* Header */
     header: {
         backgroundColor: "#184d8f",
         color: "white",
-        padding: 20,
-        borderTopLeftRadius: 5,
-        borderTopRightRadius: 5,
+        paddingHorizontal: 20,
+        paddingVertical: 30,
+        borderBottomRightRadius: 8,
+        borderBottomLeftRadius: 8,
     },
     headerRow: {
         flexDirection: "row",
         justifyContent: "space-between",
+        alignItems:'center'
     },
     invoiceTitle: {
         fontSize: 24,
@@ -86,6 +89,20 @@ const styles = StyleSheet.create({
         padding: 6,
         width: "40%",
         justifyContent: "space-between",
+    }, 
+    
+    /* Total */
+    totalContainer: {
+        marginTop: 10,
+        alignItems: "flex-end",
+    },
+    totalBox: {
+        flexDirection: "row",
+        backgroundColor: "#184d8f",
+        color: "white",
+        padding: 6,
+        width: "40%",
+        justifyContent: "space-between",
     },
 
     /* Footer */
@@ -102,7 +119,7 @@ const styles = StyleSheet.create({
     /* Stamp */
     stampWrapper: {
         position: "absolute",
-        top: "40%",
+        top: "70%",
         left: "30%",
         width: 200,
         height: 200,
@@ -138,12 +155,9 @@ const styles = StyleSheet.create({
 
 });
 
-const InvoicePDF = ({ data }) => {
+const InvoicePDF = ({ data,id, refresh, billingList }) => {
     const {
-        invoiceNo,
-        billTo,
-        from,
-        date,
+        
         items,
         bank,
     } = data;
@@ -151,8 +165,31 @@ const InvoicePDF = ({ data }) => {
     const subtotal = items.reduce(
         (acc, item) => acc + item.qty * item.price,
         0
-    );
-
+    );    
+        const [invoice, setInvoice] = useState('');
+        const [trnDate, setTrnDate] = useState('');
+        const [dueDate, setDueDate] = useState('');
+        const [subTotal, setSubTotal] = useState('');
+        const [taxAmount, setTaxAmount] = useState('');
+        const [tax, setTax] = useState('');
+        const [total, setTotal] = useState('');
+        const [status, setStatus] = useState('');
+        const [billTo, setBillTo] = useState([{name:'',phone:'',address:''}]);
+        const [from, setFrom] = useState([{name:'',phone:'',address:''}]);
+    
+        useEffect(() => {
+            const editList = billingList.find(item => item.id === id)
+            setInvoice(editList.invoice);
+            setTrnDate(editList.trndate);
+            setDueDate(editList.duedate);
+            setSubTotal(editList.subtotal);
+            setTaxAmount(editList.taxamount);
+            setTax(editList.tax);
+            setTotal(editList.totalamount);
+            setStatus(editList.status);
+           
+        }, [refresh, id])
+    
     return (
         <Document>
             <Page size="A4" style={styles.page}>
@@ -161,7 +198,7 @@ const InvoicePDF = ({ data }) => {
                     <View style={styles.headerRow}>
                         <Text style={styles.invoiceTitle}>INVOICE</Text>
                         <Text style={styles.invoiceNo}>
-                            NO: {invoiceNo}
+                            Invoice #: {invoice}
                         </Text>
                     </View>
                 </View>
@@ -184,7 +221,7 @@ const InvoicePDF = ({ data }) => {
                         </View>
                     </View>
 
-                    <Text style={{ marginBottom: 10 }}>Date: {date}</Text>
+                    <Text style={{ marginBottom: 10 }}>Date: {get_Date(trnDate,'DD MMM, YYYY')}</Text>
 
                     {/* Table Header */}
                     <View style={styles.tableHeader}>
@@ -195,59 +232,62 @@ const InvoicePDF = ({ data }) => {
                     </View>
 
                     {/* Table Rows */}
-                    {items.map((item, index) => (
-                        <View key={index} style={styles.tableRow}>
-                            <Text style={styles.colDesc}>{item.description}</Text>
-                            <Text style={styles.colQty}>{item.qty}</Text>
-                            <Text style={styles.colPrice}>${item.price.toFixed(2)}</Text>
-                            <Text style={styles.colTotal}>
-                                ${(item.qty * item.price).toFixed(2)}
-                            </Text>
-                        </View>
-                    ))}
-                    {/* Circular Status Stamp */}
-                    {status && (
-                        <View style={styles.stampWrapper}>
+                    <View key={1} style={styles.tableRow}>
+                        <Text style={styles.colDesc}>Software data management</Text>
+                        <Text style={styles.colQty}>1</Text>
+                        <Text style={styles.colPrice}>${parseFloat(subTotal).toFixed(2)}</Text>
+                        <Text style={styles.colTotal}>${parseFloat(subTotal).toFixed(2)}</Text>
+                    </View>
+
+                    {/* Circular Status Stamp */}                  
+                    <View style={styles.stampWrapper}>
+                        <View
+                            style={[
+                                styles.stampOuter,
+                                { borderColor: status === "PAID" ? "green" : "red" },
+                            ]}
+                        >
                             <View
                                 style={[
-                                    styles.stampOuter,
+                                    styles.stampInner,
                                     { borderColor: status === "PAID" ? "green" : "red" },
                                 ]}
                             >
-                                <View
+                                <Text
                                     style={[
-                                        styles.stampInner,
-                                        { borderColor: status === "PAID" ? "green" : "red" },
+                                        styles.stampText,
+                                        { color: status === "PAID" ? "green" : "red" },
                                     ]}
                                 >
-                                    <Text
-                                        style={[
-                                            styles.stampText,
-                                            { color: status === "PAID" ? "green" : "red" },
-                                        ]}
-                                    >
-                                        {status}
-                                    </Text>
-                                </View>
+                                    {status}
+                                </Text>
                             </View>
                         </View>
-                    )}
+                    </View>
 
                     {/* Subtotal */}
                     <View style={styles.subtotalContainer}>
                         <View style={styles.subtotalBox}>
                             <Text>Sub Total</Text>
-                            <Text>${subtotal.toFixed(2)}</Text>
+                            <Text>${parseFloat(subTotal).toFixed(2)}</Text>
+                        </View>
+                    </View>
+
+                    {/* Total */}
+                    <View style={styles.totalContainer}>
+                        <View style={styles.totalBox}>
+                            <Text>Total</Text>
+                            <Text>${parseFloat(total).toFixed(2)}</Text>
                         </View>
                     </View>
 
                     {/* Footer */}
                     <View style={styles.footerRow}>
                         <View>
-                            <Text style={styles.bold}>Payment Information:</Text>
+                          {/* <Text style={styles.bold}>Payment Information:</Text>
                             <Text>Bank: {bank.name}</Text>
                             <Text>Acc No: {bank.account}</Text>
-                            <Text>Email: {bank.email}</Text>
+                            <Text>Email: {bank.email}</Text>*/} 
                         </View>
 
                         <Text style={styles.thankYou}>Thank You!</Text>

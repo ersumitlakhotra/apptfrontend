@@ -4,10 +4,10 @@ import { UserOutlined } from '@ant-design/icons';
 
 const FirstPage = ({  companyList, setCid, next }) => {
     return (
-        <div class='flex flex-col font-normal gap-3 mt-2 w-full' >
+        <div class='flex flex-col font-normal gap-3 mt-2 w-full mb-4' >
             <p class='text-2xl font-sans font-bold mb-4'> Choose a location</p>
             {companyList.map(item => (
-                <div key={item.id} class='w-full border rounded-md border-gray-200 p-2 flex flex-row gap-2 shadow-md cursor-pointer' onClick={() => { setCid(item.id); next(); }} >
+                <div key={item.id} class='w-full border rounded-md border-gray-200 p-2 flex flex-row gap-2 shadow-md cursor-pointer hover:bg-gray-100' onClick={() => { setCid(item.id); next(); }} >
                     {item.logo !== null ?
                         <Image width={80} height={80} src={item.logo} style={{ borderRadius: 10 }} /> :
                         <Avatar shape="square" style={{ backgroundColor: '#f9fafb', border: 'solid', width: 80, height: 80 }} icon={<UserOutlined style={{ color: 'black' }} />} />
