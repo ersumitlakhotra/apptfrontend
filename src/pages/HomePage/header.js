@@ -38,7 +38,7 @@ const Header = ({ saveData, refresh, setRefresh, editOrder,viewOrder, editUser, 
     const [username, setUsername] = useState('');
     const [userList, setUserList] = useState([]);
     const [filteredList, setFilteredList] = useState([]);
-    const [unread, setUnread] = useState([])
+    const [unread, setUnread] = useState(0)
     const [openNotification, setOpenNotification] = useState(false);
     const [tabActiveKey, setTabActiveKey] = useState(1)
     const [reload, setReload] = useState(0);
@@ -65,9 +65,7 @@ const Header = ({ saveData, refresh, setRefresh, editOrder,viewOrder, editUser, 
     }
 
     const refreshNotification = async () => {
-        const notificationResponse = await getNotification();
-        const unread = notificationResponse.filter(a => a.read === '0');
-        setUnread(unread.length > 0 ? unread : [])
+       await getNotification();
         await onSearch();
     }
 
@@ -219,13 +217,13 @@ const Header = ({ saveData, refresh, setRefresh, editOrder,viewOrder, editUser, 
             {/* notification and profile */}
             <div class='w-3/12 pr-4 flex flex-row gap-4 justify-end items-center '>
 
-                <Badge count={unread.length}>
+                <Badge count={unread}>
                     <BellFilled style={{ fontSize: '23px', color: 'white', cursor: 'pointer' }} onClick={() => { setOpenNotification(true); setTabActiveKey('1'); }} />
                 </Badge>
 
                 <Dropdown menu={menuProps} trigger={['click']} overlayStyle={{ gap: 4, color: 'white', cursor: 'pointer' }}>
                     <Space style={{ cursor: 'pointer' }}>
-                        <AssignedTo userId={uid} userList={userList} imageWidth={28} imageHeight={28} AvatarSize={24} allowText={false} preview={false} />
+                        <AssignedTo userId={uid} userList={userList} imageWidth={28} imageHeight={28} AvatarSize={24} allowText={false} preview={false} stopPropagation={false} />
                     </Space>
                 </Dropdown>
 
@@ -242,7 +240,7 @@ const Header = ({ saveData, refresh, setRefresh, editOrder,viewOrder, editUser, 
                     </Button>
                 </Dropdown>}>
 
-                <NotificationDetail refresh={refresh} currentOption={currentOption} notificationList={notificationList} tabActiveKey={tabActiveKey} setTabActiveKey={setTabActiveKey} userList={userList} servicesList={servicesList} saveData={saveData} viewOrder={viewOrder} />
+                <NotificationDetail refresh={refresh} setUnread={setUnread} currentOption={currentOption} notificationList={notificationList} tabActiveKey={tabActiveKey} setTabActiveKey={setTabActiveKey} userList={userList} servicesList={servicesList} saveData={saveData} viewOrder={viewOrder} />
             </Drawer>
 
         </header>

@@ -1,7 +1,7 @@
 import { Avatar, Image } from "antd";
 import { UserOutlined } from '@ant-design/icons';
 
-const AssignedTo = ({ userId, userList, style = 'font-bold', imageWidth = 31, imageHeight = 31, AvatarSize = 30, allowText = true, preview = true }) => {
+const AssignedTo = ({ userId, userList, style = 'font-bold', imageWidth = 31, imageHeight = 31, AvatarSize = 30, allowText = true, preview = true ,stopPropagation = true}) => {
     if (userId === '0') {
         return '';
     }
@@ -19,7 +19,8 @@ const AssignedTo = ({ userId, userList, style = 'font-bold', imageWidth = 31, im
             userList.filter(user => user.id === userId).map(a =>
                 <div key={a.id} class='flex flex-row gap-2 items-center'>
                     {a.profilepic !== null ?
-                        <Image width={imageWidth} height={imageHeight} src={a.profilepic} style={{ borderRadius: 15 }} preview={preview} /> :
+                     <div onClick={(e) => stopPropagation && e.stopPropagation()}>
+                        <Image width={imageWidth} height={imageHeight} src={a.profilepic} style={{ borderRadius: 15 }} preview={preview}  />   </div>:
                         <Avatar size={AvatarSize} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
                     }
                     {allowText && <span class={`text-sm  text-nowrap whitespace-nowrap ${style} `}>{a.fullname}</span>}

@@ -214,14 +214,16 @@ const ExportToExcel = ({ data, fileName, servicesList, userList }) => {
         worksheet.columns = [
           getExcelItem('User', 30),
           getExcelItem('Sales', 20),
-          getExcelItem('Expense', 20),
+          getExcelItem('Tip', 20),
+          getExcelItem('Tax', 20),
           getExcelItem('Amount', 20),
         ];
         data.forEach(item => {
           worksheet.addRow({
             User: item.fullname,
             Sales: `$ ${item.sale}`,
-            Expense: `$ ${item.expense}`,
+            Tip: `$ ${item.tip}`,
+            Tax: `$ ${item.tax}`,
             Amount: `$ ${item.result}`,
           });
         });

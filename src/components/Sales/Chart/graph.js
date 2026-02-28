@@ -1,6 +1,6 @@
 
 import Chart from "react-apexcharts";
-const Bar = ({sales,expense,categories}) => {
+const Bar = ({sales,tip,tax,categories}) => {
     return (
         <Chart
             options={{
@@ -14,7 +14,7 @@ const Bar = ({sales,expense,categories}) => {
                     enabled: false
                 },
                  fill: {
-                     colors: ['#90EE90', '#ff6666']
+                     colors: ['#90EE90', '#FFD580','#ff6666']
                 }, grid: {
                     show: false
                 },
@@ -23,8 +23,11 @@ const Bar = ({sales,expense,categories}) => {
                 name: 'Sales',
                 data: sales
             }, {
-                name: 'Expense',
-                data: expense
+                name: 'Tip',
+                data: tip
+            }, {
+                name: 'Tax',
+                data: tax
             }]}
             type="bar"
             height={300}
@@ -35,7 +38,7 @@ const Pie = ({ series }) => {
     return (
         <Chart
             options={{
-                labels: ['Sales', 'Expense', 'Profit/Loss'],
+                labels: ['Sales', 'Tip', 'Tax'],
                 stroke: {
                     curve: 'smooth',
                 },
@@ -45,7 +48,7 @@ const Pie = ({ series }) => {
                     show: false
                 },
                 fill: {
-                    colors: ['#90EE90', '#ff6666', '#FFD580']
+                    colors: ['#90EE90',  '#FFD580','#ff6666']
                 },
                 plotOptions: {
                     pie: {
@@ -85,10 +88,9 @@ const AreaChart = ({ sales,expense, categoriesArray }) => {
             series={[{
                 name: 'Sales',
                 data: sales
-            }, {
-                name: 'Expense',
-                data: expense
-            }]}
+            }
+           // , {name: 'Expense',data: expense }
+             ]}
             type="area"
             height={400}
             width={'100%'}

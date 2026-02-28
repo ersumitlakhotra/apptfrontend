@@ -43,9 +43,9 @@ const UserLoginPermissions = ({ dashboard, setDashboard, tasks, setTasks, order,
                 <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={schedule} onChange={(e) => setSchedule(e)} />
             } />
 
-            {false && <TextboxFlex label={'Sales'} input={
+             <TextboxFlex label={'Reports'} input={
                 <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={sales} onChange={(e) => setSales(e)} />
-            } />}
+            } />
 
             {false && <TextboxFlex label={'Collection'} input={
                 <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={collection} onChange={(e) => setCollection(e)} />
