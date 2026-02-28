@@ -63,7 +63,7 @@ const UserDetail = ({ id, refresh, ref, userPermissionList, companyList, saveDat
             setAccountType('Basic'); setProfile(null);
             setGender('Male'); setStatus('Active');setAppSchedule(true);
 
-            setOrder(false); setTasks(false); setEvent(false);setCustomer(false); setServices(false); setUsers(false); setSchedule(false); setSetting(false); 
+            setOrder(false); setTasks(false); setEvent(false);setCustomer(false); setServices(false); setUsers(false); setSchedule(false); setSetting(false); setSales(false);
             
             if (companyList.timinginfo !== null) {
                 setMonday([...companyList.timinginfo[0].monday,'14:00:00', '14:30:00']);
@@ -118,7 +118,7 @@ const UserDetail = ({ id, refresh, ref, userPermissionList, companyList, saveDat
             setCollection(b.collection);
             setSetting(b.setting);
         })
-        console.log(editList)
+        
         if (editList.timinginfo !== null) {
             setMonday(editList.timinginfo[0].monday);
             setTuesday(editList.timinginfo[0].tuesday);
@@ -134,11 +134,11 @@ const UserDetail = ({ id, refresh, ref, userPermissionList, companyList, saveDat
     useEffect(() => {
         if (role === 'Employee')
         {
-            setOrder(true); setTasks(true); setEvent(false); setCustomer(false); setServices(false); setUsers(false); setSchedule(true); setSetting(false);
+            setOrder(true); setTasks(true); setEvent(false); setCustomer(false); setServices(false); setUsers(false);setSales(false); setSchedule(true); setSetting(false);
         }
         else if (role === 'User' && id === 0 )
         {
-            setOrder(true); setTasks(true); setEvent(false); setCustomer(false); setServices(false); setUsers(false); setSchedule(true); setSetting(false);
+            setOrder(true); setTasks(true); setEvent(false); setCustomer(false); setServices(false); setUsers(false); setSchedule(true);setSales(false); setSetting(false);
         }
         else if (role === 'User' && id !== 0)
         {

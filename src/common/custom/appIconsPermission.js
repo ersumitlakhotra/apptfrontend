@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-    PieChartOutlined,
+    BarChartOutlined,
     ProductOutlined,
     NotificationOutlined,
     UnorderedListOutlined,
@@ -63,7 +63,7 @@ const AppIconsPermission = (size='50px',iconSize=54) => {
         getItem('Services', '/services', 7, <UnorderedListOutlined style={{ fontSize: size, color: 'white' }} />, services, 'bg-gradient-to-r from-[#D6B588] to-orange-600 '),
         getItem('Users', '/users', 8, <UserOutlined style={{ fontSize: size, color: 'white' }} />, users, 'bg-gradient-to-r from-red-900 to-purple-600'),
         getItem('Schedule', '/schedule', 9, <AiFillSchedule style={{ fontSize: size, color: 'white' }} />, schedule, 'bg-gradient-to-r from-green-500 to-green-900 '),
-        getItem('Sales', '', 10, <FundOutlined style={{ fontSize: size, color: 'white' }} />, false),
+        getItem('Reports', '/reports', 10, <BarChartOutlined style={{ fontSize: size, color: 'white' }} />, sales, ' bg-fuchsia-600'),
         getItem('Collection', '', 11, <FaHandHoldingUsd style={{ fontSize: size, color: 'white' }} />, false),
         // getItem('Expenses','', 12, <FallOutlined style={{ fontSize: size, color: 'white' }} />),
         getItem('Help', '/help', 13, <CustomerServiceOutlined style={{ fontSize: size, color: 'white' }} />, true, 'bg-gradient-to-r from-cyan-400 to-cyan-900'),

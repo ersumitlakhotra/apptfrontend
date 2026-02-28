@@ -30,6 +30,7 @@ import Users from './pages/Users/users.js';
 import Schedule from './pages/Schedule/schedule.js';
 import Dashboard from './pages/Dashboard/dashboard.js';
 import QRcode from './components/Setting/QRcode/qrcode.js';
+import Reports from './pages/Reports/reports.js';
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
               <Route path="/services" element={<Services />} />
               <Route path="/users" element={<Users />} />
               <Route path="/schedule" element={<Schedule />} />
+              <Route path="/reports" element={<Reports />} />
               <Route path="/help" element={<Support />} />
               <Route path="/scanQR" element={<QRcode />} />
               <Route path="/setting" element={<Setting />} />

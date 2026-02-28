@@ -7,16 +7,16 @@ import NotificationTabs from "./notification_tabs";
 import dayjs from 'dayjs';
 import { firstDateOfMonth, lastDateOfMonth, LocalDate, UTC_LocalDateTime } from "../../../common/localDate";
 
-const NotificationDetail = ({ refresh, currentOption, notificationList, tabActiveKey, setTabActiveKey, userList,servicesList,saveData,viewOrder }) => {
+const NotificationDetail = ({ refresh, setUnread, currentOption, notificationList, tabActiveKey, setTabActiveKey, userList,servicesList,saveData,viewOrder }) => {
 
     const [allNotification, setAllNotification] = useState([]);
     const [newNotification, setNewNotification] = useState([]);
     const [rescheduleNotification, setRescheduleNotification] = useState([]);
     const [cancelNotification, setCancelNotification] = useState([]);
 
-    const [newUnread, setNewUnread] = useState([]);
-    const [rescheduleUnread, setRescheduleUnread] = useState([]);
-    const [cancelUnread, setCancelUnread] = useState([]);
+    const [newUnread, setNewUnread] = useState(0);
+    const [rescheduleUnread, setRescheduleUnread] = useState(0);
+    const [cancelUnread, setCancelUnread] = useState(0);
    
 
     useEffect(() => {
@@ -41,19 +41,22 @@ const NotificationDetail = ({ refresh, currentOption, notificationList, tabActiv
         setRescheduleNotification(rescheduleNotify.length > 0 ? rescheduleNotify : [])
         setCancelNotification(cancelNotify.length > 0 ? cancelNotify : [])
 
+        const allUnread=notification.filter(a => a.read === '0');
+        setUnread(allUnread.length)
+
         const newunread = newNotify.filter(a => a.read === '0');
         const rescheduleunread = rescheduleNotify.filter(a => a.read === '0');
         const cancelunread = cancelNotify.filter(a => a.read === '0');
-        setNewUnread(newunread.length > 0 ? newunread : []);
-        setRescheduleUnread(rescheduleunread.length > 0 ? rescheduleunread : []);
-        setCancelUnread(cancelunread.length > 0 ? cancelunread : []);
+        setNewUnread(newunread.length);
+        setRescheduleUnread(rescheduleunread.length);
+        setCancelUnread(cancelunread.length);
     }, [refresh, currentOption, notificationList])
 
     const tabItems = [
         getTabItems('1', customLabelTab("All", "cyan", 0,false), null, <NotificationTabs notificationList={allNotification} unread={[]} userList={userList} servicesList={servicesList} saveData={saveData} viewOrder={viewOrder} activeKey={tabActiveKey} />),
-        getTabItems('2', customLabelTab("New", "green", newUnread.length,newUnread.length > 0 ), null, <NotificationTabs notificationList={newNotification}  unread={newUnread} userList={userList} servicesList={servicesList} saveData={saveData}  viewOrder={viewOrder} activeKey={tabActiveKey} />),
-        getTabItems('3', customLabelTab("Reschedule", "blue", rescheduleUnread.length,rescheduleUnread.length > 0 ), null, <NotificationTabs notificationList={rescheduleNotification}  unread={rescheduleUnread}  userList={userList} servicesList={servicesList} saveData={saveData}  viewOrder={viewOrder} activeKey={tabActiveKey} />),
-        getTabItems('4', customLabelTab("Cancel", "red",  cancelUnread.length,cancelUnread.length > 0 ), null, <NotificationTabs notificationList={cancelNotification}  unread={cancelUnread}  userList={userList} servicesList={servicesList} saveData={saveData}  viewOrder={viewOrder} activeKey={tabActiveKey} />),
+        getTabItems('2', customLabelTab("New", "green", newUnread,newUnread > 0 ), null, <NotificationTabs notificationList={newNotification}  unread={newUnread} userList={userList} servicesList={servicesList} saveData={saveData}  viewOrder={viewOrder} activeKey={tabActiveKey} />),
+        getTabItems('3', customLabelTab("Reschedule", "blue", rescheduleUnread,rescheduleUnread > 0 ), null, <NotificationTabs notificationList={rescheduleNotification}  unread={rescheduleUnread}  userList={userList} servicesList={servicesList} saveData={saveData}  viewOrder={viewOrder} activeKey={tabActiveKey} />),
+        getTabItems('4', customLabelTab("Cancel", "red",  cancelUnread,cancelUnread > 0 ), null, <NotificationTabs notificationList={cancelNotification}  unread={cancelUnread}  userList={userList} servicesList={servicesList} saveData={saveData}  viewOrder={viewOrder} activeKey={tabActiveKey} />),
         ];
  
     return (

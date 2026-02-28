@@ -16,33 +16,35 @@ const MonthlyReport = ({ orderList, expensesList, yearList, months }) => {
 
     useEffect(() => {
         let salesArray = [];
-        let expenseArray = [];
-        let seriestotalSale = 0; let seriestotalExpense = 0; let seriesProfitLoss = 0;
+        let tipArray = [];
+        let taxArray = [];
+        let seriestotalSale = 0; let seriestotalTip = 0; let seriestotalTax = 0;
 
         months.map((a, index) => {
             let date = currentYear + '-' + String(index + 1).padStart(2, '0') + '-02T00:00:00';
             let frm = dayjs(firstDateOfMonth(new Date(date))).format("YYYY-MM-DD");
             let to = dayjs(lastDateOfMonth(new Date(date))).format("YYYY-MM-DD");
-            let totalSale = 0; let totalExpense = 0;
+            let totalSale = 0; let totalTip = 0; let totalTax = 0;
             orderList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= frm && get_Date(a.trndate,'YYYY-MM-DD') <= to).map(b => {
                 totalSale += parseFloat(b.total);
+                totalTip += parseFloat(b.tip);
+                totalTax += parseFloat(b.taxamount);
             });
-            expensesList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= frm && get_Date(a.trndate,'YYYY-MM-DD') <= to).map(b => {
-                totalExpense += parseFloat(b.grossamount);
-            });
-            salesArray.push(totalSale);
-            expenseArray.push(totalExpense);
+           // expensesList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= frm && get_Date(a.trndate,'YYYY-MM-DD') <= to).map(b => {
+             //   totalExpense += parseFloat(b.grossamount);
+           // });
+           // salesArray.push(totalSale);
+           // tipArray.push(totalTip);
+            //taxArray.push(totalTax);
 
             seriestotalSale += parseFloat(totalSale);
-            seriestotalExpense += parseFloat(totalExpense);
+            seriestotalTip += parseFloat(totalTip);
+            seriestotalTax += parseFloat(totalTax);
 
         })
-        seriesProfitLoss = parseFloat(seriestotalSale) - parseFloat(seriestotalExpense);
-        if (seriesProfitLoss < 0) {
-            seriesProfitLoss = seriesProfitLoss * -1;
-        }
 
-        let seriesArray = [seriestotalSale, seriestotalExpense, seriesProfitLoss];
+
+        let seriesArray = [seriestotalSale, seriestotalTip, seriestotalTax];
 
         setChart(<Pie series={seriesArray} />)
     }, [currentYear])
@@ -50,7 +52,7 @@ const MonthlyReport = ({ orderList, expensesList, yearList, months }) => {
     return (
         <div class='flex flex-col gap-4 w-full'>
             <div class='flex justify-between items-center'>
-                <span class=" text-gray-800 italic ps-4">Monthly report</span>
+                <span class=" text-gray-800 italic ps-4">Annually report</span>
                 <Dropdown menu={menuProps}>
                     <Button>
                         <Space>

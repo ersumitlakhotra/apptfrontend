@@ -16,24 +16,28 @@ const MonthlyReport = ({ orderList, expensesList, yearList, months }) => {
 
     useEffect(() => {
         let salesArray = [];
-        let expenseArray = [];
+        let tipArray = [];
+        let taxArray = [];
         
         months.map((a, index) => {
             let date = currentYear + '-' + String(index + 1).padStart(2, '0') + '-02T00:00:00';
             let frm = dayjs(firstDateOfMonth(new Date(date))).format("YYYY-MM-DD");
             let to = dayjs(lastDateOfMonth(new Date(date))).format("YYYY-MM-DD");
-            let totalSale = 0; let totalExpense = 0;
+            let totalSale = 0; let totalTip = 0;let totalTax = 0;
             orderList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= frm && get_Date(a.trndate,'YYYY-MM-DD') <= to).map(b => {
-                totalSale += parseFloat(b.total);
+                totalSale += parseFloat(b.total); 
+                totalTip += parseFloat(b.tip);
+                totalTax += parseFloat(b.taxamount);
             });
-            expensesList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= frm && get_Date(a.trndate,'YYYY-MM-DD') <= to).map(b => {
-                totalExpense += parseFloat(b.grossamount);
-            });
+           // expensesList.filter(a => get_Date(a.trndate,'YYYY-MM-DD') >= frm && get_Date(a.trndate,'YYYY-MM-DD') <= to).map(b => {
+            //    totalExpense += parseFloat(b.grossamount);
+            //});
             salesArray.push(totalSale);
-            expenseArray.push(totalExpense);
+            tipArray.push(totalTip);
+            taxArray.push(totalTax);
 
         })
-        setChart(<Bar sales={salesArray} expense={expenseArray} categories={months} />)
+        setChart(<Bar sales={salesArray} tip={tipArray} tax={taxArray} categories={months} />)
     }, [currentYear])
 
     return (
