@@ -324,7 +324,7 @@ const ProtectedLayout = () => {
             {/* Drawer on user edit*/}
             <Drawer title={userTitle} placement='right' width={500} onClose={() => setOpenUser(false)} open={openUser}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
-                <UserDetail id={userId} refresh={reload} ref={ref} userPermissionList={userPermissionList} companyList={companyList} saveData={saveData} setOpen={setOpenUser} isAdmin={isAdmin} adminEmail={userId === uid && isAdmin} />
+                <UserDetail id={userId} refresh={reload} ref={ref}  companyList={companyList} saveData={saveData} setOpen={setOpenUser} isAdmin={isAdmin} adminEmail={userId === uid && isAdmin} />
             </Drawer>
 
             {/* Drawer on schedule edit*/}

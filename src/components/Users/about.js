@@ -3,7 +3,7 @@ import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { setCellFormat } from "../../common/cellformat";
 import { TextboxFlex } from "../../common/textbox";
 
-const UserAbout = ({ fullname, setFullname, cell, setCell, email, setEmail, address, setAddress, gender, setGender, password, setPassword, role, setRole, status, setStatus, appschedule, setAppSchedule, isAdmin, adminEmail }) => {
+const UserAbout = ({ fullname, setFullname, cell, setCell, email, setEmail, address, setAddress, gender, setGender, password, setPassword, role, setRole,onRoleChange, status, setStatus, appschedule, setAppSchedule, isAdmin, adminEmail }) => {
     //const Checked = 'On'; const Unchecked = 'Off';
     
     return (
@@ -19,7 +19,7 @@ const UserAbout = ({ fullname, setFullname, cell, setCell, email, setEmail, addr
                     defaultValue={role}
                     value={role}
                     style={{ width: '100%' }}
-                    onChange={(value) => setRole(value)}
+                    onChange={(value) => {setRole(value); onRoleChange(value);}}
                     options={[
                         { value: 'User', label: 'User' },
                         { value: 'Employee', label: 'Employee' }

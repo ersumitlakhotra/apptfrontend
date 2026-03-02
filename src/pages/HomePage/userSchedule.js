@@ -27,7 +27,7 @@ const UserSchedule = () => {
     }
   
     return (
-        <div class='w-full bg-white border rounded-3xl p-4 text-gray-500 flex gap-2  shadow-md hover:shadow-xl ' style={{height:'390px'}}>
+        <div class='w-full bg-white border rounded-3xl p-4 text-gray-500 flex gap-2  shadow-md hover:shadow-xl ' style={{height:'440px'}}>
             <IsLoading isLoading={isLoading} rows={9} input={
                 <>
                     <div class=' flex-1 overflow-auto w-full scroll-auto '>

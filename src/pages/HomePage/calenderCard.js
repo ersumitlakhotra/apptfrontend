@@ -11,6 +11,7 @@ import CalenderIcon from "../../common/custom/calenderIcon";
 import { IoMdWarning } from "react-icons/io"; 
 import { AiOutlineStop } from "react-icons/ai";
 import { useNavigate, useOutletContext } from "react-router-dom";
+import AnalogClock from "../../common/clock";
 
 const CalenderCard = () => {
     const navigate = useNavigate();
@@ -69,15 +70,16 @@ const CalenderCard = () => {
         <div class='w-full bg-blue-900 border rounded-3xl p-4 text-gray-800 flex gap-6  shadow-md   hover:shadow-lg '>
             <IsLoading isLoading={isLoading} input={
                 <>
-                    <div class='w-1/3 flex flex-col justify-between text-xs font-semibold font-sans  text-white ' onClick={() => navigate('/calender') }>
+                    <div class='w-1/3 flex flex-col gap-4 justify-between text-xs font-semibold font-sans  text-white ' onClick={() => navigate('/calender') }>
                         <div class='flex flex-col gap-0 hover:font-bold hover:underline duration-150 cursor-pointer'>
                             <CalenderIcon size={40}/>
                             <span>{get_Date(LocalDate(), 'MMMM DD, YYYY')}</span>
                         </div>
+                        <AnalogClock/>
                         <span class='hover:font-bold hover:underline duration-150 cursor-pointer'>{ordersList.length} Calender events</span>
                     </div>
 
-                    <div class='w-2/3 flex flex-col text-xs font-semibold font-sans  '>
+                    <div class='w-2/3 flex flex-col justify-center text-xs font-semibold font-sans  '>
                         {listItems({ icon: <IoMdWarning size={12} />, label: 'Awaiting Request', filterBy:'Awaiting', value: awaitingList.length })}
                         {listItems({ icon: <MdPendingActions size={12} />, label: 'Pending', filterBy: 'Pending' ,value: pendingList.length})}
                         {listItems({ icon: <IoHourglassOutline size={12} />, label: 'In Progress', filterBy: 'In progress', value: inprogressList.length })}

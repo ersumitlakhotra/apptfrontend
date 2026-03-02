@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
-import { Avatar,  Button,  Image,  Rate, Tabs } from "antd";
+import { Avatar, Button, Image, Rate, Tabs } from "antd";
 import { CloudUploadOutlined, EyeOutlined, UserOutlined } from '@ant-design/icons';
 import UserAbout from "./about.js";
 import useAlert from "../../common/alert.js";
@@ -12,9 +12,9 @@ import FetchData from "../../hook/fetchData.js";
 import IsLoading from "../../common/custom/isLoading.js";
 
 function getTabItems(key, label, icon, children) {
-    return {key,label,children,icon,};
+    return { key, label, children, icon, };
 }
-const UserDetail = ({ id, refresh, ref, userPermissionList, companyList, saveData, setOpen, isAdmin,adminEmail =false }) => {
+const UserDetail = ({ id, refresh, ref, companyList, saveData, setOpen, isAdmin, adminEmail = false }) => {
     const [tabActiveKey, setTabActiveKey] = useState("1");
     const [fullname, setFullname] = useState('');
     const [cell, setCell] = useState('');
@@ -52,30 +52,30 @@ const UserDetail = ({ id, refresh, ref, userPermissionList, companyList, saveDat
     const [sunday, setSunday] = useState(['09:00:00', '21:00:00', true, '14:00:00', '14:30:00']);
 
     const { contextHolder, error, warning } = useAlert();
-    let refimage=useRef();
+    let refimage = useRef();
 
     useEffect(() => {
-        setTabActiveKey("1"); 
+        setTabActiveKey("1");
         if (id === 0) {
             setFullname('');
             setCell(''); setEmail(''); setAddress('');
             setPassword(''); setRole('Employee'); setRating(0);
             setAccountType('Basic'); setProfile(null);
-            setGender('Male'); setStatus('Active');setAppSchedule(true);
+            setGender('Male'); setStatus('Active'); setAppSchedule(true);
 
-            setOrder(false); setTasks(false); setEvent(false);setCustomer(false); setServices(false); setUsers(false); setSchedule(false); setSetting(false); setSales(false);
-            
+            setOrder(false); setTasks(false); setEvent(false); setCustomer(false); setServices(false); setUsers(false); setSchedule(false); setSetting(false); setSales(false);
+
             if (companyList.timinginfo !== null) {
-                setMonday([...companyList.timinginfo[0].monday,'14:00:00', '14:30:00']);
+                setMonday([...companyList.timinginfo[0].monday, '14:00:00', '14:30:00']);
                 setTuesday([...companyList.timinginfo[0].tuesday, '14:00:00', '14:30:00']);
                 setWednesday([...companyList.timinginfo[0].wednesday, '14:00:00', '14:30:00']);
                 setThursday([...companyList.timinginfo[0].thursday, '14:00:00', '14:30:00']);
                 setFriday([...companyList.timinginfo[0].friday, '14:00:00', '14:30:00']);
                 setSaturday([...companyList.timinginfo[0].saturday, '14:00:00', '14:30:00']);
                 setSunday([...companyList.timinginfo[0].sunday, '14:00:00', '14:30:00']);
-            }  
+            }
         }
-        else {       
+        else {
             load();
         }
     }, [refresh])
@@ -88,6 +88,7 @@ const UserDetail = ({ id, refresh, ref, userPermissionList, companyList, saveDat
             endPoint: 'user', //
             id: id
         })
+
         const editList = userResponse.data[0];
         setFullname(editList.fullname);
         setCell(editList.cell);
@@ -96,29 +97,13 @@ const UserDetail = ({ id, refresh, ref, userPermissionList, companyList, saveDat
         setGender(editList.gender);
         setPassword(editList.password);
         setRole(editList.role);
+        onRoleChange(editList.role);
         setRating(editList.rating);
         setAccountType(editList.accounttype);
         setProfile(editList.profilepic);
         setStatus(editList.status);
         setAppSchedule(Boolean(editList.appschedule));
 
-        userPermissionList.map(b => {
-            setDashboard(b.dashboard);
-            setTasks(b.tasks);
-            setOrder(b.order);
-            setEvent(b.event);
-            setPayment(b.payment);
-
-            setCustomer(b.customer);
-            setServices(b.services);
-            setUsers(b.users);
-            setSchedule(b.schedule)
-
-            setSales(b.sales);
-            setCollection(b.collection);
-            setSetting(b.setting);
-        })
-        
         if (editList.timinginfo !== null) {
             setMonday(editList.timinginfo[0].monday);
             setTuesday(editList.timinginfo[0].tuesday);
@@ -127,22 +112,23 @@ const UserDetail = ({ id, refresh, ref, userPermissionList, companyList, saveDat
             setFriday(editList.timinginfo[0].friday);
             setSaturday(editList.timinginfo[0].saturday);
             setSunday(editList.timinginfo[0].sunday);
-        }  
+        }
 
         setIsLoading(false)
     }
-    useEffect(() => {
-        if (role === 'Employee')
-        {
-            setOrder(true); setTasks(true); setEvent(false); setCustomer(false); setServices(false); setUsers(false);setSales(false); setSchedule(true); setSetting(false);
+    
+    const onRoleChange = async (role) => {
+        if (role === 'User' && id === 0) {
+            setDashboard(false); setOrder(true); setTasks(true); setEvent(false); setPayment(false); setCustomer(false); setServices(false); setUsers(false); setSchedule(true); setSales(false); setCollection(false); setSetting(false);
         }
-        else if (role === 'User' && id === 0 )
-        {
-            setOrder(true); setTasks(true); setEvent(false); setCustomer(false); setServices(false); setUsers(false); setSchedule(true);setSales(false); setSetting(false);
-        }
-        else if (role === 'User' && id !== 0)
-        {
-            userPermissionList.filter(a => a.uid === id).map(b => {
+        else if (role === 'User' && id !== 0) {
+            setIsLoading(true);
+            const userPermissionResponse = await FetchData({
+                method: 'GET',
+                endPoint: 'userpermission',
+                id: id
+            })
+            userPermissionResponse.data.map(b => {
                 setDashboard(b.dashboard);
                 setTasks(b.tasks);
                 setOrder(b.order);
@@ -158,18 +144,20 @@ const UserDetail = ({ id, refresh, ref, userPermissionList, companyList, saveDat
                 setCollection(b.collection);
                 setSetting(b.setting);
             })
+            setIsLoading(false)
+
         }
 
-    },[role])
-  
-    
+    }
+
+
     const save = async () => {
-        if (fullname !== '' &&  password !== ''  && cell.length === 12 && cell !== '' ) {
+        if (fullname !== '' && password !== '' && cell.length === 12 && cell !== '') {
             const Body = JSON.stringify({
                 fullname: fullname,
                 cell: cell,
                 email: email,
-                username: adminEmail ? email: cell.replace(/\D/g, ""),
+                username: adminEmail ? email : cell.replace(/\D/g, ""),
                 address: address,
                 gender: gender,
                 password: password,
@@ -189,7 +177,7 @@ const UserDetail = ({ id, refresh, ref, userPermissionList, companyList, saveDat
                 users: users,
                 schedule: schedule,
                 sales: sales,
-                collection:collection,
+                collection: collection,
                 setting: setting,
                 timinginfo: [{
                     monday: monday,
@@ -200,7 +188,7 @@ const UserDetail = ({ id, refresh, ref, userPermissionList, companyList, saveDat
                     saturday: saturday,
                     sunday: sunday,
                 }]
-            }); 
+            });
             saveData({
                 label: "Users",
                 method: id !== 0 ? 'PUT' : 'POST',
@@ -210,9 +198,9 @@ const UserDetail = ({ id, refresh, ref, userPermissionList, companyList, saveDat
             });
             setOpen(false);
         }
-        else{
-           // if (!isValidEmail(email))
-               // warning('Please, fill out the valid email address !');
+        else {
+            // if (!isValidEmail(email))
+            // warning('Please, fill out the valid email address !');
             //else
             warning('Please, fill out the required fields !');
         }
@@ -223,7 +211,7 @@ const UserDetail = ({ id, refresh, ref, userPermissionList, companyList, saveDat
         };
     })
     const tabItems = [
-        getTabItems('1', 'About', <UserOutlined />, <UserAbout 
+        getTabItems('1', 'About', <UserOutlined />, <UserAbout
             fullname={fullname}
             setFullname={setFullname}
             cell={cell}
@@ -233,45 +221,46 @@ const UserDetail = ({ id, refresh, ref, userPermissionList, companyList, saveDat
             address={address}
             setAddress={setAddress}
             gender={gender}
-            setGender={setGender} 
+            setGender={setGender}
             password={password}
             setPassword={setPassword}
             role={role}
             setRole={setRole}
+            onRoleChange={onRoleChange}
             status={status}
             setStatus={setStatus}
             appschedule={appschedule}
             setAppSchedule={setAppSchedule}
             isAdmin={isAdmin}
             adminEmail={adminEmail}
-            />),
-        ((role === 'User' && isAdmin) && 
-        getTabItems('2', 'Permissions', <EyeOutlined />, <UserLoginPermissions
-            dashboard={dashboard}
-            setDashboard={setDashboard}
-            tasks={tasks}
-            setTasks={setTasks}
-            order={order}
-            setOrder={setOrder}
-            event={event}
-            setEvent={setEvent}
-            payment={payment}
-            setPayment={setPayment}
-            customer={customer}
-            setCustomer={setCustomer}
-            services={services}
-            setServices={setServices}
-            users={users}
-            setUsers={setUsers}
-            schedule={schedule}
-            setSchedule={setSchedule}
-            sales={sales}
-            setSales={setSales}
-            collection={collection}
-            setCollection={setCollection}
-            setting={setting}
-            setSetting={setSetting}
-        />)),
+        />),
+        ((role === 'User' && isAdmin) &&
+            getTabItems('2', 'Permissions', <EyeOutlined />, <UserLoginPermissions
+                dashboard={dashboard}
+                setDashboard={setDashboard}
+                tasks={tasks}
+                setTasks={setTasks}
+                order={order}
+                setOrder={setOrder}
+                event={event}
+                setEvent={setEvent}
+                payment={payment}
+                setPayment={setPayment}
+                customer={customer}
+                setCustomer={setCustomer}
+                services={services}
+                setServices={setServices}
+                users={users}
+                setUsers={setUsers}
+                schedule={schedule}
+                setSchedule={setSchedule}
+                sales={sales}
+                setSales={setSales}
+                collection={collection}
+                setCollection={setCollection}
+                setting={setting}
+                setSetting={setSetting}
+            />)),
         getTabItems('3', 'Schedule', <UserOutlined />, <ScheduleN
             monday={monday}
             setMonday={setMonday}
@@ -287,7 +276,7 @@ const UserDetail = ({ id, refresh, ref, userPermissionList, companyList, saveDat
             setSaturday={setSaturday}
             sunday={sunday}
             setSunday={setSunday}
-           
+
         />),
     ];
     const handleFileChange = (event) => {
@@ -307,7 +296,7 @@ const UserDetail = ({ id, refresh, ref, userPermissionList, companyList, saveDat
                 reader.onloadend = () => {
                     // reader.result will contain the data URL (e.g., data:image/jpeg;base64,...)
                     const base64String = reader.result;
-                    setProfile(base64String);                  
+                    setProfile(base64String);
                 };
 
                 reader.onerror = (error) => {
@@ -321,35 +310,35 @@ const UserDetail = ({ id, refresh, ref, userPermissionList, companyList, saveDat
     return (
         <div class='p-2'>
             <IsLoading isLoading={isLoading} rows={20} input={<>
-            <div class='w-full flex mb-6'>     
-                <div class='flex flex-col gap-2'>
-                    {profilepic !== null ?
-                        <Image width={128} height={128} src={profilepic} style={{ borderRadius: 10 }} /> :
-                        <Avatar shape="square" size={128} style={{ backgroundColor: '#f9fafb', border: 'solid', width: 120, height: 120 }} icon={<UserOutlined style={{ color: 'black' }} />} />
-                    }
-                    <Button type="primary" shape="default" icon={<CloudUploadOutlined />} size={24} style={{ width: '100px' }} onClick={() => {
-                        refimage.current.click();
-                    }}>Change</Button>
-                    <input type="file" ref={refimage} style={{ display: 'none' }} onChange={handleFileChange} />
-                    <p class='text-gray-400 text-xs'>Allowed *.jpeg, *.jpg, *.png</p>
-                </div>
-                <div class='flex flex-col'>
-                    <p class='text-2xl font-semibold text-gray-600'>{fullname}</p>
-                    <p class="font-normal text-blue-500 ">{role}</p>
-                    <p class="font-normal text-gray-400 mt-5 mb-2">Rating</p>
-                    <Rate disabled value={rating} />
-                    
-                </div>
-            </div>
+                <div class='w-full flex mb-6'>
+                    <div class='flex flex-col gap-2'>
+                        {profilepic !== null ?
+                            <Image width={128} height={128} src={profilepic} style={{ borderRadius: 10 }} /> :
+                            <Avatar shape="square" size={128} style={{ backgroundColor: '#f9fafb', border: 'solid', width: 120, height: 120 }} icon={<UserOutlined style={{ color: 'black' }} />} />
+                        }
+                        <Button type="primary" shape="default" icon={<CloudUploadOutlined />} size={24} style={{ width: '100px' }} onClick={() => {
+                            refimage.current.click();
+                        }}>Change</Button>
+                        <input type="file" ref={refimage} style={{ display: 'none' }} onChange={handleFileChange} />
+                        <p class='text-gray-400 text-xs'>Allowed *.jpeg, *.jpg, *.png</p>
+                    </div>
+                    <div class='flex flex-col'>
+                        <p class='text-2xl font-semibold text-gray-600'>{fullname}</p>
+                        <p class="font-normal text-blue-500 ">{role}</p>
+                        <p class="font-normal text-gray-400 mt-5 mb-2">Rating</p>
+                        <Rate disabled value={rating} />
 
-            <Tabs
-                defaultActiveKey="1"
-                items={tabItems}  
-                activeKey={tabActiveKey}
-                onChange={(e) => { setTabActiveKey(e)}}
-            />
-           </>
-        }/>
+                    </div>
+                </div>
+
+                <Tabs
+                    defaultActiveKey="1"
+                    items={tabItems}
+                    activeKey={tabActiveKey}
+                    onChange={(e) => { setTabActiveKey(e) }}
+                />
+            </>
+            } />
             {contextHolder}
         </div>
     )
