@@ -35,7 +35,7 @@ const Homepage = () => {
                             <AppIcons key={index} icon={items.icon} label={items.label} backgroundColor={items.color} onClick={() => navigate(items.navigate)} />
                         )
                     })}
-                />
+                />              
             </div>
             
 
