@@ -102,7 +102,7 @@ const ScheduleDetail = ({ id, refresh, ref, date, scheduleList, userList, saveDa
                     value={uid}
                     placeholder="Select User"
                     status={uid === '' ? 'error' : ''}
-                    style={{ width: 300 }}
+                    style={{ width: 300,fontSize:16 }}
                     size="large"
                     onChange={(value) => setUid(value)}
                     options={[{ value: '', label: '' }, ...userList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
@@ -116,6 +116,7 @@ const ScheduleDetail = ({ id, refresh, ref, date, scheduleList, userList, saveDa
             <TextboxFlex label={'Date'} mandatory={true} input={       
                 <DatePicker
                     allowClear={false}
+                    style={{fontSize:16}} 
                     value={trnDate === '' ? trnDate : dayjs(trnDate, 'YYYY-MM-DD')}
                     onChange={(date, dateString) => setTrnDate(dateString)} />     
             } />
@@ -124,6 +125,7 @@ const ScheduleDetail = ({ id, refresh, ref, date, scheduleList, userList, saveDa
             <TextboxFlex label={'Timing'} mandatory={true} input={
                 <RangePicker placeholder={['Start', 'End']}
                     allowClear={false}
+                    style={{fontSize:16}} 
                     use12Hours
                     showSecond={false}
                     format={"h:mm a"}
@@ -136,6 +138,7 @@ const ScheduleDetail = ({ id, refresh, ref, date, scheduleList, userList, saveDa
             <TextboxFlex label={'Break'} mandatory={true} input={
                 <RangePicker placeholder={['Start', 'End']}
                     allowClear={false}
+                    style={{fontSize:16}} 
                     use12Hours
                     showSecond={false}
                     format={"h:mm a"}
@@ -147,7 +150,7 @@ const ScheduleDetail = ({ id, refresh, ref, date, scheduleList, userList, saveDa
             } />
 
             <TextboxFlex label={'Working'} mandatory={true} input={
-                <Switch checkedChildren={'Working'} unCheckedChildren={'Day off'} value={isWorking} onChange={(e) => setIsWorking(e)} />
+                <Switch style={{fontSize:16}}  checkedChildren={'Working'} unCheckedChildren={'Day off'} value={isWorking} onChange={(e) => setIsWorking(e)} />
             } />
 
             {contextHolder}

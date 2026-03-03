@@ -81,14 +81,14 @@ const Users = () => {
             <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
                 <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
                     <div class='w-full md:w-1/3'>
-                        <Input size="large" placeholder="Search" prefix={<IoSearchOutline />} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
+                        <Input size="large" style={{fontSize:16}}  placeholder="Search" prefix={<IoSearchOutline />} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
                     </div>
                     <div class='w-full md:w-2/3 flex flex-row md:justify-end justify-start gap-4'>
                         <div class='flex flex-row gap-2 items-center'>
                             <p class='text-sm text-gray-500 whitespace-nowrap'>Filter by</p>
                             <Select
                                 value={sortStatus}
-                                style={{ width: 120 }}
+                                style={{ width: 120, fontSize:16 }}
                                 onChange={(e) => setSortStatus(e)}
                                 options={[
                                     { value: '', label: <Badge color={'blue'} text={'Both'} /> },

@@ -97,19 +97,19 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
             <p class="text-gray-400 mb-4">Event Detail</p>
 
             <TextboxFlex label={'Name'} mandatory={true} input={
-                <Input placeholder="Name" status={title === '' ? 'error' : ''} value={title} onChange={(e) => setTitle(e.target.value)} />
+                <Input placeholder="Name"  style={{fontSize:16}} status={title === '' ? 'error' : ''} value={title} onChange={(e) => setTitle(e.target.value)} />
             } />
             
             <TextboxFlex label={'Description'} input={
-                <TextArea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} minLength={3} />
+                <TextArea placeholder="Description"  style={{fontSize:16}} value={description} onChange={(e) => setDescription(e.target.value)} minLength={3} />
             } />
 
             <TextboxFlex label={'Start Date'} mandatory={true} input={
-                <DatePicker status={startDate === '' ? 'error' : ''} style={{ width: '100%' }} allowClear={false} value={startDate === '' ? startDate : dayjs(startDate, 'YYYY-MM-DD')} onChange={(date, dateString) => setStartDate(dateString)} />
+                <DatePicker status={startDate === '' ? 'error' : ''} style={{ width: '100%',fontSize:16 }} allowClear={false} value={startDate === '' ? startDate : dayjs(startDate, 'YYYY-MM-DD')} onChange={(date, dateString) => setStartDate(dateString)} />
             } />
 
             <TextboxFlex label={'End Date'} mandatory={true} input={
-                <DatePicker status={endDate === '' ? 'error' : ''} style={{ width: '100%' }} allowClear={false}  value={endDate === '' ? endDate : dayjs(endDate, 'YYYY-MM-DD')} onChange={(date, dateString) => setEndDate(dateString)} />
+                <DatePicker status={endDate === '' ? 'error' : ''} style={{ width: '100%',fontSize:16 }} allowClear={false}  value={endDate === '' ? endDate : dayjs(endDate, 'YYYY-MM-DD')} onChange={(date, dateString) => setEndDate(dateString)} />
             } />
 
             <TextboxFlex label={'Services'} mandatory={true} input={
@@ -117,7 +117,7 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
                     status={servicesItem.length === 0 ? 'error' : ''}
                     placeholder='Select services'
                     value={servicesItem}
-                    style={{ width: '100%' }}
+                    style={{ width: '100%', fontSize:16 }}
                     onChange={(value) => onChangeServicesItem(value)}
                     options={servicesList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
                         value: item.id,
@@ -145,19 +145,19 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
             } />
 
             <TextboxFlex label={'Price ($)'}  input={
-                <Input placeholder="Price" readOnly={true} style={{ backgroundColor: '#FAFAFA' }} value={price} onChange={(e) =>  setPriceNumberOnly(e, setPrice)} />
+                <Input placeholder="Price" readOnly={true} style={{ backgroundColor: '#FAFAFA',fontSize:16 }} value={price} onChange={(e) =>  setPriceNumberOnly(e, setPrice)} />
             } />
 
             <TextboxFlex label={'Discount $'} mandatory={true} input={
-                <Input placeholder="Discount" status={(discount === '' || discount === '.') ? 'error' : ''} value={discount} onChange={(e) => setPriceNumberOnly(e, setDiscount)} />
+                <Input placeholder="Discount"  style={{fontSize:16}} status={(discount === '' || discount === '.') ? 'error' : ''} value={discount} onChange={(e) => setPriceNumberOnly(e, setDiscount)} />
             } />
 
             <TextboxFlex label={'Amount'} input={
-                <Input placeholder="Amount" style={{ backgroundColor: '#FAFAFA' }} readOnly={true} value={total} />
+                <Input placeholder="Amount"   style={{ backgroundColor: '#FAFAFA',fontSize:16 }} readOnly={true} value={total} />
             } />
 
             <TextboxFlex label={'Coupon'}  input={
-                <Input placeholder="Coupon" style={{ backgroundColor: '#FAFAFA' }}  value={coupon} onChange={setPriceNumberOnly} readOnly={true} />
+                <Input placeholder="Coupon" style={{ backgroundColor: '#FAFAFA',fontSize:16 }}  value={coupon} onChange={setPriceNumberOnly} readOnly={true} />
             } />
 
         </div>

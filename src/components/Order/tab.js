@@ -80,7 +80,7 @@ const OrderTabs = ({ index, orderList, fromDate, setFromDate, toDate, setToDate,
         <div key={index} class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
             <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
                 <div class='w-full md:w-1/4'>
-                    <Input size="large" placeholder="Search" prefix={<IoSearchOutline />} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
+                    <Input size="large" style={{ fontSize: 16 }} placeholder="Search" prefix={<IoSearchOutline />} value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
                 </div>
                 <div class='w-full md:w-1/4'>
                     {dropDownVisible && <Select
@@ -100,7 +100,7 @@ const OrderTabs = ({ index, orderList, fromDate, setFromDate, toDate, setToDate,
                         <Popover placement="bottom" title={"Filter by From Date"} content={
                             <div>
                                 <DatePicker
-                                    style={{ width: '100%' }}
+                                    style={{ width: '100%', fontSize:16 }}
                                     allowClear={false}
                                     value={fromDate === '' ? fromDate : dayjs(fromDate, 'YYYY-MM-DD')}
                                     onChange={(date, dateString) => setFromDate(dateString)} />
@@ -111,7 +111,7 @@ const OrderTabs = ({ index, orderList, fromDate, setFromDate, toDate, setToDate,
                         <Popover placement="bottom" title={"Filter by To Date"} content={
                             <div>
                                 <DatePicker
-                                    style={{ width: '100%' }}
+                                    style={{ width: '100%', fontSize:16 }}
                                     allowClear={false}
                                     value={toDate === '' ? toDate : dayjs(toDate, 'YYYY-MM-DD')}
                                     onChange={(date, dateString) => setToDate(dateString)} />

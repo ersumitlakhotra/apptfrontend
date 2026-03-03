@@ -346,7 +346,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             <TextboxFlex label={'Search'} input={
                 <Select
                     showSearch
-                    style={{ width: '100%' }}
+                    style={{ width: '100%',fontSize:16 }}
                     placeholder="Search to Select"
                     value={''}
                     onChange={(value) => onSearch(value)}
@@ -363,16 +363,16 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             <p class="text-gray-400 my-4">Customer Detail</p>
 
             <TextboxFlex label={'Name'} mandatory={true} input={
-                <Input placeholder="Name" status={customerName === '' ? 'error' : ''} value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+                <Input placeholder="Name"  style={{fontSize:16}} status={customerName === '' ? 'error' : ''} value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
             } />
 
             <TextboxFlex label={'Cell #'} mandatory={true} input={
-                <Input placeholder="111-222-3333" status={customerPhone === '' ? 'error' : ''} value={customerPhone} onChange={(e) => setCustomerPhone(setCellFormat(e.target.value))} />
+                <Input placeholder="111-222-3333"  style={{fontSize:16}} status={customerPhone === '' ? 'error' : ''} value={customerPhone} onChange={(e) => setCustomerPhone(setCellFormat(e.target.value))} />
             } />
 
 
             <TextboxFlex label={'E-mail'} mandatory={true} input={
-                <Input placeholder="abcd@company.com" status={customerEmail === '' || !isValidEmail(customerEmail) ? 'error' : ''} value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} />
+                <Input placeholder="abcd@company.com"  style={{fontSize:16}} status={customerEmail === '' || !isValidEmail(customerEmail) ? 'error' : ''} value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} />
             } /> 
             
            {false && <TextboxFlex label={'Notification'}  input={
@@ -392,7 +392,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             <TextboxFlex label={'Status'} input={
                 <Select
                     value={status}
-                    style={{ width: '100%' }}
+                    style={{ width: '100%', fontSize:16 }}
                     onChange={(value) => { CalculatePrice(servicesItem); calculateDiscount(servicesItem, trndate) ;setStatus(value);}}
                     options={[
                         { value: 'Pending', label: <Badge color={'yellow'} text={'Pending'} /> },
@@ -410,7 +410,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     placeholder='Select services'
                     mode="multiple"
                     value={servicesItem}
-                    style={{ width: '100%' }}
+                    style={{ width: '100%', fontSize:16 }}
                     onChange={(value) => { setServicesItem(value); CalculatePrice(value); calculateDiscount(value,trndate) }}
                     options={servicesList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
                         value: item.id,
@@ -438,17 +438,17 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             } />
 
             <TextboxFlex label={'Price ($)'}  input={
-                <Input placeholder="Price" value={price} status={price === '' ? 'error' : ''} readOnly={true} style={{ backgroundColor: '#FAFAFA' }} onChange={(e) => setPrice(setNumberAndDot(e.target.value))} />
+                <Input placeholder="Price"  value={price} status={price === '' ? 'error' : ''} readOnly={true} style={{ backgroundColor: '#FAFAFA', fontSize:16 }} onChange={(e) => setPrice(setNumberAndDot(e.target.value))} />
             } />
 
             <TextboxFlex label={'Discount'} input={
-                <Input placeholder="Discount" value={discount} readOnly={coupon !== ''} onChange={(e) => setDiscount(setNumberAndDot(e.target.value))} />
+                <Input placeholder="Discount"  style={{fontSize:16}} value={discount} readOnly={coupon !== ''} onChange={(e) => setDiscount(setNumberAndDot(e.target.value))} />
             } />
             <TextboxFlex label={'Tax (%)'}  input={
                 <Select
                     value={tax}
                     mode="single"
-                    style={{ width: '100%' }}
+                    style={{ width: '100%', fontSize:16 }}
                     onChange={(value) => setTax(value)}
                     options={[
                         { value: '0.0', label: '0%' },
@@ -460,14 +460,14 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             } />
 
             <TextboxFlex label={'Total'} input={
-                <Input placeholder="Total" style={{ backgroundColor: '#FAFAFA' }} status={parseFloat(total).toFixed(2) < 0  ? 'error' : ''} readOnly={true} value={total} />
+                <Input placeholder="Total"  style={{ backgroundColor: '#FAFAFA', fontSize:16 }} status={parseFloat(total).toFixed(2) < 0  ? 'error' : ''} readOnly={true} value={total} />
             } />
 
            {false &&
             <TextboxFlex label={'Event'} input={
                 <Select
                     value={coupon}
-                    style={{ width: '100%' }}
+                    style={{ width: '100%', fontSize:16 }}
                     onChange={(value) => { setCoupon(value); value === '' && setDiscount(0.00)}}
                     options={[{ value: '', label: '' },
                     ...liveList.map(item => ({
@@ -484,19 +484,19 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     <Radio.Group onChange={(e) => setMode(e.target.value)} value={mode} style={{ width: '100%' }}>
                         <Radio.Button value="Cash">
                             <Flex gap="small" justify="center" align="center"  >
-                                <BsCash style={{ fontSize: 14 }} />
+                                <BsCash style={{ fontSize: 16 }} />
                                 Cash
                             </Flex>
                         </Radio.Button>
                         <Radio.Button value="Interac">
                             <Flex gap="small" justify="center" align="center"  >
-                                 <TbTransfer style={{ fontSize: 14 }} />
+                                 <TbTransfer style={{ fontSize: 16 }} />
                                 E-Transfer
                             </Flex>
                         </Radio.Button>
                         <Radio.Button value="Card">
                             <Flex gap="small" justify="center" align="center"  >
-                                <CreditCardOutlined style={{ fontSize: 14 }} />
+                                <CreditCardOutlined style={{ fontSize: 16 }} />
                                 By Card
                             </Flex>
                         </Radio.Button>
@@ -505,13 +505,13 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
 
 
                 <TextboxFlex label={'Received'} mandatory={status === 'Completed'} input={
-                    <Input placeholder="Received" value={received} 
+                    <Input placeholder="Received"  style={{fontSize:16}} value={received} 
                         status={received === ''   ? 'error' : ''}
                         onChange={(e) =>calculateTip(e.target.value)} />
                 } />
 
                 <TextboxFlex label={'Tip'} input={
-                    <Input placeholder="Total" style={{ backgroundColor: '#FAFAFA' }} readOnly={true} value={tip} />
+                    <Input placeholder="Total" style={{ backgroundColor: '#FAFAFA', fontSize:16 }} readOnly={true} value={tip} />
                 } />
             </>
             }
@@ -521,7 +521,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
 
             <TextboxFlex label={'Date'} mandatory={true} input={
                 <DatePicker status={trndate === '' ? 'error' : ''}
-                    style={{ width: '100%' }}
+                    style={{ width: '100%', fontSize:16 }}
                     allowClear={false}
                     disabledDate={id===0 && disabledDate}
                     value={trndate === '' ? trndate : dayjs(trndate, 'YYYY-MM-DD')}
@@ -531,7 +531,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             <TextboxFlex label={'Employee'} input={
                 <Select
                     value={assigned_to}
-                    style={{ width: '100%' }}
+                    style={{ width: '100%' , fontSize:16}}
                     onChange={(value) => setAssignedTo(value)}
                     disabled={!isAdmin}
                     options={[{ value: '0', label: 'None' }, ...userList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({

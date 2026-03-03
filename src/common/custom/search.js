@@ -6,6 +6,7 @@ const Search = ({ value, onChange }) => {
     return (
         <Input
             size="middle"
+            style={{ fontSize: 16 }}
             width={'100%'}
             placeholder="Search..."
             prefix={<IoSearchOutline color="silver" />}

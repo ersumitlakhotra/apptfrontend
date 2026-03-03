@@ -78,17 +78,17 @@ const ServiceDetail = ({ id, refresh, ref, servicesList, saveData, setOpen }) =>
             <p class="text-gray-400 mb-4">Service Information</p>
 
             <TextboxFlex label={'Name'} mandatory={true} input={
-                <Input placeholder="Name" status={name === '' ? 'error' : ''} value={name} onChange={(e) => setName(e.target.value)} />
+                <Input placeholder="Name" style={{fontSize:16}}  status={name === '' ? 'error' : ''} value={name} onChange={(e) => setName(e.target.value)} />
             } />
 
             <TextboxFlex label={'Price ($)'} mandatory={true} input={
-                <Input placeholder="Price" status={(price === '' || price === '.') ? 'error' : ''} value={price} onChange={setPriceNumberOnly} />
+                <Input placeholder="Price" style={{fontSize:16}}  status={(price === '' || price === '.') ? 'error' : ''} value={price} onChange={setPriceNumberOnly} />
             } />
 
             <TextboxFlex label={'Time'} input={
                 <Select
                     value={minutes}
-                    style={{ width: '100%' }}
+                    style={{ width: '100%',fontSize:16 }}
                     onChange={(value, l) => { setTiming(l.label); setMinutes(value); }}
                     options={[
                         { value: 15, label: '15 Minutes' },
@@ -104,7 +104,7 @@ const ServiceDetail = ({ id, refresh, ref, servicesList, saveData, setOpen }) =>
 
 
             <TextboxFlex label={'Description'} input={
-                <TextArea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
+                <TextArea placeholder="Description" style={{fontSize:16}}  value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
             } />
 
             <TextboxFlex label={'Status'} input={

@@ -4,12 +4,11 @@ import { useEffect, useState } from "react";
 import {  Tabs } from "antd";
 import { customLabelTab, getTabItems } from "../../../common/items";
 import NotificationTabs from "./notification_tabs";
-import dayjs from 'dayjs';
-import { firstDateOfMonth, lastDateOfMonth, LocalDate, UTC_LocalDateTime } from "../../../common/localDate";
 
-const NotificationDetail = ({ refresh, setUnread, currentOption, notificationList, tabActiveKey, setTabActiveKey, userList,servicesList,saveData,viewOrder }) => {
+const NotificationDetail = ({ refresh,   notification, tabActiveKey, setTabActiveKey, userList,servicesList,saveData,viewOrder }) => {
 
     const [allNotification, setAllNotification] = useState([]);
+    const [allUnread, setAllUnread] = useState([]);
     const [newNotification, setNewNotification] = useState([]);
     const [rescheduleNotification, setRescheduleNotification] = useState([]);
     const [cancelNotification, setCancelNotification] = useState([]);
@@ -20,18 +19,8 @@ const NotificationDetail = ({ refresh, setUnread, currentOption, notificationLis
    
 
     useEffect(() => {
-
-        let frmMonth = dayjs(firstDateOfMonth(new Date())).format("YYYY-MM-DD");
-        let toMonth = dayjs(lastDateOfMonth(new Date())).format("YYYY-MM-DD");
-        let year = new Date().getFullYear();
-        let jan = new Date(year, 0, 1);
-        let dec = new Date(year, 11, 31);
-       
-        const notification = 
-        (currentOption === 'Today' ? notificationList.filter(a => LocalDate() === UTC_LocalDateTime(a.createdat, 'YYYY-MM-DD')) :
-                currentOption === 'Last 7 Days' ? notificationList.filter(a => UTC_LocalDateTime(a.createdat, 'YYYY-MM-DD') >= UTC_LocalDateTime(dayjs().subtract(7, 'day'), 'YYYY-MM-DD') && UTC_LocalDateTime(a.createdat, 'YYYY-MM-DD') <= LocalDate()) :
-                    currentOption === 'This Month' ? notificationList.filter(a => UTC_LocalDateTime(a.createdat, 'YYYY-MM-DD') >= frmMonth && UTC_LocalDateTime(a.createdat, 'YYYY-MM-DD') <= toMonth) :
-                        notificationList.filter(a => notificationList.filter(a => UTC_LocalDateTime(a.createdat, 'YYYY-MM-DD') >= jan && UTC_LocalDateTime(a.createdat, 'YYYY-MM-DD') <= dec)))
+        
+        setAllUnread(notification.filter(a => a.read === '0'))
 
         const newNotify = notification.filter(a => a.option === 'New');
         const rescheduleNotify = notification.filter(a => a.option === 'Reschedule');
@@ -41,22 +30,16 @@ const NotificationDetail = ({ refresh, setUnread, currentOption, notificationLis
         setRescheduleNotification(rescheduleNotify.length > 0 ? rescheduleNotify : [])
         setCancelNotification(cancelNotify.length > 0 ? cancelNotify : [])
 
-        const allUnread=notification.filter(a => a.read === '0');
-        setUnread(allUnread.length)
-
-        const newunread = newNotify.filter(a => a.read === '0');
-        const rescheduleunread = rescheduleNotify.filter(a => a.read === '0');
-        const cancelunread = cancelNotify.filter(a => a.read === '0');
-        setNewUnread(newunread.length);
-        setRescheduleUnread(rescheduleunread.length);
-        setCancelUnread(cancelunread.length);
-    }, [refresh, currentOption, notificationList])
+        setNewUnread(newNotify.filter(a => a.read === '0').length);
+        setRescheduleUnread(rescheduleNotify.filter(a => a.read === '0').length);
+        setCancelUnread(cancelNotify.filter(a => a.read === '0').length);
+    }, [refresh,  notification])
 
     const tabItems = [
         getTabItems('1', customLabelTab("All", "cyan", 0,false), null, <NotificationTabs notificationList={allNotification} unread={[]} userList={userList} servicesList={servicesList} saveData={saveData} viewOrder={viewOrder} activeKey={tabActiveKey} />),
-        getTabItems('2', customLabelTab("New", "green", newUnread,newUnread > 0 ), null, <NotificationTabs notificationList={newNotification}  unread={newUnread} userList={userList} servicesList={servicesList} saveData={saveData}  viewOrder={viewOrder} activeKey={tabActiveKey} />),
-        getTabItems('3', customLabelTab("Reschedule", "blue", rescheduleUnread,rescheduleUnread > 0 ), null, <NotificationTabs notificationList={rescheduleNotification}  unread={rescheduleUnread}  userList={userList} servicesList={servicesList} saveData={saveData}  viewOrder={viewOrder} activeKey={tabActiveKey} />),
-        getTabItems('4', customLabelTab("Cancel", "red",  cancelUnread,cancelUnread > 0 ), null, <NotificationTabs notificationList={cancelNotification}  unread={cancelUnread}  userList={userList} servicesList={servicesList} saveData={saveData}  viewOrder={viewOrder} activeKey={tabActiveKey} />),
+        getTabItems('2', customLabelTab("New", "green", newUnread,newUnread > 0 ), null, <NotificationTabs notificationList={newNotification}  unread={allUnread} userList={userList} servicesList={servicesList} saveData={saveData}  viewOrder={viewOrder} activeKey={tabActiveKey} />),
+        getTabItems('3', customLabelTab("Reschedule", "blue", rescheduleUnread,rescheduleUnread > 0 ), null, <NotificationTabs notificationList={rescheduleNotification}  unread={allUnread}  userList={userList} servicesList={servicesList} saveData={saveData}  viewOrder={viewOrder} activeKey={tabActiveKey} />),
+        getTabItems('4', customLabelTab("Cancel", "red",  cancelUnread,cancelUnread > 0 ), null, <NotificationTabs notificationList={cancelNotification}  unread={allUnread}  userList={userList} servicesList={servicesList} saveData={saveData}  viewOrder={viewOrder} activeKey={tabActiveKey} />),
         ];
  
     return (

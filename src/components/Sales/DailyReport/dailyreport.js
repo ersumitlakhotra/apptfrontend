@@ -61,7 +61,7 @@ const DailyReport = ({ orderList, expensesList, yearList }) => {
             <div class='flex justify-between items-center'>
                 <span class=" text-gray-800 italic ps-4">Daily report</span>  
                 <div class='flex flex-row justify-end gap-2'>                 
-                    <Dropdown menu={menuPropsMonth}>
+                    <Dropdown menu={menuPropsMonth} style={{fontSize:16}} >
                         <Button>
                             <Space>
                                 {monthsList.filter(a => a.key === currentMonth).map(b => b.label)}
@@ -69,7 +69,7 @@ const DailyReport = ({ orderList, expensesList, yearList }) => {
                             </Space>
                         </Button>
                     </Dropdown> 
-                    <Dropdown menu={menuProps}>
+                    <Dropdown menu={menuProps} style={{fontSize:16}} >
                         <Button>
                             <Space>
                                 {currentYear}

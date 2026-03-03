@@ -13,21 +13,26 @@ const NotificationTabs = ({ notificationList,  unread,userList,servicesList,save
     const { Accept,Reject} = useResponseButtons(saveData);
 
     useEffect(() => {
-        if (activeKey > 1 && unread.length > 0) {
-            let ids = [];
-            unread.map(item => {
+        if (activeKey > 1) {
+             let ids = [];
+             let option = activeKey === '2' ? "New" : activeKey === '3' ? "Reschedule" :activeKey === '4' ? "Cancel" : "";
+          
+            unread.filter(a => a.option === option).map(item => {
                 ids.push(item.id)
             })
+            if(ids.length > 0)
             markAsRead(ids)
         }
     }, [activeKey])
+
     const markAsRead = (ids) => {
         SaveData({
             label: "Notification",
             method: 'POST',
             endPoint: "notificationread",
             id: null,
-            body: JSON.stringify({id:ids})
+            body: JSON.stringify({id:ids}),
+            notify:false
         });
     }
 

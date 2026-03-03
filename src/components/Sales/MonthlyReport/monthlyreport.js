@@ -44,7 +44,7 @@ const MonthlyReport = ({ orderList, expensesList, yearList, months }) => {
         <div class='flex flex-col gap-4 w-full'>
             <div class='flex justify-between items-center'>
                 <span class=" text-gray-800 italic ps-4">Monthly report</span>                      
-                <Dropdown menu={menuProps}>
+                <Dropdown menu={menuProps} style={{fontSize:16}} >
                     <Button>
                         <Space>
                             {currentYear}

@@ -93,7 +93,7 @@ const Schedule = () => {
                        {isAdmin && <Select
                             value={assigned_to}
                             disabled={!isAdmin}
-                            style={{ width: 300 }}
+                            style={{ width: 300, fontSize:16 }}
                             size="large"
                             onChange={(value) => setAssignedTo(value)}
                             options={[{ value: '', label: 'All Users' }, ...userList.filter(a => !a.status.toLowerCase().includes('inactive')).map(item => ({
@@ -107,7 +107,7 @@ const Schedule = () => {
                             <Popover placement="bottom" title={"Filter by From Date"} content={
                                 <div>
                                     <DatePicker
-                                        style={{ width: '100%' }}
+                                        style={{ width: '100%',fontSize:16 }}
                                         allowClear={false}
                                         value={fromDate === '' ? fromDate : dayjs(fromDate, 'YYYY-MM-DD')}
                                         onChange={(date, dateString) => setFromDate(dateString)} />
@@ -118,7 +118,7 @@ const Schedule = () => {
                             <Popover placement="bottom" title={"Filter by To Date"} content={
                                 <div>
                                     <DatePicker
-                                        style={{ width: '100%' }}
+                                        style={{ width: '100%',fontSize:16 }}
                                         allowClear={false}
                                         value={toDate === '' ? toDate : dayjs(toDate, 'YYYY-MM-DD')}
                                         onChange={(date, dateString) => setToDate(dateString)} />

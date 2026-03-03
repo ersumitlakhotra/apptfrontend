@@ -268,6 +268,7 @@ const ProtectedLayout = () => {
                 servicesList={servicesList}
                 editOrder={editOrder}
                 viewOrder={viewOrder}
+                getOrder={getOrder}
                 editUser={editUser}
                 uid={uid} />
 
