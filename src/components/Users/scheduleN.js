@@ -24,6 +24,7 @@ const ScheduleN = ({ sunday, setSunday, monday, setMonday, tuesday, setTuesday, 
                                     <p class='w-28 font-medium text-gray-500'>Timing</p>
                                     <RangePicker placeholder={['Start', 'End']}
                                         allowClear={false}
+                                        style={{fontSize:16}} 
                                         use12Hours
                                         showSecond={false}
                                         format={"h:mm a"}
@@ -35,6 +36,7 @@ const ScheduleN = ({ sunday, setSunday, monday, setMonday, tuesday, setTuesday, 
                                     <p class='w-28 font-medium text-gray-500'>Lunch Break</p>
                                     <RangePicker placeholder={['Start', 'End']}
                                         allowClear={false}
+                                        style={{fontSize:16}} 
                                         use12Hours
                                         showSecond={false}
                                         format={"h:mm a"}
@@ -43,7 +45,7 @@ const ScheduleN = ({ sunday, setSunday, monday, setMonday, tuesday, setTuesday, 
                                 </div>
                                 <div class={` flex flex-row gap-4  items-center`}>
                                     <p class='w-28 font-medium text-gray-500'>Status</p>
-                                    <Switch checkedChildren="Working" unCheckedChildren="Day off" defaultChecked={isWorking}
+                                    <Switch style={{fontSize:16}}  checkedChildren="Working" unCheckedChildren="Day off" defaultChecked={isWorking}
                                         onChange={(e) => update(day, setDay, e)} />
                                 </div>
                             </div>

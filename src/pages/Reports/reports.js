@@ -54,7 +54,7 @@ const Reports = () => {
                         <p class='text-sm text-gray-500 whitespace-nowrap'>Type</p>
                         <Select
                             value={reportType}
-                            style={{ width: 300 }}
+                            style={{ width: 300 , fontSize:16}}
                             size="large"
                             onChange={(value) => setReportType(value)}
                             options={[
@@ -68,7 +68,7 @@ const Reports = () => {
                             <Popover placement="bottom" title={"Filter by From Date"} content={
                                 <div>
                                     <DatePicker
-                                        style={{ width: '100%' }}
+                                        style={{ width: '100%',fontSize:16 }}
                                         allowClear={false}
                                         value={fromDate === '' ? fromDate : dayjs(fromDate, 'YYYY-MM-DD')}
                                         onChange={(date, dateString) => setFromDate(dateString)} />
@@ -79,7 +79,7 @@ const Reports = () => {
                             <Popover placement="bottom" title={"Filter by To Date"} content={
                                 <div>
                                     <DatePicker
-                                        style={{ width: '100%' }}
+                                        style={{ width: '100%',fontSize:16 }}
                                         allowClear={false}
                                         value={toDate === '' ? toDate : dayjs(toDate, 'YYYY-MM-DD')}
                                         onChange={(date, dateString) => setToDate(dateString)} />

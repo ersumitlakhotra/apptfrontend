@@ -312,19 +312,19 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
                         <Radio.Group onChange={(e) => setMode(e.target.value)} value={mode} style={{ width: '100%' }}>
                             <Radio.Button value="Cash">
                                 <Flex gap="small" justify="center" align="center"  >
-                                    <BsCash style={{ fontSize: 14 }} />
+                                    <BsCash style={{ fontSize: 16 }} />
                                     Cash
                                 </Flex>
                             </Radio.Button>
                             <Radio.Button value="Interac">
                                 <Flex gap="small" justify="center" align="center"  >
-                                    <TbTransfer style={{ fontSize: 14 }} />
+                                    <TbTransfer style={{ fontSize: 16 }} />
                                     E-Transfer
                                 </Flex>
                             </Radio.Button>
                             <Radio.Button value="Card">
                                 <Flex gap="small" justify="center" align="center"  >
-                                    <CreditCardOutlined style={{ fontSize: 14 }} />
+                                    <CreditCardOutlined style={{ fontSize: 16 }} />
                                     By Card
                                 </Flex>
                             </Radio.Button>
@@ -332,11 +332,11 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
                     } />
 
                     <TextboxFlex label={'Received'} mandatory={status === 'Completed'} input={
-                        <Input placeholder="Received" value={received} status={received === '' ? 'error' : ''}
+                        <Input placeholder="Received"  style={{fontSize:16}} value={received} status={received === '' ? 'error' : ''}
                             onChange={(e) => calculateTip(e.target.value)} />
                     } />
                     <TextboxFlex label={'Tip'} input={
-                        <Input placeholder="Total" style={{ backgroundColor: '#FAFAFA' }} readOnly={true} value={tip} />
+                        <Input placeholder="Total" style={{ backgroundColor: '#FAFAFA',fontSize:16 }} readOnly={true} value={tip} />
                     } />
                 </div>
             </Modal>

@@ -56,16 +56,16 @@ const CustomerDetail = ({ id, refresh, ref, setOpen }) => {
             <p class="text-gray-400 mb-4">Customer Information</p>
 
             <TextboxFlex label={'Name'} mandatory={true} input={
-                <Input placeholder="Name" status={name === '' ? 'error' : ''} value={name} onChange={(e) => setName(e.target.value)} />
+                <Input placeholder="Name" style={{fontSize:16}}  status={name === '' ? 'error' : ''} value={name} onChange={(e) => setName(e.target.value)} />
             } />
 
             <TextboxFlex label={'Cell #'} mandatory={true} input={
-                <Input placeholder="111-222-3333" status={cell === '' ? 'error' : ''} value={cell} onChange={(e) => setCell(setCellFormat(e.target.value))} />
+                <Input placeholder="111-222-3333" style={{fontSize:16}}  status={cell === '' ? 'error' : ''} value={cell} onChange={(e) => setCell(setCellFormat(e.target.value))} />
             } />
 
 
             <TextboxFlex label={'E-mail'} mandatory={true} input={
-                <Input placeholder="abcd@company.com" status={email === '' || !isValidEmail(email) ? 'error' : ''} value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Input placeholder="abcd@company.com" style={{fontSize:16}}  status={email === '' || !isValidEmail(email) ? 'error' : ''} value={email} onChange={(e) => setEmail(e.target.value)} />
             } />
 
 

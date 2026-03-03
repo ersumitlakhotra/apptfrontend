@@ -10,48 +10,48 @@ const UserLoginPermissions = ({ dashboard, setDashboard, tasks, setTasks, order,
 
 
             <TextboxFlex label={'Appointment'} input={
-                <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={order} onChange={(e) => setOrder(e)} />
+                <Switch style={{fontSize:16}}  checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={order} onChange={(e) => setOrder(e)} />
             } />
 
           {false && <TextboxFlex label={'Dashboard'} input={
-                <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={dashboard}  onChange={(e) => setDashboard(e)}/>
+                <Switch style={{fontSize:16}}  checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={dashboard}  onChange={(e) => setDashboard(e)}/>
             } /> }
 
             <TextboxFlex label={'Calender'} input={
-                <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={tasks} onChange={(e) => setTasks(e)}  />
+                <Switch style={{fontSize:16}}  checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={tasks} onChange={(e) => setTasks(e)}  />
             } />
 
             <TextboxFlex label={'Event'} input={
-                <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={event} onChange={(e) => setEvent(e)} />
+                <Switch style={{fontSize:16}}  checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={event} onChange={(e) => setEvent(e)} />
             } />
 
             {false && <TextboxFlex label={'Payment'} input={
-                <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={payment} onChange={(e) => setPayment(e)} />
+                <Switch style={{fontSize:16}}  checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={payment} onChange={(e) => setPayment(e)} />
             } />}
 
             <TextboxFlex label={'Customer'} input={
-                <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={customer} onChange={(e) => setCustomer(e)} />
+                <Switch style={{fontSize:16}}  checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={customer} onChange={(e) => setCustomer(e)} />
             } />
             <TextboxFlex label={'Services'} input={
-                <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={services} onChange={(e) => setServices(e)} />
+                <Switch style={{fontSize:16}}  checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={services} onChange={(e) => setServices(e)} />
             } />
 
             <TextboxFlex label={'Users'} input={
-                <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={users} onChange={(e) => setUsers(e)} />
+                <Switch style={{fontSize:16}}  checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={users} onChange={(e) => setUsers(e)} />
             } />
             <TextboxFlex label={'Schedule'} input={
-                <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={schedule} onChange={(e) => setSchedule(e)} />
+                <Switch style={{fontSize:16}}  checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={schedule} onChange={(e) => setSchedule(e)} />
             } />
 
              <TextboxFlex label={'Reports'} input={
-                <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={sales} onChange={(e) => setSales(e)} />
+                <Switch style={{fontSize:16}}  checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={sales} onChange={(e) => setSales(e)} />
             } />
 
             {false && <TextboxFlex label={'Collection'} input={
-                <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={collection} onChange={(e) => setCollection(e)} />
+                <Switch style={{fontSize:16}}  checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={collection} onChange={(e) => setCollection(e)} />
             } /> }
             <TextboxFlex label={'Setting'} input={
-                <Switch checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={setting} onChange={(e) => setSetting(e)} />
+                <Switch style={{fontSize:16}}  checkedChildren={Checked} unCheckedChildren={Unchecked} defaultChecked={setting} onChange={(e) => setSetting(e)} />
             } />
 
         </div>

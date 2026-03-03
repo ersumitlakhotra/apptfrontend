@@ -3,7 +3,7 @@
 import Search from '../../common/custom/search'
 import logo from '../../Images/logo.png'
 import { SlEarphonesAlt } from "react-icons/sl";
-import { Avatar, Badge, Button, Drawer, Dropdown,  Space, Tooltip } from 'antd';
+import { Avatar, Badge, Button, Drawer, Dropdown, Space, Tooltip } from 'antd';
 import { BellFilled, LogoutOutlined, DownOutlined, UserOutlined, BellOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
@@ -12,10 +12,11 @@ import NotificationDetail from '../../components/Main/Notification/notification_
 import { getStorage } from '../../common/localStorage';
 import { useAuth } from '../../auth/authContext';
 import IsLoading from '../../common/custom/isLoading';
-import { get_Date } from '../../common/localDate';
+import { get_Date, LocalDate, UTC_LocalDateTime, firstDateOfMonth,lastDateOfMonth } from '../../common/localDate';
 import { Sort } from '../../common/sort';
 import { useResponseButtons } from '../../components/Order/responseButton';
 import { Tags } from '../../common/tags';
+import dayjs from 'dayjs';
 
 function getItem(key, label, icon, extra, disabled, danger) {
     return {
@@ -27,23 +28,24 @@ function getItem(key, label, icon, extra, disabled, danger) {
         danger,
     };
 }
-const Header = ({ saveData, refresh, setRefresh, editOrder,viewOrder, editUser, uid, orderList, notificationList, getNotification, getUserListWithAdmin, servicesList
+const Header = ({ saveData, refresh, setRefresh, editOrder, viewOrder, getOrder, editUser, uid, orderList, notificationList, getNotification, getUserListWithAdmin, servicesList
 }) => {
     const navigate = useNavigate();
     const ranOnce = useRef(false);
-    const { logout } = useAuth(); 
+    const { logout } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [search, setSearch] = useState('');
     const [fullname, setFullname] = useState('');
     const [username, setUsername] = useState('');
     const [userList, setUserList] = useState([]);
     const [filteredList, setFilteredList] = useState([]);
+    const [notificationFilteredList, setNotificationFilteredList] = useState([]);
     const [unread, setUnread] = useState(0)
     const [openNotification, setOpenNotification] = useState(false);
     const [tabActiveKey, setTabActiveKey] = useState(1)
     const [reload, setReload] = useState(0);
-     const { Accept, Reject } = useResponseButtons(saveData);
-    
+    const { Accept, Reject } = useResponseButtons(saveData);
+
 
     useEffect(() => {
         if (ranOnce.current) return;
@@ -65,8 +67,12 @@ const Header = ({ saveData, refresh, setRefresh, editOrder,viewOrder, editUser, 
     }
 
     const refreshNotification = async () => {
-       await getNotification();
-        await onSearch();
+        setIsLoading(true);
+        const response = await getOrder();
+        const responseNotification=await getNotification();
+        oncurrentOptionChange(responseNotification);
+        await onSearch(response);
+        setIsLoading(false);
     }
 
     const handleMenuClick = e => {
@@ -126,13 +132,13 @@ const Header = ({ saveData, refresh, setRefresh, editOrder,viewOrder, editUser, 
         // { key: 'This Year', label: 'This Year' },
     ];
 
-    const onItemChanged = e => { setCurrentOption(e.key) };
+    const onItemChanged = e => { setCurrentOption(e.key); oncurrentOptionChange(notificationList) };
     const menuPropsNotification = { items: itemsNotification, onClick: onItemChanged };
 
     useEffect(() => {
         const handler = setTimeout(async () => {
             setIsLoading(true)
-            await onSearch();
+            await onSearch(orderList);
             setIsLoading(false)
         }, 500); // 500ms after user stops typing
 
@@ -142,25 +148,42 @@ const Header = ({ saveData, refresh, setRefresh, editOrder,viewOrder, editUser, 
         };
     }, [search]);
 
-    const onSearch = async () => {
-        const query = (search || "").toLowerCase(); 
+    const onSearch = async (list) => {
+        const query = (search || "").toLowerCase();
         if (search !== '') {
-            const res=await orderSearch(query);
+            const res = await orderSearch(query, list);
             setFilteredList(res)
         }
         else
-            setFilteredList([])  
+            setFilteredList([])
     }
 
-    const orderSearch = async(query) => {
-        let searchedList =await orderList.filter(item =>
+    const orderSearch = async (query, list) => {
+        let searchedList = await list.filter(item =>
             (item.name || "").toLowerCase().includes(query) ||
             (item.order_no || "").toString().includes(query) ||
             (item.cell || "").toString().replace(/-/g, "").includes(query)
-        );    
-        return Sort("trndate","desc",searchedList.slice(0,10))
+        );
+        return Sort("trndate", "desc", searchedList.slice(0, 10))
     }
 
+    const oncurrentOptionChange=(list) => {
+
+        let frmMonth = dayjs(firstDateOfMonth(new Date())).format("YYYY-MM-DD");
+        let toMonth = dayjs(lastDateOfMonth(new Date())).format("YYYY-MM-DD");
+        let year = new Date().getFullYear();
+        let jan = new Date(year, 0, 1);
+        let dec = new Date(year, 11, 31);
+
+        const notification =
+            (currentOption === 'Today' ? list.filter(a => LocalDate() === UTC_LocalDateTime(a.createdat, 'YYYY-MM-DD')) :
+                currentOption === 'Last 7 Days' ? list.filter(a => UTC_LocalDateTime(a.createdat, 'YYYY-MM-DD') >= UTC_LocalDateTime(dayjs().subtract(7, 'day'), 'YYYY-MM-DD') && UTC_LocalDateTime(a.createdat, 'YYYY-MM-DD') <= LocalDate()) :
+                    currentOption === 'This Month' ? list.filter(a => UTC_LocalDateTime(a.createdat, 'YYYY-MM-DD') >= frmMonth && UTC_LocalDateTime(a.createdat, 'YYYY-MM-DD') <= toMonth) :
+                        list.filter(a => list.filter(a => UTC_LocalDateTime(a.createdat, 'YYYY-MM-DD') >= jan && UTC_LocalDateTime(a.createdat, 'YYYY-MM-DD') <= dec)))
+setNotificationFilteredList(notification);
+        setUnread(notification.filter(a => a.read === '0').length)
+    }
+    
     return (
         <header class="p-2 bg-blue-500 border-b shadow-sm flex flex-row gap-2 sticky  z-50 top-0">
 
@@ -171,45 +194,45 @@ const Header = ({ saveData, refresh, setRefresh, editOrder,viewOrder, editUser, 
             </div>
 
             {/* Search */}
-            <div class='w-8/12 md:w-6/12 flex flex-row items-center relative'> 
+            <div class='w-8/12 md:w-6/12 flex flex-row items-center relative'>
                 <Search value={search} onChange={(e) => setSearch(e)} />
                 <div class={`w-full min-h-[350px] max-h-[350px] overflow-y-scroll border border-gray-400 z-50 bg-white rounded-lg shadow absolute top-10 ${search === '' && 'hidden'} `}>
-                   <IsLoading isLoading={isLoading} rows={8} input=
-                    {
-                        filteredList.length === 0 ? <p class='text-left p-4 text-sm font-medium text-gray-400'> No match found </p> : 
-                        filteredList.map(item =>  (
-                            <div key={item.id} class={`w-full flex flex-row p-2 gap-2 border-b-2 cursor-pointer hover:bg-gray-100  hover:shadow `} onClick={() => viewOrder(item.id)}>
-                                <Avatar style={{ backgroundColor: '#60a5fa'}} size="large">
-                                    {"Appointment".charAt(0)}
-                                </Avatar>
-                                <div class='flex flex-col gap-1 md:gap-0 w-11/12 '>
-                                    <p class='text-xs text-gray-600 flex flex-col md:flex-row md:items-center gap-1'>
-                                        <span class='text-blue-500  hover:underline cursor-pointer'>{item.order_no} {Tags(item.status)}</span> 
-                                        <span> {item.name} ( {item.cell} )</span> 
-                                    </p>
-                                    <div class='flex flex-row text-xs text-gray-500 items-center justify-between'>
-                                        <span> {`${get_Date(item.trndate, "dddd MMM, DD YYYY")} [${item.slot}] `}</span>
-                                        {item.status !== 'Awaiting' ?
-                                            <div class='flex flex-row gap-2 items-center '>
-                                                <Tooltip placement="top" title={'Edit'} >
-                                                    <Button type="link" icon={<EditOutlined />} onClick={(e) => { e.stopPropagation();  editOrder(item.id);}} />
-                                                </Tooltip>
-                                                <Tooltip placement="top" title={'View'} >
-                                                    <Button type="link" icon={<EyeOutlined />} onClick={(e) => { e.stopPropagation(); viewOrder(item.id)}} />
-                                                </Tooltip>
+                    <IsLoading isLoading={isLoading} rows={8} input=
+                        {
+                            filteredList.length === 0 ? <p class='text-left p-4 text-sm font-medium text-gray-400'> No match found </p> :
+                                filteredList.map(item => (
+                                    <div key={item.id} class={`w-full flex flex-row p-2 gap-2 border-b-2 cursor-pointer hover:bg-gray-100  hover:shadow `} onClick={() => viewOrder(item.id)}>
+                                        <Avatar style={{ backgroundColor: '#60a5fa' }} size="large">
+                                            {"Appointment".charAt(0)}
+                                        </Avatar>
+                                        <div class='flex flex-col gap-1 md:gap-0 w-11/12 '>
+                                            <p class='text-xs text-gray-600 flex flex-col md:flex-row md:items-center gap-1'>
+                                                <span class='text-blue-500  hover:underline cursor-pointer'>{item.order_no} {Tags(item.status)}</span>
+                                                <span> {item.name} ( {item.cell} )</span>
+                                            </p>
+                                            <div class='flex flex-row text-xs text-gray-500 items-center justify-between'>
+                                                <span> {`${get_Date(item.trndate, "dddd MMM, DD YYYY")} [${item.slot}] `}</span>
+                                                {item.status !== 'Awaiting' ?
+                                                    <div class='flex flex-row gap-2 items-center '>
+                                                        <Tooltip placement="top" title={'Edit'} >
+                                                            <Button type="link" icon={<EditOutlined />} onClick={(e) => { e.stopPropagation(); editOrder(item.id); }} />
+                                                        </Tooltip>
+                                                        <Tooltip placement="top" title={'View'} >
+                                                            <Button type="link" icon={<EyeOutlined />} onClick={(e) => { e.stopPropagation(); viewOrder(item.id) }} />
+                                                        </Tooltip>
+                                                    </div>
+                                                    :
+                                                    <div class='flex flex-row gap-2 items-center '>
+                                                        <Accept id={item.id} userList={userList} servicesList={servicesList} />
+                                                        <Reject id={item.id} userList={userList} servicesList={servicesList} />
+                                                    </div>
+                                                }
                                             </div>
-                                            :
-                                            <div class='flex flex-row gap-2 items-center '>
-                                                <Accept id={item.id} userList={userList} servicesList={servicesList} />
-                                                <Reject id={item.id} userList={userList} servicesList={servicesList} />
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
+                                        </div>
 
-                            </div>
-                    ))
-                    }
+                                    </div>
+                                ))
+                        }
                     />
                 </div>
             </div>
@@ -240,7 +263,7 @@ const Header = ({ saveData, refresh, setRefresh, editOrder,viewOrder, editUser, 
                     </Button>
                 </Dropdown>}>
 
-                <NotificationDetail refresh={refresh} setUnread={setUnread} currentOption={currentOption} notificationList={notificationList} tabActiveKey={tabActiveKey} setTabActiveKey={setTabActiveKey} userList={userList} servicesList={servicesList} saveData={saveData} viewOrder={viewOrder} />
+                <NotificationDetail refresh={refresh} notification={notificationFilteredList} tabActiveKey={tabActiveKey} setTabActiveKey={setTabActiveKey} userList={userList} servicesList={servicesList} saveData={saveData} viewOrder={viewOrder} />
             </Drawer>
 
         </header>
