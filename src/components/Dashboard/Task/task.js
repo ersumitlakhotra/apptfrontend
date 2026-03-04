@@ -1,8 +1,8 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Dropdown, Skeleton, Space, Spin } from "antd";
+import { Button, Dropdown, Skeleton, Space } from "antd";
 import { useEffect, useState } from "react";
-import { DownOutlined, LoadingOutlined } from '@ant-design/icons';
+import { DownOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { firstDateOfMonth, get_Date, lastDateOfMonth, LocalDate } from "../../../common/localDate";
 import {  PieChart, StackedBarChart } from "../Charts/charts";

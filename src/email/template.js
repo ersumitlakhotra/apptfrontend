@@ -28,7 +28,7 @@ const Template = ({ heading, name, order_no, professional, date, slot, services,
                                         <tr>
                                             <td
                                                 style={{
-                                                    backgroundColor: (heading === 'Confirmed' || heading === 'Rescheduled') ? "#2563eb" :"#ef4444",
+                                                    backgroundColor: (heading === 'Confirmed' || heading === 'Rescheduled' || heading === 'Awaiting' ) ? "#2563eb" :"#ef4444",
                                                     padding: "20px",
                                                     textAlign: "center",
                                                     color: "#ffffff",

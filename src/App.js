@@ -2,13 +2,11 @@ import './css/App.css';
 import './css/styles.css'
 import Login from './pages/Login/login.js';
 import ResetPassword from './pages/ResetPassword/resetpassword.js' 
-import MasterPage from './pages/main/master.js';
 import Signup from './pages/Signup/signup.js';
 import BookAppointment from './pages/BookAppointment/book-appointment.js';
 import Support from './pages/Support/support.js'
 import Privacy from './pages/Privacy/privacy.js'
 import {
- BrowserRouter as Router,
  Routes,
  Route,
  BrowserRouter
@@ -28,9 +26,9 @@ import Customer from './pages/Customer/customer.js';
 import Services from './pages/Services/services.js';
 import Users from './pages/Users/users.js';
 import Schedule from './pages/Schedule/schedule.js';
-import Dashboard from './pages/Dashboard/dashboard.js';
 import QRcode from './components/Setting/QRcode/qrcode.js';
 import Reports from './pages/Reports/reports.js';
+import ErrorPage from './pages/Error/error.js'
 
 function App() {
   return (
@@ -50,7 +48,6 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<ProtectedLayout />}>
               <Route path="/home" element={<Homepage />} />
-              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/calender" element={<Tasks />} />
               <Route path="/appointment" element={<Order />} />
               <Route path="/event" element={<Event />} />
@@ -64,7 +61,8 @@ function App() {
               <Route path="/setting" element={<Setting />} />
             </Route>
           </Route>
-          
+          <Route path="*" element={<ErrorPage />} />
+          <Route path="/404" element={<ErrorPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

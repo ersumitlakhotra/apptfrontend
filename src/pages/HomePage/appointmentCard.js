@@ -6,7 +6,7 @@ import { IoIosPhonePortrait } from "react-icons/io";
 import Services from "../../common/services";
 import FlexBoxRow from "../../common/custom/flexboxRow";
 import { get_Date, getDay } from "../../common/localDate";
-import { UnorderedListOutlined, ContactsOutlined, PhoneOutlined } from '@ant-design/icons';
+import { UnorderedListOutlined } from '@ant-design/icons';
 import { useResponseButtons } from "../../components/Order/responseButton";
 
 const AppointmentCards = ({ index, data, userList, servicesList, onClick, saveData }) => {

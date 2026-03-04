@@ -97,31 +97,3 @@ const Services = ({ servicesList, eventList, servicesItem, setServicesItem}) => 
 }
 
 export default Services
-
-{/*
-    <div class='flex flex-row gap-1 items-center '>
-                            
-                            <div class='flex flex-row gap-1'>
-                                <div class={`flex items-center ${liveList.filter(b => b.serviceinfo[0] === a.id).length > 0 && 'line-through'}`}>
-                                    <Tag color={`${liveList.filter(b => b.serviceinfo[0] === a.id).length > 0 ? 'blue':'green'}`}>$ {a.price}</Tag>
-                                </div>
-                                {liveList.filter(b => b.serviceinfo[0] === a.id).map(c => <Tag color='green'>$ {c.total}</Tag> )}
-                            </div>
-                        </div>
-                         const onService_Select=(id,name,price) => {
-        setService(id); 
-        setServiceName(name);
-        setPrice(price);
-        setDiscount('0');
-        setCoupon('');
-        setTotal(price);  
-        liveList.filter(b => b.serviceinfo[0] === id).map(c =>{
-            setDiscount(c.discount);
-            setCoupon(c.coupon);
-            setPrice(c.price); 
-            setTotal(c.total); 
-        })
-    }
-                        
-                        
-                        */}
