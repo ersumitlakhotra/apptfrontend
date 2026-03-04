@@ -5,7 +5,7 @@ import { Avatar, Badge, Button, DatePicker, Divider, Dropdown, Flex, Image, Inpu
 import dayjs from 'dayjs';
 import { TextboxFlex } from "../../common/textbox";
 import { isValidEmail, setCellFormat, setNumberAndDot } from "../../common/cellformat";
-import { UserOutlined,  CreditCardOutlined, DownOutlined,ExclamationCircleOutlined } from '@ant-design/icons';
+import { UserOutlined,  CreditCardOutlined, DownOutlined } from '@ant-design/icons';
 import { BsCash } from "react-icons/bs";
 import useAlert from "../../common/alert";
 import { get_Date, LocalDate, LocalTime } from "../../common/localDate";
@@ -13,7 +13,6 @@ import { generateTimeSlotsWithDate, toMinutes } from "../../common/generateTimeS
 import { compareTimes, isOpenForWork, userSchedule } from "../../common/general";
 import { TbTransfer } from "react-icons/tb";
 import { useEmail } from "../../email/email";
-import { Tags } from "../../common/tags";
 
 function disabledDate(current) {
   // Can not select days before today and today

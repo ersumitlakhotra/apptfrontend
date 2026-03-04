@@ -154,17 +154,17 @@ const Billing = ({ companyList,billingList, saveData }) => {
                         <>
                             <div class={`border-b p-4 ps-6 flex flex-row  items-center`}>
                                 <p class='w-28 font-medium text-gray-500'>Name</p>
-                                <Input placeholder="Name on card" size="small" value={name} onChange={(e) => setName(e.target.value)} style={{ backgroundColor: '#f9fafb', width: 180 }} />
+                                <Input  placeholder="Name on card" size="small" value={name} onChange={(e) => setName(e.target.value)} style={{ backgroundColor: '#f9fafb', width: 180, fontSize:16 }} />
                             </div>
                             <div class={`border-b p-4 ps-6 flex flex-row  items-center`}>
                                 <p class='w-28 font-medium text-gray-500'>Card Number</p>
-                                <Input placeholder="1111-2222-3333-4444" size="small" value={number} onChange={(e) => setCardFormat(e.target.value)} style={{ backgroundColor: '#f9fafb', width: 180 }} />
+                                <Input placeholder="1111-2222-3333-4444" size="small" value={number} onChange={(e) => setCardFormat(e.target.value)} style={{ backgroundColor: '#f9fafb', width: 180, fontSize:16 }} />
                             </div>
                             <div class={`border-b p-4 ps-6 flex flex-row  items-center`}>
                                 <p class='w-28 font-medium text-gray-500'>Expiry</p>
                                 <Select
                                     value={month}
-                                    style={{ width: 90 }}
+                                    style={{ width: 90, fontSize:16 }}
                                     size="small"
                                     onChange={(e) => setMonth(e)}
                                     options={[
@@ -184,14 +184,14 @@ const Billing = ({ companyList,billingList, saveData }) => {
 
                                 <Select
                                     value={year}
-                                    style={{ width: 90 }}
+                                    style={{ width: 90, fontSize:16 }}
                                     size="small"
                                     onChange={(e) => setYear(e)}
                                     options={YearDisplay()} />
                             </div>
                             <div class={`p-4 ps-6 flex flex-row  items-center`}>
                                 <p class='w-28 font-medium text-gray-500'>CVV</p>
-                                <Input placeholder="123" size="small" value={cvv} onChange={(e) => setCVV(e.target.value)} style={{ backgroundColor: '#f9fafb', width: 180 }} />
+                                <Input placeholder="123" size="small" value={cvv} onChange={(e) => setCVV(e.target.value)} style={{ backgroundColor: '#f9fafb', width: 180,fontSize:16 }} />
                             </div>
                         </> :
                         <>

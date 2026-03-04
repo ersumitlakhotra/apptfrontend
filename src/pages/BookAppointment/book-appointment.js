@@ -2,10 +2,10 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import { Button, Spin,  Drawer, Input, Modal } from 'antd';
+import { Button, Spin, Drawer, Input, Modal } from 'antd';
 import { LoadingOutlined, ArrowLeftOutlined, CloseOutlined, UpCircleOutlined, UserOutlined, CalendarOutlined, ContactsOutlined } from '@ant-design/icons';
-import { useEffect,  useState } from 'react';
-import {  useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import Services from '../../components/BookAppointment/services.js';
 import Employee from '../../components/BookAppointment/employee.js';
 import Slot from '../../components/BookAppointment/slot.js';
@@ -29,11 +29,11 @@ const BookAppointment = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const { contextHolder, warning, error } = useAlert();
     const [modal, contextHolderModal] = Modal.useModal();
-   
+
     const [isLoading, setIsLoading] = useState(false);
     const [content, setContent] = useState(0);
-    const { sendEmail,AppointmentStatus} = useEmail();
-    
+    const { sendEmail, AppointmentStatus } = useEmail();
+
     const [scheduleList, setScheduleList] = useState([]);
 
     const [cid, setCid] = useState(0);
@@ -47,8 +47,8 @@ const BookAppointment = () => {
     const [bookingType, setBookingType] = useState(0);
     const [assigned_to, setAssignedTo] = useState(0);
     const [prevAssigned_To, setPrevAssigned_To] = useState(0);
-    const [activeEmployee, setActiveEmployee]=useState([])
-    
+    const [activeEmployee, setActiveEmployee] = useState([])
+
     const [employeeName, setEmployeeName] = useState('');
     const [employeeId, setEmployeeId] = useState(0);
 
@@ -73,7 +73,7 @@ const BookAppointment = () => {
     const [customerPhone, setCustomerPhone] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
 
-    const [isURL, setIsURL] = useState(false);
+    const [isURL, setIsURL] = useState(true);
     const [companyList, setCompanyList] = useState([]);
     const [servicesList, setServicesList] = useState([]);
     const [userList, setUserList] = useState([]);
@@ -101,53 +101,56 @@ const BookAppointment = () => {
     });
 
     useEffect(() => {
-        const init = async () => {
-            setIsLoading(true)
-            const locationsResponse = await FetchData({
-                method: 'GET',
-                endPoint: 'company/booking',
-                cid: storeId
-            })
-            setIsURL(locationsResponse.data.length > 0);
-            setCompanyList(locationsResponse.data);
-            setIsLoading(false)
-        };
-          init(); 
+        init();
     }, []);
 
+    const init = async () => {
+        setIsLoading(true)
+        const locationsResponse = await FetchData({
+            method: 'GET',
+            endPoint: 'company/booking',
+            cid: storeId
+        })
+        setIsURL(locationsResponse.data.length > 0);
+        setCompanyList(locationsResponse.data);
+        setIsLoading(false)
+    };
+
     useEffect(() => {
-        const init = async () => {
-            setIsLoading(true)
-            const serviceResponse = await FetchData({ method: 'GET', endPoint: 'services', cid: cid })
-            const userResponse = await FetchData({ method: 'GET', endPoint: 'user', cid: cid })
-            const eventResponse = await FetchData({ method: 'GET', endPoint: 'event', eventDate: true, cid: cid })
-            const scheduleResponse = await FetchData({ method: 'GET', endPoint: 'schedule', cid: cid })
-            companyList.filter(a => a.id === cid).map(item => {
-                setStoreName(item.name);
-                setStoreCell(item.cell);
-                setDaysAdvance(item.bookingdays);
-                setAutoAccept(item.autoaccept);
-                setStoreSchedule(item.timinginfo[0]);
-                if (item.addressinfo !== null) {
-                    let address = `${item.addressinfo[0].street}, ${item.addressinfo[0].city}, ${item.addressinfo[0].province} ${item.addressinfo[0].postal} `;
-                    setStoreAddress(address);
-                }
-            });
-            setScheduleList(scheduleResponse.data);
-            setServicesList(serviceResponse.data);
-            setUserList(userResponse.data);
-            setEventList(eventResponse.data);
-            setIsLoading(false)
-        };  
-        init(); 
+        if(cid > 0)
+        initCid();
     }, [cid]);
+
+    const initCid = async () => {
+        setIsLoading(true)
+        const serviceResponse = await FetchData({ method: 'GET', endPoint: 'services', cid: cid })
+        const userResponse = await FetchData({ method: 'GET', endPoint: 'user', cid: cid })
+        const eventResponse = await FetchData({ method: 'GET', endPoint: 'event', eventDate: true, cid: cid })
+        const scheduleResponse = await FetchData({ method: 'GET', endPoint: 'schedule', cid: cid })
+        companyList.filter(a => a.id === cid).map(item => {
+            setStoreName(item.name);
+            setStoreCell(item.cell);
+            setDaysAdvance(item.bookingdays);
+            setAutoAccept(item.autoaccept);
+            setStoreSchedule(item.timinginfo[0]);
+            if (item.addressinfo !== null) {
+                let address = `${item.addressinfo[0].street}, ${item.addressinfo[0].city}, ${item.addressinfo[0].province} ${item.addressinfo[0].postal} `;
+                setStoreAddress(address);
+            }
+        });
+        setScheduleList(scheduleResponse.data);
+        setServicesList(serviceResponse.data);
+        setUserList(userResponse.data);
+        setEventList(eventResponse.data);
+        setIsLoading(false)
+    };
 
     useEffect(() => {
         setIsLoading(true)
         let active = [];
         const user = assigned_to > 0 ? userList.filter(item => item.id === assigned_to) : userList;
         user.map(item => {
-            const timing = userSchedule(trndate, item.timinginfo[0], item.id,scheduleList);
+            const timing = userSchedule(trndate, item.timinginfo[0], item.id, scheduleList);
             if (timing[0].isOpen) {
                 active.push({
                     id: item.id,
@@ -166,7 +169,7 @@ const BookAppointment = () => {
 
     useEffect(() => {
         if (employeeId > 0)
-            userList.filter(a => a.id === employeeId).map(item => setEmployeeName(item.fullname))     
+            userList.filter(a => a.id === employeeId).map(item => setEmployeeName(item.fullname))
     }, [employeeId]);
 
     useEffect(() => {
@@ -193,102 +196,100 @@ const BookAppointment = () => {
         setTotal(_total);
         setDiscount(_discount);
         setCoupon(coupon);
-    }, [servicesItem,trndate]);
+    }, [servicesItem, trndate]);
 
     useEffect(() => {
         if (cid !== 0 && trndate !== '') {
-            onTrnDateChange();          
+            onTrnDateChange();
         }
-        }, [trndate]);
+    }, [trndate]);
 
     const onTrnDateChange = async () => {
         //setSlot(prevTrnDate === trndate && bookingType > 1 ? prevSlot :'' );
         setSlot('');
-        const business = isOpenForWork(trndate, storeSchedule); 
-         if (business[0].isOpen) {
-                setIsOpen(true);
-                if (assigned_to > 0) {
-                    const user = userList.find(item => item.id === assigned_to);
-                    setEmployeeName(user.fullname);          
-                    const employee = userSchedule(trndate, user.timinginfo[0],assigned_to,scheduleList);   
-                   
-                    if (employee[0].isOpen) {
-                        setUserWorking(true);
-                        let orderList =await getOrderList(assigned_to);
-                        let appointments = orderList.filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === assigned_to && a.status !== 'Cancelled' && a.status !== 'Rejected' && a.id !== order_id));
-                        appointments = [...appointments, { start: employee[0].breakStart ,end:employee[0].breakEnd}]
-                        let minutes = 0;
-                        servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item => { minutes += item.minutes; });
+        const business = isOpenForWork(trndate, storeSchedule);
+        if (business[0].isOpen) {
+            setIsOpen(true);
+            if (assigned_to > 0) {
+                const user = userList.find(item => item.id === assigned_to);
+                setEmployeeName(user.fullname);
+                const employee = userSchedule(trndate, user.timinginfo[0], assigned_to, scheduleList);
 
-                        let loginTime = compareTimes(business[0].inTime, employee[0].inTime);
-                        let logoutTime = compareTimes(business[0].outTime, employee[0].outTime);
-                        let inTime = loginTime === -1 ? employee[0].inTime : (loginTime === 1 || loginTime === 0) && business[0].inTime;
-                        let outTime = logoutTime === -1 ? business[0].outTime : (logoutTime === 1 || logoutTime === 0) && employee[0].outTime;
-                        setAvailableSlot(generateTimeSlotsWithDate(trndate, inTime, outTime, minutes === 0 ? 30 : minutes, appointments,assigned_to));
-                       
-                        if (prevTrnDate === trndate && order_id !== 0 && prevAssigned_To === assigned_to && prevServicesItem === servicesItem) {
-                            setSlot(prevSlot);
-                        }
-
-                    }
-                    else
-                        setUserWorking(false);
-
-                }
-                else if (assigned_to === -1)
-                {
+                if (employee[0].isOpen) {
                     setUserWorking(true);
+                    let orderList = await getOrderList(assigned_to);
+                    let appointments = orderList.filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === assigned_to && a.status !== 'Cancelled' && a.status !== 'Rejected' && a.id !== order_id));
+                    appointments = [...appointments, { start: employee[0].breakStart, end: employee[0].breakEnd }]
                     let minutes = 0;
                     servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item => { minutes += item.minutes; });
-                    let orderList = [];
-                    let appointments = [];
-                    let data = [];
-                    activeEmployee.map(async (employee,index) => {
-                        orderList =await getOrderList(employee.id);
-                        appointments = orderList.filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === employee.id && a.status !== 'Cancelled' && a.status !== 'Rejected' && a.id !== order_id));
-                        appointments = [...appointments, { start: employee.breakStart ,end:employee.breakEnd}]
-                       
-                        let loginTime = compareTimes(business[0].inTime, employee.inTime);
-                        let logoutTime = compareTimes(business[0].outTime, employee.outTime);
-                        let inTime = loginTime === -1 ? employee.inTime : (loginTime === 1 || loginTime === 0) && business[0].inTime;
-                        let outTime = logoutTime === -1 ? business[0].outTime : (logoutTime === 1 || logoutTime === 0) && employee.outTime;
-                        let slots = generateTimeSlotsWithDate(trndate, inTime, outTime, minutes === 0 ? 30 : minutes, appointments, employee.id);   
-                        data.push(slots);
 
-                        if(index === activeEmployee.length -1)
-                        {
-                            let distinctSlotObjects = [
-                                ...new Map(
-                                    data.flat().map(item => [item.slot, item])
-                                ).values()
-                            ];
-                            setAvailableSlot(distinctSlotObjects) 
-                        }
-                    })  
-                    
+                    let loginTime = compareTimes(business[0].inTime, employee[0].inTime);
+                    let logoutTime = compareTimes(business[0].outTime, employee[0].outTime);
+                    let inTime = loginTime === -1 ? employee[0].inTime : (loginTime === 1 || loginTime === 0) && business[0].inTime;
+                    let outTime = logoutTime === -1 ? business[0].outTime : (logoutTime === 1 || logoutTime === 0) && employee[0].outTime;
+                    setAvailableSlot(generateTimeSlotsWithDate(trndate, inTime, outTime, minutes === 0 ? 30 : minutes, appointments, assigned_to));
+
                     if (prevTrnDate === trndate && order_id !== 0 && prevAssigned_To === assigned_to && prevServicesItem === servicesItem) {
                         setSlot(prevSlot);
                     }
+
                 }
-                else {
-                    setUserWorking(true);
-                    setEmployeeName('');
+                else
+                    setUserWorking(false);
+
+            }
+            else if (assigned_to === -1) {
+                setUserWorking(true);
+                let minutes = 0;
+                servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item => { minutes += item.minutes; });
+                let orderList = [];
+                let appointments = [];
+                let data = [];
+                activeEmployee.map(async (employee, index) => {
+                    orderList = await getOrderList(employee.id);
+                    appointments = orderList.filter(a => (a.trndate.includes(get_Date(trndate, 'YYYY-MM-DD')) && a.assignedto === employee.id && a.status !== 'Cancelled' && a.status !== 'Rejected' && a.id !== order_id));
+                    appointments = [...appointments, { start: employee.breakStart, end: employee.breakEnd }]
+
+                    let loginTime = compareTimes(business[0].inTime, employee.inTime);
+                    let logoutTime = compareTimes(business[0].outTime, employee.outTime);
+                    let inTime = loginTime === -1 ? employee.inTime : (loginTime === 1 || loginTime === 0) && business[0].inTime;
+                    let outTime = logoutTime === -1 ? business[0].outTime : (logoutTime === 1 || logoutTime === 0) && employee.outTime;
+                    let slots = generateTimeSlotsWithDate(trndate, inTime, outTime, minutes === 0 ? 30 : minutes, appointments, employee.id);
+                    data.push(slots);
+
+                    if (index === activeEmployee.length - 1) {
+                        let distinctSlotObjects = [
+                            ...new Map(
+                                data.flat().map(item => [item.slot, item])
+                            ).values()
+                        ];
+                        setAvailableSlot(distinctSlotObjects)
+                    }
+                })
+
+                if (prevTrnDate === trndate && order_id !== 0 && prevAssigned_To === assigned_to && prevServicesItem === servicesItem) {
+                    setSlot(prevSlot);
                 }
             }
-            else
-                setIsOpen(false);
+            else {
+                setUserWorking(true);
+                setEmployeeName('');
+            }
+        }
+        else
+            setIsOpen(false);
 
     }
 
     const getOrderList = async (uid) => {
         setIsLoading(true);
-        const body = JSON.stringify({  date: get_Date(trndate, 'YYYY-MM-DD').toString(), uid: parseInt(uid) }); 
-        const orderResponse = await FetchData({ method: 'POST', endPoint: 'order/booking',cid:cid,body:body })
+        const body = JSON.stringify({ date: get_Date(trndate, 'YYYY-MM-DD').toString(), uid: parseInt(uid) });
+        const orderResponse = await FetchData({ method: 'POST', endPoint: 'order/booking', cid: cid, body: body })
         setIsLoading(false);
         return orderResponse.data;
     }
-   
- 
+
+
     const isSlotAvailable = async () => {
         if (bookingType === 3)
             return true
@@ -306,7 +307,7 @@ const BookAppointment = () => {
     }
 
     const save = async () => {
-        if (customerName !== '' && customerPhone !== '' && customerPhone.length === 12 && customerEmail !== '' && isValidEmail(customerEmail) ) {
+        if (customerName !== '' && customerPhone !== '' && customerPhone.length === 12 && customerEmail !== '' && isValidEmail(customerEmail)) {
             const Body = JSON.stringify({
                 customerName: customerName,
                 customerPhone: customerPhone,
@@ -318,7 +319,7 @@ const BookAppointment = () => {
                 taxamount: '0',
                 total: total,
                 coupon: coupon,
-                status: bookingType === 3 ? 'Cancelled' : autoAccept ? 'Pending':'Awaiting',
+                status: bookingType === 3 ? 'Cancelled' : autoAccept ? 'Pending' : 'Awaiting',
                 trndate: trndate,
                 assignedto: employeeId,
                 slot: slot,
@@ -328,42 +329,41 @@ const BookAppointment = () => {
                 mode: 'Cash',
                 tip: '0',
                 bookedvia: 'Appointment',
-                sendnotification:true
+                sendnotification: true
             });
 
-            if (isSlotAvailable())
-            {
-                const res=await SaveData({
+            if (isSlotAvailable()) {
+                const res = await SaveData({
                     label: "Appointment",
                     method: bookingType === 2 ? 'PUT' : 'POST',
-                    endPoint: bookingType === 3 ? 'order/cancel' :"order",
-                    id: bookingType === 1 ? null : order_id ,  
-                    cid:cid,
+                    endPoint: bookingType === 3 ? 'order/cancel' : "order",
+                    id: bookingType === 1 ? null : order_id,
+                    cid: cid,
                     body: Body // [] on cancel
-                }); 
-                
+                });
+
                 if (res.isSuccess) {
                     const id = res.data.id;
                     const order_no = res.data.order_no;
 
                     sendEmail({
                         id: id,
-                        cid:cid,
+                        cid: cid,
                         status: bookingType === 3 ? AppointmentStatus.CANCELLED :
-                                    autoAccept ?
-                                        bookingType === 1 ? AppointmentStatus.CONFIRMED : AppointmentStatus.RESCHEDULED 
-                                        : AppointmentStatus.AWAITING,
-                        userList: userList, 
+                            autoAccept ?
+                                bookingType === 1 ? AppointmentStatus.CONFIRMED : AppointmentStatus.RESCHEDULED
+                                : AppointmentStatus.AWAITING,
+                        userList: userList,
                         servicesList: servicesList
                     })
-                    
+
                     modal.success({
-                        title:(<span class='font-semibold'>{storeName}</span>),
-                        onOk() { window.location.reload()},
+                        title: (<span class='font-semibold'>{storeName}</span>),
+                        onOk() { window.location.reload() },
                         content: (
                             <div class='flex flex-col gap-4 p-4'>
                                 <p class='font-bold'>Hi {customerName}</p>
-                                <p>Your appointment at <span class='font-semibold'>{storeName}</span> has been 
+                                <p>Your appointment at <span class='font-semibold'>{storeName}</span> has been
                                     <strong>
                                         {
                                             bookingType === 3 ? AppointmentStatus.CANCELLED :
@@ -385,11 +385,11 @@ const BookAppointment = () => {
                     })
 
                 }
-                else 
-                    error(`We sincerely apologize, but something went wrong with your appointment. We invite you to try again, or to contact the store at ${storeCell} to get help!`)    
+                else
+                    error(`We sincerely apologize, but something went wrong with your appointment. We invite you to try again, or to contact the store at ${storeCell} to get help!`)
             }
             else
-                warning(`The time slot (${slot}) on ${trndate} has been reserved by another party and is no longer available`);          
+                warning(`The time slot (${slot}) on ${trndate} has been reserved by another party and is no longer available`);
         }
         else {
             warning('Please, fill out the required fields !');
@@ -403,20 +403,20 @@ const BookAppointment = () => {
             let result = false;
             let message = 'Either Booking# or Cell # is incorrect!';
             try {
-                const Body = JSON.stringify({order_no: order_no});
-                const orderResponse = await FetchData({ method: 'POST', endPoint: 'order/reschedule', cid: cid ,body:Body})
-               
+                const Body = JSON.stringify({ order_no: order_no });
+                const orderResponse = await FetchData({ method: 'POST', endPoint: 'order/reschedule', cid: cid, body: Body })
+
                 if (orderResponse.data.length > 0) {
                     const editList = orderResponse.data[0];
                     if (editList.cell === customerPhone) {
 
                         const date1 = new Date(editList.trndate);
                         const date2 = new Date(LocalDate());
-                        if (date1 < date2 || (get_Date(editList.trndate,'YYYY-MM-DD') === LocalDate() && toMinutes(editList.start) < toMinutes(LocalTime('HH:mm')))) {
+                        if (date1 < date2 || (get_Date(editList.trndate, 'YYYY-MM-DD') === LocalDate() && toMinutes(editList.start) < toMinutes(LocalTime('HH:mm')))) {
                             result = false;
                             message = `Past order can't be rescheduled or cancel.`;
                         }
-                        else if (editList.status === 'Completed' || editList.status === 'Cancelled' || editList.status === 'Rejected' ) {
+                        else if (editList.status === 'Completed' || editList.status === 'Cancelled' || editList.status === 'Rejected') {
                             result = false;
                             message = `Order is already marked as ${editList.status}.`;
                         }
@@ -544,9 +544,9 @@ const BookAppointment = () => {
             next={next}
             servicesItem={servicesItem}
             setServicesItem={setServicesItem}
-            setPrice={setPrice} 
-            setDiscount={setDiscount} 
-            setTotal={setTotal} 
+            setPrice={setPrice}
+            setDiscount={setDiscount}
+            setTotal={setTotal}
             setCoupon={setCoupon} />
     } else if (content === 4) {
         displayedContent = <Slot
@@ -574,7 +574,7 @@ const BookAppointment = () => {
 
     return (
         <div class='w-full p-8'>
-            {isLoading ? (
+            {isLoading ? 
                 <div
                     style={{
                         position: 'fixed',
@@ -591,7 +591,7 @@ const BookAppointment = () => {
                 >
                     <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
                 </div>
-            ) :
+             :
                 isURL ?
                     <>
                         {cid > 0 &&
@@ -615,15 +615,15 @@ const BookAppointment = () => {
                                             <p class='text-gray-600'>Services : {servicesItem.length} </p>
                                         </div>
                                     </div>
-                                        { !(content === 5 && bookingType === 2 && prevAssigned_To === assigned_to && prevTrnDate === trndate && prevSlot === slot) &&
-                                            <Button
-                                                color={bookingType === 3 && content === 5 ? "danger" : "default"}
-                                                variant="outlined"
-                                                style={{ fontWeight: 'bold' }}
-                                                onClick={() => next()}>
-                                                {content === 5 ? (bookingType === 3 ? "Cancel Booking" : bookingType === 2 ? "Reschedule" : "Complete") : 'Next'}
-                                            </Button>
-                                        }
+                                    {!(content === 5 && bookingType === 2 && prevAssigned_To === assigned_to && prevTrnDate === trndate && prevSlot === slot) &&
+                                        <Button
+                                            color={bookingType === 3 && content === 5 ? "danger" : "default"}
+                                            variant="outlined"
+                                            style={{ fontWeight: 'bold' }}
+                                            onClick={() => next()}>
+                                            {content === 5 ? (bookingType === 3 ? "Cancel Booking" : bookingType === 2 ? "Reschedule" : "Complete") : 'Next'}
+                                        </Button>
+                                    }
 
                                 </div>
                             </div>
@@ -637,16 +637,7 @@ const BookAppointment = () => {
                             </div>
                         }
                     </> :
-                    <div class='flex flex-row justify-center items-center'>
-                        <div class='flex flex-col gap-3 items-start'>
-                            {isLoading ? <p class='text-4xl font-sans font-semibold'> Loading . . .</p> : <>
-                                <p class='text-4xl font-sans font-semibold'> Page not found</p>
-                                <p >Uh oh, we can't seem to find the page you're looking for.</p>
-                                <p >Are you sure the website URL is correct ?</p>
-                                <p >Get in touch with the site owner.</p>
-                            </>}
-                        </div>
-                    </div>
+                   <Navigate to="/404" replace />
 
             }
 
@@ -672,7 +663,7 @@ const BookAppointment = () => {
                     <TextboxFlexCol label={'Cell #'} mandatory={true} input={
                         <Input placeholder="Enter your 10 digit phone number . ." size="large" status={customerPhone === '' ? 'error' : ''} value={customerPhone} onChange={(e) => setCustomerPhone(setCellFormat(e.target.value))} />
                     } />
-                       
+
                     <div class='my-4 flex justify-end items-center'>
                         <Button size='large' color='default' variant="solid" onClick={() => searchOrder()}  >Submit</Button>
                     </div>
@@ -692,21 +683,20 @@ const BookAppointment = () => {
                         value={
                             <div class='flex flex-row gap-4 w-full items-center'>
                                 {
-                                    assigned_to === -1 ? 
+                                    assigned_to === -1 ?
                                         <AssignedTo key={-1} userId={-1} userList={userList} />
-                                    :                            
-                                    userList.filter(f => f.id === assigned_to).map(item =>
-                                    <AssignedTo key={item.id} userId={item.id} userList={userList}  />
-                                )}
+                                        :
+                                        userList.filter(f => f.id === assigned_to).map(item =>
+                                            <AssignedTo key={item.id} userId={item.id} userList={userList} />
+                                        )}
                             </div>
                         } />
                     }
 
                     {servicesItem.length !== 0 && <ViewBooking title={'Services'} content={3} setContent={setContent} setOpenOrder={setOpenOrder}
                         value={<div class='flex flex-col gap-2'>
-                            {servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item =>
-                            {
-                                let list = eventList.filter(event => event.case.toUpperCase() !== 'PAST' && event.serviceinfo[0] === item.id && 
+                            {servicesList.filter(a => servicesItem.some(b => b === a.id)).map(item => {
+                                let list = eventList.filter(event => event.case.toUpperCase() !== 'PAST' && event.serviceinfo[0] === item.id &&
                                     get_Date(trndate, 'YYYY-MM-DD') >= get_Date(event.startdate, 'YYYY-MM-DD') &&
                                     get_Date(trndate, 'YYYY-MM-DD') <= get_Date(event.enddate, 'YYYY-MM-DD'));
                                 let _isDiscountApplied = false;
@@ -716,8 +706,8 @@ const BookAppointment = () => {
                                     _price = list[0].total;
                                 }
 
-                                return(
-                                <div key={item.id} class='flex flex-row items-center text-gray-700'>
+                                return (
+                                    <div key={item.id} class='flex flex-row items-center text-gray-700'>
                                         <div class='bg-gray-100 py-1 px-2  text-gray-600 font-semibold font-sans border-r shadow-md rounded-r-md flex items-center gap-2'>
                                             {_isDiscountApplied ?
                                                 <>
@@ -732,10 +722,11 @@ const BookAppointment = () => {
                                                     </span>
                                                 </>
                                             }
-                                        </div>   
-                                    <p style={{ fontSize: 11, fontWeight: 500, marginLeft: 8 }}>{item.name}</p>
-                                </div>
-                           )})}
+                                        </div>
+                                        <p style={{ fontSize: 11, fontWeight: 500, marginLeft: 8 }}>{item.name}</p>
+                                    </div>
+                                )
+                            })}
                         </div>
                         } />
                     }

@@ -7,8 +7,6 @@ import {
     UserOutlined,
     SettingOutlined,
     CustomerServiceOutlined,
-    FallOutlined,
-    FundOutlined,
     DollarOutlined,
     ContactsOutlined,
     HomeOutlined ,
@@ -38,17 +36,17 @@ function getItem(label, navigate, key, icon, isVisible = false, color, badge, bt
 }
 
 const AppIconsPermission = (size='50px',iconSize=54) => {
-    const [dashboard, setDashboard] = useState(false);
+   // const [dashboard, setDashboard] = useState(false);
     const [tasks, setTasks] = useState(false);
     const [order, setOrder] = useState(false);
     const [event, setEvent] = useState(false);
-    const [payment, setPayment] = useState(false);
+   // const [payment, setPayment] = useState(false);
     const [customer, setCustomer] = useState(false);
     const [services, setServices] = useState(false);
     const [users, setUsers] = useState(false);
     const [schedule, setSchedule] = useState(false);
     const [sales, setSales] = useState(false);
-    const [collection, setCollection] = useState(false);
+    //const [collection, setCollection] = useState(false);
     const [setting, setSetting] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -86,12 +84,12 @@ const AppIconsPermission = (size='50px',iconSize=54) => {
             id: localStorage.uid 
         })
         
-         userPermissionResponse.data.map(b => {
-            setDashboard(b.dashboard);
+         userPermissionResponse.data.forEach(b => {
+           // setDashboard(b.dashboard);
             setTasks(b.tasks);
             setOrder(b.order);
             setEvent(b.event);
-            setPayment(b.payment);
+           // setPayment(b.payment);
 
             setCustomer(b.customer);
             setServices(b.services);
@@ -99,7 +97,7 @@ const AppIconsPermission = (size='50px',iconSize=54) => {
             setSchedule(b.schedule);
 
             setSales(b.sales);
-            setCollection(b.collection);
+           // setCollection(b.collection);
             setSetting(b.setting);
         })
         setIsLoading(false);

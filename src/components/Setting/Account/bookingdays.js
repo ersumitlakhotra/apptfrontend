@@ -38,7 +38,7 @@ const BookingDays = ({ companyList, saveData }) => {
                     <Select
                         value={bookingdays}
                         size="large"
-                        style={{ width: '100%' }}
+                        style={{ width: '100%', fontSize:16 }}
                         onChange={(value) => setBookingdays(value)}
                         options={[
                             { value: 1, label: '1 day' },
@@ -55,7 +55,7 @@ const BookingDays = ({ companyList, saveData }) => {
                 </div>
                 <div class='ml-8 flex flex-col justify-center gap-0 md:w-1/6'>
                     <span class="block mb-2 text-sm font-medium">Auto Acceptance</span>
-                     <Switch style={{width:'50px'}} checkedChildren={'On'} unCheckedChildren={'Off'} value={isAutoAccept} onChange={(e) => setIsAutoAccept(e)} />
+                     <Switch style={{width:'50px', fontSize:16}} checkedChildren={'On'} unCheckedChildren={'Off'} value={isAutoAccept} onChange={(e) => setIsAutoAccept(e)} />
                 </div>
             </div>
 
