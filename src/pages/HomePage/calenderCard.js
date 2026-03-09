@@ -13,7 +13,7 @@ import { AiOutlineStop } from "react-icons/ai";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import AnalogClock from "../../common/clock";
 
-const CalenderCard = () => {
+const CalenderCard = ({ref}) => {
     const navigate = useNavigate();
     const { refresh, getOrder } = useOutletContext();
     const [ordersList, setOrdersList] = useState([]);
@@ -67,7 +67,7 @@ const CalenderCard = () => {
         )
     }
     return (
-        <div class='w-full bg-blue-900 border rounded-3xl p-4 text-gray-800 flex gap-6  shadow-md   hover:shadow-lg '>
+        <div ref={ref} class='w-full bg-blue-900 border rounded-3xl p-4 text-gray-800 flex gap-6  shadow-md   hover:shadow-lg '>
             <IsLoading isLoading={isLoading} input={
                 <>
                     <div class='w-1/3 flex flex-col gap-4 justify-between text-xs font-semibold font-sans  text-white ' onClick={() => navigate('/calender') }>

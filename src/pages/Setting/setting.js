@@ -10,17 +10,26 @@ import Security from "../../components/Setting/Security/security.js";
 import QRcode from "../../components/Setting/QRcode/qrcode.js";
 import ProfileCard from "./profileCard.js";
 import PageHeader from "../../common/pages/pageHeader.js";
-import { useOutletContext } from "react-router-dom";
+import { useLocation, useOutletContext } from "react-router-dom";
 import FetchData from "../../hook/fetchData.js";
 
 const Setting = () => {
     const { saveData,  refresh, setIsLoading } = useOutletContext();
-
+    const location = useLocation();
     const [tabActiveKey, setTabActiveKey] = useState('1');
     const [companyList, setCompanyList] = useState([]);
     const [logoList, setLogoList] = useState([]);
     const [billingList, setBillingList] = useState([]);
- 
+    
+    useEffect(() => {
+        if (location.hash) {
+            const el = document.querySelector(location.hash);
+            if (el) {
+                el.scrollIntoView({ behavior: "smooth" });
+            }
+        }
+    }, [location]);
+
     useEffect(() => {
         Init();
     }, [refresh])
