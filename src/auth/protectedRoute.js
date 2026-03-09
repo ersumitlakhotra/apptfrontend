@@ -7,10 +7,10 @@ import AppIconsPermission from "../common/custom/appIconsPermission";
 
 const ProtectedRoute = ({ children }) => {
     const { isAuthenticated, isLoading } = useAuth();
-    const { apps } = AppIconsPermission();
+    const { apps,isLoading:appsLoading  } = AppIconsPermission();
     const { pathname } = useLocation();
 
-    if (isLoading) {
+    if (isLoading || appsLoading ) {
         return <div
             style={{
                 position: 'fixed',
@@ -33,11 +33,17 @@ const ProtectedRoute = ({ children }) => {
         return <Navigate to="/" replace />
     }
 
-    const allowed = apps.find(item => item.navigate ===pathname)
+    // Wait until apps are loaded
+    if (!apps || apps.length === 0) {
+        return null; // or show fallback / spinner
+    }
 
-    if (!allowed.isVisible) {
+    const allowed = apps.find((item) => item.navigate === pathname);
+
+    // If route not found or not visible → redirect to 404
+    if (!allowed || !allowed.isVisible) {
         return <Navigate to="/404" replace />;
-  }
+    }
 
     return <Outlet/> ;
 };
