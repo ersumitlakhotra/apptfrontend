@@ -122,13 +122,15 @@ const GmailSetup = ({ companyList, saveData }) => {
                         />
                     </li>
                     <li >
-                        <span dangerouslySetInnerHTML={{ __html: `Type <b>App Name -> </b>click <b>CREATE</b> then copy , paste password in <b>App Password field and Save.</b>` }} />
+                        <span dangerouslySetInnerHTML={{ __html: `Type <b>App Name -> </b>click <b>CREATE</b> then copy , paste password in <b>App Password field.</b>` }} />
                         <img
                             draggable={false}
                             alt="app_password_create.gif"
                             src={apppasswordcreate}
                         />
                     </li>
+                     <li dangerouslySetInnerHTML={{ __html: `<b>Save Changes -> </b>Click on <b> Send Test Email</b> to verify that the setup is finished and functioning properly.` }} />
+                   
                 </ol>
             </Modal>
             {contextHolder}

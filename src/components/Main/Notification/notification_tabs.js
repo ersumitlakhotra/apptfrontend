@@ -51,8 +51,8 @@ const NotificationTabs = ({ notificationList,  unread,userList,servicesList,save
                         </div>
                         {item.status === 'Awaiting' &&  item.is_latest &&
                             <div class='flex gap-2 mt-2'>
-                                <Accept id={item.oid} userList={userList} servicesList={servicesList} labelVisible={true} />
-                                <Reject id={item.oid} userList={userList} servicesList={servicesList} labelVisible={true} />
+                                <Accept id={item.oid} labelVisible={true} />
+                                <Reject id={item.oid} labelVisible={true} />
                             </div>
                         }
                     </div>

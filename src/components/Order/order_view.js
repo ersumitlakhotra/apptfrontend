@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Avatar, Button, Divider, Flex, Image, Input, Modal, Radio, Rate, Steps } from "antd";
+import { Avatar, Button, Divider, Flex, Image, Input, Modal, Radio, Rate, Steps, Popconfirm } from "antd";
 import { CheckOutlined, CloseOutlined, CalendarOutlined, ClockCircleOutlined, UnorderedListOutlined, UserOutlined, CreditCardOutlined, SaveOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import { UTC_LocalDateTime } from "../../common/localDate";
@@ -149,14 +149,23 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
                         <span class="text-2xl font-bold text-gray-800">Appointment #{order_no}</span>
                         {status === 'Awaiting' ?
                             <div class='flex gap-2 '>
-                                <Accept id={id} userList={userList} servicesList={servicesList} labelVisible={true} setOpenView={setOpenView}  />
-                                <Reject id={id} userList={userList} servicesList={servicesList} labelVisible={true} setOpenView={setOpenView} />
+                                <Accept id={id} labelVisible={true} setOpenView={setOpenView}  />
+                                <Reject id={id} labelVisible={true} setOpenView={setOpenView} />
                             </div>
                             :
                             (status === 'Pending' || status === 'In progress') &&
                             <div class="flex gap-2">
                                 <Button color="cyan" variant="solid" icon={<CheckOutlined />} size="large" onClick={() => setIsModalOpen(true)}>Completed</Button>
-                                <Button color="danger" variant="solid" icon={<CloseOutlined />} size="large" onClick={() => cancelOrder()}>Cancelled</Button>
+                                    <Popconfirm
+                                        title="Cancel Appointment"
+                                        description="Are you sure to Cancel ? "
+                                        onConfirm={(e) => { e?.stopPropagation(); cancelOrder(); }}
+                                        onCancel={(e) => { e?.stopPropagation(); }}
+                                        okText="Yes"
+                                        cancelText="No"
+                                    >
+                                        <Button color="danger" variant="solid" icon={<CloseOutlined />} size="large">Cancelled</Button>
+                                    </Popconfirm>
 
                                 {/*<Button type='default' icon={<PrinterOutlined />} size="middle">Print</Button>*/}
                             </div>

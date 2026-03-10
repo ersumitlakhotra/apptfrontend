@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, DatePicker, Input,  Popover, Select,  Tooltip } from "antd"
+import { Button, DatePicker, Input,  Popover, Select,  Tooltip,Popconfirm } from "antd"
 import { IoSearchOutline } from "react-icons/io5";
 import { getTableItem } from "../../common/items";
 import DataTable from "../../common/datatable";
 import { useEffect, useState } from "react";
-import {  EditOutlined, EyeOutlined } from '@ant-design/icons';
+import {  EditOutlined, EyeOutlined ,CloseOutlined} from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { Tags } from "../../common/tags";
 import Services from "../../common/services";
@@ -13,6 +13,8 @@ import { UTC_LocalDateTime, get_Date } from "../../common/localDate";
 import IsLoading from "../../common/custom/isLoading.js";
 import { useOutletContext } from "react-router-dom";
 import { useResponseButtons } from './responseButton.js'
+import useAlert from "../../common/alert.js";
+import { useEmail } from "../../email/email.js";
 
 const OrderTabs = ({ index, orderList, fromDate, setFromDate, toDate, setToDate, setExportList ,isLoading}) => {
     const { saveData,viewOrder, editOrder,servicesList, userList,isAdmin } = useOutletContext();
@@ -20,6 +22,8 @@ const OrderTabs = ({ index, orderList, fromDate, setFromDate, toDate, setToDate,
     const [filteredList, setFilteredList] = useState(orderList);
     const [list, setList] = useState(orderList);
     const { Accept, Reject } = useResponseButtons(saveData);
+    const { contextHolderModal, confirmEmail } = useAlert();
+    const {AppointmentStatus} = useEmail();
 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -75,7 +79,18 @@ const OrderTabs = ({ index, orderList, fromDate, setFromDate, toDate, setToDate,
         getTableItem('9', 'Action'),
     ];
 
-
+   const cancelOrder = async (id,customerEmail) => {
+        const sendEmail_To_Customer = await confirmEmail(AppointmentStatus.CANCELLED,customerEmail);
+        saveData({
+            label: "Appointment",
+            method: 'POST',
+            endPoint: "order/cancel",
+            id: id,
+            email:sendEmail_To_Customer,
+            status: AppointmentStatus.CANCELLED,
+            body: []
+        });
+    }
     return (
         <div key={index} class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
             <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
@@ -163,11 +178,23 @@ const OrderTabs = ({ index, orderList, fromDate, setFromDate, toDate, setToDate,
                                             <Tooltip placement="top" title={'View'} >
                                                 <Button type="link" icon={<EyeOutlined />} onClick={() => viewOrder(item.id)} />
                                             </Tooltip>
+                                            {(item.status === 'Pending' || item.status === 'In progress') && <Tooltip placement="top" title={'Cancel'} >
+                                                <Popconfirm
+                                                    title="Cancel Appointment"
+                                                    description="Are you sure to Cancel ? "
+                                                    onConfirm={(e) => { e?.stopPropagation(); cancelOrder(item.id, item.email); }}
+                                                    onCancel={(e) => { e?.stopPropagation(); }}
+                                                    okText="Yes"
+                                                    cancelText="No"
+                                                >
+                                                    <Button color="danger" variant="solid" icon={<CloseOutlined />} size="small" />
+                                                </Popconfirm>
+                                            </Tooltip>}
                                         </>
                                     :
                                         <div class='flex flex-row gap-2 items-center '>
-                                            <Accept id={item.id} userList={userList} servicesList={servicesList}/>
-                                            <Reject id={item.id} userList={userList} servicesList={servicesList}/>
+                                            <Accept id={item.id}/>
+                                            <Reject id={item.id}/>
                                         </div> 
                                     }
                                     {/*
@@ -179,6 +206,7 @@ const OrderTabs = ({ index, orderList, fromDate, setFromDate, toDate, setToDate,
                         ))
                     )} />
             } />
+            {contextHolderModal}
         </div>
     )
 

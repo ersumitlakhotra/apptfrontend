@@ -39,8 +39,8 @@ const AppointmentCards = ({ index, data, userList, servicesList, onClick, saveDa
 
                         </div>
                         <div class='flex flex-row gap-2 items-center justify-end sticky z-30'>
-                            <Accept id={index} userList={userList} servicesList={servicesList} />
-                            <Reject id={index} userList={userList} servicesList={servicesList} />
+                            <Accept id={index}/>
+                            <Reject id={index} />
                         </div>
 
                     </div>

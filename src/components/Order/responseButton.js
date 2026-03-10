@@ -7,7 +7,7 @@ import { useEmail } from "../../email/email";
 export const useResponseButtons = (saveData) => {
     const { AppointmentStatus } = useEmail();
 
-    const onSave = (id, status, userList, servicesList) => {
+    const onSave = (id, status) => {
         saveData({
             label: "Appointment",
             method: 'POST',
@@ -16,27 +16,25 @@ export const useResponseButtons = (saveData) => {
             logs: true,
             email: true,
             body: [],
-            status: status,
-            userList: userList,
-            servicesList: servicesList
+            status: status
         })
     }
-    const Accept = ({ id, userList, servicesList, labelVisible = false, size = "middle", setOpenView =null}) => {
+    const Accept = ({ id, labelVisible = false, size = "middle", setOpenView =null}) => {
         return (
             <Tooltip placement="top" title={'Accept'} >
-                <Button color="cyan" variant="solid" icon={<MdDownloadDone size={12} />} size={size} onClick={(e) => { e.stopPropagation(); onSave(id, AppointmentStatus.CONFIRMED, userList, servicesList); setOpenView !== null && setOpenView(false)  }} >
+                <Button color="cyan" variant="solid" icon={<MdDownloadDone size={12} />} size={size} onClick={(e) => { e.stopPropagation(); onSave(id, AppointmentStatus.CONFIRMED); setOpenView !== null && setOpenView(false)  }} >
                 {labelVisible && 'Accept'}</Button>
             </Tooltip>
         )
     }
 
-    const Reject = ({ id, userList, servicesList, labelVisible = false, size = "middle", setOpenView = null }) => {
+    const Reject = ({ id, labelVisible = false, size = "middle", setOpenView = null }) => {
         return (
             <Tooltip placement="top" title={'Reject'} >
                 <Popconfirm
                     title="Reject"
                     description="Are you sure to Reject ? "
-                    onConfirm={(e) => { e?.stopPropagation(); onSave(id, AppointmentStatus.REJECTED, userList, servicesList); setOpenView !== null && setOpenView(false) ;}}
+                    onConfirm={(e) => { e?.stopPropagation(); onSave(id, AppointmentStatus.REJECTED); setOpenView !== null && setOpenView(false) ;}}
                     onCancel={(e) =>{e?.stopPropagation();}}
                     okText="Yes"
                     cancelText="No"

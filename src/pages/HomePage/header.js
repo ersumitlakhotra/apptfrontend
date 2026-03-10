@@ -223,8 +223,8 @@ setNotificationFilteredList(notification);
                                                     </div>
                                                     :
                                                     <div class='flex flex-row gap-2 items-center '>
-                                                        <Accept id={item.id} userList={userList} servicesList={servicesList} />
-                                                        <Reject id={item.id} userList={userList} servicesList={servicesList} />
+                                                        <Accept id={item.id} />
+                                                        <Reject id={item.id} />
                                                     </div>
                                                 }
                                             </div>

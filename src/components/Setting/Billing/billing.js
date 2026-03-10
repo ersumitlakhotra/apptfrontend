@@ -104,13 +104,11 @@ const Billing = ({ companyList,billingList, saveData }) => {
 
     const headerItems = [
         getTableItem('1', 'Invoice #'),
-        getTableItem('2', 'Date'),
-        getTableItem('3', 'Due'),
-        getTableItem('4', 'Sub Total'),
-        getTableItem('5', 'Tax'),
-        getTableItem('6', 'Total'),
-        getTableItem('7', 'Status'),
-        getTableItem('8', 'Action'),
+        getTableItem('2', 'Invoice Date'),
+        getTableItem('3', 'Due Date'),
+        getTableItem('4', 'Total'),
+        getTableItem('5', 'Status'),
+        getTableItem('6', 'Action'),
     ];
     const btn_ViewClick = (id) => {
         setReload(reload + 1);
@@ -218,8 +216,6 @@ const Billing = ({ companyList,billingList, saveData }) => {
                                     <td class="p-3 text-blue-500 italic hover:underline cursor-pointer" ># {item.invoice}</td>
                                     <td class="p-3">{dayjs(item.trndate).format('DD MMM YYYY')}</td>
                                     <td class="p-3">{dayjs(item.duedate).format('DD MMM YYYY')}</td>
-                                    <td class="p-3 font-semibold">$ {item.subtotal}</td>
-                                    <td class="p-3 font-semibold">$ {item.taxamount}</td>
                                     <td class="p-3 font-semibold">$ {item.totalamount}</td>
                                      <td class="p-3">{Tags(item.status)}</td>
                                     <td class="p-3">

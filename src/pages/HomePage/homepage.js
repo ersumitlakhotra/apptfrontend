@@ -18,7 +18,7 @@ const Homepage = () => {
     const { apps, isLoading } = AppIconsPermission();
     const {isAdmin, isLoading:homepageLoading, companyList}  = useOutletContext()
     const {contextHolderModal,allowAdminOnly} = useAlert();
-    const [isGmailPending, setIsGmailPending] = useState(true);
+    const [isGmailPending, setIsGmailPending] = useState(false);
 
     const ref1 = useRef(null);
     const ref2 = useRef(null);
@@ -73,7 +73,11 @@ const Homepage = () => {
             if (companyList.emailuser !== null && companyList.emailpass !== null) {
                 if (companyList.emailpass.length === 16 && checkGmail(companyList.emailuser))
                     setIsGmailPending(false);
+                else
+                setIsGmailPending(true);
             }
+            else
+                setIsGmailPending(true);
         }  
     }, [companyList])
 

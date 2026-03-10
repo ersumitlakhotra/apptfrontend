@@ -2,17 +2,20 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { useState } from "react";
 import { DownOutlined, LoadingOutlined, MailFilled } from '@ant-design/icons';
-import { Drawer, Spin, Input, Button, Dropdown } from 'antd';
+import { Drawer, Spin, Input, Button, Dropdown,Select } from 'antd';
 import { apiCalls } from "../../hook/apiCall.js";
 import useAlert from "../../common/alert.js";
 import { isValidEmail, setCellFormat } from "../../common/cellformat.js";
 import CountdownTimer from "../../common/countTimer.js";
+import {canadaRegions,usStates} from "../../common/province.js"
 
 export const Signup = ({ logo }) => {
   const [business_name, setBusinessName] = useState('');
   const [cell, setCell] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [country, setCountry] = useState('Canada');
+  const [province, setProvince] = useState('ON');
   const [pricing, setPricing] = useState(0.00);
   const [menuOption, setMenuOption] = useState('FREE TRIAL : $ 0.00 / 30 days');
   const [plan, setPlan] = useState('FREE TRIAL');
@@ -23,16 +26,16 @@ export const Signup = ({ logo }) => {
   const [openVerification, setOpenVerification] = useState(false);
 
 
-    const items = [
-        { key: 'FREE TRIAL', label: 'FREE TRIAL : $ 0.00 / 30 days',price:0.00 },
-        { key: 'STANDARD', label: 'STANDARD : $ 100.00 / Month',price:100.00 },
-        { key: 'ENTERPRISE', label: 'ENTERPRISE : $ 150.00 / Month',price:150.00 },
-    ];
-    const onItemChanged = e => {  items.filter(item => item.key === e.key).map(res => {setPricing(res.price); setPlan(res.key); setMenuOption(res.label);})  };
-    const menuProps = { items, onClick: onItemChanged };
+  const items = [
+    { key: 'FREE TRIAL', label: 'FREE TRIAL : $ 0.00 / 30 days', price: 0.00 },
+    { key: 'STANDARD', label: 'STANDARD : $ 100.00 / Month', price: 100.00 },
+    { key: 'ENTERPRISE', label: 'ENTERPRISE : $ 150.00 / Month', price: 150.00 },
+  ];
+  const onItemChanged = e => { items.filter(item => item.key === e.key).map(res => { setPricing(res.price); setPlan(res.key); setMenuOption(res.label); }) };
+  const menuProps = { items, onClick: onItemChanged };
 
   const onSubmit = async () => {
-    if (business_name !== '' && cell !== '' && cell.length === 12 && email !== '' && isValidEmail(email) && password !== '') {
+    if (business_name !== '' && cell !== '' && cell.length === 12 && email !== '' && isValidEmail(email) && password !== '' && province !=='' && country !=='') {
       setLoading(true);
       try {
         const body = JSON.stringify({ email: email });
@@ -101,6 +104,13 @@ export const Signup = ({ logo }) => {
           slot: 30,
           pricing: pricing,
           plan: plan,
+          addressinfo: [{
+            street: '',
+            city: '',
+            province: province,
+            country: country,
+            postal: ''
+          }],
           timinginfo: [{
             monday: ['09:00:00', '21:00:00', true],
             tuesday: ['09:00:00', '21:00:00', true],
@@ -183,6 +193,32 @@ export const Signup = ({ logo }) => {
                 placeholder="Business Name" required onChange={(e) => setBusinessName(e.target.value)} />
             </div>
             <div>
+              <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Country <span class='text-red-500'>*</span></label>
+              <Select
+                value={country}
+                style={{ width: '100%', fontSize: 16, backgroundColor:'#f9fafb' }}
+                size="large"
+                onChange={(value) => { setCountry(value);setProvince('') }}
+                options={[
+                  { value: 'Canada', label: 'Canada' },
+                  { value: 'USA', label: 'USA' },
+                ]}
+              />
+            </div>
+            <div>
+              <label for="province" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Province <span class='text-red-500'>*</span></label>
+              <Select
+                value={province}
+                style={{ width: '100%', fontSize: 16, backgroundColor:'#f9fafb' }}
+                size="large"
+                onChange={(value) => { setProvince(value); }}
+                options={(country === 'USA' ? usStates: canadaRegions).map(item => ({
+                  value: item.code,
+                  label: item.name
+                }))}
+              />
+            </div>
+            <div>
               <label for="cell" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cell number <span class='text-red-500'>*</span></label>
               <input type="tel" name="cell" id="cell" value={cell}
                 class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -199,16 +235,16 @@ export const Signup = ({ logo }) => {
               <input type="password" name="password" id="password" placeholder="••••••••" value={password}
                 class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 required onChange={(e) => setPassword(e.target.value)} />
-            </div>  
+            </div>
             <div>
               <label for="plan" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Pricing Plan <span class='text-red-500'>*</span></label>
               <Dropdown menu={menuProps} className="flex flex-row items-center justify-start" >
-                    <Button size="large" style={{width:'100%'}} >
-                        <div class="w-full text-sm flex flex-row items-center justify-between">
-                            {menuOption}
-                            <DownOutlined />
-                        </div>
-                    </Button>
+                <Button size="large" style={{ width: '100%' }} >
+                  <div class="w-full text-sm flex flex-row items-center justify-between">
+                    {menuOption}
+                    <DownOutlined />
+                  </div>
+                </Button>
               </Dropdown>
             </div>
             <div class="flex items-center justify-between">
