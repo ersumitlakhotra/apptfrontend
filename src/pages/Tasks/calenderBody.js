@@ -42,8 +42,8 @@ const CalenderBody = ({ slots, orderList,isLoading }) => {
                                 <Button type="link" icon={<EditOutlined />} size="small" onClick={() => editOrder(c.id, c.order_no)} />
                             </Tooltip> :
                             <div class='flex flex-row gap-2 items-center '>
-                                <Accept id={c.id} userList={userList} servicesList={servicesList} size="small" />
-                                <Reject id={c.id} userList={userList} servicesList={servicesList} size="small" />
+                                <Accept id={c.id} size="small" />
+                                <Reject id={c.id} size="small" />
                             </div>
                         }
                     </div>

@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
     },
     column: {
         width: "45%",
+        fontSize:10
     },
     bold: {
         fontWeight: "bold",
@@ -71,6 +72,8 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         padding: 6,
         borderBottom: "1 solid #ccc",
+        borderLeft: "1 solid #ccc",
+        borderRight: "1 solid #ccc",
     },
     colDesc: { width: "50%" },
     colQty: { width: "15%", textAlign: "center" },
@@ -101,7 +104,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#184d8f",
         color: "white",
         padding: 6,
-        width: "40%",
+        width: "35%",
         justifyContent: "space-between",
     },
 
@@ -153,41 +156,56 @@ const styles = StyleSheet.create({
         letterSpacing: 2,
     },
 
+    textBold: { fontFamily: "Helvetica-Bold" },
+    invDetail: { flexDirection: "row", justifyContent: "flex-end", textAlign: 'left', marginTop:20 },
+    invDetailRow: { flexDirection: "row", justifyContent: "space-between", textAlign: 'left' ,marginBottom:10},
+
+
 });
 
-const InvoicePDF = ({ data,id, refresh, billingList }) => {
-    const {
-        
-        items,
-        bank,
-    } = data;
-
-    const subtotal = items.reduce(
-        (acc, item) => acc + item.qty * item.price,
-        0
-    );    
+const InvoicePDF = ({ id, refresh, billingList }) => {
+ 
         const [invoice, setInvoice] = useState('');
         const [trnDate, setTrnDate] = useState('');
         const [dueDate, setDueDate] = useState('');
+        const [pricing, setPricing] = useState('');
         const [subTotal, setSubTotal] = useState('');
+        const [discount, setDiscount] = useState('');
         const [taxAmount, setTaxAmount] = useState('');
         const [tax, setTax] = useState('');
         const [total, setTotal] = useState('');
         const [status, setStatus] = useState('');
-        const [billTo, setBillTo] = useState([{name:'',phone:'',address:''}]);
-        const [from, setFrom] = useState([{name:'',phone:'',address:''}]);
+        const [billTo, setBillTo] = useState({name:'',cell:'',email:'',address:''});
+        const [from, setFrom] = useState({name:'',cell:'',email:'',address:''});
     
         useEffect(() => {
             const editList = billingList.find(item => item.id === id)
             setInvoice(editList.invoice);
             setTrnDate(editList.trndate);
             setDueDate(editList.duedate);
+            setPricing(editList.pricing)
             setSubTotal(editList.subtotal);
+            setDiscount(editList.discount);
             setTaxAmount(editList.taxamount);
             setTax(editList.tax);
             setTotal(editList.totalamount);
             setStatus(editList.status);
-           
+             if (editList.companyInfo !== null) {
+                setBillTo({
+                    name:editList.companyInfo[0].name,
+                    cell:editList.companyInfo[0].cell,
+                    email:editList.companyInfo[0].email,
+                    address:editList.companyInfo[0].address,
+                })
+            }
+             if (editList.ischeduleInfo !== null) {
+                setFrom({
+                    name:editList.ischeduleInfo[0].name,
+                    cell:editList.ischeduleInfo[0].cell,
+                    email:editList.ischeduleInfo[0].email,
+                    address:editList.ischeduleInfo[0].address,
+                })
+            }
         }, [refresh, id])
     
     return (
@@ -209,20 +227,30 @@ const InvoicePDF = ({ data,id, refresh, billingList }) => {
                         <View style={styles.column}>
                             <Text style={styles.bold}>Bill To:</Text>
                             <Text>{billTo.name}</Text>
-                            <Text>{billTo.phone}</Text>
+                            <Text>{billTo.cell}</Text>
+                            <Text>{billTo.email}</Text>
                             <Text>{billTo.address}</Text>
                         </View>
 
                         <View style={styles.column}>
                             <Text style={styles.bold}>From:</Text>
                             <Text>{from.name}</Text>
-                            <Text>{from.phone}</Text>
+                            <Text>{from.cell}</Text>
+                            <Text>{from.email}</Text>
                             <Text>{from.address}</Text>
                         </View>
                     </View>
 
-                    <Text style={{ marginBottom: 10 }}>Date: {get_Date(trnDate,'DD MMM, YYYY')}</Text>
+                    <View style={styles.column}>
+                        <Text style={{  marginTop: 10 }}>
+                            <Text style={styles.bold}>Invoice Date : </Text>{get_Date(trnDate, 'DD MMM, YYYY')}
+                        </Text> 
+                        <Text style={{ marginBottom: 10 }}>
+                            <Text style={styles.bold}>Due Date      : </Text>{get_Date(dueDate, 'DD MMM, YYYY')}
+                        </Text>
 
+                    </View>
+                    
                     {/* Table Header */}
                     <View style={styles.tableHeader}>
                         <Text style={styles.colDesc}>Description</Text>
@@ -232,31 +260,40 @@ const InvoicePDF = ({ data,id, refresh, billingList }) => {
                     </View>
 
                     {/* Table Rows */}
-                    <View key={1} style={styles.tableRow}>
+                    <View key={99} style={styles.tableRow}>
                         <Text style={styles.colDesc}>Software data management</Text>
                         <Text style={styles.colQty}>1</Text>
-                        <Text style={styles.colPrice}>${parseFloat(subTotal).toFixed(2)}</Text>
-                        <Text style={styles.colTotal}>${parseFloat(subTotal).toFixed(2)}</Text>
+                        <Text style={styles.colPrice}>${pricing}</Text>
+                        <Text style={styles.colTotal}>${pricing}</Text>
                     </View>
+                     {/* Empty Table Rows */}
+                    {Array.from({ length: 4 }).map((_, index) => (
+                        <View key={index} style={styles.tableRow}>
+                        <Text style={styles.colDesc}> </Text>
+                        <Text style={styles.colQty}> </Text>
+                        <Text style={styles.colPrice}> </Text>
+                        <Text style={styles.colTotal}> </Text>
+                        </View>
+                    ))}
 
                     {/* Circular Status Stamp */}                  
                     <View style={styles.stampWrapper}>
                         <View
                             style={[
                                 styles.stampOuter,
-                                { borderColor: status === "PAID" ? "green" : "red" },
+                                { borderColor: status.toLowerCase() === "paid" ? "green" : "red" },
                             ]}
                         >
                             <View
                                 style={[
                                     styles.stampInner,
-                                    { borderColor: status === "PAID" ? "green" : "red" },
+                                    { borderColor:  status.toLowerCase() === "paid" ? "green" : "red" },
                                 ]}
                             >
                                 <Text
                                     style={[
                                         styles.stampText,
-                                        { color: status === "PAID" ? "green" : "red" },
+                                        { color:  status.toLowerCase() === "paid" ? "green" : "red" },
                                     ]}
                                 >
                                     {status}
@@ -264,14 +301,32 @@ const InvoicePDF = ({ data,id, refresh, billingList }) => {
                             </View>
                         </View>
                     </View>
+                    {/* Invoice Details */}
+                    <View style={styles.invDetail}>
+                        <View style={{ flexDirection: "column", columnGap: 10, width: '30%', marginRight: 10 }}>
+                            {parseFloat(discount) > 0 && <View style={styles.invDetailRow}>
+                                <Text style={styles.text}>Discount</Text>
+                                <Text style={styles.text}>${parseFloat(discount).toFixed(2)}</Text>
+                            </View>}
+                            <View style={styles.invDetailRow}>
+                                <Text style={styles.text}>Sub total</Text>
+                                <Text style={styles.text}>${parseFloat(subTotal).toFixed(2)}</Text>
+                            </View>
+                            
+                             <View style={styles.invDetailRow}>
+                                <Text style={styles.text}>Tax ({tax})</Text>
+                                <Text style={styles.text}>${parseFloat(taxAmount).toFixed(2)}</Text>
+                            </View>
+                        </View>
+                    </View>
 
-                    {/* Subtotal */}
+                    {/* Subtotal 
                     <View style={styles.subtotalContainer}>
                         <View style={styles.subtotalBox}>
                             <Text>Sub Total</Text>
                             <Text>${parseFloat(subTotal).toFixed(2)}</Text>
                         </View>
-                    </View>
+                    </View>*/}
 
                     {/* Total */}
                     <View style={styles.totalContainer}>

@@ -199,7 +199,7 @@ const ProtectedLayout = () => {
         setRefresh(refresh + 1);
     }
 
-    const saveData = async ({ label, method, endPoint, id = null, body = null, notify = true, logs = true, email = false, status = null, userList = [], servicesList = [] }) => {
+    const saveData = async ({ label, method, endPoint, id = null, body = null, notify = true, logs = true, email = false, status = null }) => {
         setIsLoading(true)
         const res = await SaveData({
             label: label,
@@ -209,7 +209,7 @@ const ProtectedLayout = () => {
             body: body
         })
         if (email)
-            sendEmail({ id: res.data.id, status: status, userList: userList, servicesList: servicesList })
+            sendEmail({ id: res.data.id, status: status, userList, servicesList })
         setIsLoading(false)
 
         if (res.isSuccess) {

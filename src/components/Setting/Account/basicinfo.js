@@ -1,15 +1,17 @@
-import { Avatar, Button, Image } from "antd";
+import { Avatar, Button, Image, Select } from "antd";
 import { CloudUploadOutlined, UserOutlined } from '@ant-design/icons';
 import { setCellFormat } from "../../../common/cellformat.js"
 import Heading from "../../../common/heading.js";
-import {Textbox} from "../../../common/textbox.js";
+import {Textbox, TextboxFlexCol} from "../../../common/textbox.js";
 import { FcInfo } from "react-icons/fc";
 import { useEffect, useRef, useState } from "react";
 import useAlert from "../../../common/alert.js";
+import { usStates,canadaRegions } from "../../../common/province.js";
 
 const BasicInfo = ({ companyList, saveData, logoList }) => {
 
     const ref = useRef();
+    const { contextHolder, error,warning } = useAlert();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [cell, setCell] = useState('');
@@ -49,26 +51,29 @@ const BasicInfo = ({ companyList, saveData, logoList }) => {
     }
 
     const save = async () => {
-        const Body = JSON.stringify({
-            name:name,
-            cell:cell,
-            addressinfo: [{
-                street: street,
-                city: city,
-                province: province,
-                country: country,
-                postal: postal
-            }]
-        });
-        saveData({
-            label:headingLabel,
-            method: "PUT", 
-            endPoint:"company/address",
-            body: Body
-        });
+        if (name !== '' && province !== '' && country !== '') {
+            const Body = JSON.stringify({
+                name: name,
+                cell: cell,
+                addressinfo: [{
+                    street: street,
+                    city: city,
+                    province: province,
+                    country: country,
+                    postal: postal
+                }]
+            });
+            saveData({
+                label: headingLabel,
+                method: "PUT",
+                endPoint: "company/address",
+                body: Body
+            });
+        }
+        else
+            warning('Please, fill out the required fields !') 
     }
 
-    const { contextHolder, error } = useAlert();
 
     const handleFileChange = (event) => {
         const file = event.target.files[0]; // Access the first selected file
@@ -126,7 +131,7 @@ const BasicInfo = ({ companyList, saveData, logoList }) => {
                 </div>
 
                 <div class='flex flex-col gap-6  md:flex-row'>
-                    <div class='md:w-1/3'> <Textbox type={'text'} label={'Name'} value={name} setValue={setName} placeholder={'Business name'} /></div>
+                    <div class='md:w-1/3'> <Textbox type={'text'} isRequired={true}  label={'Name'} value={name} setValue={setName} placeholder={'Business name'} /></div>
                     <div class='md:w-1/3'> <Textbox type={'tel'} label={'Cell'} value={cell} setValue={setCellValue} placeholder={'(111)-222-3333'} /></div>
                     <div class='md:w-1/3'> <Textbox type={'email'} label={'E-Mail'} value={email} setValue={setEmail} placeholder={'name@company.com'} isDisable={true} footer="Please contact us to change your email" /></div>
                 </div>
@@ -135,9 +140,32 @@ const BasicInfo = ({ companyList, saveData, logoList }) => {
 
                 <div class='flex flex-col gap-6 mt-6 md:flex-row'>
                     <div class='md:w-1/4'> <Textbox type={'text'} label={'City'} value={city} setValue={setCity} placeholder={'City name'} /></div>
-                    <div class='md:w-1/4'><Textbox type={'text'} label={'Province'} value={province} setValue={setProvince} placeholder={'Province'} /></div>
-                    <div class='md:w-1/4'> <Textbox type={'text'} label={'Country'} value={country} setValue={setCountry} placeholder={'Country'} /></div>
+                    <div class='md:w-1/4'> <TextboxFlexCol label={"Province"} mandatory={true} input={
+                        <Select
+                            value={province}
+                            status={province === '' ? 'error' : ''}
+                            style={{ width: '100%',height: 45,  fontSize: 16, backgroundColor: '#f9fafb' }}
+                            size="large"
+                            onChange={(value) => { setProvince(value); }}
+                            options={(country === 'USA' ? usStates : canadaRegions).map(item => ({
+                                value: item.code,
+                                label: item.name
+                            }))}
+                        />} /></div>
+                    <div class='md:w-1/4'> <TextboxFlexCol label={"Country"} mandatory={true} input={
+                        <Select
+                            value={country}
+                            status={country === '' ? 'error' : ''}
+                            style={{ width: '100%', height: 45, fontSize: 16, backgroundColor: '#f9fafb' }}
+                            size="large"
+                            onChange={(value) => { setCountry(value); setProvince('') }}
+                            options={[
+                                { value: 'Canada', label: 'Canada' },
+                                { value: 'USA', label: 'USA' },
+                            ]}
+                        />} /></div>
                     <div class='md:w-1/4'> <Textbox type={'text'} label={'Postal'} value={postal} setValue={setPostal} placeholder={'Postal code'} /></div>
+                    
                 </div>
             </div>
 

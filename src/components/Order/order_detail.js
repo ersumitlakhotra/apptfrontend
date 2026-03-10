@@ -197,9 +197,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     logs:true,
                     email:sendEmail_To_Customer, //sendEmail === 'yes',
                     status: statusAppoint,//id !== 0 ? (status ==='Cancelled'? AppointmentStatus.CANCELLED : AppointmentStatus.RESCHEDULED) : AppointmentStatus.CONFIRMED,
-                    body: Body,
-                    userList:userList,
-                    servicesList:servicesList
+                    body: Body
                 });
                 setOpen(false);
                 
