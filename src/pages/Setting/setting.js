@@ -14,21 +14,34 @@ import { useLocation, useOutletContext } from "react-router-dom";
 import FetchData from "../../hook/fetchData.js";
 
 const Setting = () => {
-    const { saveData,  refresh, setIsLoading } = useOutletContext();
+    const { saveData,  refresh, setIsLoading, companyList,getCompany, billingList,getBilling } = useOutletContext();
     const location = useLocation();
     const [tabActiveKey, setTabActiveKey] = useState('1');
-    const [companyList, setCompanyList] = useState([]);
     const [logoList, setLogoList] = useState([]);
-    const [billingList, setBillingList] = useState([]);
+
     
-    useEffect(() => {
-        if (location.hash) {
-            const el = document.querySelector(location.hash);
-            if (el) {
-                el.scrollIntoView({ behavior: "smooth" });
-            }
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tab = params.get("tab");
+
+    if (tab) {
+      setTabActiveKey(tab);
+    }
+  }, [location.search]);
+
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace("#", "");
+
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
         }
-    }, [location]);
+      }, 200);
+    }
+  }, [tabActiveKey, location.hash]);
+
 
     useEffect(() => {
         Init();
@@ -37,22 +50,13 @@ const Setting = () => {
     const Init = async () => {
         setIsLoading(true);
 
-        const companyResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'company'
-        })
+        await getCompany();
+        await getBilling();
         const logoResponse = await FetchData({
             method: 'GET',
             endPoint: 'logo'
         })
-        const billingResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'billing'
-        })
-        setCompanyList(companyResponse.data);
         setLogoList(logoResponse.data);
-        setBillingList(billingResponse.data);
-
         setIsLoading(false);
     }
 
@@ -70,7 +74,7 @@ const Setting = () => {
             <PageHeader label={'Settings'} isExport={false} isCreate={false} />
             <ProfileCard refresh={refresh} />
             <div class='w-full p-4'>
-                <Tabs items={tabItems} activeKey={tabActiveKey} onChange={(e) => { setTabActiveKey(e) }} />
+                <Tabs items={tabItems} activeKey={tabActiveKey} onChange={(e) => { setTabActiveKey(e) }}  destroyInactiveTabPane={false} />
             </div>
         </div>
     )

@@ -105,5 +105,17 @@ function getDay(date,short=false) {
     const dayNum = dayjs(get_Date(date, 'YYYY-MM-DD')).get('day');
     return weekdays[dayNum];
 }
+function getMonthName (monthNumber) {
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
 
-export { LocalDate, LocalTime, LocalDateTime, UTC_LocalDateTime, firstDateOfMonth, lastDateOfMonth, UTC_LocalDateTime_relative, get_Date ,getDay}
+  // Convert string/number to integer
+  const index = parseInt(monthNumber, 10) - 1;
+
+  // Return month name if valid, else empty string
+  return months[index] || "";
+};
+
+export { LocalDate, LocalTime, LocalDateTime, UTC_LocalDateTime, firstDateOfMonth, lastDateOfMonth, UTC_LocalDateTime_relative, get_Date ,getDay,getMonthName}

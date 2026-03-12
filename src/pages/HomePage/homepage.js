@@ -7,18 +7,23 @@ import UserSchedule from "./userSchedule";
 import IsLoading from "../../common/custom/isLoading";
 import AppIconsPermission from "../../common/custom/appIconsPermission";
 import { useEffect, useRef, useState } from "react";
-import {  Tour } from 'antd';
+import { Tour } from 'antd';
 import awaitingGif from '../../Images/tour/awaiting_request.gif'
 import Warning from "./warning";
-import { RiErrorWarningLine } from "react-icons/ri";
 import useAlert from "../../common/alert";
+import { checkBillingDetails, checkEmailStatus, checkPlanStatus, handleCardExpired } from "./general";
+import { get_Date } from "../../common/localDate";
+
+function getMessageItem(key, label, type, description,moveto) {
+    return { key, label, type, description,moveto };
+} 
 
 const Homepage = () => {
     const navigate = useNavigate();
     const { apps, isLoading } = AppIconsPermission();
-    const {isAdmin, isLoading:homepageLoading, companyList}  = useOutletContext()
-    const {contextHolderModal,allowAdminOnly} = useAlert();
-    const [isGmailPending, setIsGmailPending] = useState(false);
+    const { isAdmin, isLoading: homepageLoading, setIsLoading, companyList,billingList } = useOutletContext()
+    const { contextHolderModal, allowAdminOnly } = useAlert();
+    const [messageList,setMessageList] = useState([])
 
     const ref1 = useRef(null);
     const ref2 = useRef(null);
@@ -59,33 +64,48 @@ const Homepage = () => {
         },
     ];
 
-    const handleClick = () => {
-        if (!isAdmin) allowAdminOnly(); 
-        else navigate("/setting#gmailsetup")
-    };
-
-    const checkGmail = (value) => {
-        const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-        return gmailRegex.test(value);
-    };
     useEffect(() => {
-        if (companyList.length !== 0) {
-            if (companyList.emailuser !== null && companyList.emailpass !== null) {
-                if (companyList.emailpass.length === 16 && checkGmail(companyList.emailuser))
-                    setIsGmailPending(false);
-                else
-                setIsGmailPending(true);
-            }
-            else
-                setIsGmailPending(true);
-        }  
-    }, [companyList])
+        setIsLoading(true)
+        if (companyList.length !== 0 && isAdmin) {
+            let messages=[];
 
+            const checkEmail = checkEmailStatus(companyList);
+            if (checkEmail.status)
+                messages.push(getMessageItem(1, 'Email', 'warning', checkEmail.message, "/setting?tab=1#gmailsetup"))
+
+            const checkPlan = checkPlanStatus(companyList.plan,companyList.createdat)          
+            if (checkPlan.status)
+                messages.push(getMessageItem(2, 'Plan', 'error', checkPlan.message+' <b><u> Upgrade Plan </u></b>', "/setting?tab=2#plans"))
+            
+
+            if (companyList.plan !== "FREE TRIAL") {
+                const checkBilling = checkBillingDetails(companyList);
+                if (checkBilling.status)
+                    messages.push(getMessageItem(3, 'BillingInformation', 'warning', checkBilling.message, "/setting?tab=2#billingdetail"))
+                      
+                const checkInvoice = billingList.filter(items => items.status.toLowerCase() === 'unpaid')
+                if (checkInvoice.length > 0)
+                {
+                    messages.push(getMessageItem(4, 'Invoice', 'warning', `Your next payment bill is ready and due on ${get_Date(checkInvoice[0].duedate,'MMM DD, YYYY')}`, "/setting?tab=2#invoice"));
+                    (checkInvoice[0].failedreason || '').length > 0 && messages.push(getMessageItem(5, 'Payment Failed', 'error', `Oops! Your payment failed! ${checkInvoice[0].failedreason || ''}`, "/setting?tab=2#invoice"))
+                }
+
+            }
+            setMessageList(messages);
+        }
+        setIsLoading(false)
+    }, [companyList,billingList])
+
+
+   
     return (
         <div className=" relative">
-            <IsLoading isLoading={homepageLoading} input={
-                isGmailPending && <Warning icon={<RiErrorWarningLine size={24} />} title={'Warning !'} onClick={handleClick} description={"Your Gmail account is not configured yet ! Please go to <b>Setting -> Gmail Notification Setup</b> -> set your <b>E-Mail</b> and <b>App Password</b>."} btnlabel={'Go to setup'} />}
-            />
+            {isAdmin &&
+                <IsLoading isLoading={homepageLoading} input={
+                messageList.map(items => (
+                    <Warning key={items.key} type={items.type} onClick={() => navigate(items.moveto)} description={items.description} />
+                ))} />
+            }
             <div class='flex flex-col gap-8 p-4 '>
                 <div class='w-full flex flex-col md:flex-row gap-8 '>
                     <div class='w-full md:w-4/12 flex flex-col gap-6'>
