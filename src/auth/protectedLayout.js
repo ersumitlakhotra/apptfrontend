@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Header from "../pages/HomePage/header";
 import useAlert from "../common/alert";
 import SaveData from "../hook/saveData";
 import { useEffect, useRef, useState } from "react";
-import { Button, Drawer, Popconfirm, Space, Spin, Tooltip } from "antd";
+import { Button, Drawer, Modal, Popconfirm, Space, Spin, Tooltip } from "antd";
 import { DeleteOutlined, LoadingOutlined, SaveOutlined } from '@ant-design/icons';
 import Footer from "../pages/HomePage/footer";
 import { useEmail } from "../email/email";
@@ -16,18 +16,21 @@ import OrderDetail from "../components/Order/order_detail";
 import UserDetail from "../components/Users/user_detail";
 import ScheduleDetail from "../components/Schedule/schedule_detail";
 import { LocalDate } from "../common/localDate";
+import { checkPlanStatus } from "../pages/HomePage/general";
 
 const ProtectedLayout = () => {
     const ranOnce = useRef(false);
     const ref = useRef();
+    const navigate = useNavigate();
     const { pathname } = useLocation();
     const { contextHolder, success, error, notifications } = useAlert();
     const { sendEmail } = useEmail()
     const [isLoading, setIsLoading] = useState(false);
     const [reload, setReload] = useState(0);
-    const [refresh, setRefresh] = useState(0); 
+    const [refresh, setRefresh] = useState(0);
     const [isAdmin, setIsAdmin] = useState(false);
     const [uid, setUid] = useState(0);
+    const [expired, setExpired] = useState(false);
 
     /*  Lists */
     const [orderList, setOrderList] = useState([]);
@@ -39,7 +42,8 @@ const ProtectedLayout = () => {
     const [userPermissionList, setUserPermissionList] = useState([]);
     const [scheduleList, setScheduleList] = useState([]);
     const [companyList, setCompanyList] = useState([]);
-    const [notificationList, setNotificationList] = useState([]); 
+    const [billingList, setBillingList] = useState([]);
+    const [notificationList, setNotificationList] = useState([]);
 
     /*  Order */
     const [openView, setOpenView] = useState(false);
@@ -75,12 +79,21 @@ const ProtectedLayout = () => {
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.addEventListener('message', (event) => {
                 if (event.data?.type === 'DATA_REFRESH') {
-                    setRefresh(refresh+1);
+                    setRefresh(refresh + 1);
                 }
             });
         }
         Init();
     }, []);
+
+    useEffect(() => {
+        setIsLoading(true)
+        if (companyList.length !== 0) {
+            const checkPlan = checkPlanStatus(companyList.plan, companyList.createdat)
+            setExpired(pathname === '/setting' ? false :checkPlan.expired)
+        }
+        setIsLoading(false)
+    }, [companyList]);
 
     const Init = async () => {
         setIsLoading(true)
@@ -96,9 +109,11 @@ const ProtectedLayout = () => {
         await getUserListWithAdmin();
         await getSchedule();
         await getCompany();
+        await getBilling();
         await getNotification();
         setIsLoading(false)
     }
+
     const getOrder = async () => {
         const localStorage = await getStorage();
         const response = await FetchData({
@@ -133,7 +148,7 @@ const ProtectedLayout = () => {
             method: 'GET',
             endPoint: 'services'
         })
-        setServiceList(response.data) 
+        setServiceList(response.data)
         return response.data;
     }
     const getUser = async () => {
@@ -155,7 +170,7 @@ const ProtectedLayout = () => {
         })
         setUserPermissionList(response.data)
         return response.data;
-    } 
+    }
 
     const getSchedule = async () => {
         const localStorage = await getStorage();
@@ -173,6 +188,14 @@ const ProtectedLayout = () => {
             endPoint: 'company'
         })
         setCompanyList(response.data)
+        return response.data;
+    }
+    const getBilling = async () => {
+        const response = await FetchData({
+            method: 'GET',
+            endPoint: 'billing'
+        })
+        setBillingList(response.data)
         return response.data;
     }
     const getUserListWithAdmin = async () => {
@@ -233,20 +256,20 @@ const ProtectedLayout = () => {
         setReload(reload + 1);
         setId(id);
         setOpenEdit(true);
-    } 
-   
+    }
+
     const viewOrder = (id) => {
-        setReload(reload +1);
+        setReload(reload + 1);
         setId(id);
         setOpenView(true);
     }
 
-    const editUser = (id,customTitle=false) => {
-        setUserTitle(customTitle? "Account" : (id === 0 ? `New User` : `Edit User`) );
+    const editUser = (id, customTitle = false) => {
+        setUserTitle(customTitle ? "Account" : (id === 0 ? `New User` : `Edit User`));
         setReload(reload + 1);
         setUserId(id);
         setOpenUser(true);
-    } 
+    }
     const editSchedule = (id, date, scheduleUserId = '', customTitle = false) => {
         setScheduleDate(date);
         setScheduleTitle(customTitle ? "Schedule" : (id === 0 ? `New Schedule` : `Edit Schedule`));
@@ -274,19 +297,20 @@ const ProtectedLayout = () => {
 
             <main class="flex-1 p-3 md:px-8 scroll-auto">
                 <Outlet context={{
-                    saveData, refresh,
+                    saveData, refresh, setRefresh,
                     isLoading, setIsLoading,
                     orderList, getOrder,
                     eventList, getEvent,
-                    customerList,setCustomerList, getCustomer,
+                    customerList, setCustomerList, getCustomer,
                     servicesList, setServiceList, getService,
                     userList, getUser,
                     userPermissionList, getUserPermission,
                     userListWithAdmin, getUserListWithAdmin,
                     scheduleList, getSchedule,
                     companyList, getCompany,
+                    billingList, setBillingList, getBilling,
                     viewOrder, editOrder, editUser, editSchedule,
-                    isAdmin,uid
+                    isAdmin, uid
                 }} />
             </main>
 
@@ -325,7 +349,7 @@ const ProtectedLayout = () => {
             {/* Drawer on user edit*/}
             <Drawer title={userTitle} placement='right' width={500} onClose={() => setOpenUser(false)} open={openUser}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
-                <UserDetail id={userId} refresh={reload} ref={ref}  companyList={companyList} saveData={saveData} setOpen={setOpenUser} isAdmin={isAdmin} adminEmail={userId === uid && isAdmin} />
+                <UserDetail id={userId} refresh={reload} ref={ref} companyList={companyList} saveData={saveData} setOpen={setOpenUser} isAdmin={isAdmin} adminEmail={userId === uid && isAdmin} />
             </Drawer>
 
             {/* Drawer on schedule edit*/}
@@ -337,13 +361,15 @@ const ProtectedLayout = () => {
                             <Popconfirm
                                 title="Delete "
                                 description="Are you sure to delete?"
-                                onConfirm={(e) => {saveData({
-                                    label: "Schedule",
-                                    method: 'DELETE',
-                                    endPoint: "schedule",
-                                    id: scheduleId,
-                                    body: []
-                                }); setOpenSchedule(false); }}
+                                onConfirm={(e) => {
+                                    saveData({
+                                        label: "Schedule",
+                                        method: 'DELETE',
+                                        endPoint: "schedule",
+                                        id: scheduleId,
+                                        body: []
+                                    }); setOpenSchedule(false);
+                                }}
                                 okText="Yes"
                                 cancelText="No"
                             >
@@ -351,8 +377,36 @@ const ProtectedLayout = () => {
                             </Popconfirm>
                         </Tooltip>}
                     </Space>}>
-                <ScheduleDetail id={scheduleId} refresh={reload} ref={ref} date={scheduleDate} scheduleList={scheduleList} userList={userList} userId={!isAdmin ? uid:scheduleUserId} saveData={saveData} setOpen={setOpenSchedule} isAdmin={isAdmin} />
+                <ScheduleDetail id={scheduleId} refresh={reload} ref={ref} date={scheduleDate} scheduleList={scheduleList} userList={userList} userId={!isAdmin ? uid : scheduleUserId} saveData={saveData} setOpen={setOpenSchedule} isAdmin={isAdmin} />
             </Drawer>
+
+            <Modal
+                open={expired}
+                closable={false}
+                maskClosable={false}
+                keyboard={false}
+                footer={[
+                    isAdmin && <Button
+                        type="primary"
+                        key="upgrade"
+                        onClick={() => navigate('/setting?tab=2#plans')}
+                    >
+                        Upgrade Plan
+                    </Button>
+                ]}
+            >
+                <div className="text-center py-6">
+
+                    <h2 className="text-xl font-semibold mb-2">
+                        Your app free trial has ended !
+                    </h2>
+
+                    <p className="text-gray-500 mt-4">
+                        Your free trial of {process.env.REACT_APP_PROJECT_NAME} has ended. To keep using this app, Administrator must choose a subsciption plan that works for your team.
+                    </p>
+
+                </div>
+            </Modal>
 
             {contextHolder}
         </div>

@@ -4,6 +4,7 @@ import { MailFilled } from '@ant-design/icons';
 import { Textbox } from "../../../common/textbox";
 import { useEffect, useState } from "react";
 import useAlert from "../../../common/alert";
+import { getStorage } from "../../../common/localStorage";
 
 const Security = ({ companyList, saveData }) => {
     const [password, setPassword] = useState('');
@@ -19,9 +20,10 @@ const Security = ({ companyList, saveData }) => {
 
     const save = async () => {
         if (password === currentPassword) {
+            const localStorage = await getStorage();
             const Body = JSON.stringify({
                 password: newPassword,
-                id:Number(localStorage.getItem('uid')),
+                id:Number(localStorage.uid),
             });
             saveData({
             label:headingLabel,

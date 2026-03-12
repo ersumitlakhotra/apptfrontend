@@ -5,10 +5,12 @@ import { ClockCircleFilled, CloseOutlined, EditOutlined } from '@ant-design/icon
 import Accordion from "../../../common/accordion";
 import { useEffect, useState } from "react";
 import dayjs from 'dayjs';
+import { useOutletContext } from "react-router-dom";
 const { RangePicker } = TimePicker;
 var localizedFormat = require("dayjs/plugin/localizedFormat");
 
-const Hours = ({ companyList, saveData, setRefresh }) => {
+const Hours = ({ companyList, saveData }) => {
+    const { refresh, setRefresh } = useOutletContext();
     dayjs.extend(localizedFormat);
     const today = new Date();
     const dayOfWeekNumber = today.getDay(); // 0 for Sunday, 1 for Monday, etc.
@@ -98,7 +100,7 @@ const Hours = ({ companyList, saveData, setRefresh }) => {
                 {isEdit ?
                     <Space>
                         <Button color="primary" variant="solid" onClick={save} >Save changes</Button>
-                        <Button color="default" variant="filled" icon={<CloseOutlined />} onClick={() => { setIsEdit(false); setRefresh(0); }} >Cancel</Button>
+                        <Button color="default" variant="filled" icon={<CloseOutlined />} onClick={() => { setIsEdit(false); setRefresh(refresh+1); }} >Cancel</Button>
                     </Space> :
                     <Button color="default" variant="filled" icon={<EditOutlined />} onClick={() => setIsEdit(true)} >Edit</Button>
                 }

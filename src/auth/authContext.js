@@ -77,14 +77,32 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
+        removeLocalStorage();
+        setIsAuthenticated(false);
+    }; 
+    const removeLocalStorage = () => {
         localStorage.removeItem('cid');
         localStorage.removeItem('uid');
         localStorage.removeItem('username');
         localStorage.removeItem('password');
         localStorage.removeItem('role');
-        setIsAuthenticated(false);
-    }; 
-    
+    }
+
+    const getLocalStorageWithExpiry = (key) => {
+        const itemStr = localStorage.getItem(key);
+
+        if (!itemStr) return false;
+
+        const item = JSON.parse(itemStr);
+        const now = new Date().getTime();
+
+        // check expiry
+        if (now > item.expiry) {
+            return false;
+        }
+
+        return true;
+    };
     return (
         <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
             {children}
