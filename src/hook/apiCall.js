@@ -4,17 +4,20 @@ import { SignatureV4 } from "@aws-sdk/signature-v4";
 import { Sha256 } from "@aws-crypto/sha256-js";
 import { HttpRequest } from "@aws-sdk/protocol-http";
 
-//const API_ENDPOINT = "http://localhost:3000/api/";
-const PRODUCTION =true
-const API_ENDPOINT =PRODUCTION ? "https://volmz5lsitlia26lmzkjjt537m0umece.lambda-url.ca-central-1.on.aws/api/" :"http://localhost:3000/api/";
+const PRODUCTION =Boolean(process.env.REACT_APP_PRODUCTION)
+const API_ENDPOINT = PRODUCTION ? process.env.REACT_APP_ENDPOINT : process.env.REACT_APP_ENDPOINT_LOCAL;
+const AWS_ACCESS_KEY= process.env.REACT_APP_AWS_ACCESS_KEY
+const AWS_SECRET_KEY= process.env.REACT_APP_AWS_SECRET_KEY
+const AWS_REGION=process.env.REACT_APP_AWS_REGION
+const AWS_SERVICE=process.env.REACT_APP_AWS_SERVICE
 
 const signer = new SignatureV4({
     credentials: {
-        accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY,
-        secretAccessKey:  process.env.REACT_APP_AWS_SECRET_KEY,
+        accessKeyId: AWS_ACCESS_KEY,
+        secretAccessKey:AWS_SECRET_KEY,
     },
-    region: "ca-central-1", // change if needed
-    service: "lambda", 
+    region:AWS_REGION, // change if needed
+    service: AWS_SERVICE, 
     sha256: Sha256,
 });
 
