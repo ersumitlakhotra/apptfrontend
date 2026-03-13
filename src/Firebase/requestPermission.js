@@ -21,11 +21,11 @@ export const initNotification=async (registration,saveData,onNotification)=> {
                 body: body,
                 notify: false
             });
-           // console.log("FCM Token:", token);
+            //console.log("FCM Token:", token);
         }
         // 👉 Send this token to your backend
     } catch (err) {
-        console.error("Push init failed:", err);
+       // console.error("Push init failed:", err);
     }
 
     // Optional: Listen to messages in foreground
