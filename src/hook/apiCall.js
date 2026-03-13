@@ -10,8 +10,8 @@ const API_ENDPOINT =PRODUCTION ? "https://volmz5lsitlia26lmzkjjt537m0umece.lambd
 
 const signer = new SignatureV4({
     credentials: {
-        accessKeyId: "AKIA5KY4XCPABBLBJFDI",
-        secretAccessKey: "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",
+        accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY,
+        secretAccessKey:  process.env.REACT_APP_AWS_SECRET_KEY,
     },
     region: "ca-central-1", // change if needed
     service: "lambda", 
