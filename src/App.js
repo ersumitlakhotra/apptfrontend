@@ -44,7 +44,7 @@ function App() {
           <Route path="privacy-policy" element={<Privacy />} />
           <Route path="terms-conditions" element={<TermsCondition />} />
 
-          {/* Protected Routes */}
+          {/* Protected Routes  */}
           <Route element={<ProtectedRoute />}>
             <Route element={<ProtectedLayout />}>
               <Route path="/home" element={<Homepage />} />
