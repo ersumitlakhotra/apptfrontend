@@ -19,6 +19,7 @@ import { AiFillSchedule } from "react-icons/ai";
 import { IoIosCalendar } from "react-icons/io";
 import FetchData from "../../hook/fetchData";
 import { getStorage } from "../localStorage";
+import { useAuth } from "../../auth/authContext";
 
 function getItem(label, navigate, key, icon, isVisible = false, color, badge, btn, children, dropdown) {
     return {
@@ -36,6 +37,7 @@ function getItem(label, navigate, key, icon, isVisible = false, color, badge, bt
 }
 
 const AppIconsPermission = (size='50px',iconSize=54) => {
+     const { isAuthenticated } = useAuth();
    // const [dashboard, setDashboard] = useState(false);
     const [tasks, setTasks] = useState(false);
     const [order, setOrder] = useState(false);
@@ -70,7 +72,7 @@ const AppIconsPermission = (size='50px',iconSize=54) => {
     ]
 
     useEffect(() => {
-        Init()
+        isAuthenticated && Init()
     }, [])
 
     const Init = async () => {
