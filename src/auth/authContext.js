@@ -14,12 +14,17 @@ export const AuthProvider = ({ children }) => {
         setIsLoading(true)
         const token = localStorage.getItem("token");
         if (token) {
-            const decoded = jwtDecode(token);
-            if (decoded.expiresIn * 1000 < Date.now()) {
-              login(decoded.username, decoded.password);
+            try {
+                const decoded = jwtDecode(token);
+                if (decoded.expiresIn * 1000 < Date.now()) {
+                    login(decoded.username, decoded.password);
+                }
+                else
+                    setIsAuthenticated(true);
             }
-            else
-                setIsAuthenticated(true);
+            catch (error) {
+                setIsAuthenticated(false);
+            }
         }
         else
             setIsAuthenticated(false);
