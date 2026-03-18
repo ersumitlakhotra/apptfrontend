@@ -17,9 +17,11 @@ import UserDetail from "../components/Users/user_detail";
 import ScheduleDetail from "../components/Schedule/schedule_detail";
 import { LocalDate } from "../common/localDate";
 import { checkPlanStatus } from "../pages/HomePage/general";
+import { useAuth } from "./authContext";
 
 const ProtectedLayout = () => {
     const ranOnce = useRef(false);
+    const {isAuthenticated} = useAuth();
     const ref = useRef();
     const navigate = useNavigate();
     const { pathname } = useLocation();
@@ -87,12 +89,13 @@ const ProtectedLayout = () => {
     }, []);
 
     useEffect(() => {
-        setIsLoading(true)
         if (companyList.length !== 0) {
+            setIsLoading(true)
             const checkPlan = checkPlanStatus(companyList.plan, companyList.createdat)
-            setExpired(pathname === '/setting' ? false :checkPlan.expired)
+            setExpired(pathname === '/setting' ? false : checkPlan.expired)
+            setIsLoading(false)
         }
-        setIsLoading(false)
+
     }, [companyList]);
 
     const Init = async () => {
@@ -278,8 +281,10 @@ const ProtectedLayout = () => {
         setScheduleId(id);
         setOpenSchedule(true);
     }
+    //"https://embed.tawk.to/69b8b3b92c788c1c3c2391e1/1jjsns31t";
     return (
         <div class='min-h-screen w-full flex flex-col  '>
+            
             <Header
                 saveData={saveData}
                 refresh={refresh}

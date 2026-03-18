@@ -33,7 +33,7 @@ const aws_auth_headers = async (url, method, body) => {
             "Content-Type": "application/json",
             host: endpoint.hostname,
         },
-        body: body || undefined,
+        body: body || undefined ,
     });
     const signedRequest = await signer.sign(request);
     delete signedRequest.headers.host;

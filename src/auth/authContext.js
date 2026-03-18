@@ -7,6 +7,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [permissions, setPermissions] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
     // Load user from localStorage on refresh
@@ -20,14 +21,17 @@ export const AuthProvider = ({ children }) => {
                     login(decoded.username, decoded.password);
                 }
                 else
+                {
                     setIsAuthenticated(true);
+                    setPermissions(decoded.permissions);
+                }
             }
             catch (error) {
-                setIsAuthenticated(false);
+                logout();
             }
         }
         else
-            setIsAuthenticated(false);
+            logout();
         setIsLoading(false)
     }, []);
 
@@ -56,10 +60,12 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('token', data.token);
 
             setIsAuthenticated(data.status);
+            const decoded = jwtDecode(data.token);
+            setPermissions(decoded.permissions);
             return { status: data.status, message: data.message };
         }
         catch (err) {
-            setIsAuthenticated(false);
+            logout();
             return { status: false,  message: String(err.message) };
         }
         finally
@@ -70,11 +76,12 @@ export const AuthProvider = ({ children }) => {
 
     const logout = () => {
         localStorage.removeItem('token');
+        setPermissions([]);
         setIsAuthenticated(false);
     }; 
-
+ 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated,permissions, isLoading, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

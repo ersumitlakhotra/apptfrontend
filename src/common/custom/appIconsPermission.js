@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
     BarChartOutlined,
     ProductOutlined,
@@ -17,95 +16,116 @@ import { FaHandHoldingUsd } from "react-icons/fa";
 import { AiFillSchedule } from "react-icons/ai";
 
 import { IoIosCalendar } from "react-icons/io";
-import FetchData from "../../hook/fetchData";
-import { getStorage } from "../localStorage";
 import { useAuth } from "../../auth/authContext";
 
-function getItem(label, navigate, key, icon, isVisible = false, color, badge, btn, children, dropdown) {
-    return {
-        key,
-        icon,
-        children,
-        label,
-        dropdown,
-        badge,
-        btn,
-        isVisible,
-        color,
-        navigate
-    };
-}
+
 
 const AppIconsPermission = (size='50px',iconSize=54) => {
-     const { isAuthenticated } = useAuth();
-   // const [dashboard, setDashboard] = useState(false);
-    const [tasks, setTasks] = useState(false);
-    const [order, setOrder] = useState(false);
-    const [event, setEvent] = useState(false);
-   // const [payment, setPayment] = useState(false);
-    const [customer, setCustomer] = useState(false);
-    const [services, setServices] = useState(false);
-    const [users, setUsers] = useState(false);
-    const [schedule, setSchedule] = useState(false);
-    const [sales, setSales] = useState(false);
-    //const [collection, setCollection] = useState(false);
-    const [setting, setSetting] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+     const { permissions } = useAuth();
 
+    const Item = ({ label, navigate, key, icon, isVisible = false, color, badge, btn, children, dropdown }) => ({
+        key,icon,children,label,dropdown,badge,btn,isVisible,color,navigate
+    })
+    
     const apps = [
-        getItem('Home', '/home', 1, <HomeOutlined style={{ fontSize: size, color: 'white' }} />, true, 'bg-blue-500'),
-        getItem('Appointment', '/appointment', 2, <ProductOutlined style={{ fontSize: size, color: 'white' }} />, order, 'bg-orange-300'),
-        // getItem('Dashboard','', 1, <PieChartOutlined style={{ fontSize: size, color: 'white' }} />, dashboard, 'bg-blue-500'),
-        getItem('Calender', '/calender', 3, <IoIosCalendar style={{ fontSize: size, color: 'white' }}/>, tasks, 'bg-blue-900'),
-        getItem('Event', '/event', 4, <NotificationOutlined style={{ fontSize: size, color: 'white' }} />, event, 'bg-gradient-to-b from-[#8a2ce2] via-[#4a0080] to-[#1f8fff]'),
-        getItem('Payment', '', 5, <DollarOutlined style={{ fontSize: size, color: 'white' }} />, false),
-        getItem('Customers', '/customers', 6, <ContactsOutlined style={{ fontSize: size, color: 'white' }} />, customer, 'bg-gradient-to-r from-red-400 to-pink-800 '),
-        getItem('Services', '/services', 7, <UnorderedListOutlined style={{ fontSize: size, color: 'white' }} />, services, 'bg-gradient-to-r from-[#D6B588] to-orange-600 '),
-        getItem('Users', '/users', 8, <UserOutlined style={{ fontSize: size, color: 'white' }} />, users, 'bg-gradient-to-r from-red-900 to-purple-600'),
-        getItem('Schedule', '/schedule', 9, <AiFillSchedule style={{ fontSize: size, color: 'white' }} />, schedule, 'bg-gradient-to-r from-green-500 to-green-900 '),
-        getItem('Reports', '/reports', 10, <BarChartOutlined style={{ fontSize: size, color: 'white' }} />, sales, ' bg-fuchsia-600'),
-        getItem('Collection', '', 11, <FaHandHoldingUsd style={{ fontSize: size, color: 'white' }} />, false),
-        // getItem('Expenses','', 12, <FallOutlined style={{ fontSize: size, color: 'white' }} />),
-        getItem('Help', '/help', 13, <CustomerServiceOutlined style={{ fontSize: size, color: 'white' }} />, true, 'bg-gradient-to-r from-cyan-400 to-cyan-900'),
-        getItem('QR Code', '/scanQR', 14, <QrcodeOutlined style={{ fontSize: size, color: 'white' }} />, true, 'bg-gradient-to-b from-red-900 to-[#D6B588]'),
-        getItem('Setting', '/setting', 15, <SettingOutlined style={{ fontSize: size, color: 'white' }} />, setting, 'bg-gray-500'),
+        Item({
+            key:1, 
+            label:'Home',       
+            navigate:'/home',
+            isVisible:true,
+            color:'bg-blue-500',
+            icon:<HomeOutlined style={{ fontSize: size, color: 'white' }} />
+        }),
+        Item({
+            key:2, 
+            label:'Appointment',       
+            navigate:'/appointment',
+            isVisible:permissions.includes('order'),
+            color:'bg-orange-300',
+            icon:<ProductOutlined style={{ fontSize: size, color: 'white' }} />
+        }),
+        Item({
+            key:3, 
+            label:'Calender',       
+            navigate:'/calender',
+            isVisible:permissions.includes('tasks'),
+            color:'bg-blue-900',
+            icon:<IoIosCalendar style={{ fontSize: size, color: 'white' }}/>
+        }),
+        Item({
+            key:4, 
+            label:'Event',       
+            navigate:'/event',
+            isVisible:permissions.includes('event'),
+            color:'bg-gradient-to-b from-[#8a2ce2] via-[#4a0080] to-[#1f8fff]',
+            icon:<NotificationOutlined style={{ fontSize: size, color: 'white' }} />
+        }),
+        Item({
+            key:5, 
+            label:'Customers',       
+            navigate:'/customers',
+            isVisible:permissions.includes('customer'),
+            color:'bg-gradient-to-r from-red-400 to-pink-800 ',
+            icon:<ContactsOutlined style={{ fontSize: size, color: 'white' }} />
+        }),
+        Item({
+            key:6, 
+            label:'Services',       
+            navigate:'/services',
+            isVisible:permissions.includes('services'),
+            color:'bg-gradient-to-r from-[#D6B588] to-orange-600',
+            icon: <UnorderedListOutlined style={{ fontSize: size, color: 'white' }} />
+        }),
+        Item({
+            key:7, 
+            label:'Users',       
+            navigate:'/users',
+            isVisible:permissions.includes('users'),
+            color:'bg-gradient-to-r from-red-900 to-purple-600',
+            icon: <UserOutlined style={{ fontSize: size, color: 'white' }} />
+        }),
+        Item({
+            key:8, 
+            label:'Schedule',       
+            navigate:'/schedule',
+            isVisible:permissions.includes('schedule'),
+            color:'bg-gradient-to-r from-green-500 to-green-900',
+            icon: <AiFillSchedule style={{ fontSize: size, color: 'white' }} />
+        }),
+        Item({
+            key:9, 
+            label:'Reports',       
+            navigate:'/reports',
+            isVisible:permissions.includes('sales'),
+            color:'bg-fuchsia-600',
+            icon:<BarChartOutlined style={{ fontSize: size, color: 'white' }} />
+        }),
+        Item({
+            key:10, 
+            label:'Help',       
+            navigate:'/help',
+            isVisible:true,
+            color:'bg-gradient-to-r from-cyan-400 to-cyan-900',
+            icon:<CustomerServiceOutlined style={{ fontSize: size, color: 'white' }} />
+        }),
+        Item({
+            key:11, 
+            label:'QR Code',       
+            navigate:'/scanQR',
+            isVisible:true,
+            color:'bg-gradient-to-b from-red-900 to-[#D6B588]',
+            icon:<QrcodeOutlined style={{ fontSize: size, color: 'white' }} />
+        }),
+        Item({
+            key:12, 
+            label:'Setting',       
+            navigate:'/setting',
+            isVisible:permissions.includes('setting'),
+            color:'bg-gray-500',
+            icon:<SettingOutlined style={{ fontSize: size, color: 'white' }} />
+        })
     ]
-
-    useEffect(() => {
-        isAuthenticated && Init()
-    }, [])
-
-    const Init = async () => {
-        setIsLoading(true);
-
-        const localStorage = await getStorage();
-
-        const userPermissionResponse = await FetchData({
-            method: 'GET',
-            endPoint: 'userpermission',
-            id: localStorage.uid 
-        })
-        
-         userPermissionResponse.data.forEach(b => {
-           // setDashboard(b.dashboard);
-            setTasks(b.tasks);
-            setOrder(b.order);
-            setEvent(b.event);
-           // setPayment(b.payment);
-
-            setCustomer(b.customer);
-            setServices(b.services);
-            setUsers(b.users);
-            setSchedule(b.schedule);
-
-            setSales(b.sales);
-           // setCollection(b.collection);
-            setSetting(b.setting);
-        })
-        setIsLoading(false);
-    }
-
-    return { apps, isLoading }
+    return { apps }
 }
 
 export default AppIconsPermission;

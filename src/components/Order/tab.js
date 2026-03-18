@@ -88,7 +88,7 @@ const OrderTabs = ({ index, orderList, fromDate, setFromDate, toDate, setToDate,
             id: id,
             email:sendEmail_To_Customer,
             status: AppointmentStatus.CANCELLED,
-            body: []
+            body: JSON.stringify([])
         });
     }
     return (

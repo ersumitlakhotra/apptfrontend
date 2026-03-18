@@ -11,7 +11,7 @@ import { Tour } from 'antd';
 import awaitingGif from '../../Images/tour/awaiting_request.gif'
 import Warning from "./warning";
 import useAlert from "../../common/alert";
-import { checkBillingDetails, checkEmailStatus, checkPlanStatus, handleCardExpired } from "./general";
+import { checkBillingDetails, checkEmailStatus, checkPlanStatus } from "./general";
 import { get_Date } from "../../common/localDate";
 
 function getMessageItem(key, label, type, description,moveto) {
@@ -20,8 +20,8 @@ function getMessageItem(key, label, type, description,moveto) {
 
 const Homepage = () => {
     const navigate = useNavigate();
-    const { apps, isLoading } = AppIconsPermission();
-    const { isAdmin, isLoading: homepageLoading, setIsLoading, companyList,billingList } = useOutletContext()
+    const { apps } = AppIconsPermission();
+    const { isAdmin, isLoading, setIsLoading, companyList,billingList } = useOutletContext()
     const { contextHolderModal, allowAdminOnly } = useAlert();
     const [messageList,setMessageList] = useState([])
 
@@ -53,7 +53,7 @@ const Homepage = () => {
         {
             title: 'User Schedule',
             description: 'With just one click, you may alter your working hours or designate any day as a workday or a day off.',
-            placement: 'top',
+            placement: 'left',
             target: () => ref3.current,
         },
         {
@@ -101,7 +101,7 @@ const Homepage = () => {
     return (
         <div className=" relative">
             {isAdmin &&
-                <IsLoading isLoading={homepageLoading} input={
+                <IsLoading isLoading={isLoading} input={
                 messageList.map(items => (
                     <Warning key={items.key} type={items.type} onClick={() => navigate(items.moveto)} description={items.description} />
                 ))} />
@@ -132,7 +132,7 @@ const Homepage = () => {
 
                 <button
                     onClick={() => setOpen(true)}
-                    className="fixed bottom-6 right-6 bg-yellow-400  hover:bg-yellow-500 px-5 py-3 rounded-full shadow-lg font-semibold z-50"
+                    className="fixed bottom-6 left-6 bg-yellow-400  hover:bg-yellow-500 px-5 py-3 rounded-full shadow-lg font-semibold z-50"
                 >
                     Quick Tour ?
                 </button>

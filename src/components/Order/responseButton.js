@@ -1,5 +1,4 @@
 import { Button, Popconfirm, Tooltip } from "antd"
-
 import { MdDownloadDone } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
 import { useEmail } from "../../email/email";
@@ -15,8 +14,8 @@ export const useResponseButtons = (saveData) => {
             id: id,
             logs: true,
             email: true,
-            body: [],
-            status: status
+            status: status,
+            body:JSON.stringify([])
         })
     }
     const Accept = ({ id, labelVisible = false, size = "middle", setOpenView =null}) => {
