@@ -3,14 +3,25 @@ import {  Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "./authContext";
 import { Spin } from "antd";
 import { LoadingOutlined } from '@ant-design/icons';
-import AppIconsPermission from "../common/custom/appIconsPermission";
 
-const ProtectedRoute = ({ children }) => {
-    const { isAuthenticated, isLoading } = useAuth();
-    const { apps,isLoading:appsLoading  } = AppIconsPermission();
-    const { pathname } = useLocation();
+const routePermissions = {
+    "/calender": "tasks",
+    "/appointment": "order",
+    "/event": "event",
+    "/customers": "customer",
+    "/services": "services",
+    "/users": "users",
+    "/schedule": "schedule",
+    "/reports": "sales",
+    "/setting":"setting"
+};
 
-    if (isLoading || appsLoading ) {
+const publicRoutes = ["/home","/help", "/scanQR"];
+const ProtectedRoute = () => {
+    const { isAuthenticated, permissions, isLoading } = useAuth();
+    const location = useLocation();
+
+    if (isLoading ) {
         return <div
             style={{
                 position: 'fixed',
@@ -33,17 +44,24 @@ const ProtectedRoute = ({ children }) => {
         return <Navigate to="/" replace />
     }
 
-    // Wait until apps are loaded
-    if (!apps || apps.length === 0) {
-        return null; // or show fallback / spinner
+     const currentPath = location.pathname;
+
+    // ✅ Skip permission check
+    if (publicRoutes.includes(currentPath)) {
+        return <Outlet />;
     }
 
-    const allowed = apps.find((item) => item.navigate === pathname);
+    const requiredPermission = routePermissions[currentPath];
 
-    // If route not found or not visible → redirect to 404
-    if (!allowed || !allowed.isVisible) {
-        return <Navigate to="/404" replace />;
-    }
+    if (
+        requiredPermission &&
+        !permissions.includes(requiredPermission)
+    ) { return <Navigate to="/404" replace />;}
+       
+    
+   //  if (requiredPermission && !permission.includes(requiredPermission)) {
+    //   return <Navigate to="/404" replace />;
+    //}
 
     return <Outlet/> ;
 };
