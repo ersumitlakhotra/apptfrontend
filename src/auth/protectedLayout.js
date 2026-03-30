@@ -17,16 +17,16 @@ import UserDetail from "../components/Users/user_detail";
 import ScheduleDetail from "../components/Schedule/schedule_detail";
 import { LocalDate } from "../common/localDate";
 import { checkPlanStatus } from "../pages/HomePage/general";
-import { useAuth } from "./authContext";
+import NetworkBanner from "../common/isinternet";
 
 const ProtectedLayout = () => {
     const ranOnce = useRef(false);
-    const {isAuthenticated} = useAuth();
     const ref = useRef();
     const navigate = useNavigate();
     const { pathname } = useLocation();
     const { contextHolder, success, error, notifications } = useAlert();
     const { sendEmail } = useEmail()
+
     const [isLoading, setIsLoading] = useState(false);
     const [reload, setReload] = useState(0);
     const [refresh, setRefresh] = useState(0);
@@ -95,8 +95,12 @@ const ProtectedLayout = () => {
             setExpired(pathname === '/setting' ? false : checkPlan.expired)
             setIsLoading(false)
         }
-
     }, [companyList]);
+    
+    useEffect(() => {
+        console.log(navigator.onLine)
+
+    }, [navigator.onLine]);
 
     const Init = async () => {
         setIsLoading(true)
@@ -284,7 +288,7 @@ const ProtectedLayout = () => {
     //"https://embed.tawk.to/69b8b3b92c788c1c3c2391e1/1jjsns31t";
     return (
         <div class='min-h-screen w-full flex flex-col  '>
-            
+            <NetworkBanner/>
             <Header
                 saveData={saveData}
                 refresh={refresh}
@@ -412,6 +416,8 @@ const ProtectedLayout = () => {
 
                 </div>
             </Modal>
+
+           
 
             {contextHolder}
         </div>

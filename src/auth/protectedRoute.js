@@ -1,8 +1,9 @@
 // src/components/ProtectedRoute.js
-import {  Navigate, Outlet, useLocation } from "react-router-dom";
+import {  Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "./authContext";
 import { Spin } from "antd";
 import { LoadingOutlined } from '@ant-design/icons';
+import { useEffect } from "react";
 
 const routePermissions = {
     "/calender": "tasks",
@@ -17,6 +18,7 @@ const routePermissions = {
 };
 
 const publicRoutes = ["/home","/help", "/scanQR"];
+
 const ProtectedRoute = () => {
     const { isAuthenticated, permissions, isLoading } = useAuth();
     const location = useLocation();
@@ -40,9 +42,8 @@ const ProtectedRoute = () => {
         </div>
     }
 
-    if (!isAuthenticated) {
-        return <Navigate to="/" replace />
-    }
+
+    if (!isAuthenticated) return <Navigate to="/" replace />;; // prevent rendering
 
      const currentPath = location.pathname;
 

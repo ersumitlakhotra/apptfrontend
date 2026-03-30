@@ -1,13 +1,16 @@
 // src/context/AuthContext.js
 import { createContext, useContext, useEffect, useState } from "react";
 import { loginAuth } from "../hook/apiCall";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
+import HmacSHA256 from 'crypto-js/hmac-sha256';
+import Hex from 'crypto-js/enc-hex';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [permissions, setPermissions] = useState([]);
+    const [isTawkLogin, setIsTawkLogin] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
     // Load user from localStorage on refresh
@@ -20,8 +23,8 @@ export const AuthProvider = ({ children }) => {
                 if (decoded.expiresIn * 1000 < Date.now()) {
                     login(decoded.username, decoded.password);
                 }
-                else
-                {
+                else {
+                    setIsTawkLogin(true);
                     setIsAuthenticated(true);
                     setPermissions(decoded.permissions);
                 }
@@ -57,20 +60,27 @@ export const AuthProvider = ({ children }) => {
             const res = await loginAuth(username, password);
 
             const data = res.data.data;
-            localStorage.setItem('token', data.token);
-
+            localStorage.setItem('token', data.token); 
+            if (Boolean(data.status)) {
+                const decoded = jwtDecode(data.token);
+                setPermissions(decoded.permissions);
+                if(!isTawkLogin)
+                {
+                 waitForTawk(() => {
+                    loginTawkUser(decoded.uid,username);             
+                    setIsTawkLogin(true);
+                 });
+                }
+            }
             setIsAuthenticated(data.status);
-            const decoded = jwtDecode(data.token);
-            setPermissions(decoded.permissions);
             return { status: data.status, message: data.message };
         }
         catch (err) {
             logout();
-            return { status: false,  message: String(err.message) };
+            return { status: false, message: String(err.message) };
         }
-        finally
-        {
-        setIsLoading(false)
+        finally {
+            setIsLoading(false)
         }
     };
 
@@ -78,10 +88,70 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('token');
         setPermissions([]);
         setIsAuthenticated(false);
-    }; 
- 
+        //window.location.reload();  
+    };
+
+    useEffect(() => {
+        waitForTawk(() => {
+            if (isAuthenticated) {
+                window.Tawk_API.showWidget();
+            } else {
+                if (isTawkLogin) {
+                    window.Tawk_API.logout(
+                        function (error) {
+                            if (error) {
+                                // console.error("Tawk Logout error:", error);
+                            } else {
+                                setIsTawkLogin(false)
+                                window.location.reload(); 
+                            }
+                        });
+                }
+                window.Tawk_API.hideWidget();
+            }
+        });
+    }, [isAuthenticated])
+
+    const waitForTawk = (callback) => {
+        const interval = setInterval(() => {
+            if (Object.keys(window.Tawk_API).length > 0) {
+                clearInterval(interval);
+                callback();
+            }
+        }, 100); // check every 100ms
+    };
+
+    const loginTawkUser = (id, name ) => {
+
+        const hash = HmacSHA256(id, process.env.REACT_APP_TAWK_TO_SECRET).toString(Hex) // ✅ MUST use email
+        window.Tawk_API.login({
+            userId: id,
+            name: name,
+            hash: hash,
+        });
+        {/* window.Tawk_API.login(
+                {
+                    userId: id,
+                    name: name,
+                    //email: user.email,
+                    hash: hash,
+                },
+                function (error) {
+                    if (error) {
+                        console.error("Tawk login error:", error);
+                    } else {
+                        console.log("Tawk login success");
+                    }
+                }
+            );
+            
+               
+
+            */}
+    };
+
     return (
-        <AuthContext.Provider value={{ isAuthenticated,permissions, isLoading, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, permissions, isLoading, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
