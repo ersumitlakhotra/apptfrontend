@@ -88,7 +88,6 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('token');
         setPermissions([]);
         setIsAuthenticated(false);
-        //window.location.reload();  
     };
 
     useEffect(() => {
