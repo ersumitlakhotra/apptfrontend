@@ -3,7 +3,6 @@ import {  Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "./authContext";
 import { Spin } from "antd";
 import { LoadingOutlined } from '@ant-design/icons';
-import { useEffect } from "react";
 
 const routePermissions = {
     "/calender": "tasks",

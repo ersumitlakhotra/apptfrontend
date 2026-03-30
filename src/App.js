@@ -29,6 +29,7 @@ import Schedule from './pages/Schedule/schedule.js';
 import QRcode from './components/Setting/QRcode/qrcode.js';
 import Reports from './pages/Reports/reports.js';
 import ErrorPage from './pages/Error/error.js'
+import Logout from './pages/Login/logout.js';
 
 function App() {
   return (
@@ -59,6 +60,7 @@ function App() {
               <Route path="/help" element={<Support />} />
               <Route path="/scanQR" element={<QRcode />} />
               <Route path="/setting" element={<Setting />} />
+              <Route path="/logout" element={<Logout />} />
             </Route>
           </Route> 
           <Route path="*" element={<ErrorPage />} />
