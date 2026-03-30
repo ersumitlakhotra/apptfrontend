@@ -18,6 +18,7 @@ const UserAbout = ({ fullname, setFullname, cell, setCell, email, setEmail, addr
                 <Select
                     defaultValue={role}
                     value={role}
+                    disabled={adminEmail}
                     style={{ width: '100%',fontSize:16 }}
                     onChange={(value) => {setRole(value); onRoleChange(value);}}
                     options={[
