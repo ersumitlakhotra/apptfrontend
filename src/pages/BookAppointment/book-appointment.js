@@ -24,6 +24,7 @@ import AssignedTo from '../../common/assigned_to.js';
 import FetchData from '../../hook/fetchData.js';
 import SaveData from '../../hook/saveData.js'
 import { useEmail } from '../../email/email.js';
+import { showCancelReasonModal } from '../../components/BookAppointment/cancel_reason.js';
 
 const BookAppointment = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -58,6 +59,7 @@ const BookAppointment = () => {
     const [total, setTotal] = useState('0');
     const [coupon, setCoupon] = useState('');
     const [discount, setDiscount] = useState('0');
+    const [notes, setNotes] = useState('');
 
     const [trndate, setTrnDate] = useState(LocalDate());
     const [slot, setSlot] = useState('');
@@ -307,6 +309,15 @@ const BookAppointment = () => {
     }
 
     const save = async () => {
+        let reasonText = '';
+        if (bookingType === 3) {
+            reasonText = await showCancelReasonModal();
+            if (reasonText === 'cancel')
+                return;
+            else
+              reasonText = `Cancelled by ${customerName} : ${reasonText} `  ;
+        }
+        
         if (customerName !== '' && customerPhone !== '' && customerPhone.length === 12 && customerEmail !== '' && isValidEmail(customerEmail)) {
             const Body = JSON.stringify({
                 customerName: customerName,
@@ -329,7 +340,9 @@ const BookAppointment = () => {
                 mode: 'Cash',
                 tip: '0',
                 bookedvia: 'Appointment',
-                sendnotification: true
+                sendnotification: true,
+                reason:reasonText,
+                notes:notes
             });
 
             if (isSlotAvailable()) {
@@ -418,7 +431,7 @@ const BookAppointment = () => {
                         }
                         else if (editList.status === 'Completed' || editList.status === 'Cancelled' || editList.status === 'Rejected') {
                             result = false;
-                            message = `Order is already marked as ${editList.status}.`;
+                            message = `Appointment is already marked as ${editList.status}.`;
                         }
                         else {
                             result = true;
@@ -441,6 +454,7 @@ const BookAppointment = () => {
                             setTotal(editList.total);
                             setCoupon(editList.coupon);
                             setDiscount(editList.discount);
+                            setNotes(editList.notes);
 
                         }
                     }

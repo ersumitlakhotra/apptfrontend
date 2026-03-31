@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Avatar, Button, Divider, Flex, Image, Input, Modal, Radio, Rate, Steps, Popconfirm } from "antd";
-import { CheckOutlined, CloseOutlined, CalendarOutlined, ClockCircleOutlined, UnorderedListOutlined, UserOutlined, CreditCardOutlined, SaveOutlined } from '@ant-design/icons';
+import { Avatar, Button, Divider, Flex, Image, Input, Modal, Radio, Rate, Steps } from "antd";
+import { CheckOutlined,  CalendarOutlined, ClockCircleOutlined, UnorderedListOutlined, UserOutlined, CreditCardOutlined, SaveOutlined,FormOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import { UTC_LocalDateTime } from "../../common/localDate";
 import Services from "../../common/services";
@@ -12,14 +12,12 @@ import { TbTransfer } from "react-icons/tb";
 import { useResponseButtons } from "./responseButton";
 import FetchData from "../../hook/fetchData";
 import IsLoading from "../../common/custom/isLoading";
-import { useEmail } from "../../email/email";
 
 const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }) => {
-    const { contextHolder,contextHolderModal, warning,confirmEmail } = useAlert();
-    const {AppointmentStatus} = useEmail();
+    const { contextHolder,contextHolderModal, warning } = useAlert();
 
     const [isLoading, setIsLoading] = useState(false);
-    const { Accept, Reject } = useResponseButtons(saveData);
+    const { Accept, Reject,Cancel } = useResponseButtons(saveData);
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
@@ -40,11 +38,12 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
     const [received, setReceived] = useState(0);
     const [tip, setTip] = useState(0);
     const [mode, setMode] = useState('Cash');
+    const [reason, setReason] = useState('');
+    const [notes, setNotes] = useState('');
     const [servicesItem, setServicesItem] = useState([]);
 
     //const filteredOptionsServices = servicesList.filter(o => !selectedItems.includes(o));
     const [isModalOpen, setIsModalOpen] = useState(false);
-
 
     const saveComplete = () => {
         if (received === '' || received <= 0 || parseFloat(received).toFixed(2) < parseFloat(total).toFixed(2)) {
@@ -68,31 +67,16 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
                 id: id,
                 body: Body
             });
-            //saveData("Order", "POST", "order/complete", id, Body, true, false);
             setIsModalOpen(false)
             setOpenView(false);
         }
     };
 
-    const cancelOrder = async () => {
-        const sendEmail_To_Customer = await confirmEmail(AppointmentStatus.CANCELLED,customerEmail);
-        saveData({
-            label: "Appointment",
-            method: 'POST',
-            endPoint: "order/cancel",
-            id: id,
-            email:sendEmail_To_Customer,
-            status: AppointmentStatus.CANCELLED,
-            body: []
-        });
-        setOpenView(false);
-    }
-
     useEffect(() => {
         if (id === 0) {
             setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');
             setStatus('Pending'); setPrice('0'); setTax('0'); setTotal('0'); setDiscount('0'); setCoupon(''); setTaxAmount('0'); setTrnDate(''); setCreatedat(new Date());
-            setAssignedTo(''); setOrderNo(''); setServicesItem([]); setSlot(''); setBookedVia('Walk-In')
+            setAssignedTo(''); setOrderNo(''); setServicesItem([]); setSlot(''); setBookedVia('Walk-In'); setReason('None'); setNotes('');
         }
         else {
             load();
@@ -128,6 +112,8 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
         setReceived(String(parseFloat(editList.received).toFixed(2)) );
         setMode(editList.mode);
         setTip(String(parseFloat(editList.tip).toFixed(2)));
+        setReason(editList.reason === "None" ? '' :editList.reason );
+        setNotes(editList.notes || '');
         setIsLoading(false)
     }
 
@@ -156,17 +142,7 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
                             (status === 'Pending' || status === 'In progress') &&
                             <div class="flex gap-2">
                                 <Button color="cyan" variant="solid" icon={<CheckOutlined />} size="large" onClick={() => setIsModalOpen(true)}>Completed</Button>
-                                    <Popconfirm
-                                        title="Cancel Appointment"
-                                        description="Are you sure to Cancel ? "
-                                        onConfirm={(e) => { e?.stopPropagation(); cancelOrder(); }}
-                                        onCancel={(e) => { e?.stopPropagation(); }}
-                                        okText="Yes"
-                                        cancelText="No"
-                                    >
-                                        <Button color="danger" variant="solid" icon={<CloseOutlined />} size="large">Cancelled</Button>
-                                    </Popconfirm>
-
+                                <Cancel id={id} labelVisible={true} setOpenView={setOpenView} size="large" />
                                 {/*<Button type='default' icon={<PrinterOutlined />} size="middle">Print</Button>*/}
                             </div>
                         }
@@ -190,10 +166,16 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
                                         size="small"
                                         status={status === 'Cancelled' || status === 'Rejected' ? "error" : (status === 'Completed' ? "finish" : "process")}
                                         items={[
-                                            { title: status === 'Awaiting' ? 'Awaiting' : status === 'Rejected' ? 'Rejected' : 'Accepted' },
+                                            {
+                                                title: status === 'Awaiting' ? 'Awaiting' : status === 'Rejected' ? 'Rejected' : 'Accepted',
+                                                subTitle: status === 'Rejected' && reason
+                                            },
                                             { title: 'Pending' },
                                             { title: 'In Progress' },
-                                            { title: status === 'Cancelled' ? 'Cancelled' : 'Completed' }
+                                            {
+                                                title: status === 'Cancelled' ? 'Cancelled' : 'Completed',
+                                                subTitle: status === 'Cancelled' && reason
+                                            }
                                         ]} />
                                 </div>
                             </div>
@@ -231,6 +213,10 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
                                             <UnorderedListOutlined />
                                             <Services servicesItem={servicesItem} servicesList={servicesList} />
                                         </div>
+                                        {notes !== '' && <div class='flex flex-row gap-2'>
+                                            <FormOutlined />
+                                            <span class="text-xs font-medium text-black">{notes}</span>
+                                        </div>}
                                     </div>
                                 </div>
                             </div>
