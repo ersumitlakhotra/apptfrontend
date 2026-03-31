@@ -13,11 +13,14 @@ import { generateTimeSlotsWithDate, toMinutes } from "../../common/generateTimeS
 import { compareTimes, isOpenForWork, userSchedule } from "../../common/general";
 import { TbTransfer } from "react-icons/tb";
 import { useEmail } from "../../email/email";
+import { optionsReason } from "./cancelrejectmodel";
 
 function disabledDate(current) {
   // Can not select days before today and today
   return current < dayjs().startOf('day');
 }
+
+const { TextArea } = Input;
 
 const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, userList, companyList, eventList, customerList, scheduleList, saveData, setOpen, isAdmin ,uid}) => {
     const {AppointmentStatus} = useEmail();
@@ -43,6 +46,11 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
     const [received, setReceived] = useState(0);
     const [tip, setTip] = useState(0);
     const [mode, setMode] = useState('Cash');
+
+    const [reason, setReason] = useState('None');
+    const [otherReason, setOtherReason] = useState('');
+    const [notes, setNotes] = useState('');
+
     const [servicesItem, setServicesItem] = useState([]);
     //const filteredOptionsServices = servicesList.filter(o => !selectedItems.includes(o));
     const [liveList, setLiveList] = useState([]);
@@ -92,7 +100,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             
             setOrderNo(''); setServicesItem([]); setSlot(''); setPrevSlot(''); setPrevTrnDate(''); setPrevServicesItem([]);
             setStart(''); setEnd(''); setReceived(0); setMode('Cash'); setTip(0);
-            
+             setReason('None');setOtherReason('');setNotes('');
         }
         else {
             const editList = orderList.find(item => item.id === id);
@@ -120,6 +128,9 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setMode(editList.mode);
             setTip(editList.tip);
             setDiscount(editList.discount);
+            setReason(!optionsReason.includes(editList.reason) ? 'Other' :editList.reason)     
+            setOtherReason(!optionsReason.includes(editList.reason) ? editList.reason :'');
+            setNotes(editList.notes);
         }
         setSendEmail('no');
         const liveList = eventList.filter(a => a.case.toUpperCase() === 'LIVE');
@@ -169,23 +180,25 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     mode: mode,
                     tip: status === 'Completed' ? tip : '0' ,// received > total ? parseFloat(received - total).toFixed(2) : '0',
                     bookedvia: 'Walk-In',
-                    sendnotification:false
+                    sendnotification:false,
+                    reason:reason === 'Other'? (otherReason ==='' ? 'None':otherReason) : reason,
+                    notes:notes
                 });
 
-               let sendEmail_To_Customer= false; 
+               let sendEmail_To_Customer= true; 
                let statusAppoint=AppointmentStatus.CONFIRMED;
                 if (id === 0) {
                     statusAppoint = AppointmentStatus.CONFIRMED;
-                    sendEmail_To_Customer = await confirmEmail(AppointmentStatus.CONFIRMED,customerEmail);
+                  //  sendEmail_To_Customer = await confirmEmail(AppointmentStatus.CONFIRMED,customerEmail);
                 }
                 else {
                     if (status === 'Cancelled') {
                         statusAppoint = AppointmentStatus.CANCELLED;
-                        sendEmail_To_Customer = await confirmEmail(AppointmentStatus.CANCELLED,customerEmail);
+                        //sendEmail_To_Customer = await confirmEmail(AppointmentStatus.CANCELLED,customerEmail);
                     }
                     else if (prevTrnDate !== trndate || prevSlot !== slot) {
                         statusAppoint = AppointmentStatus.RESCHEDULED;
-                        sendEmail_To_Customer = await confirmEmail(AppointmentStatus.RESCHEDULED,customerEmail);
+                        //sendEmail_To_Customer = await confirmEmail(AppointmentStatus.RESCHEDULED,customerEmail);
                     }
                 }
                 
@@ -400,6 +413,35 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     ]}
                 />
             } />
+            {(status === 'Cancelled' || status === 'Rejected') && <>
+                <TextboxFlex label={'Reason'} input={
+                    <Select
+                        value={reason}
+                        style={{ width: '100%', fontSize: 16 }}
+                        onChange={(value) => { setReason(value);   }}
+                        options={optionsReason.map(item => ({
+                            value: item,
+                            label: item
+                        }))
+                        }
+                    />
+                } />
+
+                {reason === "Other" &&
+                    <TextboxFlex label={' '} input={<TextArea
+                        rows={3}
+                        placeholder="Please specify your reason..."
+                        className={`mt-2}`}
+                        value={otherReason}
+                        onChange={(e) => {
+                            setOtherReason(e.target.value);
+                        }}
+                    />}/>
+                }
+
+
+            </>
+            }
 
             <TextboxFlex label={'Services'} mandatory={true} input={
                 <Select
@@ -460,6 +502,16 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 <Input placeholder="Total"  style={{ backgroundColor: '#FAFAFA', fontSize:16 }} status={parseFloat(total).toFixed(2) < 0  ? 'error' : ''} readOnly={true} value={total} />
             } />
 
+            <TextboxFlex label={'Notes'} input={<TextArea
+                rows={3}
+                placeholder="Additional notes..."
+                className={`mt-2}`}
+                value={notes}
+                onChange={(e) => {
+                    setNotes(e.target.value);
+                }}
+            />} />
+
            {false &&
             <TextboxFlex label={'Event'} input={
                 <Select
@@ -474,6 +526,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 />
             } />
            }
+
             {status === 'Completed' && <>
                 <p class="text-gray-400 ">Payment Detail </p>
 
@@ -512,6 +565,8 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 } />
             </>
             }
+
+            
 
             <Divider />
             <p class="text-gray-400 mb-4">Booking Details</p>

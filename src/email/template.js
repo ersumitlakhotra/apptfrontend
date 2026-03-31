@@ -1,4 +1,4 @@
-const Template = ({ heading, name, order_no, professional, date, slot, services, store, address, storeId }) => {
+const Template = ({ heading, name, order_no, professional, date, slot, services, store, address, storeId,reason }) => {
     return (
         <html>
             <body
@@ -59,9 +59,14 @@ const Template = ({ heading, name, order_no, professional, date, slot, services,
                                                 </h2>
 
                                                 <p style={{ marginTop: 0 }}>
-                                                
-                                                    Your appointment has been <strong>{heading ==='Awaiting'? 'Waiting for approval. Once your appointment has been reviewed, you will receive an email. ' :heading}</strong>. Here are
-                                                    the details:
+
+                                                    Your appointment has been <strong>{heading === 'Awaiting' ? 'Waiting for approval. Once your appointment has been reviewed, you will receive an email. ' : heading}</strong>.
+                                                   
+                                                   {(heading === 'Rejected' || heading === 'Cancelled') && reason !== "None" && (
+                                                        <p style={{ color:'red' }}>Reason: {reason}</p>
+                                                    )}
+
+                                                    <p style={{ marginTop: 10 }}>Here are the details:</p>
                                                 </p>
 
                                                 <table

@@ -44,7 +44,8 @@ export const useEmail = () => {
             cid: companyResponse.data.id,
             address: address,
             employee: bookedWith,
-            services: serviceNames
+            services: serviceNames,
+            reason: orderResponse.data.reason
         }
     }
 
@@ -68,7 +69,8 @@ export const useEmail = () => {
                  services={order.services}
                  store={order.storeName}
                  address={order.address}
-                 storeId={order.storeId}/>
+                 storeId={order.storeId}
+                 reason={order.reason}/>
             ),
         });
         try {

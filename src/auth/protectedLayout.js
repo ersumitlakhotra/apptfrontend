@@ -97,10 +97,6 @@ const ProtectedLayout = () => {
         }
     }, [companyList]);
     
-    useEffect(() => {
-        console.log(navigator.onLine)
-
-    }, [navigator.onLine]);
 
     const Init = async () => {
         setIsLoading(true)
