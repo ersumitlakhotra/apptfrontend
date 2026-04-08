@@ -132,7 +132,7 @@ const GmailSetup = ({ companyList, saveData }) => {
                      <li dangerouslySetInnerHTML={{ __html: `<b>Save Changes -> </b>Click on <b> Send Test Email</b> to verify that the setup is finished and functioning properly.` }} />
                    
                 </ol>
-            </Modal>
+            </Modal> 
             {contextHolder}
         </div>
     )
