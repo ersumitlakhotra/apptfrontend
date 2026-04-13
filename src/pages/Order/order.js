@@ -25,7 +25,8 @@ const Order = () => {
         servicesList, getService,
         userList, getUser,
         getSchedule,
-        getCompany } = useOutletContext();
+        getCompany,
+    getLoyalty } = useOutletContext();
 
     const [isLoading, setIsLoading] = useState(false);
     const [fromDate, setFromDate] = useState(LocalDate());
@@ -55,8 +56,9 @@ const Order = () => {
         setIsLoading(true);
         await getService();
         await getUser();
-        await getCompany();
         await getCustomer();
+        await getCompany();
+        await getLoyalty();
         await getEvent();
         await getSchedule();
         setIsLoading(false);

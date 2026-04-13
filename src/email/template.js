@@ -140,7 +140,8 @@ const Template = ({ heading, name, order_no, professional, date, slot, services,
                                                             <td
                                                                 style={{
                                                                     padding: "12px",
-                                                                    fontSize: "14px",
+                                                                    fontSize: "14px", 
+                                                                    borderBottom: "1px solid #e5e7eb",
                                                                 }}
                                                             >
                                                                 <strong>Location:</strong> {store}

@@ -124,6 +124,8 @@ const ExportToExcel = ({ data, fileName, servicesList, userList }) => {
           getExcelItem('Name', 30),
           getExcelItem('Email', 50),
           getExcelItem('Cell', 20),
+          getExcelItem('Badge', 20),
+          getExcelItem('Points', 20),
           getExcelItem('Last_Modified', 30)
         ];
         data.forEach(item => {
@@ -131,6 +133,8 @@ const ExportToExcel = ({ data, fileName, servicesList, userList }) => {
             Name: item.name,
             Email: item.email,
             Cell: item.cell,
+            Badge: item.badge,
+            Points: item.points,
             Last_Modified: UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A'),
           });
         });

@@ -12,12 +12,14 @@ import { TbTransfer } from "react-icons/tb";
 import { useResponseButtons } from "./responseButton";
 import FetchData from "../../hook/fetchData";
 import IsLoading from "../../common/custom/isLoading";
+import ReceivePayment from "./receivepayment";
 
-const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }) => {
+const OrderView = ({ id,refresh, servicesList, userList,customerList,loyaltyList, setOpenView, saveData }) => {
     const { contextHolder,contextHolderModal, warning } = useAlert();
 
     const [isLoading, setIsLoading] = useState(false);
     const { Accept, Reject,Cancel } = useResponseButtons(saveData);
+    const [customerId, setCustomerId] = useState(0);
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
@@ -40,6 +42,20 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
     const [mode, setMode] = useState('Cash');
     const [reason, setReason] = useState('');
     const [notes, setNotes] = useState('');
+
+    const [isComplete, setIsComplete] = useState(false);
+    const [isNewCust, setIsNewCust] = useState(false);
+    const [redeem, setRedeem] = useState(0);
+    const [referral, setReferral] = useState('');
+    
+    const [mode1, setMode1] = useState('Cash');
+    const [mode2, setMode2] = useState('Card');
+    const [payment1, setPayment1] = useState(0);
+    const [payment2, setPayment2] = useState(0);
+
+    const [isLoyaltyActive, setIsLoyaltyActive] = useState(false)
+    const [loyaltyRedeem, setLoyaltyRedeem] = useState(0)
+    const [customerPoints, setCustomerPoints] = useState(0);
     const [servicesItem, setServicesItem] = useState([]);
 
     //const filteredOptionsServices = servicesList.filter(o => !selectedItems.includes(o));
@@ -56,9 +72,18 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
         }
         else {
             const Body = JSON.stringify({
-                received: String(parseFloat(received).toFixed(2)) ,
+                received: String(parseFloat(received).toFixed(2)),
                 mode: mode,
                 tip: tip,
+                redeem: redeem,
+                referral: referral,
+                mode1: mode1,
+                payment1: payment1,
+                mode2: mode2,
+                payment2: payment2,
+                iscompleted: isComplete,
+                isnewcust: isNewCust,
+                custid:customerId
             });
             saveData({
                 label: "Appointment",
@@ -71,16 +96,24 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
             setOpenView(false);
         }
     };
+    useEffect(() => {
+        const customer = customerList.find(item => item.cell === customerPhone);
+        setCustomerPoints(customer?.points || 0);
+    }, [customerPhone, refresh])
 
     useEffect(() => {
         if (id === 0) {
-            setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');
+           setCustomerId(0); setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');
             setStatus('Pending'); setPrice('0'); setTax('0'); setTotal('0'); setDiscount('0'); setCoupon(''); setTaxAmount('0'); setTrnDate(''); setCreatedat(new Date());
             setAssignedTo(''); setOrderNo(''); setServicesItem([]); setSlot(''); setBookedVia('Walk-In'); setReason('None'); setNotes('');
+       
+         setRedeem(0); setReferral(''); setMode1('Cash'); setMode2('Card'); setPayment1(0); setPayment2(0);setIsComplete(false);setIsNewCust(false);
+      
         }
         else {
             load();
         }
+         loyaltyList.map(items => {setLoyaltyRedeem(items.redeem); setIsLoyaltyActive(items.active)})
     }, [refresh])
 
     const load = async () => {
@@ -92,6 +125,7 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
             id: id
         })
         const editList = orderResponse.data
+        setCustomerId(editList.custid);
         setCustomerName(editList.name);
         setCustomerPhone(editList.cell);
         setCustomerEmail(editList.email);
@@ -114,17 +148,15 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
         setTip(String(parseFloat(editList.tip).toFixed(2)));
         setReason(editList.reason === "None" ? '' :editList.reason );
         setNotes(editList.notes || '');
+        setRedeem(editList.redeem);
+        setReferral(editList.referral);
+        setMode1(editList?.mode1 || 'Cash');
+        setMode2(editList.mode2 || 'Card');
+        setPayment1(editList?.payment1 || 0);
+        setPayment2(editList?.payment2 || 0);
+        setIsComplete(editList.iscompleted);
+        setIsNewCust(editList.isnewcust);
         setIsLoading(false)
-    }
-
-    const calculateTip = (value) => {
-        let _value = setNumberAndDot(value) // _tax > 0 ? parseFloat((_subTotal * _tax) + _subTotal).toFixed(2) : _subTotal;
-        setReceived(_value);
-        let tip = parseFloat(_value).toFixed(2) - parseFloat(total).toFixed(2);
-        if (tip > 0)
-            setTip(parseFloat(tip).toFixed(2));
-        else
-            setTip(0);
     }
 
     return (
@@ -292,7 +324,8 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
             } />
 
             <Modal
-                title="Payment Detail"
+                title=""
+                width={560}
                 closable={{ 'aria-label': 'Custom Close Button' }}
                 open={isModalOpen}
                 //onOk={saveComplete}
@@ -301,40 +334,32 @@ const OrderView = ({ id,refresh, servicesList, userList, setOpenView, saveData }
                     <Button color="primary" variant="solid" icon={<SaveOutlined />} size="middle" onClick={saveComplete}>Save</Button>
 
                 ]}
-            >
-                <div class='flex flex-col font-normal gap-3 '>
-                    <TextboxFlex label={'Type'} input={
-                        <Radio.Group onChange={(e) => setMode(e.target.value)} value={mode} style={{ width: '100%' }}>
-                            <Radio.Button value="Cash">
-                                <Flex gap="small" justify="center" align="center"  >
-                                    <BsCash style={{ fontSize: 16 }} />
-                                    Cash
-                                </Flex>
-                            </Radio.Button>
-                            <Radio.Button value="Interac">
-                                <Flex gap="small" justify="center" align="center"  >
-                                    <TbTransfer style={{ fontSize: 16 }} />
-                                    E-Transfer
-                                </Flex>
-                            </Radio.Button>
-                            <Radio.Button value="Card">
-                                <Flex gap="small" justify="center" align="center"  >
-                                    <CreditCardOutlined style={{ fontSize: 16 }} />
-                                    By Card
-                                </Flex>
-                            </Radio.Button>
-                        </Radio.Group>
-                    } />
-
-                    <TextboxFlex label={'Received'} mandatory={status === 'Completed'} input={
-                        <Input placeholder="Received"  style={{fontSize:16}} value={received} status={received === '' ? 'error' : ''}
-                            onChange={(e) => calculateTip(e.target.value)} />
-                    } />
-                    <TextboxFlex label={'Tip'} input={
-                        <Input placeholder="Total" style={{ backgroundColor: '#FAFAFA',fontSize:16 }} readOnly={true} value={tip} />
-                    } />
-                </div>
-            </Modal>
+            >           
+               <ReceivePayment 
+                  mode={mode} 
+                  setMode={setMode} 
+                  received={received} 
+                  tip={tip} 
+                  setTip={setTip} 
+                  total={total} 
+                  setReceived={setReceived}
+                  redeem={redeem}
+                  setRedeem={setRedeem}
+                  mode1={mode1}
+                  setMode1={setMode1}
+                  mode2={mode2}
+                  setMode2={setMode2}
+                  payment1={payment1}
+                  setPayment1={setPayment1}
+                  payment2={payment2}
+                  setPayment2={setPayment2}
+                  isTotalVisible={true}
+                  isCompleted={isComplete}
+                  isLoyaltyActive={isLoyaltyActive}
+                  loyaltyRedeem={loyaltyRedeem}
+                  customerPoints={customerPoints}
+                  
+                  /></Modal>
             {contextHolder}
             {contextHolderModal}
         </div>

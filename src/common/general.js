@@ -1,6 +1,12 @@
 import dayjs from 'dayjs';
 import { get_Date, LocalDate } from './localDate';
 
+ export function pointsToDollars(points, pointsPerDollar = 100) {
+  const p = parseFloat(points) || 0;
+  const rate = parseFloat(pointsPerDollar) || 1;
+  return Math.floor(p / rate);
+}
+
 const getDay = (date) => {
     const weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
     const dayNum = dayjs(get_Date(date, 'YYYY-MM-DD')).get('day');

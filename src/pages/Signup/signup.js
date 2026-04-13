@@ -28,8 +28,8 @@ export const Signup = ({ logo }) => {
 
   const items = [
     { key: 'FREE TRIAL', label: 'FREE TRIAL : $ 0.00 / 30 days', price: 0.00 },
-    { key: 'STANDARD', label: 'STANDARD : $ 100.00 / Month', price: 100.00 },
-    { key: 'ENTERPRISE', label: 'ENTERPRISE : $ 150.00 / Month', price: 150.00 },
+    { key: 'STANDARD', label: 'STANDARD : $ 100.00 / Month', price: 49.99 },
+    { key: 'ENTERPRISE', label: 'ENTERPRISE : $ 150.00 / Month', price: 89.99 },
   ];
   const onItemChanged = e => { items.filter(item => item.key === e.key).map(res => { setPricing(res.price); setPlan(res.key); setMenuOption(res.label); }) };
   const menuProps = { items, onClick: onItemChanged };
@@ -236,7 +236,7 @@ export const Signup = ({ logo }) => {
                 class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 required onChange={(e) => setPassword(e.target.value)} />
             </div>
-            <div>
+           {false && <div>
               <label for="plan" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Pricing Plan <span class='text-red-500'>*</span></label>
               <Dropdown menu={menuProps} className="flex flex-row items-center justify-start" >
                 <Button size="large" style={{ width: '100%' }} >
@@ -246,7 +246,7 @@ export const Signup = ({ logo }) => {
                   </div>
                 </Button>
               </Dropdown>
-            </div>
+            </div>}
             <div class="flex items-center justify-between">
               <div class="flex items-start">
                 <div class="flex items-center h-5">

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Drawer, Space, Tabs, Tag } from "antd"
-import {  SaveOutlined } from '@ant-design/icons';
+import { Button, Drawer, Space, Tabs, Tag,Modal } from "antd"
+import {  MailOutlined, SaveOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from "react";
 import EventDetail from "../../components/Event/event_detail.js";
 import { getTabItems } from "../../common/items.js";
@@ -9,6 +9,8 @@ import dayjs from 'dayjs';
 import { firstDateOfMonth, get_Date, lastDateOfMonth } from "../../common/localDate.js";
 import PageHeader from "../../common/pages/pageHeader.js";
 import { useOutletContext } from "react-router-dom";
+import MassEmailUI from "../../components/Event/mass_email.js";
+import Services from "../../common/services.js";
 
 const customLabelTab = (label, tagColor, tagValue) => {
     return (
@@ -26,8 +28,10 @@ const Event = () => {
    const { saveData, refresh,
         eventList,getEvent,
         servicesList, getService,
-        userList, getUser } = useOutletContext();
-    
+        userList, getUser,
+     customerList, getCustomer, companyList } = useOutletContext();
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState('New');
@@ -41,6 +45,7 @@ const Event = () => {
     const [liveList, setLiveList] = useState([]);
     const [upcomingList, setUpcomingList] = useState([]);
     const [pastList, setPastList] = useState([]);
+    const [DiscountList, setDiscountList] = useState([]);
     const [exportList, setExportList] = useState([]);
     
     useEffect(() => {  
@@ -49,6 +54,7 @@ const Event = () => {
 
     const Init = async () => {
         setIsLoading(true); 
+        await getCustomer();
         await getService();
         await getUser(); 
         await getEvent();
@@ -74,6 +80,21 @@ const Event = () => {
         setUpcomingList(upcoming.length > 0 ? upcoming : [])
         setPastList(past.length > 0 ? past : [])
 
+        let discountEvent=[];
+        eventList.filter(a => a.case.toUpperCase() !== 'PAST').map(item => {
+            discountEvent.push({
+                name: <Services servicesItem={item.serviceinfo} servicesList={servicesList} />,
+                start:item.startdate,
+                end:item.enddate,
+                price:item.price,
+                newprice:item.total,
+                percentage:parseInt((parseFloat(item.discount).toFixed(2) / parseFloat(item.price).toFixed(2)) * 100)
+                    
+            })
+        })
+        setDiscountList(discountEvent)
+
+
     }, [refresh, eventList, fromDate,toDate])
 
     const tabItems = [
@@ -89,7 +110,8 @@ const Event = () => {
 
     return (
         <div class="flex flex-col gap-4 md:px-7 py-4 mb-12">
-            <PageHeader label={headingLabel} isExport={true} exportList={exportList} exportName={headingLabel} isCreate={true} onClick={() => btn_Click(0)} servicesList={servicesList} userList={userList} />
+            <PageHeader label={headingLabel} isExport={true} exportList={exportList} exportName={headingLabel} isCreate={true} onClick={() => btn_Click(0)} servicesList={servicesList} userList={userList}
+            customButton={<Button type='default' icon={<MailOutlined />} size="large" onClick={() => setIsModalOpen(true)}>Send E-Mail</Button>} />
             <Tabs items={tabItems} activeKey={tabActiveKey} onChange={(e) => { setTabActiveKey(e) }} />
 
 
@@ -99,6 +121,24 @@ const Event = () => {
                 <EventDetail id={id} refresh={reload} ref={ref} eventList={eventList} servicesList={servicesList} saveData={saveData} setOpen={setOpen} />
             </Drawer>
 
+            <Modal
+                title=" "
+                closable={{ 'aria-label': 'Custom Close Button' }}
+                open={isModalOpen}       
+                onOk={() => setIsModalOpen(false)}
+                onCancel={() => setIsModalOpen(false)}
+                footer={[]}
+                width={'80%'}
+            >
+                <MassEmailUI
+                    customerList={customerList}
+                    sendFrom={companyList.emailuser || ''}
+                    companyName={companyList.name}
+                    storeId={companyList.store}
+                    discountList={DiscountList}
+                    setIsModalOpen={setIsModalOpen}
+                     /> 
+            </Modal>
         </div>
     )
 }

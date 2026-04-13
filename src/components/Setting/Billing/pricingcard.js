@@ -22,7 +22,7 @@ const plans = [
   {
     key:2,
     name: "STANDARD",
-    monthly: 100.00,
+    monthly: 49.99,
     title:'Start Standard Plan',
     badge: "Recommended",
     features: [
@@ -37,7 +37,7 @@ const plans = [
   {
     key:3,
     name: "ENTERPRISE",
-    monthly: 150.00,
+    monthly: 89.99,
     title:'Start Enterprise Plan',
     features: [
       "Appointment Records",
@@ -168,7 +168,9 @@ const Pricing = () => {
                 {/* Price */}
                 <div className="mb-6">
 
-                  <span className="text-4xl font-bold">${price}</span>
+                  <span className="text-4xl font-bold">${price} 
+                    { price > 0 &&<span className="text-xs text-gray-500 font-normal"> + Tax</span>}
+                    </span>
 
                   <span className="text-gray-500"> / month</span>
 
