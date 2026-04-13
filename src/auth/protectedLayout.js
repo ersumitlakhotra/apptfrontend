@@ -46,6 +46,7 @@ const ProtectedLayout = () => {
     const [companyList, setCompanyList] = useState([]);
     const [billingList, setBillingList] = useState([]);
     const [notificationList, setNotificationList] = useState([]);
+    const [loyaltyList, setLoyaltyList] = useState([]);
 
     /*  Order */
     const [openView, setOpenView] = useState(false);
@@ -114,6 +115,7 @@ const ProtectedLayout = () => {
         await getCompany();
         await getBilling();
         await getNotification();
+        await getLoyalty();
         setIsLoading(false)
     }
 
@@ -219,6 +221,14 @@ const ProtectedLayout = () => {
         setNotificationList(response.data)
         return response.data;
     }
+    const getLoyalty = async () => {
+        const response = await FetchData({
+            method: 'GET',
+            endPoint: 'loyalty'
+        })
+        setLoyaltyList(response.data)
+        return response.data;
+    }
 
     const onNotification = ({ title, description }) => {
         notifications({ title: `${title} Appointment`, description: description, cancel: title === 'Cancel' });
@@ -314,6 +324,7 @@ const ProtectedLayout = () => {
                     scheduleList, getSchedule,
                     companyList, getCompany,
                     billingList, setBillingList, getBilling,
+                    loyaltyList, setLoyaltyList, getLoyalty,
                     viewOrder, editOrder, editUser, editSchedule,
                     isAdmin, uid
                 }} />
@@ -343,12 +354,12 @@ const ProtectedLayout = () => {
             {/* Drawer on Add/ Edit order*/}
             <Drawer title={title} placement='right' width={600} onClose={() => setOpenEdit(false)} open={openEdit}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
-                <OrderDetail id={id} refresh={reload} ref={ref} setOrderNo={setOrderNo} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} eventList={eventList} customerList={customerList} scheduleList={scheduleList} saveData={saveData} setOpen={setOpenEdit} isAdmin={isAdmin} uid={uid} />
+                <OrderDetail id={id} refresh={reload} ref={ref} setOrderNo={setOrderNo} orderList={orderList} servicesList={servicesList} userList={userList} companyList={companyList} eventList={eventList} customerList={customerList} scheduleList={scheduleList} loyaltyList={loyaltyList} saveData={saveData} setOpen={setOpenEdit} isAdmin={isAdmin} uid={uid} />
             </Drawer>
 
             {/* Drawer on View*/}
             <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
-                <OrderView id={id} refresh={reload} servicesList={servicesList} userList={userList} setOpenView={setOpenView} saveData={saveData} />
+                <OrderView id={id} refresh={reload} servicesList={servicesList} userList={userList} customerList={customerList} loyaltyList={loyaltyList} setOpenView={setOpenView} saveData={saveData} />
             </Drawer>
 
             {/* Drawer on user edit*/}

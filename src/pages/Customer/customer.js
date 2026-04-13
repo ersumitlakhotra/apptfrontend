@@ -13,6 +13,7 @@ import CustomerDetail from "../../components/Customer/customer_detail.js";
 import { useOutletContext } from "react-router-dom";
 import IsLoading from "../../common/custom/isLoading.js";
 import PageHeader from "../../common/pages/pageHeader.js";
+import StarBadge from "../../common/starbadge.js";
 
 const Customer = () => {
     const ref = useRef();
@@ -91,8 +92,10 @@ const Customer = () => {
         getTableItem('1', 'Name'),
         getTableItem('2', 'E-Mail'),
         getTableItem('3', 'Cell'),
-        getTableItem('4', 'Last Modified'),
-        getTableItem('5', 'Action'),
+        getTableItem('4', 'Badge'),
+        getTableItem('5', 'Points'),
+        getTableItem('6', 'Last Modified'),
+        getTableItem('7', 'Action'),
     ];
     return (
         <div class="flex flex-col gap-4 md:px-7 py-4  mb-12">
@@ -142,9 +145,14 @@ const Customer = () => {
                         body={(
                             filteredList.map(item => (
                                 <tr key={item.id} class="bg-white border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50 ">
-                                    <td class="p-3 font-semibold">{item.name}</td>
+                                    <td class="p-3 font-semibold inline-flex gap-2 items-center">
+                                          <StarBadge name={item.badge} size="xs" />
+                                        {item.name}
+                                        </td>
                                     <td class="p-3 ">{item.email}</td>
                                     <td class="p-3 ">{item.cell}</td>
+                                    <td class="p-3 ">{item.badge}</td>
+                                    <td class="p-3 ">{item.points}</td>
                                     <td class="p-3">{UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A')}</td>
                                     <td class="p-3">
                                         <Tooltip placement="top" title={'Edit'} >

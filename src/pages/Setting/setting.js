@@ -14,7 +14,7 @@ import { useLocation, useOutletContext } from "react-router-dom";
 import FetchData from "../../hook/fetchData.js";
 
 const Setting = () => {
-    const { saveData,  refresh, setIsLoading, companyList,getCompany, billingList,getBilling } = useOutletContext();
+    const { saveData,  refresh, setIsLoading, companyList,getCompany, billingList,getBilling,loyaltyList,  getLoyalty } = useOutletContext();
     const location = useLocation();
     const [tabActiveKey, setTabActiveKey] = useState('1');
     const [logoList, setLogoList] = useState([]);
@@ -51,6 +51,7 @@ const Setting = () => {
         setIsLoading(true);
 
         await getCompany();
+        await getLoyalty();
         await getBilling();
         const logoResponse = await FetchData({
             method: 'GET',
@@ -61,7 +62,7 @@ const Setting = () => {
     }
 
     const tabItems = [
-        getTabItems('1', 'Account', <IdcardOutlined />, <Account companyList={companyList} saveData={saveData} logoList={logoList} />),
+        getTabItems('1', 'Account', <IdcardOutlined />, <Account companyList={companyList} loyaltyList={loyaltyList} saveData={saveData} logoList={logoList} />),
         getTabItems('2', 'Billing & plans', <ContainerOutlined />, <Billing companyList={companyList} billingList={billingList} saveData={saveData}  />),
         // getTabItems('3', 'Notifications', <NotificationOutlined />, <Notification />),
         getTabItems('4', 'Security', <LockOutlined />, <Security companyList={companyList} saveData={saveData} />),

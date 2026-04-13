@@ -14,6 +14,7 @@ import { compareTimes, isOpenForWork, userSchedule } from "../../common/general"
 import { TbTransfer } from "react-icons/tb";
 import { useEmail } from "../../email/email";
 import { optionsReason } from "./cancelrejectmodel";
+import ReceivePayment from "./receivepayment";
 
 function disabledDate(current) {
   // Can not select days before today and today
@@ -22,9 +23,9 @@ function disabledDate(current) {
 
 const { TextArea } = Input;
 
-const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, userList, companyList, eventList, customerList, scheduleList, saveData, setOpen, isAdmin ,uid}) => {
+const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, userList, companyList, eventList, customerList, scheduleList,loyaltyList, saveData, setOpen, isAdmin ,uid}) => {
     const {AppointmentStatus} = useEmail();
-    const {contextHolder,contextHolderModal, warning, confirmEmail } = useAlert();
+    const {contextHolder,contextHolderModal, warning } = useAlert();
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
@@ -47,9 +48,25 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
     const [tip, setTip] = useState(0);
     const [mode, setMode] = useState('Cash');
 
+
     const [reason, setReason] = useState('None');
     const [otherReason, setOtherReason] = useState('');
     const [notes, setNotes] = useState('');
+
+    
+    const [isComplete, setIsComplete] = useState(false);
+    const [isNewCust, setIsNewCust] = useState(false);
+    const [redeem, setRedeem] = useState(0);
+    const [referral, setReferral] = useState('');
+    
+    const [mode1, setMode1] = useState('Cash');
+    const [mode2, setMode2] = useState('Card');
+    const [payment1, setPayment1] = useState(0);
+    const [payment2, setPayment2] = useState(0);
+
+    const [isLoyaltyActive, setIsLoyaltyActive] = useState(false)
+    const [loyaltyRedeem, setLoyaltyRedeem] = useState(0)
+    const [customerPoints, setCustomerPoints] = useState(0);
 
     const [servicesItem, setServicesItem] = useState([]);
     //const filteredOptionsServices = servicesList.filter(o => !selectedItems.includes(o));
@@ -101,6 +118,8 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setOrderNo(''); setServicesItem([]); setSlot(''); setPrevSlot(''); setPrevTrnDate(''); setPrevServicesItem([]);
             setStart(''); setEnd(''); setReceived(0); setMode('Cash'); setTip(0);
              setReason('None');setOtherReason('');setNotes('');
+
+             setRedeem(0); setReferral(''); setMode1('Cash'); setMode2('Card'); setPayment1(0); setPayment2(0);setIsComplete(false);setIsNewCust(false);
         }
         else {
             const editList = orderList.find(item => item.id === id);
@@ -131,20 +150,34 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             setReason(!optionsReason.includes(editList.reason) ? 'Other' :editList.reason)     
             setOtherReason(!optionsReason.includes(editList.reason) ? editList.reason :'');
             setNotes(editList.notes);
+            setRedeem(editList.redeem); 
+            setReferral(editList.referral); 
+            setMode1(editList?.mode1 || 'Cash'); 
+            setMode2(editList.mode2 || 'Card'); 
+            setPayment1(editList?.payment1 || 0); 
+            setPayment2(editList?.payment2 || 0);
+            setIsComplete(editList.iscompleted);
+            setIsNewCust(editList.isnewcust);
         }
         setSendEmail('no');
         const liveList = eventList.filter(a => a.case.toUpperCase() === 'LIVE');
         setLiveList(liveList.length > 0 ? liveList : [])
+
+        loyaltyList.map(items => {setLoyaltyRedeem(items.redeem); setIsLoyaltyActive(items.active)})
+
     }, [refresh])
 
     useEffect(() => {
         if (companyList.length !== 0) {
             setTimingInfo(companyList.timinginfo[0]);
         }
-    }, [companyList])
-
+    }, [companyList])  
+    
+    useEffect(() => {
+       const customer = customerList.find(item => item.cell === customerPhone);
+        setCustomerPoints(customer?.points || 0);
+    }, [customerPhone,refresh])
    
-
     const save = async () => {
         if (customerName !== '' && customerPhone !== '' && customerPhone.length === 12 && servicesItem.length !== 0 &&
             price !== '' && price !== '.' && trndate !== '' && customerEmail !== '' && isValidEmail(customerEmail) &&
@@ -182,7 +215,15 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     bookedvia: 'Walk-In',
                     sendnotification:false,
                     reason:reason === 'Other'? (otherReason ==='' ? 'None':otherReason) : reason,
-                    notes:notes
+                    notes:notes,
+                    redeem:redeem,
+                    referral:referral,
+                    mode1:mode1,
+                    payment1:payment1,
+                    mode2:mode2,
+                    payment2:payment2,
+                    iscompleted:isComplete,
+                    isnewcust:isNewCust
                 });
 
                let sendEmail_To_Customer= true; 
@@ -269,15 +310,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
         }
     }, [status, price, discount, tax])
 
-    const calculateTip = (value) => {
-        let _value = setNumberAndDot(value) // _tax > 0 ? parseFloat((_subTotal * _tax) + _subTotal).toFixed(2) : _subTotal;
-        setReceived(_value);
-        let tip = parseFloat(_value).toFixed(2) - parseFloat(total).toFixed(2);
-        if (tip > 0)
-            setTip(parseFloat(tip).toFixed(2));
-        else
-            setTip(0);
-    }
+ 
     const calculateDiscount = (items,date=trndate) => {
         let _discount = 0;
         liveList.filter(item =>
@@ -289,11 +322,6 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
         })
         setDiscount(parseFloat(_discount).toFixed(2))
     }
-
-    useEffect(() => {
-        if(parseFloat(received).toFixed(2) > 0)
-            calculateTip(received)
-    }, [total])
 
     useEffect(() => {
         onTrnDateChange();
@@ -502,7 +530,8 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 <Input placeholder="Total"  style={{ backgroundColor: '#FAFAFA', fontSize:16 }} status={parseFloat(total).toFixed(2) < 0  ? 'error' : ''} readOnly={true} value={total} />
             } />
 
-            <TextboxFlex label={'Notes'} input={<TextArea
+            
+           {false &&<TextboxFlex label={'Notes'} input={<TextArea
                 rows={3}
                 placeholder="Additional notes..."
                 className={`mt-2}`}
@@ -510,7 +539,7 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                 onChange={(e) => {
                     setNotes(e.target.value);
                 }}
-            />} />
+            />} />}
 
            {false &&
             <TextboxFlex label={'Event'} input={
@@ -527,46 +556,34 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
             } />
            }
 
-            {status === 'Completed' && <>
-                <p class="text-gray-400 ">Payment Detail </p>
-
-                <TextboxFlex label={'Type'}  input={
-                    <Radio.Group onChange={(e) => setMode(e.target.value)} value={mode} style={{ width: '100%' }}>
-                        <Radio.Button value="Cash">
-                            <Flex gap="small" justify="center" align="center"  >
-                                <BsCash style={{ fontSize: 16 }} />
-                                Cash
-                            </Flex>
-                        </Radio.Button>
-                        <Radio.Button value="Interac">
-                            <Flex gap="small" justify="center" align="center"  >
-                                 <TbTransfer style={{ fontSize: 16 }} />
-                                E-Transfer
-                            </Flex>
-                        </Radio.Button>
-                        <Radio.Button value="Card">
-                            <Flex gap="small" justify="center" align="center"  >
-                                <CreditCardOutlined style={{ fontSize: 16 }} />
-                                By Card
-                            </Flex>
-                        </Radio.Button>
-                    </Radio.Group>
-                } />
-
-
-                <TextboxFlex label={'Received'} mandatory={status === 'Completed'} input={
-                    <Input placeholder="Received"  style={{fontSize:16}} value={received} 
-                        status={received === ''   ? 'error' : ''}
-                        onChange={(e) =>calculateTip(e.target.value)} />
-                } />
-
-                <TextboxFlex label={'Tip'} input={
-                    <Input placeholder="Total" style={{ backgroundColor: '#FAFAFA', fontSize:16 }} readOnly={true} value={tip} />
-                } />
-            </>
+            {status === 'Completed' && 
+                  <ReceivePayment 
+                  mode={mode} 
+                  setMode={setMode} 
+                  received={received} 
+                  tip={tip} 
+                  setTip={setTip} 
+                  total={total} 
+                  setReceived={setReceived}
+                  redeem={redeem}
+                  setRedeem={setRedeem}
+                  mode1={mode1}
+                  setMode1={setMode1}
+                  mode2={mode2}
+                  setMode2={setMode2}
+                  payment1={payment1}
+                  setPayment1={setPayment1}
+                  payment2={payment2}
+                  setPayment2={setPayment2}
+                  isTotalVisible={false}
+                  isCompleted={isComplete}
+                  isLoyaltyActive={isLoyaltyActive}
+                  loyaltyRedeem={loyaltyRedeem}
+                  customerPoints={customerPoints}
+                  
+                  />
             }
 
-            
 
             <Divider />
             <p class="text-gray-400 mb-4">Booking Details</p>

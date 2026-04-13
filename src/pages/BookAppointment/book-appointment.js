@@ -81,6 +81,14 @@ const BookAppointment = () => {
     const [userList, setUserList] = useState([]);
     const [eventList, setEventList] = useState([]);
 
+    const [redeem, setRedeem] = useState(0);
+    const [referral, setReferral] = useState('');
+
+    const [mode1, setMode1] = useState('Cash');
+    const [mode2, setMode2] = useState('Card');
+    const [payment1, setPayment1] = useState(0);
+    const [payment2, setPayment2] = useState(0);
+
 
     const [order_no, setOrder_no] = useState('');
     const [order_id, setOrder_Id] = useState(0);
@@ -342,7 +350,12 @@ const BookAppointment = () => {
                 bookedvia: 'Appointment',
                 sendnotification: true,
                 reason:reasonText,
-                notes:notes
+                notes:notes,redeem:redeem,
+                referral: referral,
+                mode1: mode1,
+                payment1: payment1,
+                mode2: mode2,
+                payment2: payment2
             });
 
             if (isSlotAvailable()) {
@@ -455,7 +468,12 @@ const BookAppointment = () => {
                             setCoupon(editList.coupon);
                             setDiscount(editList.discount);
                             setNotes(editList.notes);
-
+                            setRedeem(editList.redeem);
+                            setReferral(editList.referral);
+                            setMode1(editList?.mode1 || 'Cash');
+                            setMode2(editList.mode2 || 'Card');
+                            setPayment1(editList?.payment1 || 0);
+                            setPayment2(editList?.payment2 || 0);
                         }
                     }
 
@@ -583,7 +601,13 @@ const BookAppointment = () => {
             customerPhone={customerPhone}
             setCustomerPhone={setCustomerPhone}
             customerEmail={customerEmail}
-            setCustomerEmail={setCustomerEmail} />
+            setCustomerEmail={setCustomerEmail}
+            notes={notes}
+            setNotes={setNotes}
+            referral={referral}
+            setReferral={setReferral}
+
+        />
     }
 
     return (

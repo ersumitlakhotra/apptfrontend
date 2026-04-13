@@ -3,6 +3,7 @@ import { apiCalls } from "../hook/apiCall"
 import ReactDOMServer from "react-dom/server";
 import Template from './template.js'
 import { get_Date } from "../common/localDate";
+import { getStorage } from "../common/localStorage.js";
 
 export const useEmail = () => {
     const AppointmentStatus = {
@@ -81,7 +82,31 @@ export const useEmail = () => {
             return { status: 500, message: e.message }   
         }
     }
-    return { sendEmail, AppointmentStatus }
+    const sendBulkEmail = async ({ emails,subject,message }) => {
+        const localStorage = await getStorage();
+        const companyResponse = await FetchData({
+            method: 'GET',
+            endPoint: 'company',
+            cid: localStorage.cid
+        })
+        const Body = JSON.stringify({
+            emailUser: companyResponse.data.emailuser,
+            emailPass: companyResponse.data.emailpass,
+            storeName: companyResponse.data.name,
+            emails,
+            subject,
+            message
+        });
+        try {
+           const res= await apiCalls("POST", "sendbulkmail", localStorage.cid, null, Body); 
+            return {status:res.status,message:res.message}        
+        }
+        catch (e) {
+            return { status: 500, message: e.message }   
+        }
+    }
+
+    return { sendEmail,sendBulkEmail, AppointmentStatus }
 }
 
 

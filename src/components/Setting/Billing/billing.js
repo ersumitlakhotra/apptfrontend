@@ -1,6 +1,6 @@
 import Heading from "../../../common/heading"
-import { CloseOutlined, CreditCardFilled, EditOutlined, WalletFilled, DownloadOutlined, EyeOutlined } from '@ant-design/icons';
-import { Button, Divider, Drawer, Input, Select, Space, Tooltip } from "antd";
+import { CloseOutlined, CreditCardFilled, EditOutlined, WalletFilled, DownloadOutlined, EyeOutlined,DatabaseFilled } from '@ant-design/icons';
+import { Button, Divider, Drawer,  Space, Tooltip } from "antd";
 import DataTable from "../../../common/datatable";
 import { getTableItem } from "../../../common/items.js";
 import { useEffect, useState } from "react";
@@ -18,8 +18,6 @@ const Billing = ({ companyList,billingList, saveData }) => {
    
     const { refresh, setRefresh } = useOutletContext();
    const {contextHolder, warning } = useAlert();
-    const [plan, setPlan] = useState('');
-    const [pricing, setPricing] = useState('');
     const [name, setName] = useState('');
     const [number, setNumber] = useState('');
     const [month, setMonth] = useState('');
@@ -35,8 +33,6 @@ const Billing = ({ companyList,billingList, saveData }) => {
 
     useEffect(() => {
         if (companyList.length !== 0) {
-            setPlan(companyList.plan);
-            setPricing(companyList.pricing);
             if (companyList.billinginfo !== null) {
                 setName(companyList.billinginfo[0].name);
                 setNumber(companyList.billinginfo[0].number);
@@ -103,12 +99,12 @@ const Billing = ({ companyList,billingList, saveData }) => {
 
             <div id="plans"  class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
 
-                <Heading label={"Change plan"} desc={'You can upgrade or downgrade whenever you want.'} Icon={<CreditCardFilled  />} />
+                <Heading label={"Change plan"} desc={'You can upgrade or downgrade whenever you want.'} Icon={<WalletFilled  />} />
                 <Pricing/>
                 <Divider id="billingdetail"/>
 
                 <div class='flex items-center justify-between'>
-                    <Heading label={"Billing details"} Icon={<WalletFilled  />} />
+                    <Heading label={"Billing details"} Icon={< CreditCardFilled />} />
                     {isEdit ?
                         <Space>
                             <Button color="primary" variant="solid" onClick={saveBillingDetails} >Save changes</Button>
@@ -133,7 +129,7 @@ const Billing = ({ companyList,billingList, saveData }) => {
             </div>
 
             <div id="invoice" class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
-                <Heading label={"Invoice history"} desc={"If you've just made a payment, it may take a few hours for it to appear in the table below."} Icon={<CreditCardFilled  />} />
+                <Heading label={"Invoice history"} desc={"If you've just made a payment, it may take a few hours for it to appear in the table below."} Icon={<DatabaseFilled  />} />
                 <div class='ml-6 mb-6'>
                     <DataTable headerItems={headerItems} list={billingList}
                         onChange={(page, pageSize) => {

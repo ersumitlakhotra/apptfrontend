@@ -9,6 +9,8 @@ import dayjs from 'dayjs';
 import { firstDateOfMonth, get_Date, lastDateOfMonth } from "../../common/localDate.js";
 import PageHeader from "../../common/pages/pageHeader.js";
 import { useOutletContext } from "react-router-dom";
+import MassEmailUI from "../../components/Event/mass_email.js";
+import Services from "../../common/services.js";
 
 const customLabelTab = (label, tagColor, tagValue) => {
     return (
@@ -27,7 +29,7 @@ const Event = () => {
         eventList,getEvent,
         servicesList, getService,
         userList, getUser,
-     customerList, getCustomer } = useOutletContext();
+     customerList, getCustomer, companyList } = useOutletContext();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -43,6 +45,7 @@ const Event = () => {
     const [liveList, setLiveList] = useState([]);
     const [upcomingList, setUpcomingList] = useState([]);
     const [pastList, setPastList] = useState([]);
+    const [DiscountList, setDiscountList] = useState([]);
     const [exportList, setExportList] = useState([]);
     
     useEffect(() => {  
@@ -77,6 +80,21 @@ const Event = () => {
         setUpcomingList(upcoming.length > 0 ? upcoming : [])
         setPastList(past.length > 0 ? past : [])
 
+        let discountEvent=[];
+        eventList.filter(a => a.case.toUpperCase() !== 'PAST').map(item => {
+            discountEvent.push({
+                name: <Services servicesItem={item.serviceinfo} servicesList={servicesList} />,
+                start:item.startdate,
+                end:item.enddate,
+                price:item.price,
+                newprice:item.total,
+                percentage:parseInt((parseFloat(item.discount).toFixed(2) / parseFloat(item.price).toFixed(2)) * 100)
+                    
+            })
+        })
+        setDiscountList(discountEvent)
+
+
     }, [refresh, eventList, fromDate,toDate])
 
     const tabItems = [
@@ -104,31 +122,22 @@ const Event = () => {
             </Drawer>
 
             <Modal
-                title="Gmail setup tutorial"
+                title=" "
                 closable={{ 'aria-label': 'Custom Close Button' }}
-                open={isModalOpen}
+                open={isModalOpen}       
                 onOk={() => setIsModalOpen(false)}
                 onCancel={() => setIsModalOpen(false)}
-                footer={[
-                    <Button key="ok" type="primary" onClick={() => setIsModalOpen(false)}>
-                        OK
-                    </Button>,
-                ]}
+                footer={[]}
+                width={'80%'}
             >
-                <ol className="list-decimal list-inside space-y-4">
-                    <li dangerouslySetInnerHTML={{ __html: `Login into <b>Gmail Account -> Manage Account -> Security & sign-in </b>` }} />
-                   
-                    <li>
-                        <span>Type <b>App Passwords</b> in search,click, and navigate to that page.</span>
-                      
-                    </li>
-                    <li >
-                        <span dangerouslySetInnerHTML={{ __html: `Type <b>App Name -> </b>click <b>CREATE</b> then copy , paste password in <b>App Password field.</b>` }} />
-                       
-                    </li>
-                    <li dangerouslySetInnerHTML={{ __html: `<b>Save Changes -> </b>Click on <b> Send Test Email</b> to verify that the setup is finished and functioning properly.` }} />
-
-                </ol>
+                <MassEmailUI
+                    customerList={customerList}
+                    sendFrom={companyList.emailuser || ''}
+                    companyName={companyList.name}
+                    storeId={companyList.store}
+                    discountList={DiscountList}
+                    setIsModalOpen={setIsModalOpen}
+                     /> 
             </Modal>
         </div>
     )

@@ -4,9 +4,11 @@ import {  DatePicker,  Input,  Select } from "antd";
 import dayjs from 'dayjs';
 import { TextboxFlex } from "../../common/textbox";
 import TextArea from "antd/es/input/TextArea";
+import useAlert from "../../common/alert";
 
 const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setOpen }) => {
 
+    const {contextHolder, warning } = useAlert();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [startDate, setStartDate] = useState('');
@@ -46,7 +48,7 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
         }
     };
     const save = async () => {
-        if (title !== '' && startDate !== '' && servicesItem.length !== 0 && endDate !== '' && discount !== '' && discount !== '.') {
+        if (title !== '' && startDate !== '' && servicesItem.length !== 0 && endDate !== '' && discount !== '' && discount !== '.' && parseFloat(discount) > 0) {
             const Body = JSON.stringify({
                 title: title,
                 description: description,
@@ -66,6 +68,9 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
                     body: Body
                 });
             setOpen(false);
+        }
+        else{
+                warning('Please, fill out the required fields !') 
         }
     }
 
@@ -147,9 +152,9 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
             <TextboxFlex label={'Price ($)'}  input={
                 <Input placeholder="Price" readOnly={true} style={{ backgroundColor: '#FAFAFA',fontSize:16 }} value={price} onChange={(e) =>  setPriceNumberOnly(e, setPrice)} />
             } />
-
+            
             <TextboxFlex label={'Discount $'} mandatory={true} input={
-                <Input placeholder="Discount"  style={{fontSize:16}} status={(discount === '' || discount === '.') ? 'error' : ''} value={discount} onChange={(e) => setPriceNumberOnly(e, setDiscount)} />
+                <Input placeholder="Discount"  style={{fontSize:16}} status={(discount === '' || discount === '.' || parseFloat(discount) < 1) ? 'error' : ''} value={discount} onChange={(e) => setPriceNumberOnly(e, setDiscount)} />
             } />
 
             <TextboxFlex label={'Amount'} input={
@@ -160,7 +165,9 @@ const EventDetail = ({ id, refresh, ref, eventList, servicesList, saveData, setO
                 <Input placeholder="Coupon" style={{ backgroundColor: '#FAFAFA',fontSize:16 }}  value={coupon} onChange={setPriceNumberOnly} readOnly={true} />
             } />
 
+    {contextHolder}
         </div>
+        
     )
 }
 
