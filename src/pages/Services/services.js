@@ -16,17 +16,12 @@ import IsLoading from "../../common/custom/isLoading.js";
 import { useOutletContext } from "react-router-dom";
 
 const Services = () => {
-    const ref = useRef();
     const headingLabel = 'Services'
     const { saveData, refresh, 
         servicesList, getService, setServiceList,
-        userList, getUser, } = useOutletContext();
+        userList, getUser,editService} = useOutletContext();
 
     const [isLoading, setIsLoading] = useState(false);
-    const [open, setOpen] = useState(false);
-    const [title, setTitle] = useState('New');
-    const [id, setId] = useState(0);
-    const [reload, setReload] = useState(0);
 
     const [filteredList, setFilteredList] = useState([]);
     const [list, setList] = useState([]);
@@ -53,17 +48,6 @@ const Services = () => {
         setPage(1, 10, serviceResponse);
         setIsLoading(false);
     }   
-
-    const btn_Click = (id) => {
-         setTitle(id === 0 ? `New ${headingLabel}` : `Edit ${headingLabel}`);
-        setReload(refresh + 1);
-        setId(id);
-        setOpen(true);
-    }
-   
-    const btnSave = async () => {
-        await ref.current?.save();
-    }
 
     useEffect(() => {
         const searchedList = servicesList.filter(item =>
@@ -101,7 +85,7 @@ const Services = () => {
     return (
         <div class="flex flex-col gap-4  md:px-7 py-4  mb-12">
 
-            <PageHeader label={headingLabel} isExport={true} exportList={exportList} exportName={headingLabel} isCreate={true} onClick={() => btn_Click(0)} servicesList={servicesList} userList={userList} />
+            <PageHeader label={headingLabel} isExport={true} exportList={exportList} exportName={headingLabel} isCreate={true} onClick={() => editService(0)} servicesList={servicesList} userList={userList} />
 
 
             <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
@@ -172,7 +156,7 @@ const Services = () => {
                                     <td class="p-3">{UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A')}</td>
                                     <td class="p-3">
                                         <Tooltip placement="top" title={'Edit'} >
-                                            <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
+                                            <Button type="link" icon={<EditOutlined />} onClick={() => editService(item.id)} />
                                         </Tooltip>
                                        {/*<Tooltip placement="top" title={'Logs'} >
                                             <Button type="link" icon={<ContainerOutlined />} onClick={() => btn_LogsClick(item.id)} />
@@ -181,14 +165,7 @@ const Services = () => {
                                 </tr>
                             ))
                         )} />} />
-            </div>
-
-            <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
-                extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
-
-                <ServiceDetail id={id} refresh={reload} ref={ref} servicesList={servicesList} saveData={saveData} setOpen={setOpen} />
-            </Drawer>
-     
+            </div>    
         </div>
     )
 }

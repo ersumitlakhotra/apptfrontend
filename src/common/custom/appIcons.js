@@ -13,7 +13,7 @@ const AppIcons = ({ icon, size = 108, backgroundColor, label, onClick }) => {
         </div>
     )
 }
-const AppIconsMini = ({ icon, size = 108, backgroundColor, label, onClick }) => {
+const AppIconsMini = ({ icon, size = 108, backgroundColor, label,isLabel=true, onClick }) => {
     return (
         <div class="flex-1 min-w-[50px] max-w-[50px] " >
             <div class='flex flex-col items-center justify-center group relative '>
@@ -22,7 +22,7 @@ const AppIconsMini = ({ icon, size = 108, backgroundColor, label, onClick }) => 
                     onClick={onClick}>
                     <span class="group-hover:animate-spin">{icon}</span>
                 </div>
-                 <span class='text-xs text-white font-medium absolute -top-2 opacity-0 group-hover:opacity-100 transition duration-300'>{label}</span>
+                 <span class='text-xs text-white font-medium absolute -top-2 opacity-0 group-hover:opacity-100 transition duration-300'>{isLabel && label}</span>
             </div>
         </div>
     )

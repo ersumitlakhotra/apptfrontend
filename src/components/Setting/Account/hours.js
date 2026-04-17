@@ -23,8 +23,8 @@ const Hours = ({ companyList, saveData,refresh, setRefresh,popUp=false,refNext=n
     const [wednesday, setWednesday] = useState(['00:00:00', '00:00:00', true]);
     const [thursday, setThursday] = useState(['00:00:00', '00:00:00', true]);
     const [friday, setFriday] = useState(['00:00:00', '00:00:00', true]);
-    const [saturday, setSaturday] = useState(['00:00:00', '00:00:00', true]);
-    const [sunday, setSunday] = useState(['00:00:00', '00:00:00', true]);
+    const [saturday, setSaturday] = useState(['00:00:00', '00:00:00', false]);
+    const [sunday, setSunday] = useState(['00:00:00', '00:00:00', false]);
 
     useEffect(() => {
         if (companyList.length !== 0) {
