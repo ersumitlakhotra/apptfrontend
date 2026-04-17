@@ -4,7 +4,7 @@ import Search from '../../common/custom/search'
 import logo from '../../Images/logo.png'
 import { SlEarphonesAlt } from "react-icons/sl";
 import { Avatar, Badge, Button, Drawer, Dropdown, Space, Tooltip } from 'antd';
-import { BellFilled, LogoutOutlined, DownOutlined, UserOutlined, BellOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
+import { BellFilled, LogoutOutlined, DownOutlined, UserOutlined, BellOutlined, EditOutlined, EyeOutlined, PlusCircleFilled, PlusSquareFilled } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import AssignedTo from '../../common/assigned_to';
@@ -17,6 +17,7 @@ import { Sort } from '../../common/sort';
 import { useResponseButtons } from '../../components/Order/responseButton';
 import { Tags } from '../../common/tags';
 import dayjs from 'dayjs';
+import { BsPlusCircleFill } from "react-icons/bs";
 
 function getItem(key, label, icon, extra, disabled, danger) {
     return {
@@ -238,10 +239,15 @@ setNotificationFilteredList(notification);
             </div>
 
             {/* notification and profile */}
-            <div class='w-3/12 pr-4 flex flex-row gap-4 justify-end items-center '>
+            <div class='w-3/12 pr-4 flex flex-row gap-3 md:gap-4 justify-end items-center '>
+                <Dropdown menu={menuProps} trigger={['click']} overlayStyle={{ gap: 4, color: 'white', cursor: 'pointer' }}>
+                    <Space style={{ cursor: 'pointer' }}>
+                        <PlusCircleFilled style={{ fontSize: '30px', color: 'white', cursor: 'pointer' }} />
+                    </Space>
+                </Dropdown>
 
-                <Badge count={unread}>
-                    <BellFilled style={{ fontSize: '23px', color: 'white', cursor: 'pointer' }} onClick={() => { setOpenNotification(true); setTabActiveKey('1'); }} />
+                <Badge count={unread} >
+                    <BellFilled style={{ fontSize: '23px', color: 'white', cursor: 'pointer'}} onClick={() => { setOpenNotification(true); setTabActiveKey('1'); }} />
                 </Badge>
 
                 <Dropdown menu={menuProps} trigger={['click']} overlayStyle={{ gap: 4, color: 'white', cursor: 'pointer' }}>

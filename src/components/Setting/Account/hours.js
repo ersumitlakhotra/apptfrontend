@@ -1,16 +1,14 @@
-import { Button, Space, Switch, TimePicker } from "antd";
+import { Button,  Space, Switch, TimePicker } from "antd";
 import Heading from "../../../common/heading"
 
 import { ClockCircleFilled, CloseOutlined, EditOutlined } from '@ant-design/icons';
 import Accordion from "../../../common/accordion";
-import { useEffect, useState } from "react";
+import { useEffect, useImperativeHandle, useState } from "react";
 import dayjs from 'dayjs';
-import { useOutletContext } from "react-router-dom";
 const { RangePicker } = TimePicker;
 var localizedFormat = require("dayjs/plugin/localizedFormat");
 
-const Hours = ({ companyList, saveData }) => {
-    const { refresh, setRefresh } = useOutletContext();
+const Hours = ({ companyList, saveData,refresh, setRefresh,popUp=false,refNext=null }) => {
     dayjs.extend(localizedFormat);
     const today = new Date();
     const dayOfWeekNumber = today.getDay(); // 0 for Sunday, 1 for Monday, etc.
@@ -18,8 +16,8 @@ const Hours = ({ companyList, saveData }) => {
     // Array to map day numbers to day names
     const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const dayName = weekdays[dayOfWeekNumber];
-    const headingLabel = 'Weekly Schedule';
-    const [isEdit, setIsEdit] = useState(false);
+    const headingLabel = 'Business Hours';
+    const [isEdit, setIsEdit] = useState(popUp);
     const [monday, setMonday] = useState(['00:00:00', '00:00:00', true]);
     const [tuesday, setTuesday] = useState(['00:00:00', '00:00:00', true]);
     const [wednesday, setWednesday] = useState(['00:00:00', '00:00:00', true]);
@@ -58,10 +56,16 @@ const Hours = ({ companyList, saveData }) => {
             label:headingLabel,
             method: "PUT", 
             endPoint:"company/timing",
-            body: Body
+            body: Body,
+            notify:!popUp
         });
-        setIsEdit(false);
+
+       !popUp && setIsEdit(false);
     }
+
+  useImperativeHandle(refNext, () => ({
+        handleSave: save
+    }));
 
     const timeChange = (time, timeString, day, setDay) => {
         if (timeString[0] === '' && timeString[1] === '')
@@ -93,17 +97,17 @@ const Hours = ({ companyList, saveData }) => {
 
 
     return (
-        <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
+        <div class={`w-full bg-white ${popUp ? '' :'border'}  rounded-lg p-4 flex flex-col gap-4 `}>
             <div class='flex items-center justify-between'>
-                <Heading label={headingLabel} Icon={<ClockCircleFilled />} />
+                <Heading label={headingLabel} Icon={<ClockCircleFilled size={26} />} />
 
-                {isEdit ?
+                {!popUp && (isEdit ?
                     <Space>
                         <Button color="primary" variant="solid" onClick={save} >Save changes</Button>
                         <Button color="default" variant="filled" icon={<CloseOutlined />} onClick={() => { setIsEdit(false); setRefresh(refresh+1); }} >Cancel</Button>
                     </Space> :
                     <Button color="default" variant="filled" icon={<EditOutlined />} onClick={() => setIsEdit(true)} >Edit</Button>
-                }
+                )}
             </div>
 
             <div class='border rounded-lg ml-6 flex flex-col mb-6'> {isEdit ?

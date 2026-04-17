@@ -1,9 +1,9 @@
 import { Button, Select, Switch } from "antd";
 import Heading from "../../../common/heading";
 import {CarryOutFilled } from '@ant-design/icons';
-import { useEffect, useState } from "react";
+import { useEffect, useImperativeHandle, useState } from "react";
 
-const BookingDays = ({ companyList, saveData }) => {
+const BookingDays = ({ companyList, saveData,popUp=false,refNext=null }) => {
     const [bookingdays, setBookingdays] = useState(0);
     const [isAutoAccept, setIsAutoAccept] = useState(false);
     
@@ -25,12 +25,16 @@ const BookingDays = ({ companyList, saveData }) => {
             label:headingLabel,
             method: "PUT", 
             endPoint:"company/bookingdays",
-            body: Body
+            body: Body,
+            notify:!popUp
         });
     }
+    useImperativeHandle(refNext, () => ({
+        handleSave: save
+    }));
     return (
-        <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
-            <Heading label={headingLabel} Icon={<CarryOutFilled />} desc={`Appointment can be booked up to ${bookingdays} days in advance`} />
+        <div class={`w-full bg-white ${popUp ? '' :'border'} rounded-lg p-4 flex flex-col gap-4 `}>
+            <Heading label={headingLabel} Icon={<CarryOutFilled size={26} />} desc={`Appointment can be booked up to ${bookingdays} days in advance`} />
             
             <div class=" flex flex-col  gap-3 md:flex-row">
                 <div class='ml-8 flex flex-col gap-0 md:w-1/6'>
@@ -60,7 +64,7 @@ const BookingDays = ({ companyList, saveData }) => {
             </div>
 
             <div class='mx-6 flex justify-end '>
-                <Button size='large' color="primary" variant="solid" onClick={save} >Save changes</Button>
+               {!popUp && <Button size='large' color="primary" variant="solid" onClick={save} >Save changes</Button>}
             </div>
 
         </div>
