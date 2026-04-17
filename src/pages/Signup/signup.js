@@ -117,8 +117,8 @@ export const Signup = ({ logo }) => {
             wednesday: ['09:00:00', '21:00:00', true],
             thursday: ['09:00:00', '21:00:00', true],
             friday: ['09:00:00', '21:00:00', true],
-            saturday: ['09:00:00', '21:00:00', true],
-            sunday: ['09:00:00', '21:00:00', true],
+            saturday: ['09:00:00', '21:00:00', false],
+            sunday: ['09:00:00', '21:00:00', false],
           }]
         });
 

@@ -4,10 +4,8 @@ import { useEffect, useImperativeHandle, useState } from "react";
 import { Input } from "antd";
 import { TextboxFlex } from "../../common/textbox";
 import { isValidEmail, setCellFormat } from "../../common/cellformat";
-import { useOutletContext } from "react-router-dom";
 
-const CustomerDetail = ({ id, refresh, ref, setOpen }) => {
-    const { saveData, customerList} = useOutletContext();
+const CustomerDetail = ({ id, refresh, ref, setOpen, saveData, customerList }) => {
 
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');

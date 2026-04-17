@@ -1,30 +1,24 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useRef, useState } from "react";
+import { useEffect,  useState } from "react";
 import { EditOutlined } from '@ant-design/icons';
 import { IoSearchOutline } from "react-icons/io5";
-import { Button, Drawer, Input, Select, Space, Tooltip } from "antd";
-import { SaveOutlined } from '@ant-design/icons';
+import { Button,  Input, Select,  Tooltip } from "antd";
 import DataTable from "../../common/datatable";
 import { getTableItem } from "../../common/items";
 import { Sort } from '../../common/sort.js'
 import { FaSortAlphaDown, FaSortAlphaUp } from "react-icons/fa";
 import { UTC_LocalDateTime } from "../../common/localDate.js";
-import CustomerDetail from "../../components/Customer/customer_detail.js";
 import { useOutletContext } from "react-router-dom";
 import IsLoading from "../../common/custom/isLoading.js";
 import PageHeader from "../../common/pages/pageHeader.js";
 import StarBadge from "../../common/starbadge.js";
 
 const Customer = () => {
-    const ref = useRef();
     const headingLabel = 'Customers'
-    const { refresh, customerList, setCustomerList,getCustomer} = useOutletContext();
+    const { refresh, customerList, setCustomerList,getCustomer,editCustomer} = useOutletContext();
 
     const [isLoading, setIsLoading] = useState(false);
-    const [open, setOpen] = useState(false);
-    const [title, setTitle] = useState('New');
-    const [id, setId] = useState(0);
-    const [reload, setReload] = useState(0);
+   
 
     const [filteredList, setFilteredList] = useState([]);
     const [list, setList] = useState([]);
@@ -48,16 +42,6 @@ const Customer = () => {
         setExportList(response);
         setPage(1, 10, response);
         setIsLoading(false)
-    }
-
-    const btn_Click = (id) => {
-        setTitle(id === 0 ? `New ${headingLabel}` : `Edit ${headingLabel}`);
-        setReload(reload + 1);
-        setId(id);
-        setOpen(true);
-    }
-    const btnSave = async () => {
-        await ref.current?.save();
     }
 
     useEffect(() => {
@@ -99,7 +83,7 @@ const Customer = () => {
     ];
     return (
         <div class="flex flex-col gap-4 md:px-7 py-4  mb-12">
-            <PageHeader label={headingLabel} isExport={true} exportList={exportList} exportName={headingLabel} isCreate={true} onClick={() => btn_Click(0)} servicesList={[]} userList={[]} />
+            <PageHeader label={headingLabel} isExport={true} exportList={exportList} exportName={headingLabel} isCreate={true} onClick={() => editCustomer(0)} servicesList={[]} userList={[]} />
             <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
 
                 <div class='flex flex-col md:flex-row gap-2 items-center justify-between'>
@@ -156,19 +140,13 @@ const Customer = () => {
                                     <td class="p-3">{UTC_LocalDateTime(item.modifiedat, 'DD MMM YYYY h:mm A')}</td>
                                     <td class="p-3">
                                         <Tooltip placement="top" title={'Edit'} >
-                                            <Button type="link" icon={<EditOutlined />} onClick={() => btn_Click(item.id)} />
+                                            <Button type="link" icon={<EditOutlined />} onClick={() => editCustomer(item.id)} />
                                         </Tooltip>
                                     </td>
                                 </tr>
                             ))
                         )} />} />
             </div>
-
-            <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
-                extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
-
-                <CustomerDetail id={id} refresh={reload} ref={ref} setOpen={setOpen} />
-            </Drawer>
         </div>
     )
 }

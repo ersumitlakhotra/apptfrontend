@@ -78,7 +78,7 @@ export const handleCardExpired = (month, year) => {
     };
 };
 
-const checkGmail = (value) => {
+export const checkGmail = (value) => {
     const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
     return gmailRegex.test(value);
 };
@@ -88,6 +88,7 @@ export const checkEmailStatus = (companyList) => {
         return {
             status: true,
             message: "Your Gmail account is not configured yet ! Please go to <b>Setting -> Gmail Notification Setup</b> -> set your <b>E-Mail</b> and <b>App Password</b>."
+          
         };
     }
 

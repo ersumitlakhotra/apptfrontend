@@ -5,13 +5,13 @@ import BookingDays from "./bookingdays.js";
 import GmailSetup from "./gmailsetup.js";
 import Loyalty from "./loyalty.js";
 
-const Account = ({ companyList,loyaltyList, saveData, logoList}) => {  
+const Account = ({ companyList,loyaltyList, saveData, logoList, refresh,setRefresh,setIsLoading}) => {  
     return (
         <div class='flex flex-col gap-8'>
             <BasicInfo companyList={companyList}  saveData={saveData} logoList={logoList} />
-            <Hours companyList={companyList} saveData={saveData} />
+            <Hours companyList={companyList} saveData={saveData} refresh={refresh} setRefresh={setRefresh} />
             <BookingDays companyList={companyList} saveData={saveData} />
-            <GmailSetup companyList={companyList} saveData={saveData} />     
+            <GmailSetup companyList={companyList} saveData={saveData} setIsLoading={setIsLoading}  />     
             <Loyalty loyaltyList={loyaltyList} saveData={saveData} />  
             <Deactivate /> 
         </div>

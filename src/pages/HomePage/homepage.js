@@ -13,6 +13,7 @@ import Warning from "./warning";
 import useAlert from "../../common/alert";
 import { checkBillingDetails, checkEmailStatus, checkPlanStatus } from "./general";
 import { get_Date } from "../../common/localDate";
+import SpiralNotebook from "./spiralNotebook";
 
 function getMessageItem(key, label, type, description,moveto) {
     return { key, label, type, description,moveto };
@@ -87,7 +88,7 @@ const Homepage = () => {
                 if (checkInvoice.length > 0)
                 {
                     messages.push(getMessageItem(4, 'Invoice', 'warning', `Your next payment bill is ready and due on ${get_Date(checkInvoice[0].duedate,'MMM DD, YYYY')}`, "/setting?tab=2#invoice"));
-                    (checkInvoice[0].failedreason || '').length > 0 && messages.push(getMessageItem(5, 'Payment Failed', 'error', `Oops! Your payment failed! ${checkInvoice[0].failedreason || ''}`, "/setting?tab=2#invoice"))
+                    ((checkInvoice[0].failedreason).replace(/\s+/g, "") || '').length > 0 && messages.push(getMessageItem(5, 'Payment Failed', 'error', `Oops! Your payment failed! ${checkInvoice[0].failedreason || ''}`, "/setting?tab=2#invoice"))
                 }
 
             }
@@ -109,6 +110,7 @@ const Homepage = () => {
             <div class='flex flex-col gap-8 p-4 '>
                 <div class='w-full flex flex-col md:flex-row gap-8 '>
                     <div class='w-full md:w-4/12 flex flex-col gap-6'>
+                       {/*  <SpiralNotebook/>*/} 
                         <ProfileCard />
                         <CalenderCard ref={ref1} />
                     </div>

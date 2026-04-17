@@ -1,8 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Drawer, Space, Tabs, Tag,Modal } from "antd"
-import {  MailOutlined, SaveOutlined } from '@ant-design/icons';
-import { useEffect, useRef, useState } from "react";
-import EventDetail from "../../components/Event/event_detail.js";
+import { Button, Tabs, Tag,Modal } from "antd"
+import {  MailOutlined } from '@ant-design/icons';
+import { useEffect,  useState } from "react";
 import { getTabItems } from "../../common/items.js";
 import Events from '../../components/Event/event.js'
 import dayjs from 'dayjs';
@@ -22,21 +21,16 @@ const customLabelTab = (label, tagColor, tagValue) => {
 }
 
 const Event = () => {
-    const ref = useRef(); 
     const headingLabel = 'Event'
 
    const { saveData, refresh,
         eventList,getEvent,
         servicesList, getService,
-        userList, getUser,
+        userList, getUser, editEvent,
      customerList, getCustomer, companyList } = useOutletContext();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [open, setOpen] = useState(false);
-    const [title, setTitle] = useState('New');
-    const [id, setId] = useState(0);
-    const [reload, setReload] = useState(0);
     const [tabActiveKey, setTabActiveKey] = useState("1");
     const [fromDate, setFromDate] = useState(dayjs(firstDateOfMonth(new Date())).format("YYYY-MM-DD"));
     const [toDate, setToDate] = useState(dayjs(lastDateOfMonth(new Date())).format("YYYY-MM-DD"));
@@ -59,13 +53,6 @@ const Event = () => {
         await getUser(); 
         await getEvent();
         setIsLoading(false)
-    }
-
-    const btn_Click = (id) => {
-        setTitle(id === 0 ? `New ${headingLabel}` : `Edit ${headingLabel}`);
-        setReload(reload + 1);
-        setId(id);
-        setOpen(true);
     }
 
     useEffect(() => {
@@ -98,28 +85,16 @@ const Event = () => {
     }, [refresh, eventList, fromDate,toDate])
 
     const tabItems = [
-        getTabItems('1', customLabelTab("All", "cyan", eventTotal.length), null, <Events eventList={eventTotal} servicesList={servicesList} btn_Click={btn_Click}  fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} />),
-        getTabItems('2', customLabelTab("Live", "green", liveList.length), null, <Events eventList={liveList} servicesList={servicesList} btn_Click={btn_Click} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} />),
-        getTabItems('3', customLabelTab("Upcoming", "yellow", upcomingList.length), null, <Events eventList={upcomingList} servicesList={servicesList} btn_Click={btn_Click} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList}  isLoading={isLoading}/>),
-        getTabItems('4', customLabelTab("Past", "red", pastList.length), null, <Events eventList={pastList} servicesList={servicesList} btn_Click={btn_Click}  fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList}  isLoading={isLoading}/>)
+        getTabItems('1', customLabelTab("All", "cyan", eventTotal.length), null, <Events eventList={eventTotal} servicesList={servicesList} btn_Click={editEvent}  fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} />),
+        getTabItems('2', customLabelTab("Live", "green", liveList.length), null, <Events eventList={liveList} servicesList={servicesList} btn_Click={editEvent} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList} isLoading={isLoading} />),
+        getTabItems('3', customLabelTab("Upcoming", "yellow", upcomingList.length), null, <Events eventList={upcomingList} servicesList={servicesList} btn_Click={editEvent} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList}  isLoading={isLoading}/>),
+        getTabItems('4', customLabelTab("Past", "red", pastList.length), null, <Events eventList={pastList} servicesList={servicesList} btn_Click={editEvent}  fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate} setExportList={setExportList}  isLoading={isLoading}/>)
     ];
-
-    const btnSave = async () => {
-        await ref.current?.save();
-    }
-
     return (
         <div class="flex flex-col gap-4 md:px-7 py-4 mb-12">
-            <PageHeader label={headingLabel} isExport={true} exportList={exportList} exportName={headingLabel} isCreate={true} onClick={() => btn_Click(0)} servicesList={servicesList} userList={userList}
+            <PageHeader label={headingLabel} isExport={true} exportList={exportList} exportName={headingLabel} isCreate={true} onClick={() => editEvent(0)} servicesList={servicesList} userList={userList}
             customButton={<Button type='default' icon={<MailOutlined />} size="large" onClick={() => setIsModalOpen(true)}>Send E-Mail</Button>} />
             <Tabs items={tabItems} activeKey={tabActiveKey} onChange={(e) => { setTabActiveKey(e) }} />
-
-
-            {/* Drawer on right*/}
-            <Drawer title={title} placement='right' width={500} onClose={() => setOpen(false)} open={open}
-                extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave}  >Save</Button></Space>}>
-                <EventDetail id={id} refresh={reload} ref={ref} eventList={eventList} servicesList={servicesList} saveData={saveData} setOpen={setOpen} />
-            </Drawer>
 
             <Modal
                 title=" "

@@ -1,12 +1,12 @@
 import { Button,  Switch, ConfigProvider, Checkbox, Input } from "antd";
 import Heading from "../../../common/heading";
 import { DollarCircleFilled } from '@ant-design/icons';
-import { useEffect, useState } from "react";
+import { useEffect, useImperativeHandle, useState } from "react";
 import { setNumberAndDot } from "../../../common/cellformat";
 import StarBadge from "../../../common/starbadge.js";
 import useAlert from "../../../common/alert.js";
 
-const Loyalty = ({ loyaltyList, saveData }) => {
+const Loyalty = ({ loyaltyList, saveData,popUp=false,refNext=null }) => {
     const { contextHolder, warning } = useAlert();
     const [id, setId] = useState(0)
     const [isLoyalty, setIsLoyalty] = useState(false);
@@ -127,7 +127,7 @@ const Loyalty = ({ loyaltyList, saveData }) => {
             isSave = true
         else if (isLoyalty && (isPointBased || isPunch || isReferral || isTier) && isFormValid())
             isSave = true
-
+ console.log('fyhjhkjk'+isSave)
         if (isSave) {
             const Body = JSON.stringify({
                 active: isLoyalty,
@@ -154,16 +154,29 @@ const Loyalty = ({ loyaltyList, saveData }) => {
                 method: id !== 0 ? 'PUT' : 'POST',
                 endPoint: "loyalty",
                 id: id !== 0 ? id : null,
-                body: Body
+                body: Body,
+                notify: !popUp
+
             });
+           
+            return true;
         }
         else {
             if (isLoyalty && !isPointBased && !isPunch && !isReferral && !isTier)
                 warning('Select atleast one option !')
             else
                 warning('Please, fill out the required fields !')
+
+             return false;
         }
+        
     }
+
+    useImperativeHandle(refNext, () => ({
+        handleSave: save
+    }));
+          
+        
 
     const CheckBox = ({ label, isChecked, setIsChecked }) => {
         return (<ConfigProvider
@@ -196,9 +209,9 @@ const Loyalty = ({ loyaltyList, saveData }) => {
         );
     };
     return (
-        <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
-            <Heading label={headingLabel} Icon={<DollarCircleFilled />} desc={`To encourages them to continue choosing the same business by offering rewards over time`} />
-
+        <div class={`w-full bg-white ${popUp ? '' :'border'} rounded-lg p-4 flex flex-col gap-4 `}>
+            <Heading label={headingLabel} Icon={<DollarCircleFilled  size={26}/>} desc={`To encourages them to continue choosing the same business by offering rewards over time`} />
+           
             <div class=" flex flex-col gap-2 mt-2 ps-8">
                 <div class='flex gap-3 '>
                     <span class="block text-sm font-medium">What would you like to do?  Would you like to activate that loyalty program?</span>
@@ -261,7 +274,7 @@ const Loyalty = ({ loyaltyList, saveData }) => {
 
             </div>
             <div class='mx-6 flex justify-end '>
-                <Button size='large' color="primary" variant="solid" onClick={save} >Save changes</Button>
+                {!popUp && <Button size='large' color="primary" variant="solid" onClick={save} >Save changes</Button>}
             </div>
 {contextHolder}
         </div>

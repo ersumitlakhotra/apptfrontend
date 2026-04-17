@@ -1,14 +1,14 @@
-import { Avatar, Button, Image, Select } from "antd";
+import { Avatar, Button,  Image, Select } from "antd";
 import { CloudUploadOutlined, UserOutlined } from '@ant-design/icons';
 import { setCellFormat } from "../../../common/cellformat.js"
 import Heading from "../../../common/heading.js";
 import {Textbox, TextboxFlexCol} from "../../../common/textbox.js";
 import { FcInfo } from "react-icons/fc";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useImperativeHandle, useRef, useState } from "react";
 import useAlert from "../../../common/alert.js";
 import { usStates,canadaRegions } from "../../../common/province.js";
 
-const BasicInfo = ({ companyList, saveData, logoList }) => {
+const BasicInfo = ({ companyList, saveData, logoList,popUp=false,refNext=null }) => {
 
     const ref = useRef();
     const { contextHolder, error,warning } = useAlert();
@@ -67,13 +67,17 @@ const BasicInfo = ({ companyList, saveData, logoList }) => {
                 label: headingLabel,
                 method: "PUT",
                 endPoint: "company/address",
-                body: Body
-            });
+                body: Body,
+                notify:!popUp
+            });           
         }
         else
             warning('Please, fill out the required fields !') 
     }
 
+    useImperativeHandle(refNext, () => ({
+        handleSave: save
+    }));
 
     const handleFileChange = (event) => {
         const file = event.target.files[0]; // Access the first selected file
@@ -113,8 +117,9 @@ const BasicInfo = ({ companyList, saveData, logoList }) => {
         }
     };
     return (
-        <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
+        <div class={`w-full bg-white ${popUp ? '' :'border'} rounded-lg p-4 flex flex-col gap-4 `}>
             <Heading label={headingLabel} Icon={<FcInfo size={26} />} />
+         
             <div class='ml-8'>
                 <div class='my-6 text-gray-500 flex gap-6'>
                     {logo !== null ?
@@ -169,9 +174,11 @@ const BasicInfo = ({ companyList, saveData, logoList }) => {
                 </div>
             </div>
 
-            <div class='my-4 flex justify-end items-center'>
-                <Button size='large' color="primary" variant="solid" onClick={save} >Save changes</Button>
-            </div>
+            {!popUp && <div class='my-4 flex justify-end items-center'>
+                <Button size='large' color="primary" variant="solid" onClick={save} >
+                  Save changes
+                    </Button>
+            </div>}
             {contextHolder}
         </div>
     )

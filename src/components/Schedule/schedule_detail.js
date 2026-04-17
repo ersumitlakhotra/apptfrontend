@@ -152,6 +152,7 @@ const ScheduleDetail = ({ id, refresh, ref, date, scheduleList, userList, saveDa
             <TextboxFlex label={'Working'} mandatory={true} input={
                 <Switch style={{fontSize:16}}  checkedChildren={'Working'} unCheckedChildren={'Day off'} value={isWorking} onChange={(e) => setIsWorking(e)} />
             } />
+           <p class=" mt-4 text-red-400">This schedule will be changed for this specific day, and the rest of the weekly schedule will remain the same.</p>
 
             {contextHolder}
         </div>

@@ -3,16 +3,18 @@ import { ImFacebook } from "react-icons/im";
 import { FaInstagram, FaLinkedinIn } from "react-icons/fa";
 import { BsTwitterX } from "react-icons/bs";
 import { TbWorldWww } from "react-icons/tb";
-import { useEffect, useState } from "react";
+import { useEffect, useImperativeHandle, useState } from "react";
+import Heading from "../../../common/heading";
+import { IoShareSocialSharp } from "react-icons/io5";
 
-
-const SocialLink = ({ companyList, saveData }) => {
+const SocialLink = ({ companyList, saveData ,popUp=false,refNext=null}) => {
     const [website, setWebsite] = useState('');
     const [facebook, setFacebook] = useState('');
     const [instagram, setInstagram] = useState('');
     const [twitter, setTwitter] = useState('');
     const [linkedin, setLinkedin] = useState('');
 
+    const headingLabel="Social links";
     useEffect(() => {
         if (companyList.length !== 0) {
             if (companyList.socialinfo !== null) {
@@ -36,25 +38,31 @@ const SocialLink = ({ companyList, saveData }) => {
             }]
         });
           saveData({
-            label:"Social links",
+            label:headingLabel,
             method: "PUT", 
             endPoint:"company/social",
-            body: Body
+            body: Body,
+            notify:!popUp
         }); 
 
     }
+    useImperativeHandle(refNext, () => ({
+        handleSave: save
+    }));
     return (
-        <div class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
+        <div class={`w-full bg-white ${popUp ? '' :'border'} rounded-lg p-4 flex flex-col gap-4 `}>
+            {popUp && <Heading label={headingLabel} Icon={<IoShareSocialSharp size={26} />} desc={`Stay updated and stay connected`} />}
+       
             <Input size={'large'} placeholder="https://www.website.com" value={website} onChange={(e) => setWebsite(e.target.value)} style={{ padding: 16, fontSize: 16 }} prefix={<TbWorldWww size={24} style={{ color: '#1877F2' }} />} />
             <Input size={'large'} placeholder="https://www.facebook.com" value={facebook} onChange={(e) => setFacebook(e.target.value)} style={{ padding: 16, fontSize: 16 }} prefix={<ImFacebook size={24} style={{ color: '#1877F2' }} />} />
             <Input size={'large'} placeholder="https://www.instagram.com" value={instagram} onChange={(e) => setInstagram(e.target.value)} style={{ padding: 16, fontSize: 16 }} prefix={<FaInstagram size={24} style={{ color: '#E1306C' }} />} />
             <Input size={'large'} placeholder="https://www.twitter.com" value={twitter} onChange={(e) => setTwitter(e.target.value)} style={{ padding: 16, fontSize: 16 }} prefix={<BsTwitterX size={24} />} />
             <Input size={'large'} placeholder="https://www.linkedin.com" value={linkedin} onChange={(e) => setLinkedin(e.target.value)} style={{ padding: 16, fontSize: 16 }} prefix={<FaLinkedinIn size={24} style={{ color: '#1877F2' }} />} />
-            <div class='flex justify-end items-center'>
+           {!popUp && <div class='flex justify-end items-center'>
                 <Tooltip placement="top" title={'Save changes'}>
                     <Button size='large' color='primary' variant="solid" onClick={save}  >Save changes</Button>
                 </Tooltip>
-            </div>
+            </div>}
         </div>
     )
 

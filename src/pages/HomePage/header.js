@@ -4,7 +4,7 @@ import Search from '../../common/custom/search'
 import logo from '../../Images/logo.png'
 import { SlEarphonesAlt } from "react-icons/sl";
 import { Avatar, Badge, Button, Drawer, Dropdown, Space, Tooltip } from 'antd';
-import { BellFilled, LogoutOutlined, DownOutlined, UserOutlined, BellOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
+import { BellFilled, LogoutOutlined, DownOutlined, UserOutlined, BellOutlined, EditOutlined, EyeOutlined, PlusCircleFilled, PlusSquareFilled, ProductOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import AssignedTo from '../../common/assigned_to';
@@ -17,6 +17,9 @@ import { Sort } from '../../common/sort';
 import { useResponseButtons } from '../../components/Order/responseButton';
 import { Tags } from '../../common/tags';
 import dayjs from 'dayjs';
+import { BsPlusCircleFill } from "react-icons/bs";
+import AppIconsPermission from '../../common/custom/appIconsPermission';
+import { AppIconsMini } from '../../common/custom/appIcons';
 
 function getItem(key, label, icon, extra, disabled, danger) {
     return {
@@ -28,7 +31,7 @@ function getItem(key, label, icon, extra, disabled, danger) {
         danger,
     };
 }
-const Header = ({ saveData, refresh, setRefresh, editOrder, viewOrder, getOrder, editUser, uid, orderList, notificationList, getNotification, getUserListWithAdmin, servicesList
+const Header = ({ saveData, refresh, setRefresh, editOrder, viewOrder, getOrder,editEvent, editCustomer,editService, editUser,editSchedule, uid, orderList, notificationList, getNotification, getUserListWithAdmin, servicesList
 }) => {
     const navigate = useNavigate();
     const ranOnce = useRef(false);
@@ -45,6 +48,8 @@ const Header = ({ saveData, refresh, setRefresh, editOrder, viewOrder, getOrder,
     const [tabActiveKey, setTabActiveKey] = useState(1)
     const [reload, setReload] = useState(0);
     const { Accept, Reject } = useResponseButtons(saveData);
+    const { apps } = AppIconsPermission('16px');
+    const addItemsPermission = ["Appointment","Event","Customers","Services","Users","Schedule"]
 
 
     useEffect(() => {
@@ -124,6 +129,27 @@ const Header = ({ saveData, refresh, setRefresh, editOrder, viewOrder, getOrder,
         onClick: handleMenuClick
     };
 
+    
+    const handleAddClick = e => {
+        switch (e.key) {
+            case '2':{editOrder(0);break;}
+            case '4':{editEvent(0);break;}
+            case '5':{editCustomer(0);break;}
+            case '6':{editService(0);break;}
+            case '7':{editUser(0);break;}
+            case '8':{editSchedule(0,LocalDate());break;}
+            default: { break; }
+        }
+    };
+    const addProps = {
+        items: 
+            apps.filter(app =>
+                addItemsPermission.some(icon => app.label === icon && app.isVisible)).map(res =>
+                    getItem(res.key, res.label, <AppIconsMini key={res.key} size={24} isLabel={false} icon={res.icon} label={res.label} backgroundColor={res.color} />, '⌘'+res.label.charAt(0)), { type: 'divider', }
+                )
+        ,
+        onClick: handleAddClick
+    };
     const [currentOption, setCurrentOption] = useState('Last 7 Days');
     const itemsNotification = [
         { key: 'Today', label: 'Today' },
@@ -238,10 +264,15 @@ setNotificationFilteredList(notification);
             </div>
 
             {/* notification and profile */}
-            <div class='w-3/12 pr-4 flex flex-row gap-4 justify-end items-center '>
+            <div class='w-3/12 pr-4 flex flex-row gap-3 md:gap-4 justify-end items-center '>
+                <Dropdown menu={addProps} trigger={['click']} overlayStyle={{ gap: 4, color: 'white', cursor: 'pointer' }}>
+                    <Space style={{ cursor: 'pointer' }}>
+                        <PlusCircleFilled style={{ fontSize: '30px', color: 'white', cursor: 'pointer' }} />
+                    </Space>
+                </Dropdown>
 
-                <Badge count={unread}>
-                    <BellFilled style={{ fontSize: '23px', color: 'white', cursor: 'pointer' }} onClick={() => { setOpenNotification(true); setTabActiveKey('1'); }} />
+                <Badge count={unread} >
+                    <BellFilled style={{ fontSize: '23px', color: 'white', cursor: 'pointer'}} onClick={() => { setOpenNotification(true); setTabActiveKey('1'); }} />
                 </Badge>
 
                 <Dropdown menu={menuProps} trigger={['click']} overlayStyle={{ gap: 4, color: 'white', cursor: 'pointer' }}>

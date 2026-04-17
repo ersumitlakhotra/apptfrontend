@@ -1,7 +1,7 @@
-import { Button, Modal } from "antd";
+import { Button,  Modal } from "antd";
 import Heading from "../../../common/heading";
 import { MailFilled } from '@ant-design/icons';
-import { useEffect, useState } from "react";
+import { useEffect, useImperativeHandle, useState } from "react";
 import { Textbox } from "../../../common/textbox";
 import step2verification from '../../../Images/gif/2stepVerification.gif'
 import apppassword from '../../../Images/gif/app_password.gif'
@@ -9,16 +9,15 @@ import apppasswordcreate from '../../../Images/gif/app_password_create.gif'
 import { apiCalls } from "../../../hook/apiCall";
 import { getStorage } from "../../../common/localStorage";
 import useAlert from "../../../common/alert";
-import { useOutletContext } from "react-router-dom";
+import {  checkGmail } from "../../../pages/HomePage/general";
 
-const GmailSetup = ({ companyList, saveData }) => {
+const GmailSetup = ({ companyList, saveData,setIsLoading,popUp=false,refNext=null }) => {
     const [businessName, setBusinessName] = useState('');
     const [emailUser, setEmailUser] = useState('');
     const [emailPass, setEmailPass] = useState('');
     const headingLabel = 'Gmail Notification';
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { contextHolder, success,error} = useAlert();
-    const {setIsLoading} = useOutletContext()
+    const { contextHolder, success,warning,error} = useAlert();
 
     useEffect(() => {
         if (companyList.length !== 0) {
@@ -32,17 +31,34 @@ const GmailSetup = ({ companyList, saveData }) => {
     }, [companyList])
 
     const save = async () => {
-        const Body = JSON.stringify({
-            emailuser: emailUser,
-            emailpass: emailPass.trim().replace(/\s+/g, ""),
-        });
-        saveData({
-            label: headingLabel,
-            method: "PUT",
-            endPoint: "company/emailsetup",
-            body: Body
-        });
+        if ( checkGmail(emailUser) && emailPass.trim().replace(/\s+/g, "").length === 16 ) {
+            const Body = JSON.stringify({
+                emailuser: emailUser,
+                emailpass: emailPass.trim().replace(/\s+/g, ""),
+            });
+            saveData({
+                label: headingLabel,
+                method: "PUT",
+                endPoint: "company/emailsetup",
+                body: Body,
+                notify: !popUp
+            });
+            return true;
+        }
+        else
+        {
+            warning("Please watch the SETUP TUTORIAL, if not,Skip it for the time being and set up later.");
+             return false;
+        }
+
+
+
     }
+     useImperativeHandle(refNext, () => ({
+            handleSave: save
+        }));
+      
+    
 
     const sendEmail = async () => {
         setIsLoading(true)
@@ -76,11 +92,12 @@ const GmailSetup = ({ companyList, saveData }) => {
     }
 
     return (
-        <div id="gmailsetup" class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
-            <Heading label={`${headingLabel} Setup`} Icon={<MailFilled />} desc={'Send Automatic e-mail notification to customers. '} />
+        <div id="gmailsetup" class={`w-full bg-white ${popUp ? '' :'border'} rounded-lg p-4 flex flex-col gap-4 `}>
+            <Heading label={`${headingLabel} Setup`} Icon={<MailFilled size={26} />} desc={'Send Automatic e-mail notification to customers. '} />
+           
             <div class='flex flex-col gap-6 mx-6 md:flex-row'>
-                <div class='md:w-1/3'> <Textbox type={'text'} label={'E-Mail Id'} value={emailUser} setValue={setEmailUser} placeholder={'abc@gmail.com'} /></div>
-                <div class='md:w-1/3'> <Textbox type={'password'} label={'App Password'} value={emailPass} setValue={setEmailPass} placeholder={'****'} /></div>
+                <div class='md:w-1/3'> <Textbox type={'text'} isRequired={true} label={'E-Mail Id'} value={emailUser} setValue={setEmailUser} placeholder={'abc@gmail.com'} /></div>
+                <div class='md:w-1/3'> <Textbox type={'password'} isRequired={true} label={'App Password'} value={emailPass} setValue={setEmailPass} placeholder={'****'} /></div>
             </div>
             <div className="mx-6 flex flex-col md:flex-row  justify-between gap-2">
                 <div className="flex gap-3">
@@ -88,7 +105,7 @@ const GmailSetup = ({ companyList, saveData }) => {
                     <Button size='large' color="primary" variant="outlined" onClick={() => sendEmail()} >Send Test Email</Button>
                 </div>
                 <div class='flex justify-end '>
-                    <Button size='large' color="primary" variant="solid" onClick={save} >Save changes</Button>
+                    {!popUp && <Button size='large' color="primary" variant="solid" onClick={save} >Save changes</Button>}
                 </div>
             </div>
             <Modal
