@@ -251,7 +251,7 @@ export const Signup = ({ logo }) => {
               <div class="flex items-start">
                 <div class="flex items-center h-5">
                   <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-                    Already have an account? <a href="/" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign in</a>
+                    Already have an account? <a href="/login" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign in</a>
                   </p>
                 </div>
               </div>

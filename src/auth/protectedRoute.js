@@ -42,7 +42,7 @@ const ProtectedRoute = () => {
     }
 
 
-    if (!isAuthenticated) return <Navigate to="/" replace />;; // prevent rendering
+    if (!isAuthenticated) return <Navigate to="login" replace />;; // prevent rendering
 
      const currentPath = location.pathname;
 
