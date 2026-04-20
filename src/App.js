@@ -30,13 +30,15 @@ import QRcode from './components/Setting/QRcode/qrcode.js';
 import Reports from './pages/Reports/reports.js';
 import ErrorPage from './pages/Error/error.js'
 import Logout from './pages/Login/logout.js';
+import Website from './pages/Website/Homepage/home.js';
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Login logo={logo} />} />
+          <Route path="/" element={<Website/>} />
+          <Route path="login" element={<Login logo={logo} />} />
           <Route path="signup" element={<Signup logo={logo} />} />
           <Route path="resetpassword" element={<ResetPassword logo={logo} />} />
           {/*<Route path="main" element={<MasterPage />} />*/}
