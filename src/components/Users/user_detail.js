@@ -10,6 +10,8 @@ import UserLoginPermissions from "./permissions.js";
 import ScheduleN from "./scheduleN.js";
 import FetchData from "../../hook/fetchData.js";
 import IsLoading from "../../common/custom/isLoading.js";
+import { getStorage } from "../../common/localStorage.js";
+import { getExtension } from "../../common/general.js";
 
 function getTabItems(key, label, icon, children) {
     return { key, label, children, icon, };
@@ -51,6 +53,11 @@ const UserDetail = ({ id, refresh, ref, companyList, saveData, setOpen, isAdmin,
     const [saturday, setSaturday] = useState(['09:00:00', '21:00:00', true, '14:00:00', '14:30:00']);
     const [sunday, setSunday] = useState(['09:00:00', '21:00:00', true, '14:00:00', '14:30:00']);
 
+    
+    const [fileToUpload, setFileToUpload] = useState(null);
+    const [fileType, setFileType] = useState('');
+
+
     const { contextHolder, error, warning } = useAlert();
     let refimage = useRef();
 
@@ -78,6 +85,7 @@ const UserDetail = ({ id, refresh, ref, companyList, saveData, setOpen, isAdmin,
         else {
             load();
         }
+       setFileType('');setFileToUpload(null);
     }, [refresh])
 
     const load = async () => {
@@ -150,6 +158,39 @@ const UserDetail = ({ id, refresh, ref, companyList, saveData, setOpen, isAdmin,
 
     }
 
+    const uploadToS3 =async(Id) => {
+         const Body = JSON.stringify({
+            folder:"user",
+            name:`${Id}.${getExtension(fileToUpload.name)}`,
+            type:fileType
+         })
+        const response = await FetchData({
+            method: 'POST',
+            endPoint: 'uploadtos3',
+            body:Body
+        })
+        const url = response.data.url;
+        const success = response.data.success;
+        const path = response.data.path;
+        const message = response.data.message;
+        if(Boolean(success))
+        {
+           const result= await fetch(url, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": fileType,
+                },
+                body: fileToUpload, 
+            });
+            if (result.ok)
+                return `${process.env.REACT_APP_AWS_BUCKET_URL}${path}`;
+
+            if (!result.ok) {
+               error(`Upload failed with error ${message}`);
+            }
+        }
+        return '';
+    }
 
     const save = async () => {
         if (fullname !== '' && password !== '' && cell.length === 12 && cell !== '') {
@@ -166,7 +207,6 @@ const UserDetail = ({ id, refresh, ref, companyList, saveData, setOpen, isAdmin,
                 appschedule: appschedule,
                 status: status,
                 accounttype: accounttype,
-                profilepic: profilepic,
                 dashboard: dashboard,
                 tasks: tasks,
                 order: order,
@@ -189,13 +229,31 @@ const UserDetail = ({ id, refresh, ref, companyList, saveData, setOpen, isAdmin,
                     sunday: sunday,
                 }]
             });
-            saveData({
+            const res=await saveData({
                 label: "Users",
                 method: id !== 0 ? 'PUT' : 'POST',
                 endPoint: "user",
                 id: id !== 0 ? id : null,
                 body: Body
             });
+
+            if (fileToUpload !== null) {
+                const Id=res.data.id;
+                const path = await uploadToS3(Id);
+                const ProfilePicBody = JSON.stringify({
+                    id: Id,
+                    profilepic: path
+                });
+                await saveData({
+                    label: "Users",
+                    method: 'POST',
+                    endPoint: "user/profile",
+                    id: null,
+                    body: ProfilePicBody,
+                    notify: false
+                });
+            }
+
             setOpen(false);
         }
         else {
@@ -283,12 +341,12 @@ const UserDetail = ({ id, refresh, ref, companyList, saveData, setOpen, isAdmin,
         const file = event.target.files[0]; // Access the first selected file
         if (file) {
             const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg';
-            const isLt2M = file.size / 1024 / 1024 < 2;
+            const isLt2M = file.size / 1024 / 1024 < 4;
             if (!isJpgOrPng) {
                 error('You can only upload JPG/PNG file!');
             }
             else if (!isLt2M) {
-                error('Image must smaller than 2MB!');
+                error('Image must smaller than 4MB!');
             }
             else {
                 const reader = new FileReader();
@@ -304,6 +362,9 @@ const UserDetail = ({ id, refresh, ref, companyList, saveData, setOpen, isAdmin,
                 };
 
                 reader.readAsDataURL(file);
+
+                setFileToUpload(file);
+                setFileType(file.type);
             }
         }
     };

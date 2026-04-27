@@ -17,9 +17,9 @@ const AssignedTo = ({ userId, userList, style = 'font-bold', imageWidth = 31, im
     else {
         return (
             userList.filter(user => user.id === userId).map(a =>
-                <div key={a.id} class={`flex ${isReverse ? 'flex-row-reverse' : 'flex-row'}  gap-2 items-center`}>
+                <div key={a.id} className={`flex ${isReverse ? 'flex-row-reverse' : 'flex-row'} gap-2 items-center`}>
                     {a.profilepic !== null ?
-                     <div onClick={(e) => stopPropagation && e.stopPropagation()}>
+                     <div className="flex items-center" onClick={(e) => stopPropagation && e.stopPropagation()}>
                         <Image width={imageWidth} height={imageHeight} src={a.profilepic} style={{ borderRadius: 15 }} preview={preview}  />   </div>:
                         <Avatar size={AvatarSize} style={{ backgroundColor: 'whitesmoke' }} icon={<UserOutlined style={{ color: 'black' }} />} />
                     }

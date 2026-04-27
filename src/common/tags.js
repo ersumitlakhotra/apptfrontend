@@ -20,6 +20,7 @@ export function Tags(value) {
         case 'PAID':
         case 'WORKING':
         case 'CONFIRMED':
+        case 'DELIVERED':
             {
                 return <Tag color='green'>{value}</Tag>
             }

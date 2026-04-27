@@ -25,7 +25,7 @@ const { TextArea } = Input;
 
 const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, userList, companyList, eventList, customerList, scheduleList,loyaltyList, saveData, setOpen, isAdmin ,uid}) => {
     const {AppointmentStatus} = useEmail();
-    const {contextHolder,contextHolderModal, warning } = useAlert();
+    const {contextHolder,contextHolderModal, warning,confirmEmail } = useAlert();
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
@@ -226,20 +226,20 @@ const OrderDetail = ({ id, refresh, ref, setOrderNo, orderList, servicesList, us
                     isnewcust:isNewCust
                 });
 
-               let sendEmail_To_Customer= true; 
+               let sendEmail_To_Customer= false; 
                let statusAppoint=AppointmentStatus.CONFIRMED;
                 if (id === 0) {
                     statusAppoint = AppointmentStatus.CONFIRMED;
-                  //  sendEmail_To_Customer = await confirmEmail(AppointmentStatus.CONFIRMED,customerEmail);
+                    sendEmail_To_Customer = await confirmEmail(AppointmentStatus.CONFIRMED,customerEmail);
                 }
                 else {
                     if (status === 'Cancelled') {
                         statusAppoint = AppointmentStatus.CANCELLED;
-                        //sendEmail_To_Customer = await confirmEmail(AppointmentStatus.CANCELLED,customerEmail);
+                        sendEmail_To_Customer = await confirmEmail(AppointmentStatus.CANCELLED,customerEmail);
                     }
                     else if (prevTrnDate !== trndate || prevSlot !== slot) {
                         statusAppoint = AppointmentStatus.RESCHEDULED;
-                        //sendEmail_To_Customer = await confirmEmail(AppointmentStatus.RESCHEDULED,customerEmail);
+                        sendEmail_To_Customer = await confirmEmail(AppointmentStatus.RESCHEDULED,customerEmail);
                     }
                 }
                 

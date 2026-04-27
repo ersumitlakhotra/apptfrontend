@@ -300,3 +300,9 @@ export function SortUpcomingAppointments(data) {
     return sortedArray;
 };
 
+export const getExtension = (file) => {
+  if (!file) return "";
+
+  const parts = file.split(".");
+  return parts.length > 1 ? parts.pop().toLowerCase() : "";
+};

@@ -31,7 +31,9 @@ const plans = [
       "Inventory Management",
       "Employee Performance",
       "Portal and Mobile Application",
-      "Prioritized Support"
+      "Prioritized Support",
+      "Upto 5 Users",
+      "Text Messages (Paid)"
     ]
   },
   {
@@ -46,8 +48,9 @@ const plans = [
       "Employee Performance",
       "Portal and Mobile Application",
       "Prioritized Support",
+      "5+ Users",
       "Website",
-      "Text Messages"
+      "Text Messages (Paid)"
     ]
   }
 ];

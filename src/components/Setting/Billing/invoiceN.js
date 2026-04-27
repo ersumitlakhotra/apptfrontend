@@ -166,9 +166,11 @@ const styles = StyleSheet.create({
 const InvoicePDF = ({ id, refresh, billingList }) => {
  
         const [invoice, setInvoice] = useState('');
+        const [title, setTitle] = useState('');
         const [trnDate, setTrnDate] = useState('');
         const [dueDate, setDueDate] = useState('');
         const [pricing, setPricing] = useState('');
+        const [processingFee, setProcessingFee] = useState('');
         const [subTotal, setSubTotal] = useState('');
         const [discount, setDiscount] = useState('');
         const [taxAmount, setTaxAmount] = useState('');
@@ -181,9 +183,11 @@ const InvoicePDF = ({ id, refresh, billingList }) => {
         useEffect(() => {
             const editList = billingList.find(item => item.id === id)
             setInvoice(editList.invoice);
+            setTitle(editList.title);
             setTrnDate(editList.trndate);
             setDueDate(editList.duedate);
             setPricing(editList.pricing)
+            setProcessingFee(editList.processingfee)
             setSubTotal(editList.subtotal);
             setDiscount(editList.discount);
             setTaxAmount(editList.taxamount);
@@ -261,11 +265,19 @@ const InvoicePDF = ({ id, refresh, billingList }) => {
 
                     {/* Table Rows */}
                     <View key={99} style={styles.tableRow}>
-                        <Text style={styles.colDesc}>Software data management</Text>
+                        <Text style={styles.colDesc}>{title}</Text>
                         <Text style={styles.colQty}>1</Text>
                         <Text style={styles.colPrice}>${pricing}</Text>
                         <Text style={styles.colTotal}>${pricing}</Text>
                     </View>
+                    {processingFee !== null && processingFee.trim() !== "" &&
+                        <View key={99} style={styles.tableRow}>
+                            <Text style={styles.colDesc}>Processing Fee</Text>
+                            <Text style={styles.colQty}>1</Text>
+                            <Text style={styles.colPrice}>${processingFee}</Text>
+                            <Text style={styles.colTotal}>${processingFee}</Text>
+                        </View>
+                    }
                      {/* Empty Table Rows */}
                     {Array.from({ length: 4 }).map((_, index) => (
                         <View key={index} style={styles.tableRow}>
