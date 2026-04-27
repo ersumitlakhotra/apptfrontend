@@ -22,6 +22,7 @@ import IsSetupComplete from "../pages/HomePage/isSetupComplete";
 import EventDetail from "../components/Event/event_detail";
 import CustomerDetail from "../components/Customer/customer_detail";
 import ServiceDetail from "../components/Services/service_detail";
+import CustomerView from "../components/Customer/customer_view";
 
 const ProtectedLayout = () => {
     const ranOnce = useRef(false);
@@ -50,9 +51,11 @@ const ProtectedLayout = () => {
     const [scheduleList, setScheduleList] = useState([]);
     const [companyList, setCompanyList] = useState([]);
     const [billingList, setBillingList] = useState([]);
+    const [billingTwilioList, setBillingTwilioList] = useState([]);
     const [notificationList, setNotificationList] = useState([]);
     const [loyaltyList, setLoyaltyList] = useState([]);
     const [logoList, setLogoList] = useState([]);
+    const [logsList, setLogsList] = useState([]);
 
     /*  Order */
     const [openView, setOpenView] = useState(false);
@@ -68,6 +71,7 @@ const ProtectedLayout = () => {
     
     /*  Customer */
     const [openCustomer, setOpenCustomer] = useState(false);
+    const [openCustomerView, setOpenCustomerView] = useState(false);
     const [customerTitle, setCustomerTitle] = useState('New');
     const [customerId, setCustomerId] = useState(0);    
 
@@ -138,9 +142,11 @@ const ProtectedLayout = () => {
         await getSchedule();
         await getCompany();
         await getBilling();
+        await getBillingTwilio();
         await getNotification();
         await getLoyalty();
         await getLogo();
+        await getLogs();
         setIsLoading(false)
     }
 
@@ -228,6 +234,14 @@ const ProtectedLayout = () => {
         setBillingList(response.data)
         return response.data;
     }
+    const getBillingTwilio = async () => {
+        const response = await FetchData({
+            method: 'GET',
+            endPoint: 'billing/twilio'
+        })
+        setBillingTwilioList(response.data)
+        return response.data;
+    }
     const getUserListWithAdmin = async () => {
         const response = await FetchData({
             method: 'GET',
@@ -262,6 +276,14 @@ const ProtectedLayout = () => {
         setLogoList(response.data)
         return response.data;
     }
+    const getLogs = async () => {
+        const response = await FetchData({
+            method: 'GET',
+            endPoint: 'logs'
+        })
+        setLogsList(response.data)
+        return response.data;
+    }
 
     const onNotification = ({ title, description }) => {
         notifications({ title: `${title} Appointment`, description: description, cancel: title === 'Cancel' });
@@ -284,10 +306,12 @@ const ProtectedLayout = () => {
 
         if (res.isSuccess) {
             notify && success(res.message);
-            setRefresh(refresh + 1);
+            setRefresh(prev => prev + 1);
         }
         else
             notify && error(res.message)
+
+        return res;
     }
 
     useEffect(() => {
@@ -323,7 +347,11 @@ const ProtectedLayout = () => {
         setCustomerId(id);
         setOpenCustomer(true);
     }   
-    
+       const viewCustomer  = (id) => {
+        setReload(reload + 1);
+        setCustomerId(id);
+        setOpenCustomerView(true);
+    }
     const editService = (id) => {
         setServiceTitle((id === 0 ? `New Service` : `Edit Service`));
         setReload(reload + 1);
@@ -381,9 +409,11 @@ const ProtectedLayout = () => {
                     userListWithAdmin, getUserListWithAdmin,
                     scheduleList, getSchedule,
                     companyList, getCompany,
+                    logsList, getLogs,
                     billingList, setBillingList, getBilling,
+                    billingTwilioList,getBillingTwilio,
                     loyaltyList, setLoyaltyList, getLoyalty,
-                    viewOrder, editOrder,editEvent, editCustomer, editService, editUser, editSchedule,
+                    viewOrder, editOrder,editEvent, editCustomer, viewCustomer, editService, editUser, editSchedule,
                     isAdmin, uid
                 }} />
             </main>
@@ -430,6 +460,11 @@ const ProtectedLayout = () => {
             <Drawer title={customerTitle} placement='right' width={500} onClose={() => setOpenCustomer(false)} open={openCustomer}
                 extra={<Space><Button type="primary" icon={<SaveOutlined />} onClick={btnSave} >Save</Button></Space>}>
                 <CustomerDetail id={customerId} refresh={reload} ref={ref} saveData={saveData} customerList={customerList} setOpen={setOpenCustomer} />
+            </Drawer>
+
+            {/* Drawer on customer view*/}
+             <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenCustomerView(false)} open={openCustomerView}>
+                <CustomerView id={customerId} refresh={reload} orderList={orderList} servicesList={servicesList} userList={userList} customerList={customerList} loyaltyList={loyaltyList} setOpenView={setOpenCustomerView} saveData={saveData} viewOrder={viewOrder} editOrder={editOrder} />
             </Drawer>
 
              {/* Drawer on service edit*/}

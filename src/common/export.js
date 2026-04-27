@@ -234,6 +234,57 @@ const ExportToExcel = ({ data, fileName, servicesList, userList }) => {
         break;
       
       }
+      
+      case 'MESSAGING': { 
+        worksheet.columns = [
+          getExcelItem('Date', 30),
+          getExcelItem('To', 20),
+          getExcelItem('Order_no', 20),
+          getExcelItem('Message', 100),
+          getExcelItem('Status', 20),
+          getExcelItem('Remaining_Credit', 20),
+        ];
+        data.forEach(item => {
+          worksheet.addRow({
+            Date: UTC_LocalDateTime(item.createdat, 'DD MMM YYYY h:mm A'),
+            To: item.to,
+            Order_no: item.order_no,
+            Message: item.message,
+            Status: item.status,
+            Remaining_Credit: `$ ${item.credit}`,
+          });
+        });
+        break;
+      
+      }   
+      case 'PAYMENTS': { 
+        worksheet.columns = [
+          getExcelItem('Invoice_no', 30),
+          getExcelItem('Date', 20),
+          getExcelItem('Amount', 20),
+          getExcelItem('Processing_Fee', 20),
+          getExcelItem('Sub_Amount', 20),
+          getExcelItem('Tax', 20),
+          getExcelItem('Tax_Amount', 20),
+          getExcelItem('Total', 20),
+          getExcelItem('Status', 20),
+        ];
+        data.forEach(item => {
+          worksheet.addRow({
+            Invoice_no: item.invoice,
+            Date: UTC_LocalDateTime(item.trndate, 'DD MMM YYYY'),
+            Amount: item.pricing,
+            Processing_Fee: item.processingfee,
+            Sub_Amount: item.subtotal,
+            Tax: item.tax,
+            Tax_Amount: item.taxamount,
+            Total: item.totalamount,
+            Status: item.status,
+          });
+        });
+        break;
+      
+      }
       case 'COLLECTION': { 
         worksheet.columns = [
           getExcelItem('Order', 30),

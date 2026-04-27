@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect,  useState } from "react";
-import { EditOutlined } from '@ant-design/icons';
+import { EditOutlined,EyeOutlined } from '@ant-design/icons';
 import { IoSearchOutline } from "react-icons/io5";
 import { Button,  Input, Select,  Tooltip } from "antd";
 import DataTable from "../../common/datatable";
@@ -15,7 +15,7 @@ import StarBadge from "../../common/starbadge.js";
 
 const Customer = () => {
     const headingLabel = 'Customers'
-    const { refresh, customerList, setCustomerList,getCustomer,editCustomer} = useOutletContext();
+    const { refresh, customerList, setCustomerList,getCustomer,editCustomer,viewCustomer} = useOutletContext();
 
     const [isLoading, setIsLoading] = useState(false);
    
@@ -142,6 +142,9 @@ const Customer = () => {
                                         <Tooltip placement="top" title={'Edit'} >
                                             <Button type="link" icon={<EditOutlined />} onClick={() => editCustomer(item.id)} />
                                         </Tooltip>
+                                        <Tooltip placement="top" title={'View'} >
+                                                <Button type="link" icon={<EyeOutlined />} onClick={() => viewCustomer(item.id)} />
+                                            </Tooltip>
                                     </td>
                                 </tr>
                             ))

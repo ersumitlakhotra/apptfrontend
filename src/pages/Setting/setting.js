@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {  Tabs } from "antd"
 import { getTabItems } from "../../common/items.js"
-import { ContainerOutlined, IdcardOutlined, ShareAltOutlined,  LockOutlined, QrcodeOutlined } from '@ant-design/icons';
+import { ContainerOutlined, IdcardOutlined, ShareAltOutlined,  LockOutlined, QrcodeOutlined, NotificationOutlined } from '@ant-design/icons';
 import Account from "../../components/Setting/Account/account.js";
 import SocialLink from "../../components/Setting/Social/sociallink.js";
 import Billing from "../../components/Setting/Billing/billing.js";
+import Notification from "../../components/Setting/Notification/notification.js";
 import { useEffect, useState } from "react";
 import Security from "../../components/Setting/Security/security.js";
 import QRcode from "../../components/Setting/QRcode/qrcode.js";
@@ -14,10 +15,11 @@ import { useLocation, useOutletContext } from "react-router-dom";
 import FetchData from "../../hook/fetchData.js";
 
 const Setting = () => {
-    const { saveData,  refresh,setRefresh, setIsLoading, companyList,getCompany, billingList,getBilling,loyaltyList,  getLoyalty } = useOutletContext();
+    const { saveData,  refresh,setRefresh, setIsLoading, viewOrder, companyList,getCompany, billingList,getBilling,  billingTwilioList,getBillingTwilio, loyaltyList,  getLoyalty,logsList,getLogs } = useOutletContext();
     const location = useLocation();
     const [tabActiveKey, setTabActiveKey] = useState('1');
     const [logoList, setLogoList] = useState([]);
+    const [isPaymentComplete,setIsPaymentComplete]= useState(null);
 
     
   useEffect(() => {
@@ -27,6 +29,7 @@ const Setting = () => {
     if (tab) {
       setTabActiveKey(tab);
     }
+  
   }, [location.search]);
 
   useEffect(() => {
@@ -53,6 +56,8 @@ const Setting = () => {
         await getCompany();
         await getLoyalty();
         await getBilling();
+        await getBillingTwilio();
+        await getLogs();
         const logoResponse = await FetchData({
             method: 'GET',
             endPoint: 'logo'
@@ -64,7 +69,7 @@ const Setting = () => {
     const tabItems = [
         getTabItems('1', 'Account', <IdcardOutlined />, <Account companyList={companyList} loyaltyList={loyaltyList} saveData={saveData} logoList={logoList} refresh={refresh} setRefresh={setRefresh} setIsLoading={setIsLoading} />),
         getTabItems('2', 'Billing & plans', <ContainerOutlined />, <Billing companyList={companyList} billingList={billingList} saveData={saveData}  />),
-        // getTabItems('3', 'Notifications', <NotificationOutlined />, <Notification />),
+        getTabItems('3', 'Notifications', <NotificationOutlined />, <Notification companyList={companyList} logsList={logsList} billingList={billingTwilioList} saveData={saveData} viewOrder={viewOrder} />),
         getTabItems('4', 'Security', <LockOutlined />, <Security companyList={companyList} saveData={saveData} />),
         getTabItems('5', 'Social links', <ShareAltOutlined />, <SocialLink companyList={companyList} saveData={saveData} />),
         getTabItems('6', 'QR Code', <QrcodeOutlined />, <QRcode />),
