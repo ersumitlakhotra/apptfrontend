@@ -39,7 +39,7 @@ const TextMessaging = ({ twillioCell, companyList, credit, logsList, billingList
     }
     
     const tabItems = [
-        getTabItems('1', "Message Logs", <MessageOutlined/>, <MessageLogs logsList={logsList} fromDate={fromDate} toDate={toDate} searchInput={searchInput} viewOrder={viewOrder} isLoading={isLoading} setExportList={setExportListMessageLogs} />),
+        getTabItems('1', "Message Logs", <MessageOutlined/>, <MessageLogs companyList={companyList} billingList={billingList} logsList={logsList} fromDate={fromDate} toDate={toDate} searchInput={searchInput} viewOrder={viewOrder} isLoading={isLoading} setExportList={setExportListMessageLogs} />),
         getTabItems('2', "Payments", <DollarCircleOutlined/>, <PaymentLogs companyList={companyList} billingList={billingList} fromDate={fromDate} toDate={toDate} searchInput={searchInput} isLoading={isLoading} setExportList={setExportListPayment} />),
     ];
  

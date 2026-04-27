@@ -11,6 +11,7 @@ export function Tags(value) {
         case 'IN PROGRESS':
         case 'ADD SCHEDULE':
         case 'RESCHEDULED':
+        case 'RECEIVED':
             {
                 return <Tag color='blue'>{value}</Tag>
             }

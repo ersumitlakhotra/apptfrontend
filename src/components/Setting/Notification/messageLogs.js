@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { Button, DatePicker, Divider, Input, Modal, Popover, Tabs, Tag } from "antd";
+import { Button, DatePicker, Divider, Drawer, Input, Modal, Popover, Tabs, Tag } from "antd";
 import { PlusOutlined } from '@ant-design/icons';
 import { customLabelTab, getTabItems, getTableItem } from "../../../common/items";
 import IsLoading from "../../../common/custom/isLoading";
@@ -12,13 +12,17 @@ import PageHeader from "../../../common/pages/pageHeader";
 import { Tags } from "../../../common/tags";
 import FetchData from "../../../hook/fetchData";
 import Checkout from "../../Checkout/checkout";
+import InvoiceView from "../Billing/invoice_view";
 
-const MessageLogs = ({logsList, fromDate, toDate,searchInput,viewOrder,isLoading,setExportList}) => {
+const MessageLogs = ({companyList,billingList,logsList, fromDate, toDate, searchInput, viewOrder, isLoading, setExportList }) => {
     const [filteredList, setFilteredList] = useState([]);
     const [list, setList] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
+    const [id, setId] = useState(0);
+    const [reload, setReload] = useState(0);
+    const [openView, setOpenView] = useState(false);
     useEffect(() => {
         const logs = logsList.filter(a => (get_Date(a.createdat, 'YYYY-MM-DD') >= fromDate && get_Date(a.createdat, 'YYYY-MM-DD') <= toDate));
         setList(logs);
@@ -46,7 +50,7 @@ const MessageLogs = ({logsList, fromDate, toDate,searchInput,viewOrder,isLoading
         const searchedList = list.slice(indexOfFirstItem, indexOfLastItem);
         setFilteredList(searchedList);
     }
-       const headerItems = [
+    const headerItems = [
         getTableItem('1', 'Date'),
         getTableItem('2', 'To'),
         getTableItem('3', 'Order #'),
@@ -54,28 +58,39 @@ const MessageLogs = ({logsList, fromDate, toDate,searchInput,viewOrder,isLoading
         getTableItem('5', 'Status'),
         getTableItem('6', 'Remaining_Credit')
     ];
+     const btn_ViewClick = (id) => {
+        setReload(reload + 1);
+        setId(id);
+        setOpenView(true);
+    }
     return (
-        <IsLoading isLoading={isLoading} rows={10} input={
-            <DataTable headerItems={headerItems} current={currentPage} list={list}
-                onChange={(page, pageSize) => {
-                    setCurrentPage(page);
-                    setItemsPerPage(pageSize);
-                    setPage(page, pageSize, list)
-                }}
-                body={(
-                    filteredList.map(item => (
-                        <tr key={item.id} class="bg-white border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50 ">
-                            <td class="p-3 ">{UTC_LocalDateTime(item.createdat, 'DD MMM YYYY h:mm A')}</td>
-                            <td class="p-3 ">{item.to}</td>
-                            <td class="p-3 text-blue-500 italic hover:underline cursor-pointer" onClick={() => viewOrder(item.oid)} ># {item.order_no}</td>
-                            <td class="p-3 ">{item.message}</td>
-                            <td class="p-3 ">{Tags(item.status)}</td>
-                            <td class="p-3 ">{item.credit}</td>
+        <div>
+            <IsLoading isLoading={isLoading} rows={10} input={
+                <DataTable headerItems={headerItems} current={currentPage} list={list}
+                    onChange={(page, pageSize) => {
+                        setCurrentPage(page);
+                        setItemsPerPage(pageSize);
+                        setPage(page, pageSize, list)
+                    }}
+                    body={(
+                        filteredList.map(item => (
+                            <tr key={item.id} class={`${item.type === 'TwillioCredit' ? 'bg-green-100' : 'bg-white'} border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50   `}>
+                                <td class="p-3 ">{UTC_LocalDateTime(item.createdat, 'DD MMM YYYY h:mm A')}</td>
+                                <td class="p-3 ">{item.to}</td>
+                                <td class="p-3 text-blue-500 italic hover:underline cursor-pointer" onClick={() => {item.type === 'TwillioCredit' ? btn_ViewClick(item.oid) : viewOrder(item.oid)}} > # {item.order_no}</td>
+                                <td class="p-3 ">{item.message}</td>
+                                <td class="p-3 ">{Tags(item.status)}</td>
+                                <td class="p-3 ">{item.credit}</td>
 
-                        </tr>
-                    ))
-                )} />
-        } />
+                            </tr>
+                        ))
+                    )} />
+            } />
+
+            <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
+                <InvoiceView id={id} refresh={reload} billingList={billingList} companyList={companyList} />
+            </Drawer>
+        </div>
     )
 }
 
