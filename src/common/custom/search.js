@@ -3,7 +3,7 @@ import { Input } from "antd"
 import { useState } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 
-const Search = ({ value, onChange }) => {
+const Search = ({ value, onChange,disabled=false }) => {
     const [readonly, setReadonly] = useState(true);
     return (
         <Input
@@ -16,6 +16,7 @@ const Search = ({ value, onChange }) => {
             onChange={(e) => onChange(e.target.value)} 
             allowClear        
             readOnly={readonly}
+            disabled={disabled}
             onFocus={() => setReadonly(false)}
             onBlur={() => setReadonly(true)}
             />

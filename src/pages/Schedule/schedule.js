@@ -17,7 +17,7 @@ import PageHeader from "../../common/pages/pageHeader.js";
 
 const Schedule = () => {
     const headingLabel = 'Schedule'
-    const { saveData, refresh,  userList, getUser, scheduleList, getSchedule, editSchedule, isAdmin } = useOutletContext();
+    const { saveData, refresh,  userList, getUser, scheduleList, getSchedule, editSchedule,getCompany, isAdmin } = useOutletContext();
     const [isLoading, setIsLoading] = useState(false);
    
     const [filteredList, setFilteredList] = useState([]);
@@ -38,6 +38,8 @@ const Schedule = () => {
 
     const Init = async () => {
         setIsLoading(true)
+        
+         await getCompany();
         await getUser();
         const scheduleResponse = await getSchedule();
         setFilteredList(scheduleResponse);

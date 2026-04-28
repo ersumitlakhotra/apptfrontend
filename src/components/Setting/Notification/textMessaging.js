@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, DatePicker, Divider, Input, Modal, Popover, Tabs, Tag } from "antd";
 import { DollarCircleOutlined, EditOutlined, MessageOutlined, PlusOutlined } from '@ant-design/icons';
 import { customLabelTab, getTabItems, getTableItem } from "../../../common/items";
@@ -13,36 +13,30 @@ import FetchData from "../../../hook/fetchData";
 import Checkout from "../../Checkout/checkout";
 import MessageLogs from "./messageLogs";
 import PaymentLogs from "./payments";
+import ModalCheckout from "../../Checkout/modal_Checkout";
 
 const TextMessaging = ({ twillioCell, companyList, credit, logsList, billingList,saveData, viewOrder, province, country }) => {
     const messageLabel = 'Messaging'; 
-      const paymentLabel = 'Payments';
-    const ref = useRef();
+    const paymentLabel = 'Payments';
     const [isLoading, setIsLoading] = useState(false);
     const [searchInput, setSearchInput] = useState('');
     const [fromDate, setFromDate] = useState(dayjs(firstDateOfMonth(new Date())).format("YYYY-MM-DD"));
     const [toDate, setToDate] = useState(dayjs(lastDateOfMonth(new Date())).format("YYYY-MM-DD"));
-    const [isOpen, setIsOpen] = useState(false);
     const [amount, setAmount] = useState(20);
-    
+    const [isOpen, setIsOpen] = useState(false);
+
     const [exportListMessageLogs, setExportListMessageLogs] = useState([]);
     const [exportListPayment, setExportListPayment] = useState([]);
 
     const [tabActiveKey, setTabActiveKey] = useState("1");
 
-    const handleCancel = () => {
-        setIsOpen(false);
-    };
-
-      const handleOk = async () => {
-        await ref.current?.checkoutHandle();
-    }
-    
     const tabItems = [
         getTabItems('1', "Message Logs", <MessageOutlined/>, <MessageLogs companyList={companyList} billingList={billingList} logsList={logsList} fromDate={fromDate} toDate={toDate} searchInput={searchInput} viewOrder={viewOrder} isLoading={isLoading} setExportList={setExportListMessageLogs} />),
         getTabItems('2', "Payments", <DollarCircleOutlined/>, <PaymentLogs companyList={companyList} billingList={billingList} fromDate={fromDate} toDate={toDate} searchInput={searchInput} isLoading={isLoading} setExportList={setExportListPayment} />),
     ];
- 
+
+   
+
     return (
         <div id="textmessaging" className="w-full">
             <PageHeader label={<div class='flex flex-col gap-2 '>
@@ -92,48 +86,17 @@ const TextMessaging = ({ twillioCell, companyList, credit, logsList, billingList
 
             </div>
 
-            <Modal
-                open={isOpen}
-                title=" "
-                onOk={handleOk}
-                onCancel={handleCancel}
-                okText={`Confirm Payment`}
-                cancelText="Cancel"
-                maskClosable={false}
-                keyboard={false}
-                width={'60%'}
-            >
-                <div className="mt-8 flex flex-col md:flex-row items-center justify-between">
-
-                    {/* LEFT SECTION */}
-                    <div className="w-full md:w-2/3">
-                        <h2 className="text-lg font-semibold mb-4">
-                            How much would you like to add to your account balance today?
-                        </h2>
-                        {/* Amount Input */}
-                        <label className="block text-sm font-medium mb-2">Amount</label>
-                        <div className="relative w-40 mb-2">
-                            <span className="absolute left-3 top-2.5 text-gray-500">$</span>
-                            <input
-                                type="number"
-                                value={amount}
-                                onChange={(e) => setAmount(e.target.value)}
-                                className={`w-full pl-7 pr-3 py-2 border rounded-md ${(amount < 20 || amount > 2000) && 'border-red-400'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                            />
-                        </div>
-
-                        <p className="text-sm text-gray-500 mb-6">
-                            Enter an amount between $20 and $2000
-                        </p>
-                    </div>
-
-                    {/* RIGHT SECTION */}
-                    <div className="w-full md:w-1/3 bg-gray-50 rounded-lg p-6 border">
-                        <Checkout ref={ref} amount={amount} title='Text_Message_Credit' urls='/setting?tab=3#textmessaging' companyList={companyList} />
-                    </div>
-                </div>
-
-            </Modal>
+            <ModalCheckout
+                from={'twillio'}
+                amount={amount}
+                setAmount={setAmount}
+                discount={0}
+                isOpen={isOpen} 
+                setIsOpen={setIsOpen}             
+                title='Text_Message_Credit' 
+                urls='/setting?tab=3#textmessaging' 
+                companyList={companyList}
+            />          
         </div>
     )
 }

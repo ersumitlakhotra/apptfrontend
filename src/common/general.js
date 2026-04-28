@@ -306,3 +306,20 @@ export const getExtension = (file) => {
   const parts = file.split(".");
   return parts.length > 1 ? parts.pop().toLowerCase() : "";
 };
+
+export const checkIfPastOrToday = (dateString) => {
+  const inputDate = new Date(dateString);
+  const today = new Date();
+
+  // remove time part (important!)
+  today.setHours(0, 0, 0, 0);
+  inputDate.setHours(0, 0, 0, 0);
+
+  if (inputDate > today) {
+    return "future";   // e.g. 2026-04-08 when today is 2026-04-07
+  } else if (inputDate.getTime() === today.getTime()) {
+    return "today";
+  } else {
+    return "past";
+  }
+};

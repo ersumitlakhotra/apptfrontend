@@ -4,13 +4,13 @@ import { getTax } from "../../common/taxes";
 import FetchData from "../../hook/fetchData";
 import useAlert from "../../common/alert";
 
-const Checkout = ({ref, amount, title, urls,companyList }) => {
+const Checkout = ({ref, amount,discount, title, urls,companyList , id}) => {
     const [province, setProvince] = useState('');
     const [country, setCountry] = useState('');
     const{ contextHolder, warning} = useAlert()
 
-    const processingFee = (amount * 0.03) + 0.30;
-    const subtotal = (Number(amount || 0) + Number(processingFee || 0)).toFixed(2);
+    const processingFee = ((amount-discount) * 0.03) + (amount > 0 && 0.30);
+    const subtotal = (Number(amount || 0) - Number(discount || 0) + Number(processingFee || 0)).toFixed(2);
     const tax= country === 'Canada' ? getTax(province) : 0;
     const taxamount= country === 'Canada' ?  subtotal * (tax/100) : 0;
     const totalAmount = (Number(subtotal || 0) + Number(taxamount || 0)).toFixed(2);
@@ -26,7 +26,7 @@ const Checkout = ({ref, amount, title, urls,companyList }) => {
     }, [companyList])
 
     const checkoutHandle = async () => {
-        if(amount >=0 && amount <=2000)
+        if(amount >=1 && amount <=2000)
         {
         const Body = JSON.stringify({
             title: title,
@@ -37,7 +37,8 @@ const Checkout = ({ref, amount, title, urls,companyList }) => {
             tax_amount:Number(taxamount).toFixed(2),
             amount: Number(amount).toFixed(2),
             total_amount: Number(totalAmount).toFixed(2),
-            currency:currency
+            currency:currency,
+            invoiceid:id
 
         });
         const response = await FetchData({
@@ -48,7 +49,7 @@ const Checkout = ({ref, amount, title, urls,companyList }) => {
         window.location.href = response.data.url;
     }
     else
-        warning('The amount must be in the range of $20 to $2000.')
+        warning('The amount must be in the range of $1 to $2000.')
     };
 
     useImperativeHandle(ref, () => {
@@ -66,6 +67,12 @@ const Checkout = ({ref, amount, title, urls,companyList }) => {
                     ${Number(amount || 0).toFixed(2)}
                 </span>
             </div>
+            {discount > 0 && <div className="flex justify-between mb-2">
+                <span className="text-gray-600">Discount:</span>
+                <span className="font-medium text-red-400">
+                    -${Number(discount || 0).toFixed(2)}
+                </span>
+            </div>}
             <div className="flex justify-between mb-2">
                 <span className="text-gray-600">Processing Fee:</span>
                 <span className="font-medium">

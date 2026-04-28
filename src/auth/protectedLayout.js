@@ -23,6 +23,7 @@ import EventDetail from "../components/Event/event_detail";
 import CustomerDetail from "../components/Customer/customer_detail";
 import ServiceDetail from "../components/Services/service_detail";
 import CustomerView from "../components/Customer/customer_view";
+import { checkIfPastOrToday } from "../common/general";
 
 const ProtectedLayout = () => {
     const ranOnce = useRef(false);
@@ -39,6 +40,9 @@ const ProtectedLayout = () => {
     const [uid, setUid] = useState(0);
     const [expired, setExpired] = useState(false);
     const [isSetupComplete, setIsSetupComplete] = useState(true);
+    const [isPaymentPending, setIsPaymentPending] = useState(false);
+    const [isDisabled, setIsDisabled] = useState(false);
+   
 
     /*  Lists */
     const [orderList, setOrderList] = useState([]);
@@ -121,6 +125,12 @@ const ProtectedLayout = () => {
             setExpired(pathname === '/setting' ? false : checkPlan.expired)
             setIsSetupComplete(companyList.issetupcomplete);
 
+            const checkInvoice = billingList.filter(items => items.status.toLowerCase() === 'unpaid')
+            let isDue = checkInvoice.length > 0 && checkIfPastOrToday(checkInvoice[0].duedate) === 'past';
+            setIsPaymentPending(pathname === '/setting' ? false : isDue)
+
+            setIsDisabled(checkPlan.expired || isDue)
+
             setIsLoading(false)
         }
         
@@ -140,9 +150,9 @@ const ProtectedLayout = () => {
         await getUserPermission();
         await getUserListWithAdmin();
         await getSchedule();
-        await getCompany();
         await getBilling();
         await getBillingTwilio();
+        await getCompany();
         await getNotification();
         await getLoyalty();
         await getLogo();
@@ -394,7 +404,9 @@ const ProtectedLayout = () => {
                 editCustomer={editCustomer}
                 editService={editService}
                 editSchedule={editSchedule}
-                uid={uid} />
+                uid={uid}
+                isDisabled={isDisabled}
+                />
 
             <main class="flex-1 p-3 md:px-8 scroll-auto">
                 <Outlet context={{
@@ -530,6 +542,34 @@ const ProtectedLayout = () => {
 
                     <p className="text-gray-500 mt-4">
                         Your free trial of {process.env.REACT_APP_PROJECT_NAME} has ended. To keep using this app, Administrator must choose a subsciption plan that works for your team.
+                    </p>
+
+                </div>
+            </Modal>
+
+            <Modal
+                open={isPaymentPending}
+                closable={false}
+                maskClosable={false}
+                keyboard={false}
+                footer={[
+                    isAdmin && <Button
+                        type="primary"
+                        key="paynow"
+                        onClick={() => navigate('/setting?tab=2#invoice')}
+                    >
+                        Pay Now
+                    </Button>
+                ]}
+            >
+                <div className="text-center py-6">
+
+                    <h2 className="text-xl font-semibold mb-2">
+                        Pay your bill to continue usign {process.env.REACT_APP_PROJECT_NAME} 
+                    </h2>
+
+                    <p className="text-gray-500 mt-4">
+                        Your payment is past due, and your {process.env.REACT_APP_PROJECT_NAME} will be disabled if we don't receive the payment soon. To continue , ask your billing administrator to pay the amount due.
                     </p>
 
                 </div>

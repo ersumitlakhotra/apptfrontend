@@ -22,7 +22,7 @@ function getMessageItem(key, label, type, description,moveto) {
 const Homepage = () => {
     const navigate = useNavigate();
     const { apps } = AppIconsPermission();
-    const { isAdmin, isLoading, setIsLoading, companyList,billingList } = useOutletContext()
+    const { isAdmin, refresh, isLoading, setIsLoading, companyList,billingList,getCompany,getBilling } = useOutletContext()
     const { contextHolderModal, allowAdminOnly } = useAlert();
     const [messageList,setMessageList] = useState([])
 
@@ -66,6 +66,17 @@ const Homepage = () => {
     ];
 
     useEffect(() => {
+        Init();
+    }, [refresh])
+
+    const Init = async () => {
+        setIsLoading(true);
+        await getCompany();
+        await getBilling();
+        setIsLoading(false);
+    }
+
+    useEffect(() => {
         setIsLoading(true)
         if (companyList.length !== 0 && isAdmin) {
             let messages=[];
@@ -80,9 +91,9 @@ const Homepage = () => {
             
 
             if (companyList.plan !== "FREE TRIAL") {
-                const checkBilling = checkBillingDetails(companyList);
-                if (checkBilling.status)
-                    messages.push(getMessageItem(3, 'BillingInformation', 'warning', checkBilling.message, "/setting?tab=2#billingdetail"))
+                //const checkBilling = checkBillingDetails(companyList);
+                //if (checkBilling.status)
+                  //  messages.push(getMessageItem(3, 'BillingInformation', 'warning', checkBilling.message, "/setting?tab=2#billingdetail"))
                       
                 const checkInvoice = billingList.filter(items => items.status.toLowerCase() === 'unpaid')
                 if (checkInvoice.length > 0)
@@ -96,8 +107,6 @@ const Homepage = () => {
         }
         setIsLoading(false)
     }, [companyList,billingList])
-
-
    
     return (
         <div className=" relative">

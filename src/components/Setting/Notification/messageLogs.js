@@ -74,7 +74,7 @@ const MessageLogs = ({companyList,billingList,logsList, fromDate, toDate, search
                     }}
                     body={(
                         filteredList.map(item => (
-                            <tr key={item.id} class={`${item.type === 'TwillioCredit' ? 'bg-green-100' : 'bg-white'} border-b text-xs  whitespace-nowrap border-gray-200 hover:bg-zinc-50   `}>
+                            <tr key={item.id} class={`${item.type === 'TwillioCredit' ? 'bg-green-200  ' : 'bg-white hover:bg-zinc-50 '} border-b text-xs  whitespace-nowrap border-gray-200   `}>
                                 <td class="p-3 ">{UTC_LocalDateTime(item.createdat, 'DD MMM YYYY h:mm A')}</td>
                                 <td class="p-3 ">{item.to}</td>
                                 <td class="p-3 text-blue-500 italic hover:underline cursor-pointer" onClick={() => {item.type === 'TwillioCredit' ? btn_ViewClick(item.oid) : viewOrder(item.oid)}} > # {item.order_no}</td>
