@@ -7,6 +7,7 @@ import {
     StyleSheet,
 } from "@react-pdf/renderer";
 import { get_Date } from "../../../common/localDate";
+import { color } from "framer-motion";
 
 const styles = StyleSheet.create({
     page: {
@@ -264,18 +265,26 @@ const InvoicePDF = ({ id, refresh, billingList }) => {
                     </View>
 
                     {/* Table Rows */}
-                    <View key={99} style={styles.tableRow}>
+                    <View key={11} style={styles.tableRow}>
                         <Text style={styles.colDesc}>{title}</Text>
                         <Text style={styles.colQty}>1</Text>
                         <Text style={styles.colPrice}>${pricing}</Text>
                         <Text style={styles.colTotal}>${pricing}</Text>
                     </View>
-                    {processingFee !== null && processingFee.trim() !== "" &&
-                        <View key={99} style={styles.tableRow}>
+                    {processingFee !== null && processingFee.trim() !== "" && Number(processingFee || 0) > 0 &&
+                        <View key={12} style={styles.tableRow}>
                             <Text style={styles.colDesc}>Processing Fee</Text>
                             <Text style={styles.colQty}>1</Text>
                             <Text style={styles.colPrice}>${processingFee}</Text>
                             <Text style={styles.colTotal}>${processingFee}</Text>
+                        </View>
+                    }
+                    {parseFloat(discount) > 0 &&
+                        <View key={13} style={styles.tableRow}>
+                            <Text style={styles.colDesc}>Discount</Text>
+                            <Text style={styles.colQty}> </Text>
+                            <Text style={styles.colPrice}> </Text>
+                            <Text style={[styles.colTotal, { color: "red" }]}>-${parseFloat(discount).toFixed(2)}</Text>
                         </View>
                     }
                      {/* Empty Table Rows */}
@@ -316,10 +325,7 @@ const InvoicePDF = ({ id, refresh, billingList }) => {
                     {/* Invoice Details */}
                     <View style={styles.invDetail}>
                         <View style={{ flexDirection: "column", columnGap: 10, width: '30%', marginRight: 10 }}>
-                            {parseFloat(discount) > 0 && <View style={styles.invDetailRow}>
-                                <Text style={styles.text}>Discount</Text>
-                                <Text style={styles.text}>${parseFloat(discount).toFixed(2)}</Text>
-                            </View>}
+                           
                             <View style={styles.invDetailRow}>
                                 <Text style={styles.text}>Sub total</Text>
                                 <Text style={styles.text}>${parseFloat(subTotal).toFixed(2)}</Text>

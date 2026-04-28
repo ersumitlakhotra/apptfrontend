@@ -17,7 +17,7 @@ import { useOutletContext } from "react-router-dom";
 
 const Services = () => {
     const headingLabel = 'Services'
-    const { saveData, refresh, 
+    const { saveData, refresh, getCompany,
         servicesList, getService, setServiceList,
         userList, getUser,editService} = useOutletContext();
 
@@ -40,6 +40,7 @@ const Services = () => {
 
     const Init = async () => {
         setIsLoading(true);
+        await getCompany();
         const serviceResponse=await getService();
         await getUser();
         setFilteredList(serviceResponse);

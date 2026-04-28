@@ -15,7 +15,7 @@ import StarBadge from "../../common/starbadge.js";
 
 const Customer = () => {
     const headingLabel = 'Customers'
-    const { refresh, customerList, setCustomerList,getCustomer,editCustomer,viewCustomer} = useOutletContext();
+    const { refresh, customerList, setCustomerList,getCustomer,editCustomer,viewCustomer,getCompany} = useOutletContext();
 
     const [isLoading, setIsLoading] = useState(false);
    
@@ -36,6 +36,7 @@ const Customer = () => {
 
     const Init = async () => {
         setIsLoading(true)
+        await getCompany();
         const response = await getCustomer();
         setFilteredList(response);
         setList(response);

@@ -1,5 +1,5 @@
 import Heading from "../../../common/heading"
-import { CloseOutlined, CreditCardFilled, EditOutlined, WalletFilled, DownloadOutlined, EyeOutlined,DatabaseFilled } from '@ant-design/icons';
+import { CloseOutlined, CreditCardFilled, EditOutlined, WalletFilled, DownloadOutlined, EyeOutlined,DatabaseFilled, PlusOutlined } from '@ant-design/icons';
 import { Button, Divider, Drawer,  Space, Tooltip } from "antd";
 import DataTable from "../../../common/datatable";
 import { getTableItem } from "../../../common/items.js";
@@ -13,6 +13,7 @@ import useAlert from "../../../common/alert.js";
 import { useOutletContext } from "react-router-dom";
 import { get_Date } from "../../../common/localDate.js";
 import Pricing from "./pricingcard.js";
+import ModalCheckout from "../../Checkout/modal_Checkout.js";
 
 const Billing = ({ companyList,billingList, saveData }) => {
    
@@ -30,6 +31,13 @@ const Billing = ({ companyList,billingList, saveData }) => {
     const [id, setId] = useState(0);
     const [reload, setReload] = useState(0);
     const [openView, setOpenView] = useState(false);
+
+    const [invoice, setInvoice] = useState('');
+    const [amount, setAmount] = useState(0);
+    const [totalAmount, setTotalAmount] = useState(0);
+    const [discount, setDiscount] = useState(0);
+    const [date, setDate] = useState('');
+    const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
         if (companyList.length !== 0) {
@@ -87,21 +95,48 @@ const Billing = ({ companyList,billingList, saveData }) => {
         getTableItem('3', 'Due Date'),
         getTableItem('4', 'Total'),
         getTableItem('5', 'Status'),
-        getTableItem('6', 'Action'),
+        getTableItem('6', 'Action')
     ];
     const btn_ViewClick = (id) => {
         setReload(reload + 1);
         setId(id);
         setOpenView(true);
     }
+
+    const PayNow = (id,invoice,amount,totalamount,discount,duedate) => {
+        setId(id)
+        setInvoice(invoice)
+        setAmount(Number(amount || 0).toFixed(2));
+        setTotalAmount(Number(totalamount || 0).toFixed(2))
+        setDiscount(Number(discount || 0).toFixed(2));
+        setDate(get_Date(duedate,'DD MMM YYYY'));
+        setIsOpen(true);
+    }
+    
+    const LeftSection = () => {
+        return (
+            <div className="w-full ">
+                <h2 className="text-lg font-semibold mb-4">
+                    {invoice}
+                </h2>
+                <p className="text-sm text-gray-800 font-semibold  ">
+                    Current balance: ${totalAmount}
+                </p>
+                <p className="text-xs text-gray-500 ">
+                    Payment required by ${date} !
+                </p>
+
+            </div>
+        )
+    }
     return (
         <div class='flex flex-col gap-8'>
 
             <div id="plans"  class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
 
-                <Heading label={"Change plan"} desc={'You can upgrade or downgrade whenever you want.'} Icon={<WalletFilled  />} />
+                <Heading id="billingdetail" label={"Change plan"} desc={'You can upgrade or downgrade whenever you want.'} Icon={<WalletFilled  />} />
                 <Pricing/>
-                <Divider id="billingdetail"/>
+{/*                <Divider id="billingdetail"/>
 
                 <div class='flex items-center justify-between'>
                     <Heading label={"Billing details"} Icon={< CreditCardFilled />} />
@@ -126,7 +161,9 @@ const Billing = ({ companyList,billingList, saveData }) => {
                         isCardExpired={isCardExpired} setIsCardExpired={setIsCardExpired}
                     />
                 </div>
+*/}
             </div>
+            
 
             <div id="invoice" class='w-full bg-white border rounded-lg p-4 flex flex-col gap-4 '>
                 <Heading label={"Invoice history"} desc={"If you've just made a payment, it may take a few hours for it to appear in the table below."} Icon={<DatabaseFilled  />} />
@@ -145,7 +182,7 @@ const Billing = ({ companyList,billingList, saveData }) => {
                                     <td class="p-3">{get_Date(item.duedate,'DD MMM YYYY')}</td>
                                     <td class="p-3 font-semibold">$ {item.totalamount}</td>
                                      <td class="p-3">{Tags(item.status)}</td>
-                                    <td class="p-3">
+                                    <td class="p-3 w-24">
                                         <Tooltip placement="top" title={'View'} >
                                             <Button type="link" icon={<EyeOutlined />} onClick={() => btn_ViewClick(item.id)} />
                                         </Tooltip>
@@ -155,8 +192,13 @@ const Billing = ({ companyList,billingList, saveData }) => {
                                                     loading ? 'Loading document...' : <Button type="link" icon={<DownloadOutlined />} />
                                                 }
                                             </PDFDownloadLink>
-                                            
+
                                         </Tooltip>
+                                        {item.status === 'Unpaid' &&
+                                            <Tooltip placement="top" title={'Pay Now'} >
+                                                <Button style={{ width: 100 }} type="primary" color="orange" variant="solid" icon={<PlusOutlined />} onClick={() => PayNow(item.id,`# ${item.invoice}`,item.pricing,item.totalamount,item.discount,item.duedate)} >Pay now </Button>
+                                            </Tooltip>}
+
                                     </td>
                                 </tr>
                             ))
@@ -167,6 +209,20 @@ const Billing = ({ companyList,billingList, saveData }) => {
             <Drawer title={""} placement='bottom' height={'90%'} style={{ backgroundColor: '#F9FAFB' }} onClose={() => setOpenView(false)} open={openView}>
                 <InvoiceView id={id} refresh={reload} billingList={billingList} companyList={companyList}/>
             </Drawer>
+
+            <ModalCheckout
+                LeftSection={LeftSection}
+                from={'billing'}
+                amount={amount}       
+                discount={discount}
+                isOpen={isOpen} 
+                setIsOpen={setIsOpen}
+                title='iSchedule_Payment' 
+                urls='/setting?tab=2#invoice' 
+                companyList={companyList}
+                id={id}
+
+            />  
             {contextHolder}
         </div>
     )

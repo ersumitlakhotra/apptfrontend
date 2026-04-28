@@ -27,7 +27,7 @@ const Event = () => {
         eventList,getEvent,
         servicesList, getService,
         userList, getUser, editEvent,
-     customerList, getCustomer, companyList } = useOutletContext();
+     customerList, getCustomer, companyList ,getCompany} = useOutletContext();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -48,6 +48,7 @@ const Event = () => {
 
     const Init = async () => {
         setIsLoading(true); 
+        await getCompany();
         await getCustomer();
         await getService();
         await getUser(); 

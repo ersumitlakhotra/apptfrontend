@@ -31,7 +31,8 @@ function getItem(key, label, icon, extra, disabled, danger) {
         danger,
     };
 }
-const Header = ({ saveData, refresh, setRefresh, editOrder, viewOrder, getOrder,editEvent, editCustomer,editService, editUser,editSchedule, uid, orderList, notificationList, getNotification, getUserListWithAdmin, servicesList
+const Header = ({ saveData, refresh, setRefresh, editOrder, viewOrder, getOrder,editEvent, editCustomer,editService, editUser,editSchedule, uid, orderList, notificationList, getNotification, getUserListWithAdmin, servicesList, 
+    isDisabled
 }) => {
     const navigate = useNavigate();
     const ranOnce = useRef(false);
@@ -121,7 +122,7 @@ const Header = ({ saveData, refresh, setRefresh, editOrder, viewOrder, getOrder,
                 </div>, null, null, true),
             { type: 'divider', },
             getItem('2', 'Account', <UserOutlined />, '⌘A'),
-            getItem('3', 'Notifications', <BellOutlined />),
+            getItem('3', 'Notifications', <BellOutlined />,'',isDisabled),
             getItem('4', 'Help Center', <SlEarphonesAlt />),
             { type: 'divider', },
             getItem('9', 'Sign Out', <LogoutOutlined />, null, null, true),
@@ -221,7 +222,7 @@ setNotificationFilteredList(notification);
 
             {/* Search */}
             <div class='w-8/12 md:w-6/12 flex flex-row items-center relative'>
-                <Search value={search} onChange={(e) => setSearch(e)} />
+                <Search value={search} onChange={(e) => setSearch(e)} disabled={isDisabled}  />
                 <div class={`w-full min-h-[350px] max-h-[350px] overflow-y-scroll border border-gray-400 z-50 bg-white rounded-lg shadow absolute top-10 ${search === '' && 'hidden'} `}>
                     <IsLoading isLoading={isLoading} rows={8} input=
                         {
@@ -265,14 +266,14 @@ setNotificationFilteredList(notification);
 
             {/* notification and profile */}
             <div class='w-3/12 pr-4 flex flex-row gap-3 md:gap-4 justify-end items-center '>
-                <Dropdown menu={addProps} trigger={['click']} overlayStyle={{ gap: 4, color: 'white', cursor: 'pointer' }}>
+                <Dropdown menu={addProps} disabled={isDisabled} trigger={['click']} overlayStyle={{ gap: 4, color: 'white', cursor: 'pointer' }}>
                     <Space style={{ cursor: 'pointer' }}>
                         <PlusCircleFilled style={{ fontSize: '30px', color: 'white', cursor: 'pointer' }} />
                     </Space>
                 </Dropdown>
 
                 <Badge count={unread} >
-                    <BellFilled style={{ fontSize: '23px', color: 'white', cursor: 'pointer'}} onClick={() => { setOpenNotification(true); setTabActiveKey('1'); }} />
+                    <BellFilled style={{ fontSize: '23px', color: 'white', cursor: 'pointer'}} onClick={() => { setOpenNotification( isDisabled ? false: true); setTabActiveKey('1'); }} />
                 </Badge>
 
                 <Dropdown menu={menuProps} trigger={['click']} overlayStyle={{ gap: 4, color: 'white', cursor: 'pointer' }}>
