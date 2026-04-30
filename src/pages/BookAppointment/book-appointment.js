@@ -25,13 +25,15 @@ import FetchData from '../../hook/fetchData.js';
 import SaveData from '../../hook/saveData.js'
 import { useEmail } from '../../email/email.js';
 import { showCancelReasonModal } from '../../components/BookAppointment/cancel_reason.js';
+import ReminderNote from '../../components/BookAppointment/reminder_page.js';
+import IsLoading from '../../common/custom/isLoading.js';
 
 const BookAppointment = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const { contextHolder, warning, error } = useAlert();
     const [modal, contextHolderModal] = Modal.useModal();
 
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [content, setContent] = useState(0);
     const { sendEmail, AppointmentStatus } = useEmail();
 
@@ -83,6 +85,8 @@ const BookAppointment = () => {
 
     const [redeem, setRedeem] = useState(0);
     const [referral, setReferral] = useState('');
+    const [status,setStatus]=useState('');
+    const [rejectReason,setRejectReason]=useState('');
 
     const [mode1, setMode1] = useState('Cash');
     const [mode2, setMode2] = useState('Card');
@@ -97,10 +101,14 @@ const BookAppointment = () => {
     const [openOrder, setOpenOrder] = useState(false);
     const [openSearch, setOpenSearch] = useState(false);
 
-    const storeId = searchParams.get('store') || 'All';
+    
+    const [isRefValid, setIsRefValid] = useState(false);
 
-    const onIdle = () => {
-        window.location.reload();
+    const storeId = searchParams.get('store') || 'All';
+    const uuid = searchParams.get('ref') || '';
+
+    const onIdle = () => { 
+        window.location.replace(`${process.env.REACT_APP_DOMAIN}/book-appointment?store=${storeId}`);
     };
 
     useIdleTimer({
@@ -109,6 +117,26 @@ const BookAppointment = () => {
         promptTimeout: 0, // No warning prompt
         crossTab: true, // Optional: Sync state across browser tabs
     });
+
+    const NewBookingReset = () => {
+        setOrder_Id(0); setAssignedTo(0); setPrevAssigned_To(0); setEmployeeId(0);
+        setServicesItem([]);
+        setPrevServicesItem([]);
+        setSlot(''); setStart(''); setEnd(''); setPrevSlot(''); setPrevTrnDate(''); setTrnDate(LocalDate());
+        setCustomerName(''); setCustomerEmail(''); setCustomerPhone('');setStatus('');setRejectReason('');
+        setPrice(0);
+        setTotal(0);
+        setCoupon('');
+        setDiscount(0);
+        setNotes('');
+        setRedeem(0);
+        setReferral('');
+        setMode1('Cash');
+        setMode2('Card');
+        setPayment1(0);
+        setPayment2(0);
+
+    }
 
     useEffect(() => {
         init();
@@ -123,12 +151,38 @@ const BookAppointment = () => {
         })
         setIsURL(locationsResponse.data.length > 0);
         setCompanyList(locationsResponse.data);
+        if (uuid !== "") {
+            const Body = JSON.stringify({  uuid: uuid });
+            const orderResponse = await FetchData({ 
+                method: 'POST', 
+                endPoint: 'order/uuid', 
+                cid: storeId, 
+                body: Body 
+            })
+
+            if (orderResponse.data.length > 0) {
+                const editList = orderResponse.data[0];
+                setCid(editList.cid)
+                setStatus(editList.status);
+                setRejectReason(editList.reason);
+                setOrder_no(editList.order_no);
+                setOrder_Id(editList.id);
+                setAssignedTo(editList.assignedto);
+                setCustomerPhone(editList.cell);
+                setEmployeeName(editList.fullname);
+                setPrevSlot(editList.slot);
+                setPrevTrnDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
+                setIsRefValid(true);
+            }
+           
+        }
+
         setIsLoading(false)
     };
 
     useEffect(() => {
-        if(cid > 0)
-        initCid();
+        if (cid > 0)
+            initCid();
     }, [cid]);
 
     const initCid = async () => {
@@ -137,6 +191,7 @@ const BookAppointment = () => {
         const userResponse = await FetchData({ method: 'GET', endPoint: 'user', cid: cid })
         const eventResponse = await FetchData({ method: 'GET', endPoint: 'event', eventDate: true, cid: cid })
         const scheduleResponse = await FetchData({ method: 'GET', endPoint: 'schedule', cid: cid })
+   
         companyList.filter(a => a.id === cid).map(item => {
             setStoreName(item.name);
             setStoreCell(item.cell);
@@ -350,7 +405,8 @@ const BookAppointment = () => {
                 bookedvia: 'Appointment',
                 sendnotification: true,
                 reason:reasonText,
-                notes:notes,redeem:redeem,
+                notes:notes,
+                redeem:redeem,
                 referral: referral,
                 mode1: mode1,
                 payment1: payment1,
@@ -385,7 +441,7 @@ const BookAppointment = () => {
 
                     modal.success({
                         title: (<span class='font-semibold'>{storeName}</span>),
-                        onOk() { window.location.reload() },
+                        onOk() { onIdle() },
                         content: (
                             <div class='flex flex-col gap-4 p-4'>
                                 <p class='font-bold'>Hi {customerName}</p>
@@ -422,6 +478,7 @@ const BookAppointment = () => {
         }
     }
 
+   
     const searchOrder = async () => {
         if (order_no !== '' && customerPhone !== '' && customerPhone.length === 12) {
             setIsLoading(true);
@@ -429,52 +486,50 @@ const BookAppointment = () => {
             let result = false;
             let message = 'Either Booking# or Cell # is incorrect!';
             try {
-                const Body = JSON.stringify({ order_no: order_no });
+                const Body = JSON.stringify({ order_no: order_no, customerPhone: customerPhone });
                 const orderResponse = await FetchData({ method: 'POST', endPoint: 'order/reschedule', cid: cid, body: Body })
 
                 if (orderResponse.data.length > 0) {
                     const editList = orderResponse.data[0];
-                    if (editList.cell === customerPhone) {
 
-                        const date1 = new Date(editList.trndate);
-                        const date2 = new Date(LocalDate());
-                        if (date1 < date2 || (get_Date(editList.trndate, 'YYYY-MM-DD') === LocalDate() && toMinutes(editList.start) < toMinutes(LocalTime('HH:mm')))) {
-                            result = false;
-                            message = `Past order can't be rescheduled or cancel.`;
-                        }
-                        else if (editList.status === 'Completed' || editList.status === 'Cancelled' || editList.status === 'Rejected') {
-                            result = false;
-                            message = `Appointment is already marked as ${editList.status}.`;
-                        }
-                        else {
-                            result = true;
-                            message = '';
-                            setOrder_Id(editList.id)
-                            setAssignedTo(editList.assignedto);
-                            setEmployeeId(editList.assignedto);
-                            setPrevAssigned_To(editList.assignedto);
-                            setServicesItem(editList.serviceinfo);
-                            setPrevServicesItem(editList.serviceinfo);
-                            setSlot(editList.slot);
-                            setStart(editList.start);
-                            setEnd(editList.end);
-                            setPrevSlot(editList.slot);
-                            setPrevTrnDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
-                            setTrnDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
-                            setCustomerName(editList.name);
-                            setCustomerEmail(editList.email);
-                            setPrice(editList.price);
-                            setTotal(editList.total);
-                            setCoupon(editList.coupon);
-                            setDiscount(editList.discount);
-                            setNotes(editList.notes);
-                            setRedeem(editList.redeem);
-                            setReferral(editList.referral);
-                            setMode1(editList?.mode1 || 'Cash');
-                            setMode2(editList.mode2 || 'Card');
-                            setPayment1(editList?.payment1 || 0);
-                            setPayment2(editList?.payment2 || 0);
-                        }
+                    const date1 = new Date(editList.trndate);
+                    const date2 = new Date(LocalDate());
+                    if (date1 < date2 || (get_Date(editList.trndate, 'YYYY-MM-DD') === LocalDate() && toMinutes(editList.start) < toMinutes(LocalTime('HH:mm')))) {
+                        result = false;
+                        message = `Past order can't be rescheduled or cancel.`;
+                    }
+                    else if (editList.status === 'Completed' || editList.status === 'Cancelled' || editList.status === 'Rejected') {
+                        result = false;
+                        message = `Appointment is already marked as ${editList.status}.`;
+                    }
+                    else {
+                        result = true;
+                        message = '';
+                        setOrder_Id(editList.id)
+                        setAssignedTo(editList.assignedto);
+                        setEmployeeId(editList.assignedto);
+                        setPrevAssigned_To(editList.assignedto);
+                        setServicesItem(editList.serviceinfo);
+                        setPrevServicesItem(editList.serviceinfo);
+                        setSlot(editList.slot);
+                        setStart(editList.start);
+                        setEnd(editList.end);
+                        setPrevSlot(editList.slot);
+                        setPrevTrnDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
+                        setTrnDate(get_Date(editList.trndate, 'YYYY-MM-DD'));
+                        setCustomerName(editList.name);
+                        setCustomerEmail(editList.email);
+                        setPrice(editList.price);
+                        setTotal(editList.total);
+                        setCoupon(editList.coupon);
+                        setDiscount(editList.discount);
+                        setNotes(editList.notes);
+                        setRedeem(editList.redeem);
+                        setReferral(editList.referral);
+                        setMode1(editList?.mode1 || 'Cash');
+                        setMode2(editList.mode2 || 'Card');
+                        setPayment1(editList?.payment1 || 0);
+                        setPayment2(editList?.payment2 || 0);
                     }
 
                     if (result) {
@@ -505,12 +560,21 @@ const BookAppointment = () => {
         switch (content) {
             case 1:
                 {
-                    if (bookingType > 1 && order_id === 0) {
-                        isNext = false;
-                        setOpenSearch(true);
+                    if(bookingType === 1)
+                        NewBookingReset();
+
+                    if (bookingType > 1 && order_id === 0) {    
+                            isNext = false;
+                            setOpenSearch(true);                 
                     }
+                    
                     if (bookingType < 2)
                         setTrnDate(LocalDate())
+
+                    if (bookingType > 1 && order_id !== 0 && order_no !=='' && uuid!== '') {   
+                        isNext = false; 
+                            searchOrder();                
+                    }
                     break;
                 }
             case 2:
@@ -564,7 +628,9 @@ const BookAppointment = () => {
 
     let displayedContent;
     if (content === 0) {
-        displayedContent = <FirstPage companyList={companyList} setCid={setCid} next={next} />
+        displayedContent = uuid ==='' ?
+         <FirstPage companyList={companyList} setCid={setCid} next={next} isLoading={isLoading} />
+         : isRefValid && <ReminderNote next={next} setCid={setCid} date={get_Date(prevTrnDate, 'DD MMM YYYY')} slot={prevSlot} employeeName={employeeName} status={status} rejectReason={rejectReason} />
     } else if (content === 1) {
         displayedContent = <BookingOption bookingType={bookingType} setBookingType={setBookingType} />
     } else if (content === 2) {
@@ -632,14 +698,14 @@ const BookAppointment = () => {
              :
                 isURL ?
                     <>
-                        {cid > 0 &&
+                        {(cid > 0 && content > 0) &&
                             <div class='w-full flex flex-row justify-between items-center mb-2'>
                                 {content > 2 ? <ArrowLeftOutlined style={{ fontSize: 20 }} onClick={() => prev()} /> : <p></p>}
                                 <CloseOutlined style={{ fontSize: 20 }} onClick={() => setOpenExit(true)} />
                             </div>
                         }
                         <div class='overflow-x-auto'>
-                            {displayedContent}
+                             <IsLoading isLoading={isLoading} rows={10} input={displayedContent} />
                         </div>
 
                         {
@@ -686,7 +752,7 @@ const BookAppointment = () => {
                         <Button color="default" variant="outlined" style={{ width: '100%', borderRadius: 24 }} onClick={() => setOpenExit(false)}> No </Button>
                     </div>
                     <div class='w-1/2'>
-                        <Button color="danger" variant="solid" style={{ width: '100%', borderRadius: 24 }} onClick={() => window.location.reload()}> Yes, Exit </Button>
+                        <Button color="danger" variant="solid" style={{ width: '100%', borderRadius: 24 }} onClick={() => onIdle()}> Yes, Exit </Button>
                     </div>
                 </div>
             </Drawer>

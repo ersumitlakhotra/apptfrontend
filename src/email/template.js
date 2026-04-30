@@ -1,4 +1,4 @@
-const Template = ({ heading, name, order_no, professional, date, slot, services, store, address, storeId,reason }) => {
+const Template = ({ heading, name, order_no, professional, date, slot, services, store, address, storeId,reason,ref }) => {
     return (
         <html>
             <body
@@ -162,7 +162,7 @@ const Template = ({ heading, name, order_no, professional, date, slot, services,
 
                                                 <div style={{ textAlign: "center", margin: "30px 0" }}>
                                                     <a
-                                                        href={`${process.env.REACT_APP_DOMAIN}/book-appointment?store=` + storeId}
+                                                        href={`${process.env.REACT_APP_DOMAIN}/book-appointment?store=${storeId}&ref=${ref}`}
                                                         style={{
                                                             backgroundColor: "#2563eb",
                                                             color: "#ffffff",
