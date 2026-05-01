@@ -461,7 +461,7 @@ const BookAppointment = () => {
                                     <p>Booked with: <span class='font-semibold'>{employeeName}</span></p>
                                     <p>Date: <span class='font-semibold'>{`${get_Date(trndate, 'DD MMM YYYY')} at ${slot}`}</span></p>
                                 </div>
-                                <p>You will shortly receive an email shortly.</p>
+                                <p>You will receive an email shortly.</p>
                             </div>
                         ),
                     })

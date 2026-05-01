@@ -60,7 +60,7 @@ const CustomerView = ({ id, refresh, orderList, servicesList, userList, customer
         setName(editList.name);
         setCell(editList.cell);
         setEmail(editList.email);
-        setBadge('Bronze');
+        setBadge(editList.badge);
         setPoints(editList.points);
         setCreatedat(editList.createdat);
         const referral = orderList.filter(item => item.referral === editList.cell);

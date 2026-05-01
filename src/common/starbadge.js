@@ -1,5 +1,6 @@
 const getBadgeStyle = (name) => {
-  switch (name.toLowerCase()) {
+  const badgeName = name ===''?'default': name;
+  switch (badgeName.toLowerCase()) {
     case "bronze":
       return {
         gradient: "from-amber-700 to-amber-500",
