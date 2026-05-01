@@ -4,13 +4,14 @@ import logo from '../../../../Images/logo.png'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(true);
   
 
   useEffect(() => {
     const handleScroll = () => {
       // show only after small scroll (adjust 40–100 as needed)
-      setShow(window.scrollY > 60);
+     // setShow(window.scrollY > 60);  
+      setShow(true);
     };
 
     window.addEventListener("scroll", handleScroll);
